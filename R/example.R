@@ -1,9 +1,15 @@
-test package
+#test package
+
+#Install package:
 #require(devtools)
 #install_github("zinman/SBadapter")
+
+#load library
 library(SBadapter)
 
-modelRes = SBlearn("titanic", "/Users/zinman/Google\ Drive/data/datasets/public/titanic/titanic_train.tsv", "survived")
+#perform learn on titanic train dataset
+modelRes = SBlearn("titanic", "./titanic_train.tsv", "survived")
 
-predictRes = SBpredict(modelRes$artifactPath, "/Users/zinman/Google\ Drive/data/datasets/public/titanic/titanic_test.csv", "/tmp/titanic_test.tsv.gz")
+#perform prediction on titanic test dataset
+predictRes = SBpredict(modelRes$artifactPath, "./titanic_test.csv", "./titanic_test.tsv.gz")
 
