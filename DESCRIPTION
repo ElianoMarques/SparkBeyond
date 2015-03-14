@@ -1,7 +1,7 @@
 Package: SBadapter
 Title: R adapter for SparkBeyond engine
 Version: 0.1
-Authors@R: "Guy Zinman <guy.zinman@sparkbeyond.com>" [aut, cre]
+Authors@R: "Guy Zinman <guy.zinman@sparkbeyond.com> [aut, cre]"
 Description: R adapter for SparkBeyond engine
 Depends: R (>= 3.1.2)
 License: > GPL-2
