@@ -7,6 +7,9 @@
 #load library
 #library(SBadapter)
 
+#' Run SparkBeyond titanic example.
+#' @examples
+#' run_SB_examples()
 run_SB_examples <- function() {
   print("Running titanic train example")
 
