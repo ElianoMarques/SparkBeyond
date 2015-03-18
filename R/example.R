@@ -30,7 +30,7 @@ run_SB_examples <- function() {
       return (1)
     }
   }, error = function(e) {
-    print (e$message, stderr())
+    write (e$message, stderr())
     return (0)
   })
   return (0)
