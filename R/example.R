@@ -8,9 +8,10 @@
 #library(SBadapter)
 
 #' Run SparkBeyond titanic example.
+#' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default
 #' @examples
 #' run_SB_examples()
-run_SB_examples <- function() {
+run_SB_examples <- function(server_port = 9000) {
   print("Running titanic train example")
 
   #perform learn on titanic train dataset
@@ -18,7 +19,7 @@ run_SB_examples <- function() {
   #titanic_train = read.table(titanic_train_filename, header = TRUE, sep="\t") #inspect file content
   #str(titanic_train) #inspect file content
   tryCatch({
-    modelRes = SBlearn("titanic", titanic_train_filename, "survived")
+    modelRes = SBlearn("titanic", titanic_train_filename, "survived", server_port)
 
     #perform prediction on titanic test dataset
     if (!is.null(modelRes)){
@@ -26,7 +27,7 @@ run_SB_examples <- function() {
       titanic_test_filename = system.file("extdata", "titanic_test.csv", package = "SBadapter")
       #titanic_test = read.table(titanic_test_filename, header = TRUE, sep=",") #inspect file content
       #str(titanic_test) #inspect file content
-      predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, "./titanic_test.tsv.gz")
+      predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, "./titanic_test.tsv.gz", server_port)
       return (1)
     }
   }, error = function(e) {

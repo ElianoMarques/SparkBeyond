@@ -4,7 +4,7 @@
 \alias{SBlearn}
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
-SBlearn(sessionName, trainingFilePath, target)
+SBlearn(sessionName, trainingFilePath, target, server_port = 9000)
 }
 \arguments{
 \item{sessionName}{String of the session name.}
@@ -12,6 +12,8 @@ SBlearn(sessionName, trainingFilePath, target)
 \item{trainingFilePath}{path to the file to be trained on.}
 
 \item{target}{column name of in the training file that conatins the target of the prediction.}
+
+\item{server_port}{the port to be accessed in the SparkBeyond API server. 9000 by default.}
 }
 \value{
 model path of the prediction on \code{trainingFilePath}.

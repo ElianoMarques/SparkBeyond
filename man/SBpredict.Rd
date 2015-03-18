@@ -4,7 +4,7 @@
 \alias{SBpredict}
 \title{Run SparkBeyond prediction on a result of SBlearn.}
 \usage{
-SBpredict(modelPath, dataPath, outputPath)
+SBpredict(modelPath, dataPath, outputPath, server_port = 9000)
 }
 \arguments{
 \item{modelPath}{path to the model file returned by SBlearn.}
@@ -12,6 +12,8 @@ SBpredict(modelPath, dataPath, outputPath)
 \item{dataPath}{path to the file to be tested.}
 
 \item{outputPath}{path to write the results of the prediction.}
+
+\item{server_port}{the port to be accessed in the SparkBeyond API server. 9000 by default.}
 }
 \value{
 A data frame containing the prediction.

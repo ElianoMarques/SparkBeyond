@@ -13,18 +13,18 @@
 
 
 #' Run SparkBeyond feature enrichment and learning process.
-#'
 #' @param sessionName String of the session name.
 #' @param trainingFilePath path to the file to be trained on.
 #' @param target column name of in the training file that conatins the target of the prediction.
+#' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default.
 #' @return model path of the prediction on \code{trainingFilePath}.
 #' @examples
 #' modelRes = SBlearn("titanic", titanic_train_filename, "survived")
-SBlearn <- function(sessionName, trainingFilePath, target){
+SBlearn <- function(sessionName, trainingFilePath, target, server_port = 9000){
 	require(httr)
 	require(rjson)
 
-	url <- "http://127.0.0.1:9000/rapi/learn"
+	url <- paste("http://127.0.0.1:",server_port,"/rapi/learn", sep="")
 	params <-list("sessionName" = sessionName,
 		"trainingFilePath" = trainingFilePath,
 		algorithmsWhiteList = list("J48"),
@@ -71,13 +71,14 @@ SBlearn <- function(sessionName, trainingFilePath, target){
 #' @param dataPath  path to the file to be tested.
 #' @param outputPath path to write the results of the prediction.
 #' @return A data frame containing the prediction.
+#' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default.
 #' @examples
 #' predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, "./titanic_test.tsv.gz")
-SBpredict <- function(modelPath, dataPath, outputPath){
+SBpredict <- function(modelPath, dataPath, outputPath, server_port = 9000){
 	require(httr)
 	require(rjson)
 
-	url <- "http://127.0.0.1:9000/rapi/predict"
+	url <- paste("http://127.0.0.1:",server_port,"/rapi/predict", sep="")
 	params <-list(modelPath = modelPath,
 		dataPath = dataPath,
 		outputPath = outputPath)
