@@ -4,16 +4,42 @@
 \alias{SBlearn}
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
-SBlearn(sessionName, trainingFilePath, target, server_port = 9000)
+SBlearn(sessionName, trainingFilePath, target, testFilePath = NA,
+  trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
+  algorithmsWhiteList = NA, hints = NA, useGraph = FALSE,
+  globalFeatureIterations = 300, evaluationMetric = "PREC",
+  scoreOnTestSet = FALSE, crossValidation = 5, server_port = 9000)
 }
 \arguments{
 \item{sessionName}{String of the session name.}
 
-\item{trainingFilePath}{path to the file to be trained on.}
+\item{trainingFilePath}{String of the path to the file to be trained on.}
 
-\item{target}{column name of in the training file that conatins the target of the prediction.}
+\item{target}{String of the column name of in the training file that conatins the target of the prediction.}
 
-\item{server_port}{the port to be accessed in the SparkBeyond API server. 9000 by default.}
+\item{server_port}{Optional. the port to be accessed in the SparkBeyond API server. 9000 by default.}
+
+\item{testFilePath:}{Optional. String of the path to an independent test file to test the prediction on. NA by default.}
+
+\item{trainTestSplitRatio:}{Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.}
+
+\item{weightColumn:}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}
+
+\item{maxDepth:}{Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
+
+\item{algorithmsWhiteList:}{Optional. A list of strings that represents the set of algorithms to run. NA by default}
+
+\item{hints:}{Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.}
+
+\item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
+
+\item{globalFeatureIterations:}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
+
+\item{evaluationMetric:}{Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.}
+
+\item{scoreOnTestSet:}{Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.}
+
+\item{crossValidation:}{Optional. Integer value representing how many cross validation splits should be used. 5 by default.}
 }
 \value{
 model path of the prediction on \code{trainingFilePath}.

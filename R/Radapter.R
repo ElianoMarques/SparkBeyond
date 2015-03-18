@@ -1,34 +1,58 @@
 # replace with an SB object that will be initialized with url and will contain the methods
-#testFilePath: Option[String] = None,
-#maxDepth: Option[Int],
-#trainTestSplitRatio: Option[Double],
-#algorithmsWhiteList: Option[List[String]],
-#hints: Option[Seq[String]],
-#globalFeatureIterations: Option[Int],
-#evaluationMetric: Option[String],
-#weightColumn: Option[String],
-#scoreOnTestSet: Option[Boolean],
-#crossValidation: Option[Int],
-#useGraph: Option[Boolean]
-
 
 #' Run SparkBeyond feature enrichment and learning process.
 #' @param sessionName String of the session name.
-#' @param trainingFilePath path to the file to be trained on.
-#' @param target column name of in the training file that conatins the target of the prediction.
-#' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default.
+#' @param trainingFilePath String of the path to the file to be trained on.
+#' @param target String of the column name of in the training file that conatins the target of the prediction.
+#' @param testFilePath: Optional. String of the path to an independent test file to test the prediction on. NA by default.
+#' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
+#' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
+#' @param maxDepth: Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
+#' @param hints: Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.
+#' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param globalFeatureIterations: Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
+#' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
+#' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
+#' @param server_port Optional. the port to be accessed in the SparkBeyond API server. 9000 by default.
 #' @return model path of the prediction on \code{trainingFilePath}.
 #' @examples
 #' modelRes = SBlearn("titanic", titanic_train_filename, "survived")
-SBlearn <- function(sessionName, trainingFilePath, target, server_port = 9000){
+SBlearn <- function(sessionName, trainingFilePath, target,
+                    testFilePath = NA,
+                    trainTestSplitRatio = 0.8,
+                    weightColumn = NA,
+                    maxDepth = 2,
+                    algorithmsWhiteList = NA,
+                    hints = NA,
+                    useGraph = FALSE,
+                    globalFeatureIterations = 300,
+                    evaluationMetric = "PREC",
+                    scoreOnTestSet = FALSE,
+                    crossValidation = 5,
+                    server_port = 9000){
 	require(httr)
 	require(rjson)
 
 	url <- paste("http://127.0.0.1:",server_port,"/rapi/learn", sep="")
 	params <-list("sessionName" = sessionName,
 		"trainingFilePath" = trainingFilePath,
-		algorithmsWhiteList = list("J48"),
-		target = target)
+		target = target,
+		testFilePath = testFilePath,
+		trainTestSplitRatio = trainTestSplitRatio,
+		weightColumn = weightColumn,
+		maxDepth = maxDepth,
+		algorithmsWhiteList = algorithmsWhiteList, #list("J48")
+		hints = hints,
+		useGraph = useGraph,
+		globalFeatureIterations = globalFeatureIterations,
+		evaluationMetric = evaluationMetric,
+		scoreOnTestSet = scoreOnTestSet,
+		crossValidation = crossValidation
+	)
+
+  params = params[!is.na(params)]
 
 	body = rjson::toJSON(params)
 	res = httr::POST(url, body = body, httr::content_type_json())
@@ -66,7 +90,6 @@ SBlearn <- function(sessionName, trainingFilePath, target, server_port = 9000){
 }
 
 #' Run SparkBeyond prediction on a result of SBlearn.
-#'
 #' @param modelPath path to the model file returned by SBlearn.
 #' @param dataPath  path to the file to be tested.
 #' @param outputPath path to write the results of the prediction.
