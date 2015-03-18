@@ -24,11 +24,11 @@ SBlearn <- function(sessionName, trainingFilePath, target,
                     trainTestSplitRatio = 0.8,
                     weightColumn = NA,
                     maxDepth = 2,
-                    algorithmsWhiteList = NA,
+                    algorithmsWhiteList = NA, #list available algorithms
                     hints = NA,
                     useGraph = FALSE,
-                    globalFeatureIterations = 300,
-                    evaluationMetric = "PREC",
+                    globalFeatureIterations = 300, #make it a list
+                    evaluationMetric = "PREC", #add all options
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
                     server_port = 9000){
@@ -110,7 +110,7 @@ SBpredict <- function(modelPath, dataPath, outputPath, server_port = 9000){
 	res = httr::POST(url, body = body, httr::content_type_json())
   res <- jsonlite::fromJSON(txt=content(res, as="text"),simplifyDataFrame=TRUE)
 
-  finalRes = if (!is.null(res$error) && res$result == "OK"){
+  finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
   	read.table(outputPath, header = TRUE, sep="\t")
   } else {
     print(paste("Prediction failed: ", res$error))
