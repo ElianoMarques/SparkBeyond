@@ -28,11 +28,11 @@ run_SB_examples <- function(server_port = 9000) {
       #titanic_test = read.table(titanic_test_filename, header = TRUE, sep=",") #inspect file content
       #str(titanic_test) #inspect file content
       predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, "./titanic_test.tsv.gz", server_port)
-      return (1)
+      return ("Success")
     }
   }, error = function(e) {
     write (e$message, stderr())
-    return (0)
+    return (e$message)
   })
-  return (0)
+  return ("Learn returned null")
 }
