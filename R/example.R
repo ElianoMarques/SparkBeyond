@@ -18,7 +18,7 @@ run_SB_examples <- function(server_port = 9000) {
   titanic_train_filename = system.file("extdata", "titanic_train.tsv", package = "SBadapter")
   #titanic_train = read.table(titanic_train_filename, header = TRUE, sep="\t") #inspect file content
   #str(titanic_train) #inspect file content
-  tryCatch({
+  res = tryCatch({
     modelRes = SBlearn("titanic", titanic_train_filename, "survived", server_port)
 
     #perform prediction on titanic test dataset
@@ -34,5 +34,5 @@ run_SB_examples <- function(server_port = 9000) {
     write (e$message, stderr())
     return (e$message)
   })
-  return ("Learn returned null")
+  return (res)
 }
