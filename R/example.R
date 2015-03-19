@@ -14,6 +14,7 @@
 #' run_SB_examples()
 run_SB_examples <- function(configuration='1', server_port = 9000) {
   print(paste("Running titanic train example - configuration: ",   configuration))
+  write(paste("Running titanic train example - configuration: ",   configuration), stderr())
 
 
   #perform learn on titanic train dataset
