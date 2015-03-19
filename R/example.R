@@ -12,8 +12,8 @@
 #' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default
 #' @examples
 #' run_SB_examples()
-run_SB_examples <- function(configuration=1, server_port = 9000) {
-  print("Running titanic train example")
+run_SB_examples <- function(configuration='1', server_port = 9000) {
+  print(paste("Running titanic train example - configuration: ",   configuration))
 
 
   #perform learn on titanic train dataset
@@ -33,6 +33,8 @@ run_SB_examples <- function(configuration=1, server_port = 9000) {
       "2" = list(algorithmsWhiteList = list("RRandomForest")),
       "3" = list(algorithmsWhiteList = NA)
     )
+
+
 
     modelRes = do.call(SBlearn,c(params, additional_params))
 

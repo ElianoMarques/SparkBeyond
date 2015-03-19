@@ -58,8 +58,9 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 	res = httr::POST(url, body = body, httr::content_type_json())
   res <- jsonlite::fromJSON(txt=content(res, as="text"),simplifyDataFrame=TRUE)
   if (!is.null(res$error)) {
-    print(paste("Train error: ", res$error, " - terminating."))
-    return(NULL)
+    res = paste("Train error: ", res$error, " - terminating.")
+    print(res)
+    stop(res)
   }
 
   serverResponded = FALSE
@@ -69,9 +70,10 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 		flush.console()
 		i = i+1
     if (i >= 3 && !serverResponded) {
-      print(paste("Server didn't respond for 30 seconds... check that server is up... terminating."))
+      res = "Server didn't respond for 30 seconds... check that server is up... terminating."
+      print(res)
       flush.console()
-      return (NULL)
+      stop(res)
     }
 		Sys.sleep(10)
 		statusFile = paste(res$artifactPath,"/json/status.json", sep="")
@@ -113,8 +115,9 @@ SBpredict <- function(modelPath, dataPath, outputPath, server_port = 9000){
   finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
   	read.table(outputPath, header = TRUE, sep="\t")
   } else {
-    print(paste("Prediction failed: ", res$error))
-    NULL
+    message = paste("Prediction failed: ", res$error)
+    print(message)
+    stop(message)
   }
 	return(finalRes)
 }
