@@ -8,11 +8,13 @@
 #library(SBadapter)
 
 #' Run SparkBeyond titanic example.
+#' @param configuration Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList
 #' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default
 #' @examples
 #' run_SB_examples()
-run_SB_examples <- function(server_port = 9000) {
+run_SB_examples <- function(configuration=1, server_port = 9000) {
   print("Running titanic train example")
+
 
   #perform learn on titanic train dataset
   titanic_train_filename = system.file("extdata", "titanic_train.tsv", package = "SBadapter")
@@ -20,7 +22,19 @@ run_SB_examples <- function(server_port = 9000) {
   #str(titanic_train) #inspect file content
   res = tryCatch({
 
-    modelRes = SBlearn("titanic", titanic_train_filename, "survived", server_port=server_port)
+    params = list(
+      sessionName = "titanic",
+      trainingFilePath = titanic_train_filename,
+      target = "survived",
+      server_port=server_port
+    )
+    additional_params = switch (configuration,
+      "1" = list(algorithmsWhiteList = list("J48")),
+      "2" = list(algorithmsWhiteList = list("RRandomForest")),
+      "3" = list(algorithmsWhiteList = NA)
+    )
+
+    modelRes = do.call(SBlearn,c(params, additional_params))
 
     #perform prediction on titanic test dataset
     if (!is.null(modelRes)){

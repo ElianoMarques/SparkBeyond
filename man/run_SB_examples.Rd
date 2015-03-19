@@ -4,7 +4,7 @@
 \alias{run_SB_examples}
 \title{Run SparkBeyond titanic example.}
 \usage{
-run_SB_examples(server_port = 9000)
+run_SB_examples(configuration = 1, server_port = 9000)
 }
 \arguments{
 \item{server_port}{the port to be accessed in the SparkBeyond API server. 9000 by default}

@@ -35,8 +35,6 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 	require(httr)
 	require(rjson)
 
-  print(paste("server_port",server_port))
-
 	url <- paste("http://127.0.0.1:",server_port,"/rapi/learn", sep="")
 	params <-list("sessionName" = sessionName,
 		"trainingFilePath" = trainingFilePath,
@@ -45,7 +43,7 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 		trainTestSplitRatio = trainTestSplitRatio,
 		weightColumn = weightColumn,
 		maxDepth = maxDepth,
-		algorithmsWhiteList = algorithmsWhiteList, #list("J48")
+		algorithmsWhiteList = algorithmsWhiteList,
 		hints = hints,
 		useGraph = useGraph,
 		globalFeatureIterations = globalFeatureIterations,
