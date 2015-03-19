@@ -34,8 +34,6 @@ run_SB_examples <- function(configuration='1', server_port = 9000) {
       "3" = list(algorithmsWhiteList = NA)
     )
 
-
-
     modelRes = do.call(SBlearn,c(params, additional_params))
 
     #perform prediction on titanic test dataset
@@ -44,7 +42,7 @@ run_SB_examples <- function(configuration='1', server_port = 9000) {
       titanic_test_filename = system.file("extdata", "titanic_test.csv", package = "SBadapter")
       #titanic_test = read.table(titanic_test_filename, header = TRUE, sep=",") #inspect file content
       #str(titanic_test) #inspect file content
-      predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, "./titanic_test.tsv.gz", server_port)
+      predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, paste(getwd(),"titanic_test.tsv.gz",sep=""), server_port)
       return ("Success")
     }
   }, error = function(e) {
