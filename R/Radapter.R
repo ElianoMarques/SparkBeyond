@@ -34,6 +34,7 @@ SBlearn <- function(sessionName, trainingFilePath, target,
                     server_port = 9000){
 	require(httr)
 	require(rjson)
+  require(jsonlite)
 
 	url <- paste("http://127.0.0.1:",server_port,"/rapi/learn", sep="")
 	params <-list("sessionName" = sessionName,
