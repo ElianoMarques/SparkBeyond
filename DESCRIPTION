@@ -6,3 +6,7 @@ Description: R adapter for SparkBeyond engine
 Depends: R (>= 3.1.2)
 License: > GPL-2
 LazyData: true
+Imports:
+    httr (>= 0.6.1),
+    rjson (>= 0.2.15),
+    jsonlite (>= 0.9.14)

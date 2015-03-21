@@ -32,9 +32,6 @@ SBlearn <- function(sessionName, trainingFilePath, target,
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
                     server_port = 9000){
-	require(httr)
-	require(rjson)
-  require(jsonlite)
 
 	url <- paste("http://127.0.0.1:",server_port,"/rapi/learn", sep="")
 	params <-list("sessionName" = sessionName,
@@ -57,7 +54,7 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 
 	body = rjson::toJSON(params)
 	res = httr::POST(url, body = body, httr::content_type_json())
-  res <- jsonlite::fromJSON(txt=content(res, as="text"),simplifyDataFrame=TRUE)
+  res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
   if (!is.null(res$error)) {
     res = paste("Train error: ", res$error, " - terminating.")
     print(res)
@@ -80,7 +77,7 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 		statusFile = paste(res$artifactPath,"/json/status.json", sep="")
 		if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
         serverResponded = TRUE
-			  status = fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
+			  status = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
 			  if (i %% 6 == 0 ) {
 				  print(i)
 				  print(status)
@@ -101,8 +98,6 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 #' @examples
 #' predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, "./titanic_test.tsv.gz")
 SBpredict <- function(modelPath, dataPath, outputPath, server_port = 9000){
-	require(httr)
-	require(rjson)
 
 	url <- paste("http://127.0.0.1:",server_port,"/rapi/predict", sep="")
 	params <-list(modelPath = modelPath,
@@ -111,7 +106,7 @@ SBpredict <- function(modelPath, dataPath, outputPath, server_port = 9000){
 
 	body = rjson::toJSON(params)
 	res = httr::POST(url, body = body, httr::content_type_json())
-  res <- jsonlite::fromJSON(txt=content(res, as="text"),simplifyDataFrame=TRUE)
+  res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
   finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
   	read.table(outputPath, header = TRUE, sep="\t")
