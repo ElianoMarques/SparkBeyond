@@ -22,7 +22,6 @@ run_SB_examples <- function(configuration='1', server_port = 9000) {
   #titanic_train = read.table(titanic_train_filename, header = TRUE, sep="\t") #inspect file content
   #str(titanic_train) #inspect file content
   res = tryCatch({
-
     params = list(
       sessionName = "titanic",
       trainingFilePath = titanic_train_filename,
@@ -43,7 +42,17 @@ run_SB_examples <- function(configuration='1', server_port = 9000) {
       titanic_test_filename = system.file("extdata", "titanic_test.csv", package = "SBadapter")
       #titanic_test = read.table(titanic_test_filename, header = TRUE, sep=",") #inspect file content
       #str(titanic_test) #inspect file content
-      predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, paste(getwd(),"titanic_test.tsv.gz",sep=""), server_port)
+      predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, paste(getwd(),"titanic_test.tsv.gz",sep="/"), server_port)
+      print("Prediction was successful")
+    }
+
+    #perform enrichment on titanic test dataset
+    if (!is.null(modelRes)){
+      print("Enriching titanic test data")
+      titanic_test_filename = system.file("extdata", "titanic_test.csv", package = "SBadapter")
+      #titanic_test = read.table(titanic_test_filename, header = TRUE, sep=",") #inspect file content
+      #str(titanic_test) #inspect file content
+      enrichRes = SBenrich(modelRes$artifactPath, titanic_test_filename, paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=10, server_port)
       return ("Success")
     }
   }, error = function(e) {
@@ -52,3 +61,5 @@ run_SB_examples <- function(configuration='1', server_port = 9000) {
   })
   return (res)
 }
+
+

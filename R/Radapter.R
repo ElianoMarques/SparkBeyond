@@ -64,7 +64,7 @@ SBlearn <- function(sessionName, trainingFilePath, target,
   serverResponded = FALSE
   i = 0
 	repeat {
-		print(paste("Prediction sent to server... waiting... ",i))
+		print(paste("In modeling process... please notice that this process may take some time... ",i))
 		flush.console()
 		i = i+1
     if (i >= 3 && !serverResponded) {
@@ -93,8 +93,8 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 #' @param modelPath path to the model file returned by SBlearn.
 #' @param dataPath  path to the file to be tested.
 #' @param outputPath path to write the results of the prediction.
-#' @return A data frame containing the prediction.
 #' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default.
+#' @return A data frame containing the prediction.
 #' @examples
 #' predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, "./titanic_test.tsv.gz")
 SBpredict <- function(modelPath, dataPath, outputPath, server_port = 9000){
@@ -116,4 +116,74 @@ SBpredict <- function(modelPath, dataPath, outputPath, server_port = 9000){
     stop(message)
   }
 	return(finalRes)
+}
+
+#' Run SparkBeyond enrichment on a result of SBlearn.
+#' @param modelPath path to the model file returned by SBlearn.
+#' @param dataPath  path to the data to be enriched.
+#' @param outputPath path to write the results of the enriched data.
+#' @param featureCount Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the globalFeatureIterations parameter in SBlearn).
+#' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default.
+#' @return A data frame containing the enrichedData.
+#' @examples
+#' enriched = SBenrich(modelRes$artifactPath, titanic_test_filename, "./titanic_test.tsv.gz", featureCount=10)
+SBenrich <- function(modelPath, dataPath, outputPath, featureCount = NA, server_port = 9000){
+
+  url <- paste("http://127.0.0.1:",server_port,"/rapi/enrich", sep="")
+  params <-list(modelPath = modelPath,
+                dataPath = dataPath,
+                featureCount = featureCount,
+                outputPath = outputPath)
+
+  params = params[!is.na(params)]
+
+  body = rjson::toJSON(params)
+  res = httr::POST(url, body = body, httr::content_type_json())
+  res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+
+  finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
+    df = read.table(outputPath, header = TRUE, sep="\t")
+    for(i in 1:ncol(df)){
+      if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
+        df[,i] = as.logical(as.character(df[,i]))
+      } else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
+        df[,i] = as.logical(as.character(df[,i]))
+      }
+    }
+    df
+  } else {
+    message = paste("Enrichment failed: ", res$error)
+    print(message)
+    stop(message)
+  }
+  return(finalRes)
+}
+
+#' Returns an SB evaluation object that contains info on a model result.
+#' @param modelPath path to the model file returned by SBlearn
+#' @return An evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.
+#' @examples
+#' evaluation = SBmodelEvaluation(SBlearn(..)$artifactPath)
+SBmodelEvaluation <- function(modelPath){
+  evaluationFile = paste(modelPath,"/json/evaluation.json", sep="")
+  evaluation = if (file.exists(evaluationFile)){
+    lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
+    eval = jsonlite::fromJSON(gsub("NaN", 0.0, lines))
+    writeLines(eval$evaluation$classDetails)
+    eval
+  } else {stop(paste("Evaluation file does not exist in ", modelPath))}
+  return (evaluation)
+}
+
+#' Prints just a summary of the model evaluation.
+#' @param modelPath path to the model file returned by SBlearn.
+#' @examples
+#' print.evaluation(SBlearn(..)$artifactPath)
+print.evaluation <- function(modelPath){
+  evaluationFile = paste(modelPath,"/json/evaluation.json", sep="")
+  if (file.exists(evaluationFile)){
+    lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
+    eval = jsonlite::fromJSON(gsub("NaN", 0.0, lines))
+    writeLines(eval$evaluation$classDetails)
+  } else {stop(paste("Evaluation file does not exist in ", modelPath))}
 }
