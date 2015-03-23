@@ -1,4 +1,19 @@
-# replace with an SB object that will be initialized with url and will contain the methods
+# SB object that encapsulates a model result
+# SBmodel = setRefClass("SBmodel",
+#    fields = list(
+#      artifactLoc = "character"
+#    ),
+#    methods = list(
+#     # initialize SBmodel object
+#     initialize = function(loc) {
+#       artifactLoc<<- loc;
+#     },
+#
+#     evaluate = function() {
+#       print("evaluation")
+#     }
+#   )
+# );
 
 #' Run SparkBeyond feature enrichment and learning process.
 #' @param sessionName String of the session name.
@@ -168,7 +183,7 @@ SBmodelEvaluation <- function(modelPath){
   evaluationFile = paste(modelPath,"/json/evaluation.json", sep="")
   evaluation = if (file.exists(evaluationFile)){
     lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
-    eval = jsonlite::fromJSON(gsub("NaN", 0.0, lines))
+    eval = jsonlite::fromJSON(gsub("NaN", 0.0, lines),flatten = TRUE)
     writeLines(eval$evaluation$classDetails)
     eval
   } else {stop(paste("Evaluation file does not exist in ", modelPath))}
