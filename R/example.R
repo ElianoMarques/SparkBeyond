@@ -58,7 +58,7 @@ runTitanicLearn <- function(configuration='1', server_port = 9000) {
 #' runTitanicTestEnrich()
 runTitanicTestEnrich <- function(model) {
   print("Enriching titanic test data")
-  enrichRes = model$enrich(titanic_test_filename, paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=NA)
+  enrichRes = model$enrich(getTitanicFilename(train=FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=NA)
   if (ncol(enrichRes) == 0) stop("Enrichment failed")
   return(enrichRes)
 }
