@@ -15,17 +15,17 @@ SBfeatureSearchOnly(sessionName, trainingFilePath, target, weightColumn = NA,
 
 \item{target}{String of the column name of in the training file that conatins the target of the prediction.}
 
+\item{weightColumn}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}
+
+\item{maxDepth}{Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
+
+\item{hints}{Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.}
+
+\item{useGraph}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
+
+\item{maxFeaturesCount}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
+
 \item{server_port}{Optional. the port to be accessed in the SparkBeyond API server. 9000 by default.}
-
-\item{weightColumn:}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}
-
-\item{maxDepth:}{Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
-
-\item{hints:}{Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.}
-
-\item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
-
-\item{maxFeaturesCount:}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
 }
 \value{
 SBmodel object that encapsulate the feature search result.

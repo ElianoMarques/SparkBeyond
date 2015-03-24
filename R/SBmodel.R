@@ -1,6 +1,16 @@
 #' SB object that encapsulates a model result
 #'
 #' @field artifactLoc String location pointing to the model artifact.
+#' @examples
+#' #model learn
+#' model = SBlearn("titanic", titanic_train_filename, "survived")
+#' model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
+#' model$predict(titanic_test_filename, "./titanic_test.tsv.gz")
+#' model$enrich(titanic_test_filename, "./titanic_test_enriched.tsv.gz")
+#' model$evaluate()
+#' model$showFeatures()
+#' model$showConfusionMatrix()
+#'
 SBmodel = setRefClass("SBmodel",
   fields = list(
     artifact_loc = "character",
@@ -141,9 +151,10 @@ SBmodel = setRefClass("SBmodel",
     }
 
 
-    # add featureSearch with ZeroR as method - return enriched
-    # serialize / deserialize
+    # add stub function
     # non blocking
+    # add groupBy column, time column
+    # serialize / deserialize
     # add features json
     # lift, regression plots
     # feature clusters report
@@ -248,9 +259,9 @@ SBlearn <- function(sessionName, trainingFilePath, target,
       if (status$alive == FALSE || status$evaluation == TRUE) {break}
     }
   }
-  m = SBmodel(res$artifactPath, server_port)
+  model = SBmodel(res$artifactPath, server_port)
   model$modelBuilt = TRUE
-  return(m)
+  return(model)
 }
 
 
@@ -259,11 +270,11 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 #' @param sessionName String of the session name.
 #' @param trainingFilePath String of the path to the file to be trained on.
 #' @param target String of the column name of in the training file that conatins the target of the prediction.
-#' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
-#' @param maxDepth: Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
-#' @param hints: Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.
-#' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
-#' @param maxFeaturesCount: Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
+#' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param hints Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.
+#' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param maxFeaturesCount Optional. An integer of how many features should be created by the SB engine. 300 by default.
 #' @param server_port Optional. the port to be accessed in the SparkBeyond API server. 9000 by default.
 #' @return SBmodel object that encapsulate the feature search result.
 #' @examples

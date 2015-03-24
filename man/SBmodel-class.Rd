@@ -44,4 +44,14 @@ SB object that encapsulates a model result
 
 \item{\code{showReport(report_name = NA, showInIDE = TRUE)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, features, field, function, InputSchema, modelComparison, roc_best, roc_CV}
 }}
+\examples{
+#model learn
+model = SBlearn("titanic", titanic_train_filename, "survived")
+model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
+model$predict(titanic_test_filename, "./titanic_test.tsv.gz")
+model$enrich(titanic_test_filename, "./titanic_test_enriched.tsv.gz")
+model$evaluate()
+model$showFeatures()
+model$showConfusionMatrix()
+}
 
