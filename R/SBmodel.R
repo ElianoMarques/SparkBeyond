@@ -259,7 +259,7 @@ SBlearn <- function(sessionName, trainingFilePath, target,
       if (status$alive == FALSE || status$evaluation == TRUE) {break}
     }
   }
-  model = SBmodel$initialize(res$artifactPath, server_port)
+  model = SBmodel(res$artifactPath, server_port)
   model$modelBuilt = TRUE
   return(model)
 }
