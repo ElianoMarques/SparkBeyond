@@ -34,27 +34,24 @@ run_SB_examples <- function(configuration='1', server_port = 9000) {
       "3" = list(algorithmsWhiteList = NA)
     )
 
-    modelRes = do.call(SBlearn,c(params, additional_params))
+    model = do.call(SBlearn,c(params, additional_params))
+
 
     #perform prediction on titanic test dataset
-    if (!is.null(modelRes)){
-      print("Running titanic test example")
-      titanic_test_filename = system.file("extdata", "titanic_test.csv", package = "SBadapter")
-      #titanic_test = read.table(titanic_test_filename, header = TRUE, sep=",") #inspect file content
-      #str(titanic_test) #inspect file content
-      predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, paste(getwd(),"titanic_test.tsv.gz",sep="/"), server_port)
-      print("Prediction was successful")
-    }
+    print("Running titanic test example")
+    titanic_test_filename = system.file("extdata", "titanic_test.csv", package = "SBadapter")
+    #titanic_test = read.table(titanic_test_filename, header = TRUE, sep=",") #inspect file content
+    #str(titanic_test) #inspect file content
+    predictRes = model$predict(titanic_test_filename, paste(getwd(),"titanic_test.tsv.gz",sep="/"))
+    if (nrow(predictRes) == 0) stop("Prediction failed")
 
     #perform enrichment on titanic test dataset
-    if (!is.null(modelRes)){
-      print("Enriching titanic test data")
-      titanic_test_filename = system.file("extdata", "titanic_test.csv", package = "SBadapter")
-      #titanic_test = read.table(titanic_test_filename, header = TRUE, sep=",") #inspect file content
-      #str(titanic_test) #inspect file content
-      enrichRes = SBenrich(modelRes$artifactPath, titanic_test_filename, paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=10, server_port)
-      return ("Success")
-    }
+    print("Enriching titanic test data")
+    enrichRes = model$enrich(titanic_test_filename, paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=NA)
+    if (ncol(enrichRes) == 0) stop("Enrichment failed")
+
+    return ("Success")
+
   }, error = function(e) {
     write (e$message, stderr())
     return (e$message)
