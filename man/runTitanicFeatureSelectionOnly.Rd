@@ -16,6 +16,6 @@ data.frame containing a prediction for each sample in the test set.
 Perform feature search only on Titanic train data.
 }
 \examples{
-model = runTitanicFeatureSelectionOnly()
+# model = runTitanicFeatureSelectionOnly()
 }
 

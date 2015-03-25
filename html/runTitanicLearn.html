@@ -1,0 +1,62 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Perform learn on SparkBeyond titanic example.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for runTitanicLearn {SBadapter}"><tr><td>runTitanicLearn {SBadapter}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Perform learn on SparkBeyond titanic example.</h2>
+
+<h3>Description</h3>
+
+<p>Perform learn on SparkBeyond titanic example.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+runTitanicLearn(configuration = "1", server_port = 9000)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>configuration</code></td>
+<td>
+<p>Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList.</p>
+</td></tr>
+<tr valign="top"><td><code>server_port</code></td>
+<td>
+<p>the port to be accessed in the SparkBeyond API server. 9000 by default.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>SBmodel object containing the result of the learning
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">model = runTitanicLearn()
+</code></pre>
+
+<pre><code>## [1] &quot;Artifact location was created at: /Users/zinman/sparkBeyond/coderbot/web/target/universal/stage/localdata/artifacts/titanic/97&quot;
+## [1] &quot;In modeling process... please notice that this process may take some time...  0&quot;
+## [1] &quot;In modeling process... please notice that this process may take some time...  1&quot;
+## [1] &quot;In modeling process... please notice that this process may take some time...  2&quot;
+</code></pre>
+
+
+<hr><div align="center">[Package <em>SBadapter</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

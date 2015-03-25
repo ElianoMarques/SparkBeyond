@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Run SparkBeyond feature enrichment and learning process.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for SBfeatureSearchOnly {SBadapter}"><tr><td>SBfeatureSearchOnly {SBadapter}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Run SparkBeyond feature enrichment and learning process.</h2>
+
+<h3>Description</h3>
+
+<p>Run SparkBeyond feature enrichment and learning process.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+SBfeatureSearchOnly(sessionName, trainingFilePath, target, weightColumn = NA,
+  maxDepth = 2, hints = NA, useGraph = FALSE, maxFeaturesCount = 300,
+  runBlocking = TRUE, server_port = 9000)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>sessionName</code></td>
+<td>
+<p>String of the session name.</p>
+</td></tr>
+<tr valign="top"><td><code>trainingFilePath</code></td>
+<td>
+<p>String of the path to the file to be trained on.</p>
+</td></tr>
+<tr valign="top"><td><code>target</code></td>
+<td>
+<p>String of the column name of in the training file that conatins the target of the prediction.</p>
+</td></tr>
+<tr valign="top"><td><code>weightColumn</code></td>
+<td>
+<p>Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>maxDepth</code></td>
+<td>
+<p>Optional. Integer &lt; 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.</p>
+</td></tr>
+<tr valign="top"><td><code>hints</code></td>
+<td>
+<p>Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>useGraph</code></td>
+<td>
+<p>Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>maxFeaturesCount</code></td>
+<td>
+<p>Optional. An integer of how many features should be created by the SB engine. 300 by default.</p>
+</td></tr>
+<tr valign="top"><td><code>server_port</code></td>
+<td>
+<p>Optional. the port to be accessed in the SparkBeyond API server. 9000 by default.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>SBmodel object that encapsulate the feature search result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">#model = SBfeatureSearchOnly(&quot;titanic&quot;, titanic_train_filename, &quot;survived&quot;)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>SBadapter</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

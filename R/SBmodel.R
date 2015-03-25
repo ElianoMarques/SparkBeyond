@@ -3,13 +3,16 @@
 #' @field artifactLoc String location pointing to the model artifact.
 #' @examples
 #' #model learn
-#' model = SBlearn("titanic", titanic_train_filename, "survived")
-#' model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
-#' model$predict(titanic_test_filename, "./titanic_test.tsv.gz")
-#' model$enrich(titanic_test_filename, "./titanic_test_enriched.tsv.gz")
-#' model$evaluate()
-#' model$showFeatures()
-#' model$showConfusionMatrix()
+#' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived",algorithmsWhiteList = list("RRandomForest"))
+#' #model = SBfeatureSearchOnly("titanic", getTitanicFilename(train = TRUE), "survived")
+#' enriched = model$enrich(getTitanicFilename(train = FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount = 10)
+#' colnames(enriched)
+#' predicted = model$predict(getTitanicFilename(train = FALSE), paste(getwd(),"titanic_test_predicted.tsv.gz",sep="/"))
+#' colnames(predicted)
+#' predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
+#' eval = model$evaluate()
+#' #model$showFeatures()
+#' #model$showConfusionMatrix()
 #'
 SBmodel = setRefClass("SBmodel",
   fields = list(
@@ -27,6 +30,7 @@ SBmodel = setRefClass("SBmodel",
 
     predict = function(dataPath, outputPath) {
       "Returns prediction on a created model. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction."
+      if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
       url <- paste("http://127.0.0.1:",server_port,"/rapi/predict", sep="")
       params <-list(modelPath = artifact_loc,
                     dataPath = dataPath,
@@ -80,6 +84,7 @@ SBmodel = setRefClass("SBmodel",
 
     evaluate = function() {
       "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
+      if (!modelBuilt) stop("Evaluation requires full model building using SBlearn")
       evaluationFile = paste(artifact_loc,"/json/evaluation.json", sep="")
       evaluation = if (file.exists(evaluationFile)){
         lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
@@ -96,7 +101,7 @@ SBmodel = setRefClass("SBmodel",
                        "function", "InputSchema", "modelComparison", "roc_best", "roc_CV")
       if (is.na(report_name) || ! report_name %in% validReports ) stop("Report name is not valid")
       reportsThatRequireModel = c("confusionMatrix", "confusionMatrix_normalized", "modelComparison", "roc_best", "roc_CV")
-      if (!modelBuilt && report_name %in% reportsThatRequireModel) stop("This report requires model building")
+      if (!modelBuilt && report_name %in% reportsThatRequireModel) stop("This report requires full model building using SBlearn")
       if (showInIDE && (report_name == "roc_best" || report_name == "roc_CV")) print ("Graphs cannot be shown in the IDE and will be displayed in the external browser")
       #verify model created, check if classification, file exists
       htmlSource <- paste(artifact_loc,"/reports/", report_name, ".html",sep="")
@@ -111,41 +116,41 @@ SBmodel = setRefClass("SBmodel",
         utils::browseURL(htmlSource)
     },
 
-    showModelExtractorsReport = function(showInIDE = TRUE){
+    showExtractors = function(showInIDE = TRUE){
       "Shows extractors used by a model in the IDE viewer on in the web browser."
       showReport("extractor",showInIDE)
     },
-    showFeaturesReport = function(showInIDE = TRUE){
+    showFeatures = function(showInIDE = TRUE){
       "Shows features used by a model in the IDE viewer on in the web browser."
       showReport("features",showInIDE)
     },
-    showFieldsReport = function(showInIDE = TRUE){
+    showFields = function(showInIDE = TRUE){
       "Shows fields used by a model in the IDE viewer on in the web browser."
       showReport("field",showInIDE)
     },
-    showFunctionReport = function(showInIDE = TRUE){
+    showFunctions = function(showInIDE = TRUE){
       "Shows functions used by a model in the IDE viewer on in the web browser."
       showReport("function",showInIDE)
     },
-    showInputSchemaReport = function(showInIDE = TRUE){
+    showInputSchema = function(showInIDE = TRUE){
       "Shows the input schema a model in the IDE viewer on in the web browser."
       showReport("InputSchema",showInIDE)
     },
 
     #require model methods
-    showConfusionMatrixReport = function(normalized = FALSE, showInIDE = TRUE){ #verify that this was a classification problem
+    showConfusionMatrix = function(normalized = FALSE, showInIDE = TRUE){ #verify that this was a classification problem
       "Shows a confusion matrix of a model in the IDE viewer on in the web browser."
       showReport(if (normalized) "confusionMatrix_normalized" else "confusionMatrix",showInIDE)
     },
-    showModelComparisonReport = function(showInIDE = TRUE){
+    showModelComparison = function(showInIDE = TRUE){
       "Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
       showReport("modelComparison",showInIDE)
     },
-    showROCReport = function(){
+    showROC = function(){
       "Shows ROC of the model in the IDE viewer on in the web browser."
       showReport("roc_best",FALSE) #problematic to show in internal browser non local resources
     },
-    showROC_CVReport = function(){
+    showROC_CV = function(){
       "Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
       showReport("roc_CV",FALSE) #problematic to show in internal browser non local resources
     }
@@ -188,7 +193,7 @@ SBmodel = setRefClass("SBmodel",
 #' @param server_port Optional. the port to be accessed in the SparkBeyond API server. 9000 by default.
 #' @return SBmodel object the encapsulate the prediction.
 #' @examples
-#' model = SBlearn("titanic", titanic_train_filename, "survived")
+#' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
 SBlearn <- function(sessionName, trainingFilePath, target,
                     testFilePath = NA,
                     trainTestSplitRatio = 0.8,
@@ -278,7 +283,7 @@ SBlearn <- function(sessionName, trainingFilePath, target,
 #' @param server_port Optional. the port to be accessed in the SparkBeyond API server. 9000 by default.
 #' @return SBmodel object that encapsulate the feature search result.
 #' @examples
-#' model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
+#' #model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
 SBfeatureSearchOnly <- function(sessionName, trainingFilePath, target,
                     weightColumn = NA,
                     maxDepth = 2,

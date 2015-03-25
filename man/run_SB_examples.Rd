@@ -15,6 +15,6 @@ run_SB_examples(configuration = "1", server_port = 9000)
 Run SparkBeyond titanic example.
 }
 \examples{
-run_SB_examples()
+# run_SB_examples()
 }
 

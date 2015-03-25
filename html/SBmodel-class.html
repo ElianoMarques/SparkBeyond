@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: SB object that encapsulates a model result</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for SBmodel-class {SBadapter}"><tr><td>SBmodel-class {SBadapter}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>SB object that encapsulates a model result</h2>
+
+<h3>Description</h3>
+
+<p>SB object that encapsulates a model result
+</p>
+
+
+<h3>Fields</h3>
+
+
+<dl>
+<dt><code>artifactLoc</code></dt><dd><p>String location pointing to the model artifact.</p>
+</dd>
+</dl>
+
+
+<h3>Methods</h3>
+
+
+<dl>
+<dt><code>enrich(dataPath, outputPath, featureCount = NA)</code></dt><dd><p>Returns a data frame containing the enrichedData. <code>dataPath</code> is the path to the file to be tested. <code>outputPath</code> is the path to write the results of the prediction. featureCount Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling).</p>
+</dd>
+<dt><code>evaluate()</code></dt><dd><p>Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.</p>
+</dd>
+<dt><code>initialize(artifact_loc, server_port = 9000)</code></dt><dd><p>initializes a model using a string provided as <code>loc</code>.</p>
+</dd>
+<dt><code>predict(dataPath, outputPath)</code></dt><dd><p>Returns prediction on a created model. <code>dataPath</code> is the path to the file to be tested. <code>outputPath</code> is the path to write the results of the prediction.</p>
+</dd>
+<dt><code>showConfusionMatrix(normalized = FALSE, showInIDE = TRUE)</code></dt><dd><p>Shows a confusion matrix of a model in the IDE viewer on in the web browser.</p>
+</dd>
+<dt><code>showExtractors(showInIDE = TRUE)</code></dt><dd><p>Shows extractors used by a model in the IDE viewer on in the web browser.</p>
+</dd>
+<dt><code>showFeatures(showInIDE = TRUE)</code></dt><dd><p>Shows features used by a model in the IDE viewer on in the web browser.</p>
+</dd>
+<dt><code>showFields(showInIDE = TRUE)</code></dt><dd><p>Shows fields used by a model in the IDE viewer on in the web browser.</p>
+</dd>
+<dt><code>showFunctions(showInIDE = TRUE)</code></dt><dd><p>Shows functions used by a model in the IDE viewer on in the web browser.</p>
+</dd>
+<dt><code>showInputSchema(showInIDE = TRUE)</code></dt><dd><p>Shows the input schema a model in the IDE viewer on in the web browser.</p>
+</dd>
+<dt><code>showModelComparison(showInIDE = TRUE)</code></dt><dd><p>Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.</p>
+</dd>
+<dt><code>showROC()</code></dt><dd><p>Shows ROC of the model in the IDE viewer on in the web browser.</p>
+</dd>
+<dt><code>showROC_CV()</code></dt><dd><p>Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.</p>
+</dd>
+<dt><code>showReport(report_name = NA, showInIDE = TRUE)</code></dt><dd><p><code>report_name</code> should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, features, field, function, InputSchema, modelComparison, roc_best, roc_CV</p>
+</dd>
+</dl>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">#model learn
+model = SBlearn(&quot;titanic&quot;, getTitanicFilename(train = TRUE), &quot;survived&quot;,algorithmsWhiteList = list(&quot;RRandomForest&quot;))
+</code></pre>
+
+<pre><code>## [1] &quot;Artifact location was created at: /Users/zinman/sparkBeyond/coderbot/web/target/universal/stage/localdata/artifacts/titanic/96&quot;
+## [1] &quot;In modeling process... please notice that this process may take some time...  0&quot;
+## [1] &quot;In modeling process... please notice that this process may take some time...  1&quot;
+## [1] &quot;In modeling process... please notice that this process may take some time...  2&quot;
+</code></pre>
+
+<pre><code class="r">#model = SBfeatureSearchOnly(&quot;titanic&quot;, getTitanicFilename(train = TRUE), &quot;survived&quot;)
+enriched = model$enrich(getTitanicFilename(train = FALSE), paste(getwd(),&quot;titanic_test_enriched.tsv.gz&quot;,sep=&quot;/&quot;))
+colnames(enriched)
+</code></pre>
+
+<pre><code>##   [1] &quot;pclass&quot;                                                       
+##   [2] &quot;name&quot;                                                         
+##   [3] &quot;sex&quot;                                                          
+##   [4] &quot;age&quot;                                                          
+##   [5] &quot;sibsp&quot;                                                        
+##   [6] &quot;parch&quot;                                                        
+##   [7] &quot;ticket&quot;                                                       
+##   [8] &quot;fare&quot;                                                         
+##   [9] &quot;cabin&quot;                                                        
+##  [10] &quot;embarked&quot;                                                     
+##  [11] &quot;ngrams2_name_contains_mr_&quot;                                    
+##  [12] &quot;numericSubstring_ticket_120393_25_111538_75&quot;                  
+##  [13] &quot;fare_length_5_0_1_5&quot;                                          
+##  [14] &quot;name_zipWithIndex_getOrElse_0_18&quot;                             
+##  [15] &quot;numericSubstring_fare_15_172899999999998&quot;                     
+##  [16] &quot;sex_male&quot;                                                     
+##  [17] &quot;newCore_datastructures_Histogram_name_getOrElse_e_0_0_1_5&quot;    
+##  [18] &quot;prefixes_ticket_Contains_349&quot;                                 
+##  [19] &quot;prefixes_ticket_Contains_34&quot;                                  
+##  [20] &quot;smallSubsets_fare_ContainsList_4_1_7_&quot;                        
+##  [21] &quot;ticket_zipWithIndex_getOrElse_A_2147483647_2&quot;                 
+##  [22] &quot;newCore_datastructures_Histogram_name_getOrElse_0_0_4_0&quot;      
+##  [23] &quot;ngrams2_name_Contains_&quot;                                       
+##  [24] &quot;embarked_C&quot;                                                   
+##  [25] &quot;fare_zipWithIndex_getOrElse_5_0_3_5_2_0&quot;                      
+##  [26] &quot;cabin_&quot;                                                       
+##  [27] &quot;pclass_3&quot;                                                     
+##  [28] &quot;fare_zipWithIndex_getOrElse_3_0_4_0_0_5&quot;                      
+##  [29] &quot;numericSuffix_fare_4438_0_4416_0&quot;                             
+##  [30] &quot;newCore_datastructures_Histogram_name_exists___M_2_0_&quot;        
+##  [31] &quot;name_zipWithIndex_getOrElse_A_0_34_75_5_25&quot;                   
+##  [32] &quot;name_zipWithIndex_getOrElse_P_0_8_5_6_0&quot;                      
+##  [33] &quot;prefixes_fare_Contains_26_2&quot;                                  
+##  [34] &quot;smallSubsets_ticket_ContainsList_3_4_6_&quot;                      
+##  [35] &quot;name_zipWithIndex_getOrElse_R_0_10_25_4_25&quot;                   
+##  [36] &quot;name_zipWithIndex_contains_28_&quot;                               
+##  [37] &quot;name_zipWithIndex_getOrElse_o_0_12_75_1_75&quot;                   
+##  [38] &quot;name_indicesContains29&quot;                                       
+##  [39] &quot;name_zipWithIndex_getOrElse_y_2147483647_8&quot;                   
+##  [40] &quot;name_zipWithIndex_getOrElse_p_0_23&quot;                           
+##  [41] &quot;name_zipWithIndex_getOrElse_v_0_12_0_5_5&quot;                     
+##  [42] &quot;newCore_datastructures_Histogram_fare_getOrElse_4_0_0_1_5&quot;    
+##  [43] &quot;ticket_zipWithIndex_contains_8_9_&quot;                            
+##  [44] &quot;newCore_datastructur_e_PositiveInfinity_4_5_671004324&quot;        
+##  [45] &quot;name_zipWithIndex_contains_11_&quot;                               
+##  [46] &quot;ticket_zipWithIndex_contains_1_3_&quot;                            
+##  [47] &quot;smallSubsets_fare_ContainsList_0_2_9_&quot;                        
+##  [48] &quot;fare_zipWithIndex_getOrElse_6_2147483647_2&quot;                   
+##  [49] &quot;fare_zipWithIndex_getOrElse_3_0_2&quot;                            
+##  [50] &quot;name_zipWithIndex_getOrElse_F_0_28&quot;                           
+##  [51] &quot;name_zipWithIndex_getOrElse_V_2147483647_14&quot;                  
+##  [52] &quot;name_zipWithIndex_contains_M_23_&quot;                             
+##  [53] &quot;tokenizeByCommonDelimiters_fare_Contains_05&quot;                  
+##  [54] &quot;smallSubsets_fare_ContainsList_8_2_9_&quot;                        
+##  [55] &quot;fare_zipWithIndex_contains_3_6_&quot;                              
+##  [56] &quot;newCore_datastructur_e_PositiveInfinity_2_5_1853096548&quot;       
+##  [57] &quot;name_zipWithIndex_getOrElse_u_0_35_0_4_5&quot;                     
+##  [58] &quot;ticket_zipWithIndex_contains_9_7_&quot;                            
+##  [59] &quot;prefixes_ticket_Contains_117&quot;                                 
+##  [60] &quot;name_zipWithIndex_getOrElse_x_0_20&quot;                           
+##  [61] &quot;name_zipWithIndex_contains_h_13_&quot;                             
+##  [62] &quot;name_zipWithIndex_contains_t_9_&quot;                              
+##  [63] &quot;numericSuffix_fare_125_0&quot;                                     
+##  [64] &quot;name_zipWithIndex_getOrElse_G_0_5_25_3_25&quot;                    
+##  [65] &quot;ticket_zipWithIndex_contains_7_4_&quot;                            
+##  [66] &quot;smallSubsets_ticket_ContainsList_7_A_&quot;                        
+##  [67] &quot;name_zipWithIndex_contains_r_10_&quot;                             
+##  [68] &quot;name_zipWithIndex_contains_k_24_&quot;                             
+##  [69] &quot;name_zipWithIndex_contains_n_34_&quot;                             
+##  [70] &quot;name_zipWithIndex_contains_31_&quot;                               
+##  [71] &quot;ticket_zipWithIndex_getOrElse_7_0_5&quot;                          
+##  [72] &quot;name_zipWithIndex_getOrElse_k_0_40_75_4_25&quot;                   
+##  [73] &quot;newCore_datastructures_Histogram_name_exists___s_2_0_&quot;        
+##  [74] &quot;normalizedNgramsWithoutStopwords_name_ContainsList_mr_joseph_&quot;
+##  [75] &quot;smallSubsets_ticket_ContainsList_1_6_&quot;                        
+##  [76] &quot;smallSubsets_ticket_ContainsList_3_5_9_&quot;                      
+##  [77] &quot;smallSubsets_ticket_ContainsList_6_&quot;                          
+##  [78] &quot;numericPrefix_fare_10_5&quot;                                      
+##  [79] &quot;age_zipWithIndex_getOrElse_0_2&quot;                               
+##  [80] &quot;name_zipWithIndex_getOrElse_E_0_16&quot;                           
+##  [81] &quot;newCore_datastructures_Histogram_name_getOrElse_s_0_0_1_5&quot;    
+##  [82] &quot;smallSubsets_fare_ContainsList_1_8_6_&quot;                        
+##  [83] &quot;smallSubsets_fare_ContainsList_1_8_&quot;                          
+##  [84] &quot;fare_length_7&quot;                                                
+##  [85] &quot;smallSubsets_cabin_ContainsList_2_E_&quot;                         
+##  [86] &quot;name_zipWithIndex_getOrElse_o_2147483647_28&quot;                  
+##  [87] &quot;fare_lastOption_Some_7_&quot;                                      
+##  [88] &quot;name_indicesContains44&quot;                                       
+##  [89] &quot;name_zipWithIndex_getOrElse_K_1_25_0_6_0&quot;                     
+##  [90] &quot;name_zipWithIndex_getOrElse_M_0_24&quot;                           
+##  [91] &quot;ticket_zipWithIndex_contains_1_0_&quot;                            
+##  [92] &quot;fare_zipWithIndex_contains_4_1_&quot;                              
+##  [93] &quot;fare_zipWithIndex_getOrElse_7_0_3_0_0_5&quot;                      
+##  [94] &quot;name_zipWithIndex_getOrElse_l_0_28_0_1_5&quot;                     
+##  [95] &quot;name_zipWithIndex_getOrElse_T_0_24&quot;                           
+##  [96] &quot;newCore_datastructures_Histogram_fare_getOrElse_3_0_0_1_5&quot;    
+##  [97] &quot;newCore_datastructures_Histogram_name_getOrElse_a_0_0_2_5&quot;    
+##  [98] &quot;ticket_length_6&quot;                                              
+##  [99] &quot;numericPrefix_fare_6_0&quot;                                       
+## [100] &quot;ticket_zipWithIndex_getOrElse_0_0_3_0_0_5&quot;                    
+## [101] &quot;name_zipWithIndex_contains_e_42_&quot;                             
+## [102] &quot;newCore_datastructur_e_PositiveInfinity_1_5_227445247&quot;        
+## [103] &quot;ticket_zipWithIndex_contains_5_9_&quot;                            
+## [104] &quot;fare_zipWithIndex_contains_6_1_&quot;                              
+## [105] &quot;ngrams2_name_Contains_miss_Anna&quot;                              
+## [106] &quot;name_zipWithIndex_contains_e_34_&quot;                             
+## [107] &quot;name_zipWithIndex_getOrElse_0_10_0_6_5&quot;                       
+## [108] &quot;tokenizeByCommonDelimitersAndNormalize_name_contains_mr_&quot;     
+## [109] &quot;ticket_zipWithIndex_getOrElse_7_0_4_0_0_5&quot;                    
+## [110] &quot;name_zipWithIndex_contains_M_22_&quot;                             
+## [111] &quot;tokenizeByCommonDelimiters_fare_Contains_8&quot;                   
+## [112] &quot;fare_zipWithIndex_contains_1_5_&quot;                              
+## [113] &quot;name_zipWithIndex_getOrElse_J_0_15_5_5_0&quot;                     
+## [114] &quot;name_zipWithIndex_getOrElse_z_0_35&quot;                           
+## [115] &quot;age_sorted_47&quot;                                                
+## [116] &quot;fare_length_6&quot;                                                
+## [117] &quot;name_indicesContains31&quot;                                       
+## [118] &quot;name_zipWithIndex_getOrElse_g_2147483647_6&quot;                   
+## [119] &quot;pclass_1&quot;                                                     
+## [120] &quot;name_zipWithIndex_getOrElse_p_2147483647_7&quot;                   
+## [121] &quot;numericSuffix_cabin_20_0&quot;                                     
+## [122] &quot;smallSubsets_cabin_ContainsList_5_2_&quot;                         
+## [123] &quot;smallSubsets_cabin_ContainsList_1_D_&quot;                         
+## [124] &quot;prefixes_cabin_Contains_E1&quot;                                   
+## [125] &quot;mode_cabin_Some_9_&quot;                                           
+## [126] &quot;embarked_S&quot;                                                   
+## [127] &quot;smallSubsets_fare_ContainsList_0_5_7_&quot;                        
+## [128] &quot;name_zipWithIndex_getOrElse_t_2_19&quot;                           
+## [129] &quot;name_zipWithIndex_getOrElse_J_0_26&quot;                           
+## [130] &quot;newCore_datastructures_Histogram_name_getOrElse_M_0_0_1_5&quot;    
+## [131] &quot;tokenizeByCommonDelimiters_name_Contains_j&quot;                   
+## [132] &quot;smallSubsets_ticket_ContainsList_3_5_&quot;                        
+## [133] &quot;name_zipWithIndex_contains_e_26_&quot;                             
+## [134] &quot;name_zipWithIndex_contains_i_7_&quot;                              
+## [135] &quot;ticket_zipWithIndex_getOrElse_5_0_9_25_0_75&quot;                  
+## [136] &quot;newCore_datastructures_Histogram_name_exists___6_0_&quot;          
+## [137] &quot;name_zipWithIndex_contains_S_13_&quot;                             
+## [138] &quot;prefixes_ticket_Contains_267&quot;                                 
+## [139] &quot;name_zipWithIndex_contains_45_&quot;                               
+## [140] &quot;name_zipWithIndex_getOrElse_B_2147483647_46&quot;                  
+## [141] &quot;name_zipWithIndex_getOrElse_c_2147483647_4&quot;                   
+## [142] &quot;name_zipWithIndex_getOrElse_B_0_8&quot;                            
+## [143] &quot;name_length_43&quot;                                               
+## [144] &quot;prefixes_ticket_Contains_PC1747&quot;                              
+## [145] &quot;name_zipWithIndex_getOrElse_w_2147483647_18_5_1_0&quot;            
+## [146] &quot;name_zipWithIndex_getOrElse_n_0_19&quot;                           
+## [147] &quot;name_zipWithIndex_contains_g_24_&quot;                             
+## [148] &quot;name_zipWithIndex_getOrElse_R_0_15&quot;                           
+## [149] &quot;ngrams2_ticket_Contains_s_o&quot;                                  
+## [150] &quot;name_zipWithIndex_contains_o_26_&quot;                             
+## [151] &quot;name_zipWithIndex_getOrElse_c_0_13_0_4_5&quot;                     
+## [152] &quot;name_zipWithIndex_contains_J_26_&quot;                             
+## [153] &quot;numericSubstring_ticket_336058_0&quot;                             
+## [154] &quot;name_zipWithIndex_getOrElse_s_2147483647_15&quot;                  
+## [155] &quot;prefixes_name_Contains_Cald&quot;                                  
+## [156] &quot;name_length_20&quot;                                               
+## [157] &quot;tokenizeByCommonDelimiters_name_Contains_kate&quot;                
+## [158] &quot;numericPrefix_fare_57_0&quot;                                      
+## [159] &quot;name_zipWithIndex_contains_i_25_&quot;                             
+## [160] &quot;name_zipWithIndex_getOrElse_0_12&quot;                             
+## [161] &quot;newCore_datastructures_Histogram_name_exists___i_5_0_&quot;        
+## [162] &quot;tokenizeByCommonDelimiters_fare_Contains_65&quot;                  
+## [163] &quot;age_sorted_35&quot;                                                
+## [164] &quot;name_zipWithIndex_contains_g_8_&quot;                              
+## [165] &quot;name_zipWithIndex_getOrElse_b_0_31&quot;                           
+## [166] &quot;smallSubsets_ticket_ContainsList_&quot;                            
+## [167] &quot;name_zipWithIndex_contains_S_19_&quot;                             
+## [168] &quot;name_zipWithIndex_contains_i_9_&quot;                              
+## [169] &quot;name_indices_contains_22_&quot;                                    
+## [170] &quot;smallSubsets_fare_ContainsList_3_4_8_&quot;                        
+## [171] &quot;ticket_zipWithIndex_getOrElse_9_2147483647_2&quot;                 
+## [172] &quot;prefixes_name_Contains_Mad&quot;                                   
+## [173] &quot;fare_tailContains_3_&quot;                                         
+## [174] &quot;newCore_datastructures_Histogram_name_getOrElse_y_0_0_1_5&quot;    
+## [175] &quot;name_zipWithIndex_contains_m_5_&quot;                              
+## [176] &quot;ticket_zipWithIndex_getOrElse_8_0_10&quot;                         
+## [177] &quot;name_zipWithIndex_contains_f_7_&quot;                              
+## [178] &quot;smallSubsets_ticket_ContainsList_4_2_&quot;                        
+## [179] &quot;ticket_zipWithIndex_getOrElse_1_2147483647_4&quot;                 
+## [180] &quot;numericPrefix_age_64_0&quot;                                       
+## [181] &quot;name_zipWithIndex_getOrElse_D_0_11_0_1_5&quot;                     
+## [182] &quot;name_zipWithIndex_getOrElse_i_0_10_0_1_5&quot;                     
+## [183] &quot;name_zipWithIndex_getOrElse_s_0_11_0_3_5&quot;                     
+## [184] &quot;newCore_datastructures_Histogram_name_getOrElse_f_0_0_1_5&quot;    
+## [185] &quot;fare_zipWithIndex_contains_9_5_&quot;                              
+## [186] &quot;newCore_datastructur_ouble_PositiveInfinity_1948126896&quot;       
+## [187] &quot;numericSuffix_fare_9_0&quot;                                       
+## [188] &quot;smallSubsets_fare_ContainsList_3_1_&quot;                          
+## [189] &quot;numericPrefix_age_4_5_2_0&quot;                                    
+## [190] &quot;newCore_datastructures_Histogram_cabin_exists___3_2_0_&quot;       
+## [191] &quot;ngrams2_name_Contains_miss_Margaret&quot;                          
+## [192] &quot;tokenizeBySpace_name_Contains_mary&quot;                           
+## [193] &quot;ngrams2_name_Contains_miss_Elizabeth&quot;                         
+## [194] &quot;prefixes_fare_Contains_18_&quot;                                   
+## [195] &quot;name_length_33&quot;                                               
+## [196] &quot;name_zipWithIndex_contains_A_24_&quot;                             
+## [197] &quot;cabin_zipWithIndex_getOrElse_5_1_2&quot;                           
+## [198] &quot;newCore_datastructur_e_PositiveInfinity_1_5_1989454623&quot;       
+## [199] &quot;numericPrefix_age_0_0&quot;                                        
+## [200] &quot;newCore_datastructures_Histogram_fare_getOrElse_1_0_0_2_5&quot;    
+## [201] &quot;name_zipWithIndex_contains_A_23_&quot;                             
+## [202] &quot;name_zipWithIndex_getOrElse_I_2147483647_28_25_6_25&quot;          
+## [203] &quot;name_indices_contains_24_&quot;                                    
+## [204] &quot;ticket_zipWithIndex_contains_0_8_&quot;                            
+## [205] &quot;tokenizeByCommonDelimitersAndNormalize_name_Contains_daniel&quot;  
+## [206] &quot;name_zipWithIndex_contains_c_4_&quot;                              
+## [207] &quot;ticket_zipWithIndex_contains_4_8_&quot;                            
+## [208] &quot;prefixes_name_Contains_Pa&quot;                                    
+## [209] &quot;name_zipWithIndex_getOrElse_b_2147483647_17&quot;                  
+## [210] &quot;prefixes_fare_Contains_14_4&quot;                                  
+## [211] &quot;tokenizeByCommonDelimiters_name_Contains_johan&quot;               
+## [212] &quot;ngrams2_name_Contains_elizabeth&quot;                              
+## [213] &quot;tokenizeByCommonDelimiters_name_Contains_ada&quot;                 
+## [214] &quot;name_indicesContains41&quot;                                       
+## [215] &quot;ticket_zipWithIndex_contains_9_5_&quot;                            
+## [216] &quot;name_indicesContains30&quot;                                       
+## [217] &quot;prefixes_name_Contains_Bou&quot;                                   
+## [218] &quot;tokenizeByCommonDelimiters_name_Contains_nils&quot;                
+## [219] &quot;prefixes_name_Contains_Sund&quot;                                  
+## [220] &quot;smallSubsets_ticket_ContainsList_4_8_6_&quot;                      
+## [221] &quot;ticket_zipWithIndex_getOrElse_C_0_1_5_1_0&quot;                    
+## [222] &quot;tokenizeByCommonDelimiters_name_Contains_david&quot;               
+## [223] &quot;fare_zipWithIndex_getOrElse_2_0_2_0_0_5&quot;                      
+## [224] &quot;smallSubsets_fare_ContainsList_3_8_2_&quot;                        
+## [225] &quot;name_zipWithIndex_getOrElse_f_2147483647_20&quot;                  
+## [226] &quot;prefixes_name_Contains_Beck&quot;                                  
+## [227] &quot;prefixes_cabin_Contains_C10&quot;                                  
+## [228] &quot;numericPrefix_fare_76_0&quot;                                      
+## [229] &quot;smallSubsets_cabin_ContainsList_4_5_&quot;                         
+## [230] &quot;prefixes_ticket_Contains_1175&quot;                                
+## [231] &quot;prefixes_cabin_Contains_C5&quot;                                   
+## [232] &quot;smallSubsets_cabin_ContainsList_6_A_&quot;                         
+## [233] &quot;name_zipWithIndex_contains_p_25_&quot;                             
+## [234] &quot;smallSubsets_cabin_ContainsList_3_9_&quot;                         
+## [235] &quot;name_zipWithIndex_getOrElse_r_2_11_5_4_0&quot;                     
+## [236] &quot;name_zipWithIndex_contains_l_41_&quot;                             
+## [237] &quot;name_zipWithIndex_contains_o_43_&quot;                             
+## [238] &quot;smallSubsets_ticket_ContainsList_1_7_&quot;                        
+## [239] &quot;ticket_zipWithIndex_contains_2_5_&quot;                            
+## [240] &quot;name_zipWithIndex_contains_m_8_&quot;                              
+## [241] &quot;prefixes_ticket_Contains_174&quot;                                 
+## [242] &quot;newCore_datastructur_ouble_PositiveInfinity_1386585326&quot;       
+## [243] &quot;smallSubsets_ticket_ContainsList_5_P_&quot;                        
+## [244] &quot;fare_lastOption_Some_8_&quot;                                      
+## [245] &quot;prefixes_name_Contains_Ol&quot;                                    
+## [246] &quot;ticket_zipWithIndex_getOrElse_2_0_3_0_2_5&quot;                    
+## [247] &quot;smallSubsets_fare_ContainsList_3_2_&quot;                          
+## [248] &quot;prefixes_name_Contains_Lan&quot;                                   
+## [249] &quot;newCore_datastructur_e_PositiveInfinity_3_0_701785833&quot;        
+## [250] &quot;age_zipWithIndex_getOrElse_3_3_1&quot;                             
+## [251] &quot;newCore_datastructures_Histogram_name_exists___r_2_0_&quot;        
+## [252] &quot;name_zipWithIndex_contains_s_11_&quot;                             
+## [253] &quot;newCore_datastructures_Histogram_name_exists___i_4_0_&quot;        
+## [254] &quot;fare_sorted_12357&quot;                                            
+## [255] &quot;name_zipWithIndex_contains_g_17_&quot;                             
+## [256] &quot;ticket_min_3_&quot;                                                
+## [257] &quot;newCore_datastructur_e_PositiveInfinity_4_5_1544657881&quot;       
+## [258] &quot;name_zipWithIndex_getOrElse_k_0_24&quot;                           
+## [259] &quot;smallSubsets_ticket_ContainsList_3_C_6_&quot;                      
+## [260] &quot;ticket_zipWithIndex_contains_7_0_&quot;                            
+## [261] &quot;name_zipWithIndex_contains_t_25_&quot;                             
+## [262] &quot;smallSubsets_ticket_ContainsList_1_S_7_&quot;                      
+## [263] &quot;prefixes_ticket_Contains_230&quot;                                 
+## [264] &quot;mode_ticket_Some_4_&quot;                                          
+## [265] &quot;tokenizeByCommonDelimiters_name_Contains_katherine&quot;           
+## [266] &quot;smallSubsets_cabin_ContainsList_D_7_&quot;                         
+## [267] &quot;tokenizeByCommonDelimiters_name_Contains_florence&quot;            
+## [268] &quot;tokenizeByCommonDelimiters_name_Contains_jane&quot;                
+## [269] &quot;tokenizeByCommonDelimiters_name_Contains_marie&quot;               
+## [270] &quot;tokenizeByCommonDelimiters_name_Contains_bertha&quot;              
+## [271] &quot;tokenizeByCommonDelimiters_name_Contains_emily&quot;               
+## [272] &quot;prefixes_cabin_Contains_B7&quot;                                   
+## [273] &quot;name_zipWithIndex_contains_t_36_&quot;                             
+## [274] &quot;name_zipWithIndex_getOrElse_G_0_28&quot;                           
+## [275] &quot;smallSubsets_ticket_ContainsList_3_0_C_&quot;                      
+## [276] &quot;prefixes_ticket_Contains_PC174&quot;                               
+## [277] &quot;prefixes_name_Contains_Bi&quot;                                    
+## [278] &quot;smallSubsets_fare_ContainsList_4_1_9_&quot;                        
+## [279] &quot;smallSubsets_ticket_ContainsList_0_9_&quot;                        
+## [280] &quot;ngrams2_name_Contains_alfred_&quot;                                
+## [281] &quot;mode_ticket_Some_&quot;                                            
+## [282] &quot;smallSubsets_fare_ContainsList_2_6_&quot;                          
+## [283] &quot;name_zipWithIndex_contains_t_21_&quot;                             
+## [284] &quot;name_zipWithIndex_getOrElse_e_2147483647_4_0_0_5&quot;             
+## [285] &quot;name_zipWithIndex_contains_u_26_&quot;                             
+## [286] &quot;newCore_datastructures_Histogram_ticket_getOrElse_2_0_0_2_5&quot;  
+## [287] &quot;smallSubsets_ticket_ContainsList_4_8_9_&quot;                      
+## [288] &quot;tokenizeByCommonDelimiters_name_Contains_martha&quot;              
+## [289] &quot;name_zipWithIndex_getOrElse_e_0_33&quot;                           
+## [290] &quot;name_zipWithIndex_contains_h_38_&quot;                             
+## [291] &quot;tokenizeBySpace_name_Contains_mary.1&quot;                         
+## [292] &quot;name_zipWithIndex_getOrElse_S_1_32_25_1_25&quot;                   
+## [293] &quot;name_zipWithIndex_contains_F_15_&quot;                             
+## [294] &quot;smallSubsets_ticket_ContainsList_1_P_&quot;                        
+## [295] &quot;prefixes_ticket_Contains_31508&quot;                               
+## [296] &quot;prefixes_ticket_Contains_239&quot;                                 
+## [297] &quot;ticket_zipWithIndex_getOrElse_0_2147483647_3&quot;                 
+## [298] &quot;sibsp_1&quot;                                                      
+## [299] &quot;fare_min_5_&quot;                                                  
+## [300] &quot;fare_tail_9&quot;                                                  
+## [301] &quot;name_zipWithIndex_contains_s_13_&quot;                             
+## [302] &quot;ticket_zipWithIndex_contains_4_1_&quot;                            
+## [303] &quot;prefixes_name_Contains_Fra&quot;                                   
+## [304] &quot;newCore_datastructures_Histogram_name_getOrElse_0_0_4_5&quot;      
+## [305] &quot;name_zipWithIndex_getOrElse_u_0_31&quot;                           
+## [306] &quot;smallSubsets_ticket_ContainsList_3_4_8_&quot;                      
+## [307] &quot;name_zipWithIndex_contains_44_&quot;                               
+## [308] &quot;name_zipWithIndex_getOrElse_d_0_43&quot;                           
+## [309] &quot;name_zipWithIndex_contains_a_39_&quot;                             
+## [310] &quot;name_zipWithIndex_contains_e_45_&quot;
+</code></pre>
+
+<pre><code class="r">predicted = model$predict(getTitanicFilename(train = FALSE), paste(getwd(),&quot;titanic_test_predicted.tsv.gz&quot;,sep=&quot;/&quot;))
+colnames(predicted)
+</code></pre>
+
+<pre><code>##  [1] &quot;pclass&quot;             &quot;name&quot;               &quot;sex&quot;               
+##  [4] &quot;age&quot;                &quot;sibsp&quot;              &quot;parch&quot;             
+##  [7] &quot;ticket&quot;             &quot;fare&quot;               &quot;cabin&quot;             
+## [10] &quot;embarked&quot;           &quot;survived_predicted&quot; &quot;X_0_probability&quot;   
+## [13] &quot;X_1_probability&quot;
+</code></pre>
+
+<pre><code class="r">predicted[1:5,c(&quot;survived_predicted&quot;, &quot;X_0_probability&quot;, &quot;X_1_probability&quot;)]
+</code></pre>
+
+<pre><code>##   survived_predicted X_0_probability X_1_probability
+## 1                  0           0.928           0.072
+## 2                  1           0.480           0.520
+## 3                  0           0.798           0.202
+## 4                  0           0.954           0.046
+## 5                  1           0.330           0.670
+</code></pre>
+
+<pre><code class="r">eval = model$evaluate()
+</code></pre>
+
+<pre><code>## === Detailed Accuracy By Class ===
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## 0               0.916     0.351     0.79        0.916    0.848       0.875      0.751
+## 1               0.649     0.084     0.842       0.649    0.733       0.875      0.751
+## Weighted Avg.   0.807     0.242     0.811       0.807    0.801       0.875      0.751
+## 
+</code></pre>
+
+<pre><code class="r">#model$showFeatures()
+#model$showConfusionMatrix()
+</code></pre>
+
+
+<hr><div align="center">[Package <em>SBadapter</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

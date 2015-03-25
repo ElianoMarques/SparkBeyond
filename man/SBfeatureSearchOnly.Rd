@@ -34,6 +34,6 @@ SBmodel object that encapsulate the feature search result.
 Run SparkBeyond feature enrichment and learning process.
 }
 \examples{
-model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
+#model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
 }
 

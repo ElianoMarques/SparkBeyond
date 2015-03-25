@@ -18,6 +18,6 @@ SBmodel object containing the result of the learning
 Perform learn on SparkBeyond titanic example.
 }
 \examples{
-runTitanicLearn()
+model = runTitanicLearn()
 }
 

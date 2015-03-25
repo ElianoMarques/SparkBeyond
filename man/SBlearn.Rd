@@ -49,6 +49,6 @@ SBmodel object the encapsulate the prediction.
 Run SparkBeyond feature enrichment and learning process.
 }
 \examples{
-model = SBlearn("titanic", titanic_train_filename, "survived")
+model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
 }
 

@@ -24,34 +24,37 @@ SB object that encapsulates a model result
 
 \item{\code{predict(dataPath, outputPath)}}{Returns prediction on a created model. \code{dataPath} is the path to the file to be tested. \code{outputPath} is the path to write the results of the prediction.}
 
-\item{\code{showConfusionMatrixReport(normalized = FALSE, showInIDE = TRUE)}}{Shows a confusion matrix of a model in the IDE viewer on in the web browser.}
+\item{\code{showConfusionMatrix(normalized = FALSE, showInIDE = TRUE)}}{Shows a confusion matrix of a model in the IDE viewer on in the web browser.}
 
-\item{\code{showFeaturesReport(showInIDE = TRUE)}}{Shows features used by a model in the IDE viewer on in the web browser.}
+\item{\code{showExtractors(showInIDE = TRUE)}}{Shows extractors used by a model in the IDE viewer on in the web browser.}
 
-\item{\code{showFieldsReport(showInIDE = TRUE)}}{Shows fields used by a model in the IDE viewer on in the web browser.}
+\item{\code{showFeatures(showInIDE = TRUE)}}{Shows features used by a model in the IDE viewer on in the web browser.}
 
-\item{\code{showFunctionReport(showInIDE = TRUE)}}{Shows functions used by a model in the IDE viewer on in the web browser.}
+\item{\code{showFields(showInIDE = TRUE)}}{Shows fields used by a model in the IDE viewer on in the web browser.}
 
-\item{\code{showInputSchemaReport(showInIDE = TRUE)}}{Shows the input schema a model in the IDE viewer on in the web browser.}
+\item{\code{showFunctions(showInIDE = TRUE)}}{Shows functions used by a model in the IDE viewer on in the web browser.}
 
-\item{\code{showModelComparisonReport(showInIDE = TRUE)}}{Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.}
+\item{\code{showInputSchema(showInIDE = TRUE)}}{Shows the input schema a model in the IDE viewer on in the web browser.}
 
-\item{\code{showModelExtractorsReport(showInIDE = TRUE)}}{Shows extractors used by a model in the IDE viewer on in the web browser.}
+\item{\code{showModelComparison(showInIDE = TRUE)}}{Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.}
 
-\item{\code{showROCReport()}}{Shows ROC of the model in the IDE viewer on in the web browser.}
+\item{\code{showROC()}}{Shows ROC of the model in the IDE viewer on in the web browser.}
 
-\item{\code{showROC_CVReport()}}{Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.}
+\item{\code{showROC_CV()}}{Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.}
 
 \item{\code{showReport(report_name = NA, showInIDE = TRUE)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, features, field, function, InputSchema, modelComparison, roc_best, roc_CV}
 }}
 \examples{
 #model learn
-model = SBlearn("titanic", titanic_train_filename, "survived")
-model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
-model$predict(titanic_test_filename, "./titanic_test.tsv.gz")
-model$enrich(titanic_test_filename, "./titanic_test_enriched.tsv.gz")
-model$evaluate()
-model$showFeatures()
-model$showConfusionMatrix()
+model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived",algorithmsWhiteList = list("RRandomForest"))
+#model = SBfeatureSearchOnly("titanic", getTitanicFilename(train = TRUE), "survived")
+enriched = model$enrich(getTitanicFilename(train = FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"))
+colnames(enriched)
+predicted = model$predict(getTitanicFilename(train = FALSE), paste(getwd(),"titanic_test_predicted.tsv.gz",sep="/"))
+colnames(predicted)
+predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
+eval = model$evaluate()
+#model$showFeatures()
+#model$showConfusionMatrix()
 }
 

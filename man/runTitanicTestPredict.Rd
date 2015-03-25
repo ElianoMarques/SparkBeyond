@@ -16,6 +16,6 @@ data.frame containing a prediction for each sample in the test set.
 Perform prediction on titanic test dataset.
 }
 \examples{
-runTitanicTestPredict()
+# predicted = runTitanicTestPredict(model)
 }
 
