@@ -4,7 +4,7 @@ output: html_document
 ---
 This tutorial explains how to use **R SparkBeyond plugin**.
 
-### Installation
+### Installation 
 
 Install and load the SBadatper plugin 
 
@@ -38,7 +38,11 @@ library('SBadapter')
   train_file_path = getTitanicFilename(train = TRUE)
 --> 
 
-```{r, eval=FALSE}
+```{r, echo=FALSE}
+train_file_path = getTitanicFilename(train = TRUE)
+```
+
+```{r, eval=TRUE}
 model = SBlearn(sessionName = "titanic",
                         trainingFilePath = train_file_path,
                         target = "survived",
@@ -57,7 +61,11 @@ The help file for `SBmodel` class contains additional information.
 2.  `outputPath`    - output file path
 3.  `featureCount`  - number of features  (use NA to get all features)
 
-```{r,  eval=FALSE}
+```{r, echo=FALSE}
+test_file_path = getTitanicFilename(train = FALSE)
+```
+
+```{r,  eval=TRUE}
 enriched = model$enrich(dataPath = test_file_path, 
              outputPath = paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), 
              featureCount=10)
@@ -65,7 +73,7 @@ enriched = model$enrich(dataPath = test_file_path,
 
 Each feature is added to the dataset as a new column
 
-```{r,  eval=FALSE}
+```{r,  eval=TRUE}
 colnames(enriched)
 ```
 
@@ -87,14 +95,14 @@ it requires the following input:
 1.  `datapath`   - data-file path (typically a test-set)
 2.  `outputPath` - output file path
 
-```{r,  eval=FALSE}
+```{r,  eval=TRUE}
 predicted = model$predict(dataPath = test_file_path, 
              outputPath = paste(getwd(),"titanic_test_predicted.tsv.gz",sep="/"))
 ```
 
 The resulting prediction is added to the `dataset` as a set of new columns
 
-```{r,  eval=FALSE}
+```{r,  eval=TRUE}
 colnames(predicted)
 predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
 ```
@@ -109,7 +117,7 @@ We now have 3 additional columns:
 
 `evaluate` summarizes `model` results in a short textual report. 
 
-```{r,  eval=FALSE}
+```{r,  eval=TRUE}
 eval = model$evaluate()
 ```
 It also returns an `eval` object containing evaluation metrics.
