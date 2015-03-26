@@ -1,3 +1,5 @@
+library(methods) #to support RScript
+
 #' SB object that encapsulates a model result
 #'
 #' @field artifactLoc String location pointing to the model artifact.
@@ -153,8 +155,12 @@ SBmodel = setRefClass("SBmodel",
     showROC_CV = function(){
       "Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
       showReport("roc_CV",FALSE) #problematic to show in internal browser non local resources
+    },
+    save = function(file) {
+      'Save the current object on the file in R external object format.'
+      SBmodelSerializeVar = .self
+      base::save(SBmodelSerializeVar, file = file)
     }
-
 
     # add stub function
     # non blocking
@@ -169,6 +175,10 @@ SBmodel = setRefClass("SBmodel",
   )
 );
 
+#To enable tab completion on SBmodel classes
+.DollarNames.SBmodel <- function(x, pattern){
+   grep(pattern, getRefClass(class(x))$methods(), value=TRUE)
+}
 
 
 
@@ -309,3 +319,16 @@ SBfeatureSearchOnly <- function(sessionName, trainingFilePath, target,
   model
 }
 
+#' load saved SparkBeyond model saved using $save
+#' @param file filename where the model was saved
+#' @return SBmodel object
+#' @examples
+#' #tf = paste(tempfile(), ".Rdata", sep="")
+#' #model$save(tf)
+#' #SBloadModel(tf)
+SBloadModel = function(file) {
+  base::load(file)
+  loadedModel = SBmodelSerializeVar
+  rm(SBmodelSerializeVar)
+  return(loadedModel)
+}
