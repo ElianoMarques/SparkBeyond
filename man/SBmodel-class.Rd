@@ -11,7 +11,9 @@ SB object that encapsulates a model result
 \section{Fields}{
 
 \describe{
-\item{\code{artifactLoc}}{String location pointing to the model artifact.}
+\item{\code{artifact_loc}}{String location pointing to the model artifact.}
+
+\item{\code{modelBuilt}}{Indication for whether only a feature search was performed or a full model was created.}
 }}
 \section{Methods}{
 
@@ -20,7 +22,7 @@ SB object that encapsulates a model result
 
 \item{\code{evaluate()}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
-\item{\code{initialize(artifact_loc, server_port = 9000)}}{initializes a model using a string provided as \code{loc}.}
+\item{\code{initialize(artifact_loc, modelBuilt = FALSE)}}{initializes a model using a string provided as \code{loc}.}
 
 \item{\code{predict(dataPath, outputPath)}}{Returns prediction on a created model. \code{dataPath} is the path to the file to be tested. \code{outputPath} is the path to write the results of the prediction.}
 
@@ -40,9 +42,9 @@ SB object that encapsulates a model result
 
 \item{\code{showModelComparison(showInIDE = TRUE)}}{Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.}
 
-\item{\code{showROC()}}{Shows ROC of the model in the IDE viewer on in the web browser.}
+\item{\code{showROC(showInIDE = TRUE)}}{Shows ROC of the model in the IDE viewer on in the web browser.}
 
-\item{\code{showROC_CV()}}{Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.}
+\item{\code{showROC_CV(showInIDE = TRUE)}}{Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.}
 
 \item{\code{showReport(report_name = NA, showInIDE = TRUE)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, features, field, function, InputSchema, modelComparison, roc_best, roc_CV}
 }}
@@ -58,5 +60,6 @@ predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
 eval = model$evaluate()
 #model$showFeatures()
 #model$showConfusionMatrix()
+#model$save("/tmp/myModel.Rdata")
 }
 

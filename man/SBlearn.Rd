@@ -8,8 +8,7 @@ SBlearn(sessionName, trainingFilePath, target, testFilePath = NA,
   trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
   algorithmsWhiteList = NA, hints = NA, useGraph = FALSE,
   maxFeaturesCount = 300, evaluationMetric = "PREC",
-  scoreOnTestSet = FALSE, crossValidation = 5, runBlocking = TRUE,
-  server_port = 9000)
+  scoreOnTestSet = FALSE, crossValidation = 5, runBlocking = TRUE)
 }
 \arguments{
 \item{sessionName}{String of the session name.}
@@ -17,8 +16,6 @@ SBlearn(sessionName, trainingFilePath, target, testFilePath = NA,
 \item{trainingFilePath}{String of the path to the file to be trained on.}
 
 \item{target}{String of the column name of in the training file that conatins the target of the prediction.}
-
-\item{server_port}{Optional. the port to be accessed in the SparkBeyond API server. 9000 by default.}
 
 \item{testFilePath:}{Optional. String of the path to an independent test file to test the prediction on. NA by default.}
 

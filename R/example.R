@@ -9,15 +9,14 @@
 
 #' Run SparkBeyond titanic example.
 #' @param configuration Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList
-#' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default
 #' @examples
 #' # run_SB_examples()
-run_SB_examples <- function(configuration='1', server_port = 9000) {
+run_SB_examples <- function(configuration='1') {
   print(paste("Running titanic train example - configuration: ",   configuration))
   write(paste("Running titanic train example - configuration: ",   configuration), stderr())
 
   res = tryCatch({
-    model = runTitanicLearn(configuration, server_port)
+    model = runTitanicLearn(configuration)
     runTitanicTestEnrich(model)
     runTitanicTestPredict(model)
     return ("Success")
@@ -30,16 +29,14 @@ run_SB_examples <- function(configuration='1', server_port = 9000) {
 
 #' Perform learn on SparkBeyond titanic example.
 #' @param configuration Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList.
-#' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default.
 #' @return SBmodel object containing the result of the learning
 #' @examples
 #' model = runTitanicLearn()
-runTitanicLearn <- function(configuration='1', server_port = 9000) {
+runTitanicLearn <- function(configuration='1') {
   params = list(
     sessionName = "titanic",
     trainingFilePath = getTitanicFilename(train = TRUE),
-    target = "survived",
-    server_port=server_port
+    target = "survived"
   )
   additional_params = switch (configuration,
     "1" = list(algorithmsWhiteList = list("RRandomForest")),
@@ -75,16 +72,14 @@ runTitanicTestPredict <- function(model) {
 }
 
 #' Perform feature search only on Titanic train data.
-#' @param server_port the port to be accessed in the SparkBeyond API server. 9000 by default.
 #' @return data.frame containing a prediction for each sample in the test set.
 #' @examples
 #' # model = runTitanicFeatureSelectionOnly()
-runTitanicFeatureSelectionOnly <- function(server_port = 9000) {
+runTitanicFeatureSelectionOnly <- function() {
   print("Performing feature search only on Titanic train data")
   model = SBfeatureSearchOnly(sessionName = "titanic",
                         trainingFilePath = getTitanicFilename(train = TRUE),
-                        target = "survived",
-                        server_port=server_port
+                        target = "survived"
   )
   return (model)
 }

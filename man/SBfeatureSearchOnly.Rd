@@ -6,7 +6,7 @@
 \usage{
 SBfeatureSearchOnly(sessionName, trainingFilePath, target, weightColumn = NA,
   maxDepth = 2, hints = NA, useGraph = FALSE, maxFeaturesCount = 300,
-  runBlocking = TRUE, server_port = 9000)
+  runBlocking = TRUE)
 }
 \arguments{
 \item{sessionName}{String of the session name.}
@@ -24,8 +24,6 @@ SBfeatureSearchOnly(sessionName, trainingFilePath, target, weightColumn = NA,
 \item{useGraph}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
 \item{maxFeaturesCount}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
-
-\item{server_port}{Optional. the port to be accessed in the SparkBeyond API server. 9000 by default.}
 }
 \value{
 SBmodel object that encapsulate the feature search result.
