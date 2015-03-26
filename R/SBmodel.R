@@ -104,7 +104,7 @@ SBmodel = setRefClass("SBmodel",
       if (is.na(report_name) || ! report_name %in% validReports ) stop("Report name is not valid")
       reportsThatRequireModel = c("confusionMatrix", "confusionMatrix_normalized", "modelComparison", "roc_best", "roc_CV")
       if (!modelBuilt && report_name %in% reportsThatRequireModel) stop("This report requires full model building using SBlearn")
-      if (showInIDE && (report_name == "roc_best" || report_name == "roc_CV")) print ("Graphs cannot be shown in the IDE and will be displayed in the external browser")
+ #     if (showInIDE && (report_name == "roc_best" || report_name == "roc_CV")) print ("Graphs cannot be shown in the IDE and will be displayed in the external browser")
       #verify model created, check if classification, file exists
       htmlSource <- paste(artifact_loc,"/reports/", report_name, ".html",sep="")
       viewer <- getOption("viewer")
@@ -148,13 +148,13 @@ SBmodel = setRefClass("SBmodel",
       "Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
       showReport("modelComparison",showInIDE)
     },
-    showROC = function(){
+    showROC = function(showInIDE = TRUE){
       "Shows ROC of the model in the IDE viewer on in the web browser."
-      showReport("roc_best",FALSE) #problematic to show in internal browser non local resources
+      showReport("roc_best",showInIDE) #problematic to show in internal browser non local resources
     },
-    showROC_CV = function(){
+    showROC_CV = function(showInIDE = TRUE){
       "Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
-      showReport("roc_CV",FALSE) #problematic to show in internal browser non local resources
+      showReport("roc_CV",showInIDE) #problematic to show in internal browser non local resources
     },
     save = function(file) {
       'Save the current object on the file in R external object format.'
