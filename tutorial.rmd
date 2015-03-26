@@ -45,11 +45,13 @@ model = SBlearn(sessionName = "titanic",
                         algorithmsWhiteList = list("RRandomForest"))
 ```
 
-The returned object `model` encapsulates a predictive-model on which we can perform various operations listed in the help for the SBmodel class. 
+The returned object `model` encapsulates a predictive-model on which we can perform various operations.
+
+The help file for `SBmodel` class contains additional information. 
 
 ### Enriching a dataset
 
-`enrich` is used to calculate & add new features from a `model` to a `dataset`, it requires the following input:
+`enrich` is usedadd new features to a `dataset` using a `model`, it requires the following input:
 
 1.  `datapath`      - data-file path (typically a test-set)
 2.  `outputPath`    - output file path
@@ -61,7 +63,7 @@ enriched = model$enrich(dataPath = test_file_path,
              featureCount=10)
 ```
 
-Each features is added to the dataset as a new columns
+Each feature is added to the dataset as a new column
 
 ```{r,  eval=FALSE}
 colnames(enriched)
@@ -90,7 +92,7 @@ predicted = model$predict(dataPath = test_file_path,
              outputPath = paste(getwd(),"titanic_test_predicted.tsv.gz",sep="/"))
 ```
 
-The resulting prediction is added to the dataset as a set of new columns
+The resulting prediction is added to the `dataset` as a set of new columns
 
 ```{r,  eval=FALSE}
 colnames(predicted)
@@ -115,7 +117,7 @@ It also returns an `eval` object containing evaluation metrics.
 
 ### Reports
 
-A rich set of pre-defined reports is available for model analysis. 
+A rich set of pre-defined reports is available for feature & model analysis. 
 These are HTML reports and will show either in the RStudio viewer pane or in an external browser. 
 
 #### Data & Features
@@ -123,15 +125,15 @@ These are HTML reports and will show either in the RStudio viewer pane or in an 
 * `showFeatures` - Features discovered by the system in the learning process 
 * `showFields` - Fields from which features were generated 
 * `showFunctions` - Transformations used to generate the features
-* `showExtractors` - will show extractors used in the features that were created
+* `showExtractors` - Extractors used to generate the features
 
 #### Model
 * `showROC` - ROC plot
 * `showConfusionMatrix` - Confusion matrix  (option for the normalized version)
-* `showROC_CV` - combined ROC plot for of the various algorithms that were tried
-* `showModelComparison` - Comparison evaluation table of the various algorithms that were tried
+* `showROC_CV` - combined ROC plot of the various algorithms attempted
+* `showModelComparison` - Comparison evaluation table of the various algorithms attempted
 
-Here are a a few examples:
+Here are a few examples:
 
 **Features**
 ```{r,  eval = FALSE}
@@ -152,7 +154,7 @@ model$showROC()
 <iframe width="1000" height="800" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/roc_best.html"  frameborder="0" seamless></iframe>
 
 ### Performing feature search only
-There is an option to perform only feature extraction at the learning stage using `SBfeatureSearchOnly`
+There is an option to perform only feature discovery at the learning stage using `SBfeatureSearchOnly`
 
 ```{r, eval = FALSE}
 model = SBfeatureSearchOnly(sessionName = "titanic",
@@ -160,5 +162,9 @@ model = SBfeatureSearchOnly(sessionName = "titanic",
                         target = "survived")
 ```
 In this case, the user will be able to call `evaluate` but will get an exception calling `predict`.
-In edition, some of the reports pertaining to the model results (e.g., `showROC` and `showConfusionMatrix`) will not be available.  
+
+In addition, some of the reports pertaining to model evaluation (e.g., `showROC` and `showConfusionMatrix`) will not be available.  
+
+
+
 
