@@ -1,0 +1,17 @@
+---
+title: "fullTutorial"
+author: "Guy Zinman"
+date: "March 26, 2015"
+output: html_document
+---
+
+# Need to add the rest of the code from Mar 25 in the morning
+
+### Saving and loading models
+ 
+Models can be saved by calling the `save` method and be loaded using the `SBloadModel` function.
+```{r,  eval=TRUE}
+model$save("/tmp/myModel.Rdata")
+model2 = SBloadModel("/tmp/myModel.Rdata")
+eval2 = model2$evaluate()
+```

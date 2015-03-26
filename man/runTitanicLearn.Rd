@@ -4,12 +4,10 @@
 \alias{runTitanicLearn}
 \title{Perform learn on SparkBeyond titanic example.}
 \usage{
-runTitanicLearn(configuration = "1", server_port = 9000)
+runTitanicLearn(configuration = "1")
 }
 \arguments{
 \item{configuration}{Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList.}
-
-\item{server_port}{the port to be accessed in the SparkBeyond API server. 9000 by default.}
 }
 \value{
 SBmodel object containing the result of the learning

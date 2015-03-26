@@ -4,10 +4,7 @@
 \alias{runTitanicFeatureSelectionOnly}
 \title{Perform feature search only on Titanic train data.}
 \usage{
-runTitanicFeatureSelectionOnly(server_port = 9000)
-}
-\arguments{
-\item{server_port}{the port to be accessed in the SparkBeyond API server. 9000 by default.}
+runTitanicFeatureSelectionOnly()
 }
 \value{
 data.frame containing a prediction for each sample in the test set.
