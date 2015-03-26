@@ -8,9 +8,7 @@
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 
-<meta name="author" content="Guy Zinman" />
 
-<meta name="date" content="2015-03-25" />
 
 <title>SparkBeyond R plugin tutorial</title>
 
@@ -63,150 +61,137 @@ img {
 
 <div id="header">
 <h1 class="title">SparkBeyond R plugin tutorial</h1>
-<h4 class="author"><em>Guy Zinman</em></h4>
-<h4 class="date"><em>March 25, 2015</em></h4>
 </div>
 
 
-<p>This tutorial explains the basics of how to use the <strong>R SparkBeyond plugin</strong>.</p>
-<p>For this tutorial we will use titanic as an example.</p>
+<p>This tutorial explains how to use <strong>R SparkBeyond plugin</strong>.</p>
 <div id="installation" class="section level3">
 <h3>Installation</h3>
-<p>We will first install and load the SBadatper plugin: <!-- eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all --></p>
+<p>Install and load the SBadatper plugin</p>
+<!-- 
+  Comment:
+  ========
+  eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all 
+--> 
+  
+
 <pre class="r"><code>library('devtools')
 install_github('zinman/SBadapter')
 library('SBadapter')</code></pre>
 </div>
-<div id="loading-data" class="section level3">
-<h3>Loading data</h3>
-<p>As example datasets we added titanic train and test datasets to this package. We will first use an auxiliary function named ‘getTitanicFilename’ to retrieve the path to the train file (and also to the test file for a later use):</p>
-<pre class="r"><code>train_file_path = getTitanicFilename(train = TRUE)
-test_file_path = getTitanicFilename(train = FALSE)</code></pre>
-</div>
 <div id="feature-search-model-building" class="section level3">
 <h3>Feature search + Model building</h3>
-<p>We can now send this file (or alternatively a file of your choice for training). The necessary parameters are:</p>
+<p><code>SBlearn</code> is used to discover features &amp; build a model, it requires the following input:</p>
 <ol style="list-style-type: decimal">
-<li><code>sessionName</code> - a name describring the analysis</li>
-<li><code>training file path</code> - the path to the training file</li>
-<li><code>target</code> - the column name in the input data that denotes the label you want to learn</li>
+<li><code>sessionName</code> - a name describring the analysis<br /></li>
+<li><code>training file path</code> - the path to the training file (text file, comma or tab separated)</li>
+<li><code>target</code> - the column name in the input data denoting the label to learn</li>
 </ol>
-<p>In order to expedite this run, we are limiting the algorithms to be used to R’s RandomForest algorithm. There are many other parameters that can be defined in the learning process and they are detailed in the SBadapter help. <!-- PUT LINK TO HELP HERE --></p>
+<!--  
+  Comment:
+  ========
+  in order for this to work we need to get the titanic file path using:
+  train_file_path = getTitanicFilename(train = TRUE)
+--> 
+
+
 <pre class="r"><code>model = SBlearn(sessionName = &quot;titanic&quot;,
                         trainingFilePath = train_file_path,
                         target = &quot;survived&quot;,
                         algorithmsWhiteList = list(&quot;RRandomForest&quot;))</code></pre>
-<pre><code>## [1] &quot;Artifact location was created at: /Users/zinman/sparkBeyond/coderbot/web/target/universal/stage/localdata/artifacts/titanic/89&quot;
-## [1] &quot;In modeling process... please notice that this process may take some time...  0&quot;
-## [1] &quot;In modeling process... please notice that this process may take some time...  1&quot;
-## [1] &quot;In modeling process... please notice that this process may take some time...  2&quot;</code></pre>
-<p>The returned object encapsulates a model on which we can perform various operations listed in the help for the SBmodel class. We will demonstrate below some of them.</p>
+<p>The returned object <code>model</code> encapsulates a predictive-model on which we can perform various operations listed in the help for the SBmodel class.</p>
 </div>
 <div id="enriching-a-dataset" class="section level3">
 <h3>Enriching a dataset</h3>
-<p>We will now show how to enrich an external dataset (e.g, our holdout test titanic data) using SparkBeyond features that were automatically generated in the model above. The parameters are:</p>
+<p><code>enrich</code> is used to calculate &amp; add new features from a <code>model</code> to a <code>dataset</code>, it requires the following input:</p>
 <ol style="list-style-type: decimal">
-<li><code>datapath</code> - the path to the test file</li>
-<li><code>outputPath</code> - the path to where the output should be written to</li>
-<li><code>featureCount</code> - the number of features to get back (use NA for all, in this example we request only the top 10)</li>
+<li><code>datapath</code> - data-file path (typically a test-set)</li>
+<li><code>outputPath</code> - output file path</li>
+<li><code>featureCount</code> - number of features (use NA to get all features)</li>
 </ol>
 <pre class="r"><code>enriched = model$enrich(dataPath = test_file_path, 
              outputPath = paste(getwd(),&quot;titanic_test_enriched.tsv.gz&quot;,sep=&quot;/&quot;), 
-             featureCount=10)
-colnames(enriched)</code></pre>
-<pre><code>##  [1] &quot;pclass&quot;                                                   
-##  [2] &quot;name&quot;                                                     
-##  [3] &quot;sex&quot;                                                      
-##  [4] &quot;age&quot;                                                      
-##  [5] &quot;sibsp&quot;                                                    
-##  [6] &quot;parch&quot;                                                    
-##  [7] &quot;ticket&quot;                                                   
-##  [8] &quot;fare&quot;                                                     
-##  [9] &quot;cabin&quot;                                                    
-## [10] &quot;embarked&quot;                                                 
-## [11] &quot;ngrams2_name_contains_mr_&quot;                                
-## [12] &quot;numericSubstring_ticket_120393_25_111538_75&quot;              
-## [13] &quot;fare_length_5_0_1_5&quot;                                      
-## [14] &quot;name_zipWithIndex_getOrElse_0_18&quot;                         
-## [15] &quot;numericSubstring_fare_15_172899999999998&quot;                 
-## [16] &quot;sex_male&quot;                                                 
-## [17] &quot;newCore_datastructures_Histogram_name_getOrElse_e_0_0_1_5&quot;
-## [18] &quot;prefixes_ticket_Contains_349&quot;                             
-## [19] &quot;prefixes_ticket_Contains_34&quot;                              
-## [20] &quot;smallSubsets_fare_ContainsList_4_1_7_&quot;</code></pre>
-<p>As you see we got the 10 original columns + 10 more columns generated by the model. The new columns have standardized names and we will short see how get more information on the new features.</p>
+             featureCount=10)</code></pre>
+<p>Each features is added to the dataset as a new columns</p>
+<pre class="r"><code>colnames(enriched)</code></pre>
+<p>As you see we now have 10 original <em>titanic</em> columns + 10 additional columns generated by the model.</p>
+<!--  
+  Comment:
+  ========
+  in order for this to work we need to get the titanic file path using:
+  test_file_path = getTitanicFilename(train = FALSE)  
+--> 
+
 </div>
 <div id="making-a-prediction" class="section level3">
 <h3>Making a prediction</h3>
-<p>We will now show how to apply the model on an external dataset (e.g, our holdout test titanic data). The parameters are:</p>
+<p><code>predict</code> is used to calculate predicted-values for <code>target</code> based on a <code>model</code> applied to a <code>dataset</code>,</p>
+<p>it requires the following input:</p>
 <ol style="list-style-type: decimal">
-<li><code>datapath</code> - the path to the test file</li>
-<li><code>outputPath</code> - the path to where the output should be written to</li>
+<li><code>datapath</code> - data-file path (typically a test-set)</li>
+<li><code>outputPath</code> - output file path</li>
 </ol>
 <pre class="r"><code>predicted = model$predict(dataPath = test_file_path, 
-             outputPath = paste(getwd(),&quot;titanic_test_predicted.tsv.gz&quot;,sep=&quot;/&quot;))
-colnames(predicted)</code></pre>
-<pre><code>##  [1] &quot;pclass&quot;             &quot;name&quot;               &quot;sex&quot;               
-##  [4] &quot;age&quot;                &quot;sibsp&quot;              &quot;parch&quot;             
-##  [7] &quot;ticket&quot;             &quot;fare&quot;               &quot;cabin&quot;             
-## [10] &quot;embarked&quot;           &quot;survived_predicted&quot; &quot;X_0_probability&quot;   
-## [13] &quot;X_1_probability&quot;</code></pre>
-<pre class="r"><code>predicted[1:5,c(&quot;survived_predicted&quot;, &quot;X_0_probability&quot;, &quot;X_1_probability&quot;)]</code></pre>
-<pre><code>##   survived_predicted X_0_probability X_1_probability
-## 1                  0           0.936           0.064
-## 2                  1           0.482           0.518
-## 3                  0           0.752           0.248
-## 4                  0           0.958           0.042
-## 5                  1           0.324           0.676</code></pre>
-<p>As we can see we got back 3 additional columns, one indicating the final prediction, and two columns indicated the probability for getting the class “0” and class “1” of the survival state.</p>
+             outputPath = paste(getwd(),&quot;titanic_test_predicted.tsv.gz&quot;,sep=&quot;/&quot;))</code></pre>
+<p>The resulting prediction is added to the dataset as a set of new columns</p>
+<pre class="r"><code>colnames(predicted)
+predicted[1:5,c(&quot;survived_predicted&quot;, &quot;X_0_probability&quot;, &quot;X_1_probability&quot;)]</code></pre>
+<p>We now have 3 additional columns:</p>
+<ol style="list-style-type: decimal">
+<li>final prediction</li>
+<li>probability of class “0”</li>
+<li>probability of class “1”</li>
+</ol>
 </div>
 <div id="model-evaluation" class="section level3">
 <h3>Model evaluation</h3>
-<p>Calling <code>evaluate</code> on <code>model</code> will produce a short text report on the results of the model. In addition the return object contains addtional evaluation metrics available to the user.</p>
+<p><code>evaluate</code> summarizes <code>model</code> results in a short textual report.</p>
 <pre class="r"><code>eval = model$evaluate()</code></pre>
-<pre><code>## === Detailed Accuracy By Class ===
-##                                                                                      
-## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
-##                                                                                      
-## 0               0.916     0.351     0.79        0.916    0.848       0.871      0.742
-## 1               0.649     0.084     0.842       0.649    0.733       0.871      0.742
-## Weighted Avg.   0.807     0.242     0.811       0.807    0.801       0.871      0.742
-## </code></pre>
+<p>It also returns an <code>eval</code> object containing evaluation metrics.</p>
 </div>
 <div id="reports" class="section level3">
 <h3>Reports</h3>
-<p>There are numerous reports that can be call on the results of a model and the user. These are HTML reports and will show either in the RStudio viewer pane or in an external browser. The reports divide to reports that provide information regarding the feature search process, including:</p>
+<p>A rich set of pre-defined reports is available for model analysis. These are HTML reports and will show either in the RStudio viewer pane or in an external browser.</p>
+<div id="data-features" class="section level4">
+<h4>Data &amp; Features</h4>
 <ul>
-<li><code>showInputSchema</code> - will show the list of fields that were sent to the feature search process, including types, cardinality and more</li>
-<li><code>showFeatures</code> - will show features that were generated by the feature search process including statics on the performance of each one.</li>
-<li><code>showFields</code> - will show fields from which features were generated</li>
-<li><code>showFunctions</code> - will show functions used in the features that were created</li>
+<li><code>showInputSchema</code> - Schema of the dataset sent for modeling</li>
+<li><code>showFeatures</code> - Features discovered by the system in the learning process</li>
+<li><code>showFields</code> - Fields from which features were generated</li>
+<li><code>showFunctions</code> - Transformations used to generate the features</li>
 <li><code>showExtractors</code> - will show extractors used in the features that were created</li>
 </ul>
-<p>and reports that provide information regarding the modeling process, including:</p>
+</div>
+<div id="model" class="section level4">
+<h4>Model</h4>
 <ul>
-<li><code>showROC</code> - will plot in the browser the ROC of the model that was generated</li>
-<li><code>showConfusionMatrix</code> - will show the confusion matrix table (option for the normalized version)</li>
-<li><code>showROC_CV</code> - will plot in the browser the ROC of the various algorithms that were tried</li>
-<li><code>showModelComparison</code> - will provide a table summarizing the CV results for the different algorithms</li>
+<li><code>showROC</code> - ROC plot</li>
+<li><code>showConfusionMatrix</code> - Confusion matrix (option for the normalized version)</li>
+<li><code>showROC_CV</code> - combined ROC plot for of the various algorithms that were tried</li>
+<li><code>showModelComparison</code> - Comparison evaluation table of the various algorithms that were tried</li>
 </ul>
-<p>Here are some examples of reports:</p>
+<p>Here are a a few examples:</p>
 <p><strong>Features</strong></p>
 <pre class="r"><code>model$showFeatures()</code></pre>
-<p>should look like this: <iframe width="900" height="400" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/features.html" frameborder="0" seamless></iframe></p>
+<iframe width="900" height="400" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/features.html" frameborder="0" seamless></iframe>
+
 <p><strong>Confusion matrix</strong></p>
 <pre class="r"><code>model$showConfusionMatrix()</code></pre>
-<p>should look like this: <iframe width="400" height="400" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/confusionMatrix.html" frameborder="0" seamless></iframe></p>
+<iframe width="400" height="400" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/confusionMatrix.html" frameborder="0" seamless></iframe>
+
 <p><strong>ROC plot</strong></p>
 <pre class="r"><code>model$showROC()</code></pre>
-<p>should look like this: <iframe width="1000" height="800" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/roc_best.html" frameborder="0" seamless></iframe></p>
+<iframe width="1000" height="800" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/roc_best.html" frameborder="0" seamless></iframe>
+
+</div>
 </div>
 <div id="performing-feature-search-only" class="section level3">
 <h3>Performing feature search only</h3>
-<p>This is very similar to the the <code>SBlearn</code> call but will preform only the feature selection phase. In this mode, the user will be able to call <code>evaluate</code> but will get an exception calling <code>predict</code>. In edition, some of the reports pertaining to the model results (e.g., <code>showROC</code> and <code>showConfusionMatrix</code>) will not be available.</p>
+<p>There is an option to perform only feature extraction at the learning stage using <code>SBfeatureSearchOnly</code></p>
 <pre class="r"><code>model = SBfeatureSearchOnly(sessionName = &quot;titanic&quot;,
                         trainingFilePath = train_file_path,
                         target = &quot;survived&quot;)</code></pre>
+<p>In this case, the user will be able to call <code>evaluate</code> but will get an exception calling <code>predict</code>. In edition, some of the reports pertaining to the model results (e.g., <code>showROC</code> and <code>showConfusionMatrix</code>) will not be available.</p>
 </div>
 
 
