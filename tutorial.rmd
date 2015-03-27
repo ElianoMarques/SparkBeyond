@@ -132,21 +132,24 @@ These are HTML reports and will show either in the RStudio viewer pane or in an 
 * `showROC_CV` - Combined ROC plot of the various algorithms attempted
 * `showModelComparison` - Comparison evaluation table of the various algorithms attempted
 
+
+#### Examples
+
 Here are a few examples:
 
-**Features**
+#####Features
 ```{r,  eval = FALSE}
 model$showFeatures()
 ```
 <iframe width="900" height="400" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/features.html"  frameborder="0" seamless></iframe>
 
-**Confusion matrix**
+#####Confusion matrix
 ```{r,  eval = FALSE}
 model$showConfusionMatrix()
 ```
 <iframe width="400" height="400" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/confusionMatrix.html"  frameborder="0" seamless></iframe>
 
-**ROC plot**
+#####ROC plot
 ```{r,  eval = FALSE}
 model$showROC()
 ```
