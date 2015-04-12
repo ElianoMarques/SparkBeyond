@@ -26,8 +26,6 @@ SB object that encapsulates a model result
 
 \item{\code{predict(dataPath, outputPath)}}{Returns prediction on a created model. \code{dataPath} is the path to the file to be tested. \code{outputPath} is the path to write the results of the prediction.}
 
-\item{\code{save(file)}}{Save the current object on the file in R external object format.}
-
 \item{\code{showConfusionMatrix(normalized = FALSE, showInIDE = TRUE)}}{Shows a confusion matrix of a model in the IDE viewer on in the web browser.}
 
 \item{\code{showExtractors(showInIDE = TRUE)}}{Shows extractors used by a model in the IDE viewer on in the web browser.}

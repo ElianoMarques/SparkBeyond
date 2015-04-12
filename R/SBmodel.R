@@ -1,53 +1,9 @@
 library(methods) #to support RScript
 
-assign("SBhost", "http://127.0.0.1", envir = globalenv())
-assign("SBport", "9000", envir = globalenv())
-print(paste("Setting server host to:", SBhost))
-print(paste("Setting server port to:", SBport))
-
-globalVariables('SBhost', 'SBadapter', add = TRUE)
-globalVariables('SBport', 'SBadapter', add = TRUE)
-
-#' A function to set the SparkBeyond server host.
-#' @param host new host URL.
-setSBserverHost = function(host = "http://127.0.0.1"){
-  assign("SBhost", host, envir = globalenv())
-  print(paste("Setting server host to:", SBhost))
+#To enable tab completion on SBmodel classes
+.DollarNames.SBmodel <- function(x, pattern){
+  grep(pattern, getRefClass(class(x))$methods(), value=TRUE)
 }
-
-#' A function to set the SparkBeyond server host.
-getSBserverHost = function() {
-  host = if (exists("SBhost")) SBhost else setSBserverHost()
-  return(host)
-}
-
-#' A function to set the SparkBeyond server host.
-printSBserverHost = function() {
-  host = getSBserverHost()
-  print(paste("Server host is:", host))
-}
-
-
-#' A function to set the SparkBeyond server port.
-#' @param port new port.
-setSBserverPort = function(port = "9000"){
-  assign("SBport", port, envir = globalenv())
-  print(paste("Setting server port to:", SBport))
-  return(SBport)
-}
-
-#' A function to get the SparkBeyond server port.
-getSBserverPort = function() {
-  port = if (exists("SBport")) SBport else setSBserverPort()
-  return(port)
-}
-
-#' A function to print the SparkBeyond server port.
-printSBserverPort = function() {
-  port = getSBserverPort()
-  print(paste("Server port is:", port))
-}
-
 
 #' SB object that encapsulates a model result
 #' @field artifact_loc String location pointing to the model artifact.
@@ -66,313 +22,220 @@ printSBserverPort = function() {
 #' #model$showConfusionMatrix()
 #' #model$save("/tmp/myModel.Rdata")
 SBmodel = setRefClass("SBmodel",
-                      fields = list(
-                        artifact_loc = "character",
-                        modelBuilt = "logical"
-                      ),
-                      methods = list(
-                        initialize = function(artifact_loc, modelBuilt = FALSE) {
-                          "initializes a model using a string provided as \\code{loc}."
-                          artifact_loc<<- artifact_loc
-                          modelBuilt <<- modelBuilt
-                        },
+    fields = list(
+      artifact_loc = "character",
+      modelBuilt = "logical"       #TODO: replace to a function call
+    ),
+    methods = list(
+      initialize = function(artifact_loc, modelBuilt = FALSE) {
+        "initializes a model using a string provided as \\code{loc}."
+        artifact_loc<<- artifact_loc
+        modelBuilt <<- modelBuilt
+      },
 
-                        predict = function(dataPath, outputPath) {
-                          "Returns prediction on a created model. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction."
-                          if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
-                          url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/predict", sep="")
-                          print(paste("Calling:", url))
-                          params <-list(modelPath = artifact_loc,
-                                        dataPath = dataPath,
-                                        outputPath = outputPath)
+      waitForProcess = function() { #TODO: number of mintues as parameter?
+        serverResponded = FALSE
+        i = 0
+        finalStatus = repeat {
+          i = i+1
+          if (i >= 3 && !serverResponded) {
+            res = "Server didn't respond for 30 seconds... check that server is up... terminating."
+            print(res)
+            flush.console()
+            stop(res)
+          }
+          status = checkStatus()
+          switch (status,
+            "DONE" = return ("Done"),
+            "NOT_ALIVE" = return ("Server is not alive"),
+            "IN_PROCESS" = {serverResponded = TRUE},
+            "NO_RESPONSE" = {serverResponded = FALSE}
+          )
+          print(paste("In modeling process... please notice that this process may take some time... ",i))
+          flush.console()
+          if (i %% 6 == 0 ) {  #TODO: report status in a parsed way
+            print(i)
+            print(status) #TODO: parse
+            flush.console()
+          }
+          Sys.sleep(10)
+        }
+        return (finalStatus)
+      },
 
-                          body = rjson::toJSON(params)
-                          res = httr::POST(url, body = body, httr::content_type_json())
-                          res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+      checkStatus = function() {
+        statusFile = paste(artifact_loc,"/json/status.json", sep="")
+        finalStatus = if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
+          serverResponded = TRUE
+          status = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
+          if (status$evaluation == TRUE) return ("DONE")
+          if (status$alive == FALSE) return("NOT_ALIVE")
+          return("IN_PROCESS")   #TODO: further parse status and refine to feature search, evaluation
+        } else return("NO_RESPONSE")
+      },
 
-                          finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
-                            read.table(outputPath, header = TRUE, sep="\t")
-                          } else {
-                            message = paste("Prediction failed: ", res$error)
-                            print(message)
-                            stop(message)
-                          }
-                          return(finalRes)
-                        },
+      statusException = function() {
+        status = checkStatus()
+        if (status == "IN_PROCESS") stop("Processing still didn't finish") #TODO: or more refined
+        if (status != "DONE") stop(paste("Model was not created - ", status))
+      },
 
-                        enrich = function(dataPath, outputPath, featureCount = NA) {
-                          "Returns a data frame containing the enrichedData. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction. featureCount Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling)."
-                          url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich", sep="")
-                          print(paste("Calling:", url))
-                          params <-list(modelPath = artifact_loc,
-                                        dataPath = dataPath,
-                                        featureCount = featureCount,
-                                        outputPath = outputPath)
+      predict = function(dataPath, outputPath) {
+        "Returns prediction on a created model. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction."
+        statusException()
+        if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
+        url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/predict", sep="")
+        print(paste("Calling:", url))
+        params <-list(modelPath = artifact_loc,
+                      dataPath = dataPath,
+                      outputPath = outputPath)
 
-                          params = params[!is.na(params)]
+        body = rjson::toJSON(params)
+        res = httr::POST(url, body = body, httr::content_type_json())
+        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
-                          body = rjson::toJSON(params)
-                          res = httr::POST(url, body = body, httr::content_type_json())
-                          res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
+          read.table(outputPath, header = TRUE, sep="\t")
+        } else {
+          message = paste("Prediction failed: ", res$error)
+          print(message)
+          stop(message)
+        }
+        return(finalRes)
+      },
 
-                          finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
-                            df = read.table(outputPath, header = TRUE, sep="\t")
-                            for(i in 1:ncol(df)){
-                              if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
-                                df[,i] = as.logical(as.character(df[,i]))
-                              } else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
-                                df[,i] = as.logical(as.character(df[,i]))
-                              }
-                            }
-                            df
-                          } else {
-                            message = paste("Enrichment failed: ", res$error)
-                            print(message)
-                            stop(message)
-                          }
-                          return(finalRes)
-                        },
+      enrich = function(dataPath, outputPath, featureCount = NA) {
+        "Returns a data frame containing the enrichedData. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction. featureCount Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling)."
+        statusException()
+        url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich", sep="")
+        print(paste("Calling:", url))
+        params <-list(modelPath = artifact_loc,
+                      dataPath = dataPath,
+                      featureCount = featureCount,
+                      outputPath = outputPath)
 
-                        evaluate = function() {
-                          "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
-                          if (!modelBuilt) stop("Evaluation requires full model building using SBlearn")
-                          evaluationFile = paste(artifact_loc,"/json/evaluation.json", sep="")
-                          evaluation = if (file.exists(evaluationFile)){
-                            lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
-                            eval = jsonlite::fromJSON(gsub("NaN", 0.0, lines),flatten = TRUE)
-                            writeLines(eval$evaluation$classDetails)
-                            eval
-                          } else {stop(paste("Evaluation file does not exist in ", artifact_loc))}
-                          return (evaluation)
-                        },
+        params = params[!is.na(params)]
 
-                        showReport = function(report_name = NA, showInIDE = TRUE){ #confine to a specific list
-                          "\\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, features, field, function, InputSchema, modelComparison, roc_best, roc_CV"
-                          validReports = c("confusionMatrix", "confusionMatrix_normalized", "extractor", "features", "field",
-                                           "function", "InputSchema", "modelComparison", "roc_best", "roc_CV")
-                          if (is.na(report_name) || ! report_name %in% validReports ) stop("Report name is not valid")
-                          reportsThatRequireModel = c("confusionMatrix", "confusionMatrix_normalized", "modelComparison", "roc_best", "roc_CV")
-                          if (!modelBuilt && report_name %in% reportsThatRequireModel) stop("This report requires full model building using SBlearn")
-                          #verify model created, check if classification, file exists
-                          htmlSource <- paste(artifact_loc,"/reports/", report_name, ".html",sep="")
-                          viewer <- getOption("viewer")
-                          if (!is.null(viewer) && showInIDE){
-                            x <- paste(readLines(htmlSource, warn = F), collapse = '\n')
-                            temp.f <- tempfile("plot", fileext=c(".html"))
-                            writeLines(x, con = temp.f)
-                            viewer(temp.f)
-                          }
-                          else
-                            utils::browseURL(htmlSource)
-                        },
+        body = rjson::toJSON(params)
+        res = httr::POST(url, body = body, httr::content_type_json())
+        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
-                        showExtractors = function(showInIDE = TRUE){
-                          "Shows extractors used by a model in the IDE viewer on in the web browser."
-                          showReport("extractor",showInIDE)
-                        },
-                        showFeatures = function(showInIDE = TRUE){
-                          "Shows features used by a model in the IDE viewer on in the web browser."
-                          showReport("features",showInIDE)
-                        },
-                        showFields = function(showInIDE = TRUE){
-                          "Shows fields used by a model in the IDE viewer on in the web browser."
-                          showReport("field",showInIDE)
-                        },
-                        showFunctions = function(showInIDE = TRUE){
-                          "Shows functions used by a model in the IDE viewer on in the web browser."
-                          showReport("function",showInIDE)
-                        },
-                        showInputSchema = function(showInIDE = TRUE){
-                          "Shows the input schema a model in the IDE viewer on in the web browser."
-                          showReport("InputSchema",showInIDE)
-                        },
+        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
+          df = read.table(outputPath, header = TRUE, sep="\t")
+          for(i in 1:ncol(df)){
+            if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
+              df[,i] = as.logical(as.character(df[,i]))
+            } else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
+              df[,i] = as.logical(as.character(df[,i]))
+            }
+          }
+          df
+        } else {
+          message = paste("Enrichment failed: ", res$error)
+          print(message)
+          stop(message)
+        }
+        return(finalRes)
+      },
 
-                        #require model methods
-                        showConfusionMatrix = function(normalized = FALSE, showInIDE = TRUE){ #verify that this was a classification problem
-                          "Shows a confusion matrix of a model in the IDE viewer on in the web browser."
-                          showReport(if (normalized) "confusionMatrix_normalized" else "confusionMatrix",showInIDE)
-                        },
-                        showModelComparison = function(showInIDE = TRUE){
-                          "Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
-                          showReport("modelComparison",showInIDE)
-                        },
-                        showROC = function(showInIDE = TRUE){
-                          "Shows ROC of the model in the IDE viewer on in the web browser."
-                          showReport("roc_best",showInIDE) #problematic to show in internal browser non local resources
-                        },
-                        showROC_CV = function(showInIDE = TRUE){
-                          "Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
-                          showReport("roc_CV",showInIDE) #problematic to show in internal browser non local resources
-                        },
-                        save = function(file) {
-                          'Save the current object on the file in R external object format.'
-                          SBmodelSerializeVar = .self
-                          base::save(SBmodelSerializeVar, file = file)
-                        }
+      evaluate = function() {
+        "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
+        statusException()
+        if (!modelBuilt) stop("Evaluation requires full model building using SBlearn")
+        evaluationFile = paste(artifact_loc,"/json/evaluation.json", sep="")
+        evaluation = if (file.exists(evaluationFile)){
+          lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
+          eval = jsonlite::fromJSON(gsub("NaN", 0.0, lines),flatten = TRUE)
+          writeLines(eval$evaluation$classDetails)
+          eval
+        } else {stop(paste("Evaluation file does not exist in ", artifact_loc))}
+        return (evaluation)
+      },
 
-                        # add stub function
-                        # non blocking
-                        # add groupBy column, time column
-                        # add features json
-                        # lift, regression plots
-                        # feature clusters report
-                        # featurePlot
-                        # add S3 methods of print, predict
+      showReport = function(report_name = NA, showInIDE = TRUE){ #confine to a specific list
+        "\\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, features, field, function, InputSchema, modelComparison, roc_best, roc_CV"
+        validReports = c("confusionMatrix", "confusionMatrix_normalized", "extractor", "features", "field",
+                         "function", "InputSchema", "modelComparison", "roc_best", "roc_CV")
+        if (is.na(report_name) || ! report_name %in% validReports ) stop("Report name is not valid")
+        reportsThatRequireModel = c("confusionMatrix", "confusionMatrix_normalized", "modelComparison", "roc_best", "roc_CV")
+        if (!modelBuilt && report_name %in% reportsThatRequireModel) stop("This report requires full model building using SBlearn")
+        #verify model created, check if classification, file exists
+        statusException() #TODO: can be more refined here per report
+        htmlSource <- paste(artifact_loc,"/reports/", report_name, ".html",sep="")
+        viewer <- getOption("viewer")
+        if (!is.null(viewer) && showInIDE){
+          x <- paste(readLines(htmlSource, warn = F), collapse = '\n')
+          temp.f <- tempfile("plot", fileext=c(".html"))
+          writeLines(x, con = temp.f)
+          viewer(temp.f)
+        }
+        else
+          utils::browseURL(htmlSource)
+      },
 
-                      )
+      showExtractors = function(showInIDE = TRUE){
+        "Shows extractors used by a model in the IDE viewer on in the web browser."
+        showReport("extractor",showInIDE)
+      },
+      showFeatures = function(showInIDE = TRUE){
+        "Shows features used by a model in the IDE viewer on in the web browser."
+        showReport("features",showInIDE)
+      },
+      showFields = function(showInIDE = TRUE){
+        "Shows fields used by a model in the IDE viewer on in the web browser."
+        showReport("field",showInIDE)
+      },
+      showFunctions = function(showInIDE = TRUE){
+        "Shows functions used by a model in the IDE viewer on in the web browser."
+        showReport("function",showInIDE)
+      },
+      showInputSchema = function(showInIDE = TRUE){
+        "Shows the input schema a model in the IDE viewer on in the web browser."
+        showReport("InputSchema",showInIDE)
+      },
+
+      #require model methods
+      showConfusionMatrix = function(normalized = FALSE, showInIDE = TRUE){ #verify that this was a classification problem
+        "Shows a confusion matrix of a model in the IDE viewer on in the web browser."
+        showReport(if (normalized) "confusionMatrix_normalized" else "confusionMatrix",showInIDE)
+      },
+      showModelComparison = function(showInIDE = TRUE){
+        "Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
+        showReport("modelComparison",showInIDE)
+      },
+      showROC = function(showInIDE = TRUE){
+        "Shows ROC of the model in the IDE viewer on in the web browser."
+        showReport("roc_best",showInIDE) #problematic to show in internal browser non local resources
+      },
+      showROC_CV = function(showInIDE = TRUE){
+        "Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
+        showReport("roc_CV",showInIDE) #problematic to show in internal browser non local resources
+      }
+# save and load are probably more confusing at this time hence commented out. Just use regular save and load.
+#       ,
+#       save = function(filename) {
+#         'Save the current object to \\code{filename} in R external object format.'
+#         SBmodelSerializeVar = .self
+#         base::save(SBmodelSerializeVar, file = filename)
+#       },
+#
+#       load = function(filename) {
+#         'Loads a saved SparkBeyond model saved using \\code{$save}. Paramter: \\code{filename} where the model was saved.'
+#         base::load(filename)
+#         loadedModel = SBmodelSerializeVar
+#         rm(SBmodelSerializeVar)
+#         return(loadedModel)
+#       }
+
+      # add groupBy column, time column
+      # add features json
+      # lift, regression plots
+      # feature clusters report
+      # featurePlot
+      # add S3 methods of print, predict
+  )
 );
 
-#To enable tab completion on SBmodel classes
-.DollarNames.SBmodel <- function(x, pattern){
-  grep(pattern, getRefClass(class(x))$methods(), value=TRUE)
-}
 
 
-
-# S3 functions (De facto constructors of SBmodel)
-
-
-#' Run SparkBeyond feature enrichment and learning process.
-#' @param sessionName String of the session name.
-#' @param trainingFilePath String of the path to the file to be trained on.
-#' @param target String of the column name of in the training file that conatins the target of the prediction.
-#' @param testFilePath: Optional. String of the path to an independent test file to test the prediction on. NA by default.
-#' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
-#' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
-#' @param maxDepth: Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
-#' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
-#' @param hints: Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.
-#' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
-#' @param maxFeaturesCount: Optional. An integer of how many features should be created by the SB engine. 300 by default.
-#' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
-#' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
-#' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
-#' @return SBmodel object the encapsulate the prediction.
-#' @examples
-#' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
-SBlearn <- function(sessionName, trainingFilePath, target,
-                    testFilePath = NA,
-                    trainTestSplitRatio = 0.8,
-                    weightColumn = NA,
-                    maxDepth = 2,
-                    algorithmsWhiteList = NA, #list available algorithms
-                    hints = NA,
-                    useGraph = FALSE,
-                    maxFeaturesCount = 300, #make it a list
-                    evaluationMetric = "PREC", #add all options
-                    scoreOnTestSet = FALSE,
-                    crossValidation = 5,
-                    runBlocking = TRUE){
-
-  url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
-  print(paste("Calling:", url))
-
-  params <-list("sessionName" = sessionName,
-                "trainingFilePath" = trainingFilePath,
-                target = target,
-                testFilePath = testFilePath,
-                trainTestSplitRatio = trainTestSplitRatio,
-                weightColumn = weightColumn,
-                maxDepth = maxDepth,
-                algorithmsWhiteList = algorithmsWhiteList,
-                hints = hints,
-                useGraph = useGraph,
-                globalFeatureIterations = maxFeaturesCount,
-                evaluationMetric = evaluationMetric,
-                scoreOnTestSet = scoreOnTestSet,
-                crossValidation = crossValidation
-  )
-
-  params = params[!is.na(params)]
-
-  body = rjson::toJSON(params)
-  res = httr::POST(url, body = body, httr::content_type_json())
-  res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-  if (!is.null(res$error)) {
-    res = paste("Train error: ", res$error, " - terminating.")
-    print(res)
-    stop(res)
-  }
-
-  print(paste("Artifact location was created at:", res$artifactPath))
-
-  serverResponded = FALSE
-  i = 0
-  repeat {
-    print(paste("In modeling process... please notice that this process may take some time... ",i))
-    flush.console()
-    i = i+1
-    if (i >= 3 && !serverResponded) {
-      res = "Server didn't respond for 30 seconds... check that server is up... terminating."
-      print(res)
-      flush.console()
-      stop(res)
-    }
-    Sys.sleep(10)
-    statusFile = paste(res$artifactPath,"/json/status.json", sep="")
-    if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
-      serverResponded = TRUE
-      status = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
-      if (i %% 6 == 0 ) {
-        print(i)
-        print(status)
-        flush.console()
-      }
-      if (status$alive == FALSE || status$evaluation == TRUE) {break}
-    }
-  }
-  model = SBmodel(artifact_loc = res$artifactPath, modelBuilt = TRUE)
-  return(model)
-}
-
-
-
-#' Run SparkBeyond feature enrichment and learning process.
-#' @param sessionName String of the session name.
-#' @param trainingFilePath String of the path to the file to be trained on.
-#' @param target String of the column name of in the training file that conatins the target of the prediction.
-#' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
-#' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
-#' @param hints Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.
-#' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
-#' @param maxFeaturesCount Optional. An integer of how many features should be created by the SB engine. 300 by default.
-#' @return SBmodel object that encapsulate the feature search result.
-#' @examples
-#' #model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
-SBfeatureSearchOnly <- function(sessionName, trainingFilePath, target,
-                                weightColumn = NA,
-                                maxDepth = 2,
-                                hints = NA,
-                                useGraph = FALSE,
-                                maxFeaturesCount = 300, #make it a list
-                                runBlocking = TRUE){
-
-  params <-list("sessionName" = sessionName,
-                "trainingFilePath" = trainingFilePath,
-                target = target,
-                weightColumn = weightColumn,
-                maxDepth = maxDepth,
-                algorithmsWhiteList = list("ZeroR"),
-                hints = hints,
-                useGraph = useGraph,
-                maxFeaturesCount = maxFeaturesCount,
-                runBlocking = runBlocking)
-  model = do.call(SBlearn,c(params))
-  model$modelBuilt = FALSE
-  model
-}
-
-#' load saved SparkBeyond model saved using $save
-#' @param file filename where the model was saved
-#' @return SBmodel object
-#' @examples
-#' #tf = paste(tempfile(), ".Rdata", sep="")
-#' #model$save(tf)
-#' #SBloadModel(tf)
-SBloadModel = function(file) {
-  base::load(file)
-  loadedModel = SBmodelSerializeVar
-  rm(SBmodelSerializeVar)
-  return(loadedModel)
-}
 
