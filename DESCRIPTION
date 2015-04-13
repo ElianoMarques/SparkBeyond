@@ -10,3 +10,5 @@ Imports:
     httr (>= 0.6.1),
     rjson (>= 0.2.15),
     jsonlite (>= 0.9.14)
+    data.table (>=1.9.4)
+    dplyr (>=0.4.1)
