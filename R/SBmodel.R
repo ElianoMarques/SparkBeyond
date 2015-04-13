@@ -74,6 +74,15 @@ SBmodel = setRefClass("SBmodel",
         } else return("NO_RESPONSE")
       },
 
+#       hasModelBuilt = function() {
+#         statusFile = paste(artifact_loc,"/json/status.json", sep="")
+#         status = if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
+#           statusContent = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
+#           statusContent$model
+#         } else FALSE
+#         return (status)
+#       },
+
       statusException = function() {
         status = checkStatus()
         if (status == "IN_PROCESS") stop("Processing still didn't finish") #TODO: or more refined

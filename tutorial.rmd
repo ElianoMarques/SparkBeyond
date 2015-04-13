@@ -169,13 +169,8 @@ In addition, some of the reports pertaining to model evaluation (e.g., `showROC`
 
 ### Saving and loading models
  
-Models can be saved by calling the `save` method and loaded using the `SBloadModel` function.
+Models can be saved using regular R `load()` and `save()` methods
 
-```{r,  eval=TRUE}
-model$save("/tmp/myModel.Rdata")
-model2 = SBloadModel("/tmp/myModel.Rdata")
-eval2 = model2$evaluate()
-```
 
 For more information please review the **help** file for `SBmodel` 
 

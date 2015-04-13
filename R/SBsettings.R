@@ -1,11 +1,13 @@
-# Global settings
+# Global variables
 
+# Server Host
+# ===========
 #' A function to set the SparkBeyond server host.
 #' @param host new host URL.
 setSBserverHost = function(host = "http://127.0.0.1"){
   assign("SBhost", host, envir = globalenv())
   print(paste("Setting server host to:", SBhost))
-  return(host)
+  return(SBhost)
 }
 
 #' A function to get the SparkBeyond server host.
@@ -20,6 +22,8 @@ printSBserverHost = function() {
   print(paste("Server host is:", host))
 }
 
+# Server Port
+# ===========
 #' A function to set the SparkBeyond server port.
 #' @param port new port.
 setSBserverPort = function(port = "9000"){
@@ -38,4 +42,35 @@ getSBserverPort = function() {
 printSBserverPort = function() {
   port = getSBserverPort()
   print(paste("Server port is:", port))
+}
+
+# Server IO Folder
+# ======================
+#' A function to set the SparkBeyond server I/O folder.
+#' @param port new port.
+setSBserverIOfolder = function(folder){
+  if (is.null(folder) || folder == "") {stop("folder location is empty")}
+  if (!file.exists(folder)) {
+    print (paste("Folder ",  folder, " does not exists - attempting to create"))
+    dir.create(folder)
+    if (!file.exists(folder)) {stop(paste("failed to create folder", folder))}
+  }
+  assign("IOfolder", folder, envir = globalenv())
+  print(paste("Setting server IO folder to:", IOfolder))
+  return(IOfolder)
+}
+
+#' A function to get the SparkBeyond server IO folder.
+getSBserverIOfolder = function() {
+  folder = if (exists("IOfolder")) IOfolder else {
+    print("Server IO folder was not defined. Please define folder using setSBserverIOfolder")
+    NULL
+  }
+  return(folder)
+}
+
+#' A function to print the SparkBeyond server IO folder.
+printSBserverIOfolder = function() {
+  folder = getSBserverIOfolder()
+  print(paste("Server IO folder is:", folder))
 }

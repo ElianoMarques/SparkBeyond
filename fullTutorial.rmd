@@ -11,7 +11,8 @@ output: html_document
  
 Models can be saved by calling the `save` method and be loaded using the `SBloadModel` function.
 ```{r,  eval=TRUE}
-model$save("/tmp/myModel.Rdata")
-model2 = SBloadModel("/tmp/myModel.Rdata")
-eval2 = model2$evaluate()
+  if (is.null(getSBserverIOfolder())) setSBserverIOfolder(tempdir())
+  titanic_train_filename = getTitanicFilename()
+  data = read.table(titanic_train_filename, header = TRUE, sep="\t")
+  model = SBlearn("titanic", writeDataToServer(data), "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = FALSE)  
 ```

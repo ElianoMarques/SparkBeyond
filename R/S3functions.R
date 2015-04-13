@@ -1,15 +1,15 @@
 # S3 functions (De facto constructors of SBmodel)
 
 #' Run SparkBeyond feature enrichment and learning process.
-#' @param sessionName Optional string of the session name. Setting a session name is highly recommened. "temp" by default.
+#' @param sessionName Optional string of the session name. Setting a session name is highly recommended. "temp" by default.
 #' @param trainingFilePath String of the path to the file to be trained on.
-#' @param target String of the column name of in the training file that conatins the target of the prediction.
+#' @param target String of the column name of in the training file that contains the target of the prediction.
 #' @param testFilePath: Optional. String of the path to an independent test file to test the prediction on. NA by default.
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
-#' @param maxDepth: Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
-#' @param hints: Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.
+#' @param hints: Optional. A list of strings that represents a set of hints that will be used to guide the feature search. NA by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. An integer of how many features should be created by the SB engine. 300 by default.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
@@ -28,7 +28,7 @@ SBlearn <- function(sessionName = "temp",
                     algorithmsWhiteList = NA, #list available algorithms
                     hints = NA,
                     useGraph = FALSE,
-                    maxFeaturesCount = 300, #make it a list
+                    maxFeaturesCount = 300, #TODO: make it a list
                     evaluationMetric = "PREC", #add all options
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
@@ -65,7 +65,7 @@ SBlearn <- function(sessionName = "temp",
   }
 
   print(paste("Artifact location was created at:", res$artifactPath))
-  model = SBmodel(artifact_loc = res$artifactPath)
+  model = SBmodel(artifact_loc = res$artifactPath, TRUE)
   if (runBlocking) model$waitForProcess()
   return(model)
 }
@@ -89,7 +89,7 @@ SBfeatureSearchOnly <- function(sessionName = "temp",
                                 maxDepth = 2,
                                 hints = NA,
                                 useGraph = FALSE,
-                                maxFeaturesCount = 300, #make it a list
+                                maxFeaturesCount = 300, #TODO: make it a list
                                 runBlocking = TRUE){
 
   params <-list("sessionName" = sessionName,
@@ -105,6 +105,15 @@ SBfeatureSearchOnly <- function(sessionName = "temp",
   model = do.call(SBlearn,c(params))
   model$modelBuilt = FALSE
   model
+}
+
+#' A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.
+#' @param data Data frame or table to export to the server.
+#' @return A filepath to the file on the server that was created.
+writeDataToServer = function(data){
+  filename = tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext="tsv")
+  write.table(data, file=filename, row.names = FALSE, sep='\t')
+  return (filename)
 }
 
 # #' Run SparkBeyond prediction on a result of SBlearn.
