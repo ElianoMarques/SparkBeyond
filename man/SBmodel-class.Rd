@@ -40,11 +40,11 @@ SB object that encapsulates a model result
 
 \item{\code{showModelComparison(showInIDE = TRUE)}}{Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.}
 
+\item{\code{showReport(report_name = NA, showInIDE = TRUE)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, features, field, function, InputSchema, modelComparison, roc_best, roc_CV}
+
 \item{\code{showROC(showInIDE = TRUE)}}{Shows ROC of the model in the IDE viewer on in the web browser.}
 
 \item{\code{showROC_CV(showInIDE = TRUE)}}{Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser.}
-
-\item{\code{showReport(report_name = NA, showInIDE = TRUE)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, features, field, function, InputSchema, modelComparison, roc_best, roc_CV}
 }}
 \examples{
 #model learn

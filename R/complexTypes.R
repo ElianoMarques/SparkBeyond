@@ -1,3 +1,9 @@
+colTypeOf = function(y) {typeof(y)}
+colLength = function(y) {if(length(y) == 1 && is.na(y)) list(NA) else length(unlist(y))}
+trimN = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y)) list(NA) else list(y[1:n])}
+trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))  list(NA) else list(list(y[1:n]))}
+excludeCols = function(data, cols) data[, (cols) := NULL] #note: parenthesis around cols are important
+
 pasteList = function(x) {
   x1 = unlist(x)
   content = if (typeof(x1) == "character") {
@@ -9,11 +15,29 @@ pasteList = function(x) {
   paste("[",content,"]",sep="")
 }
 
+pasteCols = function(data, groupColumns) {data[,lapply(.SD,pasteList), by=groupColumns]}
+
 writeGroupedData = function(data, groupColumns, outputFile) { #sugar for writing grouped data
   library(data.table)
-  toWrite = data[,lapply(.SD,pasteList), by=groupColumns]
+  toWrite = pasteCols(data, groupColumns)
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
+
+#dt <- data.table(dt, new = paste(dt$A, dt$B, sep = ""))
+
+#joins
+joinExample = function () {
+  (dt1 <- data.table(A = letters[1:10], X = 1:10, key = "A"))
+  (dt2 <- data.table(A = letters[5:14], Y = 1:10, key = "A"))
+  merge(dt1, dt2) #join left # can add by = "A", allow.cartesian
+  merge(dt1, dt2, all = TRUE) #join all
+}
+
+#IDate
+dateTimeExample = function  () {
+  (seqdates <- seq(as.IDate("2001-01-01"), as.IDate("2001-08-03"), by = "3 weeks"))
+}
+
 
 runComplexTypeExample = function() {
   library(data.table)
