@@ -3,23 +3,28 @@ colLength = function(y) {if(length(y) == 1 && is.na(y)) list(NA) else length(unl
 trimN = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y)) list(NA) else list(y[1:n])}
 trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))  list(NA) else list(list(y[1:n]))}
 excludeCols = function(data, cols) data[, (cols) := NULL] #note: parenthesis around cols are important
+# zipCol = function
 
-pasteList = function(x) {
-  x1 = unlist(x)
-  content = if (typeof(x1) == "character") {
-    x2 = sapply(x1, function(s) gsub("\"","\\\\\"",s)) #deal with escaping
-    paste("\"", paste(x2,collapse = "\",\"",sep=""), "\"",sep="")
-  } else {
-    paste(x1,collapse = ",",sep="")
-  }
-  paste("[",content,"]",sep="")
+col2Text = function(x) {
+  if (is.list(x)){
+    x1 = unlist(x)
+    escapeFun = function(s) gsub("\"","\\\\\"",s)
+    content = if (typeof(x1) == "character") {
+      x2 = sapply(x1,  escapeFun) #deal with escaping
+      paste0("\"", paste0(x2,collapse = "\",\""), "\"")
+    } else {
+      paste0(x1,collapse = ",")
+    }
+    paste0("[",content,"]")
+  } else if (typeof(x) == "character") paste0("\"",escapeFun(),"\"") else x
 }
+cols2Text = function(data, groupColumns) {data[,lapply(.SD,col2Text), by=groupColumns]}
 
-pasteCols = function(data, groupColumns) {data[,lapply(.SD,pasteList), by=groupColumns]}
+
 
 writeGroupedData = function(data, groupColumns, outputFile) { #sugar for writing grouped data
   library(data.table)
-  toWrite = pasteCols(data, groupColumns)
+  toWrite = cols2Text(data, groupColumns)
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
 

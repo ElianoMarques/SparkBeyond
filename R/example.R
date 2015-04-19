@@ -32,11 +32,12 @@ run_SB_examples <- function(configuration='1') {
 #' @return SBmodel object containing the result of the learning
 #' @examples
 #' model = runTitanicLearn()
-runTitanicLearn <- function(configuration='1') {
+runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
   params = list(
     sessionName = "titanic",
     trainingFilePath = getTitanicFilename(train = TRUE),
-    target = "survived"
+    target = "survived",
+    runBlocking = runBlocking
   )
   additional_params = switch (configuration,
     "1" = list(algorithmsWhiteList = list("RRandomForest")),

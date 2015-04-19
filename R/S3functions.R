@@ -32,7 +32,7 @@ SBlearn <- function(sessionName = "temp",
                     evaluationMetric = "PREC", #add all options
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
-                    runBlocking = TRUE){
+                    runBlocking = FALSE){
 
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
   print(paste("Calling:", url))
@@ -90,7 +90,7 @@ SBfeatureSearchOnly <- function(sessionName = "temp",
                                 hints = NA,
                                 useGraph = FALSE,
                                 maxFeaturesCount = 300, #TODO: make it a list
-                                runBlocking = TRUE){
+                                runBlocking = FALSE){
 
   params <-list("sessionName" = sessionName,
                 "trainingFilePath" = trainingFilePath,
@@ -112,8 +112,16 @@ SBfeatureSearchOnly <- function(sessionName = "temp",
 #' @return A filepath to the file on the server that was created.
 writeDataToServer = function(data){
   filename = tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext="tsv")
-  write.table(data, file=filename, row.names = FALSE, sep='\t')
+  write.table(data, file=filename, row.names = FALSE, sep='\t') #TODO: write things using the new write function
   return (filename)
+}
+
+#' A function to restart server
+#' @return The response from the server.
+restartServer = function() {
+  url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/die", sep="")
+  res = httr::POST(url, body = FALSE, httr::content_type_json())
+  res
 }
 
 # #' Run SparkBeyond prediction on a result of SBlearn.

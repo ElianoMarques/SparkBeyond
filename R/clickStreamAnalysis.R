@@ -9,7 +9,7 @@ runClickStreamExample = function() {
 }
 
 #process raw data and save vectorized columns to file
-processRawData = function(inputFile, outputFile) {
+processRawData = function(inputFile, processedFile) {
   data = fread(inputFile, sep="\t", header=TRUE) #faster file reading
   data[,URL_FULL:=paste0(URL_BASE,URL_QUERY) #concat ths url
        ][,WEB_SITE_NAME:=lapply(WEB_SITE_NAME,stringr::str_trim) #remove white space from domain
@@ -19,8 +19,8 @@ processRawData = function(inputFile, outputFile) {
   grouped = data[,lapply(.SD,list), by="WEB_SESSION_ID"] # group all columns by WEB_SESSION_ID
 
   #option1: target: identify if user clicked on 'checkout'
-  matchFun = function(y) grep("checkout",y,ignore.case=TRUE, useBytes=TRUE)[1]
-  grouped[,checkoutIndex:=lapply(URL_FULL, matchFun), by="WEB_SESSION_ID"
+  matchFun = function(y, str) grep(str, y, ignore.case=TRUE, useBytes=TRUE)[1][1]
+  grouped[,checkoutIndex:=lapply(URL_FULL, matchFun, str = "checkout"), by="WEB_SESSION_ID"
           ][, trimIndex := checkoutIndex-1 #trim session info until the click before checkout
             ][, `:=` ( #trim lists in columns by trimIndex
               DATE_AND_TIME_OF_PAGE_VIEW = mapply(trimByCol,DATE_AND_TIME_OF_PAGE_VIEW, trimIndex),
@@ -28,15 +28,16 @@ processRawData = function(inputFile, outputFile) {
               URL_FULL = mapply(trimByCol,URL_FULL, trimIndex)
             ), by = WEB_SESSION_ID]
   #(grouped[!is.na(checkoutIndex), lapply(.SD, colLength),by = WEB_SESSION_ID, .SDcols = c("WEB_SITE_NAME")]) #verify that trimming is correct
-  grouped[,label:=lapply(checkoutIndex,function(x) if (!is.na(x)) 1 else 0) # create 0/1 label if session got to checkout
+  grouped[,label:=if (!is.na(checkoutIndex)) 1 else 0, by = "WEB_SESSION_ID" # create 0/1 label if session got to checkout
           ][,(c("checkoutIndex","trimIndex")):=NULL][] #remove indices
-  writeGroupedData(grouped, c("WEB_SESSION_ID"), outputFile) #write data to file
-
+  writeGroupedData(grouped, c("WEB_SESSION_ID"), processedFile) #write data to file
 }
 
 #option2: identify time on site (e.g., after 5 pages)
 
 
+#l = list(a = list(1,3,3), b= c(5,6,7))
+#l$c = mapply(cbind, l$a, l$b)
 
 
 
