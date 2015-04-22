@@ -74,3 +74,43 @@ printSBserverIOfolder = function() {
   folder = getSBserverIOfolder()
   print(paste("Server IO folder is:", folder))
 }
+
+#' Save settings to the current folder.
+saveSettings = function() {
+  SB_IOfolder = getSBserverIOfolder()
+  SB_HOST = getSBserverHost()
+  SB_PORT = getSBserverPort()
+
+  save(SB_IOfolder, SB_HOST, SB_PORT, file = "settings.RData")
+}
+
+#' Load settings from the current folder.
+loadSettings = function() {
+  if (file.exists("settings.RData")){
+    load("settings.RData")
+    setSBserverIOfolder(SB_IOfolder)
+    setSBserverHost(SB_HOST)
+    setSBserverPort(SB_PORT)
+  } else print("Settings file does not exist.")
+}
+
+
+
+# Server functions:
+
+#' A function to restart server
+#' @return The response from the server.
+restartServer = function() {
+  url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/die", sep="")
+  res = httr::POST(url, body = FALSE, httr::content_type_json())
+  res
+}
+
+#clean cache
+
+
+#General:
+#' A function to update the package from github
+updatePackage = function() {
+  devtools::install_github("zinman/SBadapter")
+}

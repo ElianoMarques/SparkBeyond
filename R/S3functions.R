@@ -111,23 +111,13 @@ SBfeatureSearchOnly <- function(projectName = "temp",
 #' @param data Data frame or table to export to the server.
 #' @param groupColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 #' @return A filepath to the file on the server that was created.
-writeDataToServer = function(data, groupColumns = NULL){
+writeToServer = function(data, groupColumns = NULL){
   filename = tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext="tsv")
   writeGroupedData(data, groupColumns, filename)
   return (filename)
 }
 
-#' A function to restart server
-#' @return The response from the server.
-restartServer = function() {
-  url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/die", sep="")
-  res = httr::POST(url, body = FALSE, httr::content_type_json())
-  res
-}
 
-updatePackage = function() {
-  devtools::install_github("zinman/SBadapter")
-}
 
 # #' Run SparkBeyond prediction on a result of SBlearn.
 # #' @param modelPath path to the model file returned by SBlearn.
