@@ -34,7 +34,7 @@ run_SB_examples <- function(configuration='1') {
 #' model = runTitanicLearn()
 runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
   params = list(
-    sessionName = "titanic",
+    projectName = "titanic",
     trainingFilePath = getTitanicFilename(train = TRUE),
     target = "survived",
     runBlocking = runBlocking
@@ -78,7 +78,7 @@ runTitanicTestPredict <- function(model) {
 #' # model = runTitanicFeatureSelectionOnly()
 runTitanicFeatureSelectionOnly <- function() {
   print("Performing feature search only on Titanic train data")
-  model = SBfeatureSearchOnly(sessionName = "titanic",
+  model = SBfeatureSearchOnly(projectName = "titanic",
                         trainingFilePath = getTitanicFilename(train = TRUE),
                         target = "survived"
   )
