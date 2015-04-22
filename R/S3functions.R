@@ -1,7 +1,7 @@
 # S3 functions (De facto constructors of SBmodel)
 
 #' Run SparkBeyond feature enrichment and learning process.
-#' @param sessionName Optional string of the session name. Setting a session name is highly recommended. "temp" by default.
+#' @param projectName Optional string of the session name. Setting a session name is highly recommended. "temp" by default.
 #' @param trainingFilePath String of the path to the file to be trained on.
 #' @param target String of the column name of in the training file that contains the target of the prediction.
 #' @param testFilePath: Optional. String of the path to an independent test file to test the prediction on. NA by default.
@@ -18,7 +18,7 @@
 #' @return SBmodel object the encapsulate the prediction.
 #' @examples
 #' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
-SBlearn <- function(sessionName = "temp",
+SBlearn <- function(projectName = "temp",
                     trainingFilePath,
                     target,
                     testFilePath = NA,
@@ -37,7 +37,7 @@ SBlearn <- function(sessionName = "temp",
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
   print(paste("Calling:", url))
 
-  params <-list("sessionName" = sessionName,
+  params <-list("projectName" = projectName,
                 "trainingFilePath" = trainingFilePath,
                 target = target,
                 testFilePath = testFilePath,
@@ -71,7 +71,7 @@ SBlearn <- function(sessionName = "temp",
 }
 
 #' Run SparkBeyond feature enrichment and learning process.
-#' @param sessionName Optional string of the session name. Setting a session name is highly recommened. "temp" by default.
+#' @param projectName Optional string of the session name. Setting a session name is highly recommened. "temp" by default.
 #' @param trainingFilePath String of the path to the file to be trained on.
 #' @param target String of the column name of in the training file that conatins the target of the prediction.
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
@@ -82,7 +82,7 @@ SBlearn <- function(sessionName = "temp",
 #' @return SBmodel object that encapsulate the feature search result.
 #' @examples
 #' #model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
-SBfeatureSearchOnly <- function(sessionName = "temp",
+SBfeatureSearchOnly <- function(projectName = "temp",
                                 trainingFilePath,
                                 target,
                                 weightColumn = NA,
@@ -92,7 +92,7 @@ SBfeatureSearchOnly <- function(sessionName = "temp",
                                 maxFeaturesCount = 300, #TODO: make it a list
                                 runBlocking = FALSE){
 
-  params <-list("sessionName" = sessionName,
+  params <-list("projectName" = projectName,
                 "trainingFilePath" = trainingFilePath,
                 target = target,
                 weightColumn = weightColumn,
@@ -109,10 +109,11 @@ SBfeatureSearchOnly <- function(sessionName = "temp",
 
 #' A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.
 #' @param data Data frame or table to export to the server.
+#' @param groupColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 #' @return A filepath to the file on the server that was created.
-writeDataToServer = function(data){
+writeDataToServer = function(data, groupColumns = NULL){
   filename = tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext="tsv")
-  write.table(data, file=filename, row.names = FALSE, sep='\t') #TODO: write things using the new write function
+  writeGroupedData(data, groupColumns, filename)
   return (filename)
 }
 
@@ -122,6 +123,10 @@ restartServer = function() {
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/die", sep="")
   res = httr::POST(url, body = FALSE, httr::content_type_json())
   res
+}
+
+updatePackage = function() {
+  devtools::install_github("zinman/SBadapter")
 }
 
 # #' Run SparkBeyond prediction on a result of SBlearn.

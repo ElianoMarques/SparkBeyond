@@ -4,14 +4,14 @@
 \alias{SBlearn}
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
-SBlearn(sessionName = "temp", trainingFilePath, target, testFilePath = NA,
+SBlearn(projectName = "temp", trainingFilePath, target, testFilePath = NA,
   trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
   algorithmsWhiteList = NA, hints = NA, useGraph = FALSE,
   maxFeaturesCount = 300, evaluationMetric = "PREC",
-  scoreOnTestSet = FALSE, crossValidation = 5, runBlocking = TRUE)
+  scoreOnTestSet = FALSE, crossValidation = 5, runBlocking = FALSE)
 }
 \arguments{
-\item{sessionName}{Optional string of the session name. Setting a session name is highly recommended. "temp" by default.}
+\item{projectName}{Optional string of the session name. Setting a session name is highly recommended. "temp" by default.}
 
 \item{trainingFilePath}{String of the path to the file to be trained on.}
 

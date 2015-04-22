@@ -4,10 +4,12 @@
 \alias{writeDataToServer}
 \title{A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.}
 \usage{
-writeDataToServer(data)
+writeDataToServer(data, groupColumns = NULL)
 }
 \arguments{
 \item{data}{Data frame or table to export to the server.}
+
+\item{groupColumns}{Optional. A vector of possible columns that were used for grouping the data. NULL by default.}
 }
 \value{
 A filepath to the file on the server that was created.

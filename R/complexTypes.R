@@ -21,11 +21,11 @@ col2Text = function(x) {
 cols2Text = function(data, groupColumns) {data[,lapply(.SD,col2Text), by=groupColumns]}
 
 
-
-writeGroupedData = function(data, groupColumns, outputFile) { #sugar for writing grouped data
+writeGroupedData = function(data, groupColumns = NULL, outputFile) { #sugar for writing grouped data
   library(data.table)
-  toWrite = cols2Text(data, groupColumns)
-  write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
+  toWrite = if (groupColumns) cols2Text(data, groupColumns) else data
+  quote = if (groupColumns) FALSE else TRUE
+  write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=quote)
 }
 
 #dt <- data.table(dt, new = paste(dt$A, dt$B, sep = ""))

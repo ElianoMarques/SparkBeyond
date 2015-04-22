@@ -4,12 +4,12 @@
 \alias{SBfeatureSearchOnly}
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
-SBfeatureSearchOnly(sessionName = "temp", trainingFilePath, target,
+SBfeatureSearchOnly(projectName = "temp", trainingFilePath, target,
   weightColumn = NA, maxDepth = 2, hints = NA, useGraph = FALSE,
-  maxFeaturesCount = 300, runBlocking = TRUE)
+  maxFeaturesCount = 300, runBlocking = FALSE)
 }
 \arguments{
-\item{sessionName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
+\item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
 
 \item{trainingFilePath}{String of the path to the file to be trained on.}
 
