@@ -19,12 +19,12 @@
 #' @examples
 #' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
 SBlearn <- function(projectName = "temp",
-                    trainingData,
-                    serverTrainDataFileName = "",
+                    trainData,
+                    trainDataFilename = "",
                     target,
                     testData = NA,
-                    serverTestDataFileName = "",
-                    overrideServerFiles = TRUE,
+                    testDataFilename = "",
+                    overridePreviousFiles = TRUE,
                     trainTestSplitRatio = 0.8,
                     weightColumn = NA,
                     maxDepth = 2,
@@ -41,10 +41,10 @@ SBlearn <- function(projectName = "temp",
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
   print(paste("Calling:", url))
 
-  params <-list("projectName" = projectName,
-                "trainingFilePath" = writeToServer(trainingData), #TODO: add logic to pass filenames and see if need to override
+  params <-list(projectName = projectName,
+                trainingFilePath = writeToServer(trainData, trainDataFilename, overridePreviousFiles), #TODO: add logic to pass filenames and see if need to override
                 target = target,
-                testFilePath = if (!is.na(testData)) writeToServer(testData) else NA, #TODO: add logic to pass filenames and see if need to override
+                testFilePath = if (!is.na(testData)) writeToServer(testData, testDataFilename, overridePreviousFiles) else NA, #TODO: add logic to pass filenames and see if need to override
                 trainTestSplitRatio = trainTestSplitRatio,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
@@ -88,7 +88,8 @@ SBlearn <- function(projectName = "temp",
 #' @examples
 #' #model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
 SBfeatureSearchOnly <- function(projectName = "temp",
-                                trainingFilePath, #TODO: change filePath like in SBlearn
+                                trainingData,
+                                trainingDataFileName = "", #TODO:
                                 target,
                                 weightColumn = NA,
                                 maxDepth = 2,
@@ -97,8 +98,8 @@ SBfeatureSearchOnly <- function(projectName = "temp",
                                 maxFeaturesCount = 300, #TODO: make it a list
                                 runBlocking = FALSE){
 
-  params <-list("projectName" = projectName,
-                "trainingFilePath" = trainingFilePath,
+  params <-list(projectName = projectName,
+                trainingFilePath = trainingFilePath,
                 target = target,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
@@ -116,10 +117,11 @@ SBfeatureSearchOnly <- function(projectName = "temp",
 #' @param data Data frame or table to export to the server.
 #' @param groupColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 #' @return A filepath to the file on the server that was created.
-writeToServer = function(data, groupColumns = NULL){
-  filename = tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext="tsv")
-  writeGroupedData(data, groupColumns, filename)
-  return (filename)
+writeToServer = function(data, filename = "", overridePreviousFile = TRUE, groupColumns = NULL){
+  final_filename = if (filename == "") tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext="tsv") else paste0(getSBserverIOfolder(), filename)
+  if (!file.exists(final_filename) || overridePreviousFile)
+    writeGroupedData(data, groupColumns, final_filename)
+  return (final_filename)
 }
 
 

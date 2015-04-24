@@ -4,14 +4,13 @@
 \alias{SBfeatureSearchOnly}
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
-SBfeatureSearchOnly(projectName = "temp", trainingFilePath, target,
-  weightColumn = NA, maxDepth = 2, hints = NA, useGraph = FALSE,
-  maxFeaturesCount = 300, runBlocking = FALSE)
+SBfeatureSearchOnly(projectName = "temp", trainingData,
+  trainingDataFileName = "", target, weightColumn = NA, maxDepth = 2,
+  hints = NA, useGraph = FALSE, maxFeaturesCount = 300,
+  runBlocking = FALSE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
-
-\item{trainingFilePath}{String of the path to the file to be trained on.}
 
 \item{target}{String of the column name of in the training file that conatins the target of the prediction.}
 
@@ -24,6 +23,8 @@ SBfeatureSearchOnly(projectName = "temp", trainingFilePath, target,
 \item{useGraph}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
 \item{maxFeaturesCount}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
+
+\item{trainingFilePath}{String of the path to the file to be trained on.}
 }
 \value{
 SBmodel object that encapsulate the feature search result.

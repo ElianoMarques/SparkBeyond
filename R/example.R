@@ -17,7 +17,7 @@ run_SB_examples <- function(configuration='1') {
 
   res = tryCatch({
     model = runTitanicLearn(configuration)
- #   runTitanicTestEnrich(model)
+#    runTitanicTestEnrich(model)
 #    runTitanicTestPredict(model)
     return ("Success")
   }, error = function(e) {
@@ -35,7 +35,9 @@ run_SB_examples <- function(configuration='1') {
 runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
   params = list(
     projectName = "titanic",
-    trainingData = getTitanicData(train = TRUE),
+    trainData = getTitanicData(train = TRUE),
+    trainDataFilename = "titanic_train",
+    overridePreviousFiles = FALSE,
     target = "survived",
     runBlocking = runBlocking
   )
@@ -55,7 +57,7 @@ runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
 #' enriched = runTitanicTestEnrich(model)
 runTitanicTestEnrich <- function(model, featureCount = 10) {
   print("Enriching titanic test data")
- # enrichRes = model$enrich(getTitanicData(train=FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=featureCount)
+  enrichRes = model$enrich(getTitanicData(train=FALSE), featureCount=featureCount, "titanic_test_enriched.tsv.gz", overridePreviousFile = FALSE)
   if (ncol(enrichRes) == 0) stop("Enrichment failed")
   return(enrichRes)
 }

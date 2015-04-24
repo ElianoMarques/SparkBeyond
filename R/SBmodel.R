@@ -89,39 +89,17 @@ SBmodel = setRefClass("SBmodel",
         if (status != "DONE") stop(paste("Model was not created - ", status))
       },
 
-      predict = function(dataPath, outputPath) { #TODO: change dataPath, outputPath
-        "Returns prediction on a created model. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction."
-        statusException()
-        if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
-        url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/predict", sep="")
-        print(paste("Calling:", url))
-        params <-list(modelPath = artifact_loc,
-                      dataPath = dataPath,
-                      outputPath = outputPath)
-
-        body = rjson::toJSON(params)
-        res = httr::POST(url, body = body, httr::content_type_json())
-        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-
-        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
-          read.table(outputPath, header = TRUE, sep="\t")
-        } else {
-          message = paste("Prediction failed: ", res$error)
-          print(message)
-          stop(message)
-        }
-        return(finalRes)
-      },
-
-      enrich = function(dataPath, outputPath, featureCount = NA) { #TODO: change dataPath, outputPath
+      enrich = function(data, featureCount = NA, dataFilename = "", overridePreviousFile = TRUE) { #TODO: change documentation
         "Returns a data frame containing the enrichedData. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction. featureCount Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling)."
         statusException()
         url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich", sep="")
         print(paste("Calling:", url))
+        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
-                      dataPath = dataPath,
+                      dataPath = writeToServer(data),
                       featureCount = featureCount,
-                      outputPath = outputPath)
+                      outputPath = outputPath,
+                      pathPrefix = getSBserverIOfolder())
 
         params = params[!is.na(params)]
 
@@ -146,6 +124,33 @@ SBmodel = setRefClass("SBmodel",
         }
         return(finalRes)
       },
+
+      predict = function(data, dataFilename = "", overridePreviousFile = TRUE) { #TODO: change documentation
+        "Returns prediction on a created model. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction."
+        statusException()
+        if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
+        url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/predict", sep="")
+        print(paste("Calling:", url))
+        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv") #TODO: complement with params
+        params <-list(modelPath = artifact_loc,
+                      dataPath = writeToServer(data),
+                      outputPath = outputPath,
+                      pathPrefix = getSBserverIOfolder())
+
+        body = rjson::toJSON(params)
+        res = httr::POST(url, body = body, httr::content_type_json())
+        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+
+        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
+          read.table(outputPath, header = TRUE, sep="\t")
+        } else {
+          message = paste("Prediction failed: ", res$error)
+          print(message)
+          stop(message)
+        }
+        return(finalRes)
+      },
+
 
       evaluate = function() {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."

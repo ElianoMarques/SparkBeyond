@@ -4,7 +4,8 @@
 \alias{writeToServer}
 \title{A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.}
 \usage{
-writeToServer(data, groupColumns = NULL)
+writeToServer(data, filename = "", overridePreviousFile = TRUE,
+  groupColumns = NULL)
 }
 \arguments{
 \item{data}{Data frame or table to export to the server.}
