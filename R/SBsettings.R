@@ -75,14 +75,19 @@ printSBserverIOfolder = function() {
   print(paste("Server IO folder is:", folder))
 }
 
+#' Print all current settings.
+printSettings = function(){
+  printSBserverIOfolder()
+  printSBserverHost()
+  printSBserverPort()
+}
+
 #' Save settings to the current folder.
 saveSettings = function() {
   SB_IOfolder = getSBserverIOfolder()
   SB_HOST = getSBserverHost()
   SB_PORT = getSBserverPort()
-  printSBserverIOfolder()
-  printSBserverHost()
-  printSBserverPort()
+  printSettings()
 
   save(SB_IOfolder, SB_HOST, SB_PORT, file = "settings.RData")
 }
