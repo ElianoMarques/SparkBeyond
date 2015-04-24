@@ -41,8 +41,8 @@ SBlearn <- function(projectName = "temp",
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
   print(paste("Calling:", url))
 
-  params <-list(projectName = projectName,
-                trainingFilePath = writeToServer(trainData), #TODO: add logic to pass filenames and see if need to override
+  params <-list("projectName" = projectName,
+                "trainingFilePath" = writeToServer(trainData), #TODO: add logic to pass filenames and see if need to override
                 target = target,
                 testFilePath = if (!is.na(testData)) writeToServer(testData) else NA, #TODO: add logic to pass filenames and see if need to override
                 trainTestSplitRatio = trainTestSplitRatio,
