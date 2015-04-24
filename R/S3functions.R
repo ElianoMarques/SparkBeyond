@@ -19,7 +19,7 @@
 #' @examples
 #' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
 SBlearn <- function(projectName = "temp",
-                    trainData,
+                    trainingData,
                     serverTrainDataFileName = "",
                     target,
                     testData = NA,
@@ -42,7 +42,7 @@ SBlearn <- function(projectName = "temp",
   print(paste("Calling:", url))
 
   params <-list("projectName" = projectName,
-                "trainingFilePath" = writeToServer(trainData), #TODO: add logic to pass filenames and see if need to override
+                "trainingFilePath" = writeToServer(trainingData), #TODO: add logic to pass filenames and see if need to override
                 target = target,
                 testFilePath = if (!is.na(testData)) writeToServer(testData) else NA, #TODO: add logic to pass filenames and see if need to override
                 trainTestSplitRatio = trainTestSplitRatio,

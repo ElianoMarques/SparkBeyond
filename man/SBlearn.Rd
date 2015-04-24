@@ -4,7 +4,7 @@
 \alias{SBlearn}
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
-SBlearn(projectName = "temp", trainData, serverTrainDataFileName = "",
+SBlearn(projectName = "temp", trainingData, serverTrainDataFileName = "",
   target, testData = NA, serverTestDataFileName = "",
   overrideServerFiles = TRUE, trainTestSplitRatio = 0.8,
   weightColumn = NA, maxDepth = 2, algorithmsWhiteList = NA, hints = NA,

@@ -35,7 +35,7 @@ run_SB_examples <- function(configuration='1') {
 runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
   params = list(
     projectName = "titanic",
-    trainingFilePath = getTitanicData(train = TRUE),
+    trainingData = getTitanicData(train = TRUE),
     target = "survived",
     runBlocking = runBlocking
   )
