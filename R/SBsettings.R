@@ -80,6 +80,9 @@ saveSettings = function() {
   SB_IOfolder = getSBserverIOfolder()
   SB_HOST = getSBserverHost()
   SB_PORT = getSBserverPort()
+  printSBserverIOfolder()
+  printSBserverHost()
+  printSBserverPort()
 
   save(SB_IOfolder, SB_HOST, SB_PORT, file = "settings.RData")
 }
