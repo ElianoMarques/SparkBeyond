@@ -17,8 +17,8 @@ run_SB_examples <- function(configuration='1') {
 
   res = tryCatch({
     model = runTitanicLearn(configuration)
-    runTitanicTestEnrich(model)
-    runTitanicTestPredict(model)
+ #   runTitanicTestEnrich(model)
+#    runTitanicTestPredict(model)
     return ("Success")
   }, error = function(e) {
     write (e$message, stderr())
@@ -35,7 +35,7 @@ run_SB_examples <- function(configuration='1') {
 runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
   params = list(
     projectName = "titanic",
-    trainingFilePath = writeToServer(getTitanicData(train = TRUE)),
+    trainingFilePath = getTitanicData(train = TRUE),
     target = "survived",
     runBlocking = runBlocking
   )
@@ -55,7 +55,7 @@ runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
 #' enriched = runTitanicTestEnrich(model)
 runTitanicTestEnrich <- function(model, featureCount = 10) {
   print("Enriching titanic test data")
-  enrichRes = model$enrich(writeToServer(getTitanicData(train=FALSE)), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=featureCount)
+ # enrichRes = model$enrich(getTitanicData(train=FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=featureCount)
   if (ncol(enrichRes) == 0) stop("Enrichment failed")
   return(enrichRes)
 }
@@ -67,7 +67,7 @@ runTitanicTestEnrich <- function(model, featureCount = 10) {
 #' # predicted = runTitanicTestPredict(model)
 runTitanicTestPredict <- function(model) {
   print("Running titanic test example")
-  predictRes = model$predict(getTitanicFilename(train=FALSE), paste(getwd(),"titanic_test.tsv.gz",sep="/"))
+ # predictRes = model$predict(getTitanicFilename(train=FALSE), paste(getwd(),"titanic_test.tsv.gz",sep="/"))
   if (nrow(predictRes) == 0) stop("Prediction failed")
   return(predictRes)
 }
@@ -78,11 +78,11 @@ runTitanicTestPredict <- function(model) {
 #' # model = runTitanicFeatureSelectionOnly()
 runTitanicFeatureSelectionOnly <- function() {
   print("Performing feature search only on Titanic train data")
-  model = SBfeatureSearchOnly(projectName = "titanic",
-                        trainingFilePath = writeToServer(getTitanicData(train = TRUE)),
-                        target = "survived"
-  )
-  return (model)
+#   model = SBfeatureSearchOnly(projectName = "titanic",
+#                         trainingFilePath = writeToServer(getTitanicData(train = TRUE)),
+#                         target = "survived"
+#  )
+#  return (model)
 }
 
 #' Auxiliary function to get Titanic train/test dataset filename.

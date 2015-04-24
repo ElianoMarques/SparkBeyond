@@ -2,7 +2,7 @@
 
 #' Run SparkBeyond feature enrichment and learning process.
 #' @param projectName Optional string of the session name. Setting a session name is highly recommended. "temp" by default.
-#' @param trainingFilePath String of the path to the file to be trained on.
+#' @param trainingFilePath-TO_UPDATE String of the path to the file to be trained on.
 #' @param target String of the column name of in the training file that contains the target of the prediction.
 #' @param testFilePath: Optional. String of the path to an independent test file to test the prediction on. NA by default.
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
@@ -19,9 +19,12 @@
 #' @examples
 #' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
 SBlearn <- function(projectName = "temp",
-                    trainingFilePath,
+                    trainData,
+                    serverTrainDataFileName = "",
                     target,
-                    testFilePath = NA,
+                    testData = NA,
+                    serverTestDataFileName = "",
+                    overrideServerFiles = TRUE,
                     trainTestSplitRatio = 0.8,
                     weightColumn = NA,
                     maxDepth = 2,
@@ -38,10 +41,10 @@ SBlearn <- function(projectName = "temp",
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
   print(paste("Calling:", url))
 
-  params <-list("projectName" = projectName,
-                "trainingFilePath" = trainingFilePath,
+  params <-list(projectName = projectName,
+                trainingFilePath = writeToServer(trainData), #TODO: add logic to pass filenames and see if need to override
                 target = target,
-                testFilePath = testFilePath,
+                testFilePath = if (!is.na(testData)) writeToServer(testData) else NA, #TODO: add logic to pass filenames and see if need to override
                 trainTestSplitRatio = trainTestSplitRatio,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
@@ -51,7 +54,8 @@ SBlearn <- function(projectName = "temp",
                 globalFeatureIterations = maxFeaturesCount,
                 evaluationMetric = evaluationMetric,
                 scoreOnTestSet = scoreOnTestSet,
-                crossValidation = crossValidation
+                crossValidation = crossValidation,
+                pathPrefix = getSBserverIOfolder()
   )
 
   params = params[!is.na(params)]
@@ -84,7 +88,7 @@ SBlearn <- function(projectName = "temp",
 #' @examples
 #' #model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
 SBfeatureSearchOnly <- function(projectName = "temp",
-                                trainingFilePath,
+                                trainingFilePath, #TODO: change filePath like in SBlearn
                                 target,
                                 weightColumn = NA,
                                 maxDepth = 2,

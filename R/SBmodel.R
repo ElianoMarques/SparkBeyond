@@ -89,7 +89,7 @@ SBmodel = setRefClass("SBmodel",
         if (status != "DONE") stop(paste("Model was not created - ", status))
       },
 
-      predict = function(dataPath, outputPath) {
+      predict = function(dataPath, outputPath) { #TODO: change dataPath, outputPath
         "Returns prediction on a created model. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction."
         statusException()
         if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
@@ -113,7 +113,7 @@ SBmodel = setRefClass("SBmodel",
         return(finalRes)
       },
 
-      enrich = function(dataPath, outputPath, featureCount = NA) {
+      enrich = function(dataPath, outputPath, featureCount = NA) { #TODO: change dataPath, outputPath
         "Returns a data frame containing the enrichedData. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction. featureCount Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling)."
         statusException()
         url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich", sep="")

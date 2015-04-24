@@ -4,19 +4,20 @@
 \alias{SBlearn}
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
-SBlearn(projectName = "temp", trainingFilePath, target, testFilePath = NA,
-  trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
-  algorithmsWhiteList = NA, hints = NA, useGraph = FALSE,
-  maxFeaturesCount = 300, evaluationMetric = "PREC",
+SBlearn(projectName = "temp", trainData, serverTrainDataFileName = "",
+  target, testData = NA, serverTestDataFileName = "",
+  overrideServerFiles = TRUE, trainTestSplitRatio = 0.8,
+  weightColumn = NA, maxDepth = 2, algorithmsWhiteList = NA, hints = NA,
+  useGraph = FALSE, maxFeaturesCount = 300, evaluationMetric = "PREC",
   scoreOnTestSet = FALSE, crossValidation = 5, weightByClass = FALSE,
   runBlocking = FALSE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommended. "temp" by default.}
 
-\item{trainingFilePath}{String of the path to the file to be trained on.}
-
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
+
+\item{trainingFilePath-TO_UPDATE}{String of the path to the file to be trained on.}
 
 \item{testFilePath:}{Optional. String of the path to an independent test file to test the prediction on. NA by default.}
 
