@@ -32,6 +32,7 @@ SBlearn <- function(projectName = "temp",
                     evaluationMetric = "PREC", #add all options
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
+                    weightByClass = FALSE,
                     runBlocking = FALSE){
 
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")

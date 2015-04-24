@@ -23,8 +23,8 @@ cols2Text = function(data, groupColumns) {data[,lapply(.SD,col2Text), by=groupCo
 
 writeGroupedData = function(data, groupColumns = NULL, outputFile) { #sugar for writing grouped data
   library(data.table)
-  toWrite = if (groupColumns) cols2Text(data, groupColumns) else data
-  quote = if (groupColumns) FALSE else TRUE
+  toWrite = if (!is.null(groupColumns)) cols2Text(data, groupColumns) else data
+  quote = if (!is.null(groupColumns)) FALSE else TRUE
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=quote)
 }
 

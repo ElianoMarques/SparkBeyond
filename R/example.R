@@ -35,7 +35,7 @@ run_SB_examples <- function(configuration='1') {
 runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
   params = list(
     projectName = "titanic",
-    trainingFilePath = getTitanicFilename(train = TRUE),
+    trainingFilePath = writeToServer(getTitanicData(train = TRUE)),
     target = "survived",
     runBlocking = runBlocking
   )
@@ -55,7 +55,7 @@ runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
 #' enriched = runTitanicTestEnrich(model)
 runTitanicTestEnrich <- function(model, featureCount = 10) {
   print("Enriching titanic test data")
-  enrichRes = model$enrich(getTitanicFilename(train=FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=featureCount)
+  enrichRes = model$enrich(writeToServer(getTitanicData(train=FALSE)), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount=featureCount)
   if (ncol(enrichRes) == 0) stop("Enrichment failed")
   return(enrichRes)
 }
@@ -79,7 +79,7 @@ runTitanicTestPredict <- function(model) {
 runTitanicFeatureSelectionOnly <- function() {
   print("Performing feature search only on Titanic train data")
   model = SBfeatureSearchOnly(projectName = "titanic",
-                        trainingFilePath = getTitanicFilename(train = TRUE),
+                        trainingFilePath = writeToServer(getTitanicData(train = TRUE)),
                         target = "survived"
   )
   return (model)
@@ -90,11 +90,11 @@ runTitanicFeatureSelectionOnly <- function() {
 #' @return String with the requested dataset filepath.
 #' @examples
 #' getTitanicFilename()
-getTitanicFilename <- function(train = TRUE) {
+getTitanicData <- function(train = TRUE) {
   titanic_filename = system.file("extdata", if (train) "titanic_train.tsv" else "titanic_test.csv", package = "SBadapter")
-  #data = read.table(titanic_filename, header = TRUE, sep="\t") #inspect file content
+  data = read.table(titanic_filename, header = TRUE, sep="\t") #inspect file content
   #str(data) #inspect file content
-  return(titanic_filename)
+  return(data)
 }
 
 
