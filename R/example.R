@@ -17,8 +17,8 @@ run_SB_examples <- function(configuration='1') {
 
   res = tryCatch({
     model = runTitanicLearn(configuration)
-#    runTitanicTestEnrich(model)
-#    runTitanicTestPredict(model)
+    runTitanicTestEnrich(model)
+    runTitanicTestPredict(model) #TODO: check why all the escaping in the scala output were produced, potentially return only last 3 columns and not the entire row
     return ("Success")
   }, error = function(e) {
     write (e$message, stderr())
@@ -36,7 +36,7 @@ runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
   params = list(
     projectName = "titanic",
     trainData = getTitanicData(train = TRUE),
-    trainDataFilename = "titanic_train",
+    trainDataFilename = "titanic_train.tsv",
     overridePreviousFiles = FALSE,
     target = "survived",
     runBlocking = runBlocking
@@ -57,7 +57,7 @@ runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
 #' enriched = runTitanicTestEnrich(model)
 runTitanicTestEnrich <- function(model, featureCount = 10) {
   print("Enriching titanic test data")
-  enrichRes = model$enrich(getTitanicData(train=FALSE), featureCount=featureCount, "titanic_test_enriched.tsv.gz", overridePreviousFile = FALSE)
+  enrichRes = model$enrich(getTitanicData(train=FALSE), featureCount=featureCount, dataFilename = "titanic_test_enriched.tsv", overridePreviousFile = FALSE)
   if (ncol(enrichRes) == 0) stop("Enrichment failed")
   return(enrichRes)
 }
@@ -69,7 +69,7 @@ runTitanicTestEnrich <- function(model, featureCount = 10) {
 #' # predicted = runTitanicTestPredict(model)
 runTitanicTestPredict <- function(model) {
   print("Running titanic test example")
- # predictRes = model$predict(getTitanicFilename(train=FALSE), paste(getwd(),"titanic_test.tsv.gz",sep="/"))
+  predictRes = model$predict(getTitanicData(train=FALSE), dataFilename= "titanic_test.tsv", overridePreviousFile = FALSE)
   if (nrow(predictRes) == 0) stop("Prediction failed")
   return(predictRes)
 }
@@ -80,11 +80,13 @@ runTitanicTestPredict <- function(model) {
 #' # model = runTitanicFeatureSelectionOnly()
 runTitanicFeatureSelectionOnly <- function() {
   print("Performing feature search only on Titanic train data")
-#   model = SBfeatureSearchOnly(projectName = "titanic",
-#                         trainingFilePath = writeToServer(getTitanicData(train = TRUE)),
-#                         target = "survived"
-#  )
-#  return (model)
+   model = SBfeatureSearchOnly(projectName = "titanic",
+                         trainData = getTitanicData(train = TRUE),
+                         trainDataFilename = "titanic_train.tsv",
+                         overridePreviousFile = FALSE,
+                         target = "survived"
+  )
+  return (model)
 }
 
 #' Auxiliary function to get Titanic train/test dataset filename.
@@ -94,7 +96,7 @@ runTitanicFeatureSelectionOnly <- function() {
 #' getTitanicFilename()
 getTitanicData <- function(train = TRUE) {
   titanic_filename = system.file("extdata", if (train) "titanic_train.tsv" else "titanic_test.csv", package = "SBadapter")
-  data = read.table(titanic_filename, header = TRUE, sep="\t") #inspect file content
+  data = read.table(titanic_filename, header = TRUE, sep= if (tools::file_ext(titanic_filename) == ".tsv") "\t" else ",") #inspect file content
   #str(data) #inspect file content
   return(data)
 }

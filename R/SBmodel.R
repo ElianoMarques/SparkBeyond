@@ -94,9 +94,9 @@ SBmodel = setRefClass("SBmodel",
         statusException()
         url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich", sep="")
         print(paste("Calling:", url))
-        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv") #TODO: complement with params
+        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
-                      dataPath = writeToServer(data),
+                      dataPath = writeToServer(data, dataFilename, overridePreviousFile),
                       featureCount = featureCount,
                       outputPath = outputPath,
                       pathPrefix = getSBserverIOfolder())
@@ -131,9 +131,9 @@ SBmodel = setRefClass("SBmodel",
         if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
         url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/predict", sep="")
         print(paste("Calling:", url))
-        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv") #TODO: complement with params
+        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
-                      dataPath = writeToServer(data),
+                      dataPath = writeToServer(data, dataFilename, overridePreviousFile),
                       outputPath = outputPath,
                       pathPrefix = getSBserverIOfolder())
 

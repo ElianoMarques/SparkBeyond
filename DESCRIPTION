@@ -13,4 +13,5 @@ Imports:
     data.table (>= 1.9.4)
 Suggests:
     dplyr (>= 0.4.1),
-    devtools
+    devtools,
+    tools

@@ -88,8 +88,9 @@ SBlearn <- function(projectName = "temp",
 #' @examples
 #' #model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
 SBfeatureSearchOnly <- function(projectName = "temp",
-                                trainingData,
-                                trainingDataFileName = "", #TODO:
+                                trainData,
+                                trainDataFilename = "", #TODO:
+                                overridePreviousFile = TRUE,
                                 target,
                                 weightColumn = NA,
                                 maxDepth = 2,
@@ -99,7 +100,9 @@ SBfeatureSearchOnly <- function(projectName = "temp",
                                 runBlocking = FALSE){
 
   params <-list(projectName = projectName,
-                trainingFilePath = trainingFilePath,
+                trainData = trainData,
+                trainDataFilename = trainDataFilename,
+                overridePreviousFiles = overridePreviousFile,
                 target = target,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
@@ -118,7 +121,7 @@ SBfeatureSearchOnly <- function(projectName = "temp",
 #' @param groupColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 #' @return A filepath to the file on the server that was created.
 writeToServer = function(data, filename = "", overridePreviousFile = TRUE, groupColumns = NULL){
-  final_filename = if (filename == "") tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext="tsv") else paste0(getSBserverIOfolder(), filename)
+  final_filename = if (filename == "") tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext=".tsv") else paste0(getSBserverIOfolder(), filename)
   if (!file.exists(final_filename) || overridePreviousFile)
     writeGroupedData(data, groupColumns, final_filename)
   return (final_filename)

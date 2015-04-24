@@ -4,8 +4,8 @@
 \alias{SBfeatureSearchOnly}
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
-SBfeatureSearchOnly(projectName = "temp", trainingData,
-  trainingDataFileName = "", target, weightColumn = NA, maxDepth = 2,
+SBfeatureSearchOnly(projectName = "temp", trainData, trainDataFilename = "",
+  overridePreviousFile = TRUE, target, weightColumn = NA, maxDepth = 2,
   hints = NA, useGraph = FALSE, maxFeaturesCount = 300,
   runBlocking = FALSE)
 }
