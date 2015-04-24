@@ -3,13 +3,14 @@ Title: R adapter for SparkBeyond engine
 Version: 0.1
 Authors@R: "Guy Zinman <guy.zinman@sparkbeyond.com> [aut, cre]"
 Description: R adapter for SparkBeyond engine
-Depends: R (>= 3.1)
+Depends: R (>= 3.1.0)
 License: > GPL-2
 LazyData: true
 Imports:
     httr (>= 0.6.1),
     rjson (>= 0.2.15),
     jsonlite (>= 0.9.14),
-    data.table (>= 1.9.4),
+    data.table (>= 1.9.4)
+Suggests:
     dplyr (>= 0.4.1),
     devtools
