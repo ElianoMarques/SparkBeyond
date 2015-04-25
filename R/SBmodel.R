@@ -64,7 +64,7 @@ SBmodel = setRefClass("SBmodel",
       },
 
       checkStatus = function() {
-        statusFile = paste(artifact_loc,"/json/status.json", sep="")
+        statusFile = paste0(artifact_loc,"/json/status.json")
         finalStatus = if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
           serverResponded = TRUE
           status = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
@@ -75,7 +75,7 @@ SBmodel = setRefClass("SBmodel",
       },
 
 #       hasModelBuilt = function() {
-#         statusFile = paste(artifact_loc,"/json/status.json", sep="")
+#         statusFile = paste0(artifact_loc,"/json/status.json")
 #         status = if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
 #           statusContent = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
 #           statusContent$model
@@ -92,7 +92,7 @@ SBmodel = setRefClass("SBmodel",
       enrich = function(data, featureCount = NA, dataFilename = "", overridePreviousFile = TRUE) { #TODO: change documentation
         "Returns a data frame containing the enrichedData. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction. featureCount Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling)."
         statusException()
-        url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich", sep="")
+        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich")
         print(paste("Calling:", url))
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
@@ -129,7 +129,7 @@ SBmodel = setRefClass("SBmodel",
         "Returns prediction on a created model. \\code{dataPath} is the path to the file to be tested. \\code{outputPath} is the path to write the results of the prediction."
         statusException()
         if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
-        url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/predict", sep="")
+        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
         print(paste("Calling:", url))
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
@@ -156,7 +156,7 @@ SBmodel = setRefClass("SBmodel",
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
         statusException()
         if (!modelBuilt) stop("Evaluation requires full model building using SBlearn")
-        evaluationFile = paste(artifact_loc,"/json/evaluation.json", sep="")
+        evaluationFile = paste0(artifact_loc,"/json/evaluation.json")
         evaluation = if (file.exists(evaluationFile)){
           lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
           eval = jsonlite::fromJSON(gsub("NaN", 0.0, lines),flatten = TRUE)
@@ -175,7 +175,7 @@ SBmodel = setRefClass("SBmodel",
         if (!modelBuilt && report_name %in% reportsThatRequireModel) stop("This report requires full model building using SBlearn")
         #verify model created, check if classification, file exists
         statusException() #TODO: can be more refined here per report
-        htmlSource <- paste(artifact_loc,"/reports/", report_name, ".html",sep="")
+        htmlSource <- paste0(artifact_loc,"/reports/", report_name, ".html")
         viewer <- getOption("viewer")
         if (!is.null(viewer) && showInIDE){
           x <- paste(readLines(htmlSource, warn = F), collapse = '\n')

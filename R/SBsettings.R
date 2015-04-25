@@ -109,13 +109,17 @@ loadSettings = function() {
 #' A function to restart server
 #' @return The response from the server.
 restartServer = function() {
-  url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/die", sep="")
+  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/die")
   res = httr::POST(url, body = FALSE, httr::content_type_json())
   res
 }
 
-#clean cache
-
+#clear cache
+clearCache = function(projectName) {
+  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/cleanCache/:",projectName)
+  res = httr::POST(url, body = FALSE, httr::content_type_json())
+  res
+}
 
 #General:
 #' A function to update the package from github

@@ -35,6 +35,7 @@ SBlearn <- function(projectName = "temp",
                     evaluationMetric = "PREC", #add all options
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
+                    allocatedMemoryMB = 1000,
                     weightByClass = FALSE,
                     runBlocking = FALSE){
 
@@ -55,6 +56,7 @@ SBlearn <- function(projectName = "temp",
                 evaluationMetric = evaluationMetric,
                 scoreOnTestSet = scoreOnTestSet,
                 crossValidation = crossValidation,
+                allocatedMemoryMB = allocatedMemoryMB,
                 pathPrefix = getSBserverIOfolder()
   )
 
@@ -97,6 +99,7 @@ SBfeatureSearchOnly <- function(projectName = "temp",
                                 hints = NA,
                                 useGraph = FALSE,
                                 maxFeaturesCount = 300, #TODO: make it a list
+                                allocatedMemoryMB = 1000,
                                 runBlocking = FALSE){
 
   params <-list(projectName = projectName,
@@ -110,6 +113,7 @@ SBfeatureSearchOnly <- function(projectName = "temp",
                 hints = hints,
                 useGraph = useGraph,
                 maxFeaturesCount = maxFeaturesCount,
+                allocatedMemoryMB = allocatedMemoryMB,
                 runBlocking = runBlocking)
   model = do.call(SBlearn,c(params))
   model$modelBuilt = FALSE
