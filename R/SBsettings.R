@@ -111,14 +111,26 @@ loadSettings = function() {
 restartServer = function() {
   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/die")
   res = httr::POST(url, body = FALSE, httr::content_type_json())
-  res
+  if (res$status == 200) "Server is restarting, please wait few seconds before sending a new job." else "Something went wrong"
+}
+
+#' A function to clear the cache of a specific project
+#' @param projectName The project name to clear (e.g., "titanic").
+#' @return The response from the server.
+clearCache = function(projectName) {
+  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/cleanCache/",projectName)
+  res = httr::POST(url, body = FALSE, httr::content_type_json())
+  #to verify: list.files(paste0(getSBserverIOfolder(),"/",getSBserverPort(),"/artifacts/",projectName))
+  if (res$status == 200) paste("Cleared:",projectName) else "Something went wrong"
 }
 
 #clear cache
-clearCache = function(projectName) {
-  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/cleanCache/:",projectName)
+#' A function to check whether the server is alive
+#' @return The response from the server.
+isServerAlive = function() {
+  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/heartbeat")
   res = httr::POST(url, body = FALSE, httr::content_type_json())
-  res
+  if (res$status == 200) "OK" else "He's dead, Jim!"
 }
 
 #General:
