@@ -96,7 +96,8 @@ runTitanicFeatureSelectionOnly <- function() {
 #' getTitanicFilename()
 getTitanicData <- function(train = TRUE) {
   titanic_filename = system.file("extdata", if (train) "titanic_train.tsv" else "titanic_test.csv", package = "SBadapter")
-  data = read.table(titanic_filename, header = TRUE, sep= if (tools::file_ext(titanic_filename) == ".tsv") "\t" else ",") #inspect file content
+  sep = if (tools::file_ext(titanic_filename) == "tsv") "\t" else ","
+  data = read.table(titanic_filename, header = TRUE, sep = sep) #inspect file content
   #str(data) #inspect file content
   return(data)
 }

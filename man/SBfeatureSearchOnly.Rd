@@ -7,7 +7,7 @@
 SBfeatureSearchOnly(projectName = "temp", trainData, trainDataFilename = "",
   overridePreviousFile = TRUE, target, weightColumn = NA, maxDepth = 2,
   hints = NA, useGraph = FALSE, maxFeaturesCount = 300,
-  runBlocking = FALSE)
+  allocatedMemoryMB = 1000, runBlocking = FALSE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}

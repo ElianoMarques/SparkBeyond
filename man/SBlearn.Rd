@@ -9,8 +9,8 @@ SBlearn(projectName = "temp", trainData, trainDataFilename = "", target,
   trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
   algorithmsWhiteList = NA, hints = NA, useGraph = FALSE,
   maxFeaturesCount = 300, evaluationMetric = "PREC",
-  scoreOnTestSet = FALSE, crossValidation = 5, weightByClass = FALSE,
-  runBlocking = FALSE)
+  scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
+  weightByClass = FALSE, runBlocking = FALSE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommended. "temp" by default.}
