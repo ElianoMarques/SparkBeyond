@@ -1,10 +1,13 @@
 # S3 functions (De facto constructors of SBmodel)
 
 #' Run SparkBeyond feature enrichment and learning process.
-#' @param projectName Optional string of the session name. Setting a session name is highly recommended. "temp" by default.
-#' @param trainingFilePath-TO_UPDATE String of the path to the file to be trained on.
+#' @param projectName: Optional string of the session name. Setting a session name is highly recommended. "temp" by default.
+#' @param trainData: A data frame to analyze.
+#' @param trainDataFilename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.
 #' @param target String of the column name of in the training file that contains the target of the prediction.
-#' @param testFilePath: Optional. String of the path to an independent test file to test the prediction on. NA by default.
+#' @param testData: Optional. An independent test data frame to test the prediction on. NA by default.
+#' @param testDataFilename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.
+#' @param overridePreviousFiles: An indicator whether to override train / test files that were previously written to the server.
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
@@ -15,6 +18,7 @@
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
+#' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @return SBmodel object the encapsulate the prediction.
 #' @examples
 #' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))

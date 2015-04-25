@@ -13,13 +13,19 @@ SBlearn(projectName = "temp", trainData, trainDataFilename = "", target,
   weightByClass = FALSE, runBlocking = FALSE)
 }
 \arguments{
-\item{projectName}{Optional string of the session name. Setting a session name is highly recommended. "temp" by default.}
-
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
 
-\item{trainingFilePath-TO_UPDATE}{String of the path to the file to be trained on.}
+\item{projectName:}{Optional string of the session name. Setting a session name is highly recommended. "temp" by default.}
 
-\item{testFilePath:}{Optional. String of the path to an independent test file to test the prediction on. NA by default.}
+\item{trainData:}{A data frame to analyze.}
+
+\item{trainDataFilename:}{Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.}
+
+\item{testData:}{Optional. An independent test data frame to test the prediction on. NA by default.}
+
+\item{testDataFilename:}{Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.}
+
+\item{overridePreviousFiles:}{An indicator whether to override train / test files that were previously written to the server.}
 
 \item{trainTestSplitRatio:}{Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.}
 
@@ -40,6 +46,8 @@ SBlearn(projectName = "temp", trainData, trainDataFilename = "", target,
 \item{scoreOnTestSet:}{Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.}
 
 \item{crossValidation:}{Optional. Integer value representing how many cross validation splits should be used. 5 by default.}
+
+\item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
 }
 \value{
 SBmodel object the encapsulate the prediction.
