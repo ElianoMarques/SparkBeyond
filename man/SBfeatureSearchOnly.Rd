@@ -24,7 +24,11 @@ SBfeatureSearchOnly(projectName = "temp", trainData, trainDataFilename = "",
 
 \item{maxFeaturesCount}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
 
-\item{trainingFilePath}{String of the path to the file to be trained on.}
+\item{trainData:}{A data frame to analyze.}
+
+\item{trainDataFilename:}{Optional. define a name to save the data to. Useful in combination with {overridePreviousFile} to cache files written to server.}
+
+\item{overridePreviousFile:}{An indicator whether to override file that was previously written to the server.}
 }
 \value{
 SBmodel object that encapsulate the feature search result.

@@ -11,6 +11,10 @@ writeToServer(data, filename = "", overridePreviousFile = TRUE,
 \item{data}{Data frame or table to export to the server.}
 
 \item{groupColumns}{Optional. A vector of possible columns that were used for grouping the data. NULL by default.}
+
+\item{filename:}{Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.}
+
+\item{overridePreviousFile:}{An indicator whether to override file that was previously written to the server.}
 }
 \value{
 A filepath to the file on the server that was created.

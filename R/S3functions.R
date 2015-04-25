@@ -21,7 +21,7 @@
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @return SBmodel object the encapsulate the prediction.
 #' @examples
-#' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
+#' model = SBlearn("titanic", getTitanicData(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
 SBlearn <- function(projectName = "temp",
                     trainData,
                     trainDataFilename = "",
@@ -83,7 +83,9 @@ SBlearn <- function(projectName = "temp",
 
 #' Run SparkBeyond feature enrichment and learning process.
 #' @param projectName Optional string of the session name. Setting a session name is highly recommened. "temp" by default.
-#' @param trainingFilePath String of the path to the file to be trained on.
+#' @param trainData: A data frame to analyze.
+#' @param trainDataFilename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFile} to cache files written to server.
+#' @param overridePreviousFile: An indicator whether to override file that was previously written to the server.
 #' @param target String of the column name of in the training file that conatins the target of the prediction.
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
@@ -126,6 +128,8 @@ SBfeatureSearchOnly <- function(projectName = "temp",
 
 #' A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.
 #' @param data Data frame or table to export to the server.
+#' @param filename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.
+#' @param overridePreviousFile: An indicator whether to override file that was previously written to the server.
 #' @param groupColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 #' @return A filepath to the file on the server that was created.
 writeToServer = function(data, filename = "", overridePreviousFile = TRUE, groupColumns = NULL){
