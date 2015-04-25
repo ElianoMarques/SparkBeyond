@@ -130,7 +130,7 @@ clearCache = function(projectName) {
 isServerAlive = function() {
   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/heartbeat")
   res = httr::POST(url, body = FALSE, httr::content_type_json())
-  if (res$status == 200) "OK" else "He's dead, Jim!"
+  if (res$status == 200) "ALIVE" else "He's dead, Jim!"
 }
 
 #General:
