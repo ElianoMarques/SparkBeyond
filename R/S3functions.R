@@ -21,7 +21,7 @@
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @return SBmodel object the encapsulate the prediction.
 #' @examples
-#' model = SBlearn("titanic", getTitanicData(train = TRUE), "survived", algorithmsWhiteList = list("RRandomForest"))
+#' model = SBlearn("titanic", getTitanicData(train = TRUE), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
 SBlearn <- function(projectName = "temp",
                     trainData,
                     trainDataFilename = "",
@@ -135,7 +135,7 @@ SBfeatureSearchOnly <- function(projectName = "temp",
 writeToServer = function(data, filename = "", overridePreviousFile = TRUE, groupColumns = NULL){
   final_filename = if (filename == "") tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext=".tsv") else paste0(getSBserverIOfolder(), filename)
   if (!file.exists(final_filename) || overridePreviousFile)
-    writeGroupedData(data, groupColumns, final_filename)
+    writeGroupedData(data, final_filename, groupColumns)
   return (final_filename)
 }
 

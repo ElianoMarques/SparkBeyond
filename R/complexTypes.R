@@ -1,10 +1,16 @@
+#' Sugar to identify type of column
 colTypeOf = function(y) {typeof(y)}
+#' Sugar to identify size of a list column
 colLength = function(y) {if(length(y) == 1 && is.na(y)) list(NA) else length(unlist(y))}
+#' Sugar to trim a list column by a number
 trimN = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y)) list(NA) else list(y[1:n])}
+#' Sugar to trim a column by another column variable
 trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))  list(NA) else list(list(y[1:n]))}
+#' Sugar to exclude columns
 excludeCols = function(data, cols) data[, (cols) := NULL] #note: parenthesis around cols are important
 # zipCol = function
 
+#' sugar to convert a column to text
 col2Text = function(x) {
   if (is.list(x)){
     x1 = unlist(x)
@@ -18,10 +24,12 @@ col2Text = function(x) {
     paste0("[",content,"]")
   } else if (typeof(x) == "character") paste0("\"",escapeFun(),"\"") else x
 }
+
+#' sugar to convert all columns to text
 cols2Text = function(data, groupColumns) {data[,lapply(.SD,col2Text), by=groupColumns]}
 
-
-writeGroupedData = function(data, groupColumns = NULL, outputFile) { #sugar for writing grouped data
+#' sugar to convert all columns to text and write to file
+writeGroupedData = function(data, outputFile, groupColumns = NULL) { #sugar for writing grouped data
   library(data.table)
   toWrite = if (!is.null(groupColumns)) cols2Text(data, groupColumns) else data
   quote = if (!is.null(groupColumns)) FALSE else TRUE

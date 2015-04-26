@@ -51,7 +51,7 @@ SB object that encapsulates a model result
 #model learn
 model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived",algorithmsWhiteList = list("RRandomForest"))
 #model = SBfeatureSearchOnly("titanic", getTitanicFilename(train = TRUE), "survived")
-enriched = model$enrich(getTitanicFilename(train = FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount = 10)
+enriched = model$enrich(getTitanicData(train = FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount = 10)
 colnames(enriched)
 predicted = model$predict(getTitanicFilename(train = FALSE), paste(getwd(),"titanic_test_predicted.tsv.gz",sep="/"))
 colnames(predicted)
