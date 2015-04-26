@@ -14,7 +14,7 @@ excludeCols = function(data, cols) data[, (cols) := NULL] #note: parenthesis aro
 col2Text = function(x) {
   if (is.list(x)){
     x1 = unlist(x)
-    escapeFun = function(s) gsub("\"","\\\\\"",s)
+    escapeFun = function(s) gsub("\"","\"\"",s)
     content = if (typeof(x1) == "character") {
       x2 = sapply(x1,  escapeFun) #deal with escaping
       paste0("\"", paste0(x2,collapse = "\",\""), "\"")
