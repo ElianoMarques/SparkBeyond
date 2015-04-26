@@ -15,14 +15,14 @@ col2Text = function(x) {
   if (is.list(x)){
     x1 = unlist(x)
     escapeFun = function(s) gsub("\"","\"\"",s)
-    content = if (typeof(x1) == "character") {
+    content = if (typeof(x1) == "character" || is.factor(x1)) {
       x2 = sapply(x1,  escapeFun) #deal with escaping
       paste0("\"", paste0(x2,collapse = "\",\""), "\"")
     } else {
       paste0(x1,collapse = ",")
     }
     paste0("[",content,"]")
-  } else if (typeof(x) == "character") paste0("\"",escapeFun(),"\"") else x
+  } else if (typeof(x) == "character" || is.factor(x)) paste0("\"",escapeFun(x),"\"") else x
 }
 
 #' sugar to convert all columns to text
