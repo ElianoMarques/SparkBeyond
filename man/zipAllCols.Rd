@@ -2,11 +2,11 @@
 % Please edit documentation in R/complexTypes.R
 \name{zipAllCols}
 \alias{zipAllCols}
-\title{zipCols sugar}
+\title{zipAllCols sugar}
 \usage{
 zipAllCols(data, col1, by)
 }
 \description{
-zipCols sugar
+zipAllCols sugar
 }
 

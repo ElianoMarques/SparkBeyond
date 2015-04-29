@@ -23,6 +23,8 @@ SB object that encapsulates a model result
 
 \item{\code{evaluate()}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
+\item{\code{features()}}{Returns a dataset with top feature information}
+
 \item{\code{initialize(artifact_loc, modelBuilt = FALSE)}}{initializes a model using a string provided as \code{loc}.}
 
 \item{\code{predict(data, dataFilename = "", overridePreviousFile = TRUE)}}{Returns prediction on a created model. \code{data} is a dataframe to be tested. \code{dataFilename} is optional name to write on the server. \code{overridePreviousFile} is indicator whether to override previous file that may exist on the server.}

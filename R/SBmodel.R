@@ -162,8 +162,18 @@ SBmodel = setRefClass("SBmodel",
           eval = jsonlite::fromJSON(gsub("NaN", 0.0, lines),flatten = TRUE)
           writeLines(eval$evaluation$classDetails)
           eval
-        } else {stop(paste("Evaluation file does not exist in ", artifact_loc))}
+        } else {stop(paste("Evaluation file does not exist in ", evaluationFile))}
         return (evaluation)
+      },
+
+      features = function() {
+        "Returns a dataset with top feature information"
+        statusException()
+        featuresFile = paste0(artifact_loc,"/reports/features.tsv")
+        features = if (file.exists(featuresFile)){
+          fread(featuresFile, sep="\t", header=TRUE)
+        } else {stop(paste("Features file does not exist in ", featuresFile))}
+        return (features)
       },
 
       showReport = function(report_name = NA, showInIDE = TRUE){ #confine to a specific list
@@ -241,11 +251,11 @@ SBmodel = setRefClass("SBmodel",
 #         return(loadedModel)
 #       }
 
-      # add groupBy column, time column
+
       # add features json
       # lift, regression plots
       # feature clusters report
-      # featurePlot
+      # featurePlots
       # add S3 methods of print, predict
   )
 );
