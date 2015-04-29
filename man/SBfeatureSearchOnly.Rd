@@ -6,7 +6,8 @@
 \usage{
 SBfeatureSearchOnly(projectName = "temp", trainData, trainDataFilename = "",
   overridePreviousFile = TRUE, target, weightColumn = NA, maxDepth = 2,
-  hints = NA, useGraph = FALSE, maxFeaturesCount = 300,
+  functionsWhiteList = NA, functionsBlackList = NA, useGraph = FALSE,
+  maxFeaturesCount = 300, columnSubsetSize = 1, customColumnSubsets = NA,
   allocatedMemoryMB = 1000, runBlocking = FALSE)
 }
 \arguments{
@@ -18,8 +19,6 @@ SBfeatureSearchOnly(projectName = "temp", trainData, trainDataFilename = "",
 
 \item{maxDepth}{Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
 
-\item{hints}{Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.}
-
 \item{useGraph}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
 \item{maxFeaturesCount}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
@@ -29,6 +28,14 @@ SBfeatureSearchOnly(projectName = "temp", trainData, trainDataFilename = "",
 \item{trainDataFilename:}{Optional. define a name to save the data to. Useful in combination with {overridePreviousFile} to cache files written to server.}
 
 \item{overridePreviousFile:}{An indicator whether to override file that was previously written to the server.}
+
+\item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
+
+\item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.}
+
+\item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
+
+\item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
 }
 \value{
 SBmodel object that encapsulate the feature search result.

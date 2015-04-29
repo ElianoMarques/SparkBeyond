@@ -51,16 +51,15 @@ SB object that encapsulates a model result
 }}
 \examples{
 #model learn
-model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived",algorithmsWhiteList = list("RRandomForest"))
-#model = SBfeatureSearchOnly("titanic", getTitanicFilename(train = TRUE), "survived")
-enriched = model$enrich(getTitanicData(train = FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount = 10)
+model = SBlearn("titanic", getTitanicData(train = TRUE), "survived",algorithmsWhiteList = list("RRandomForest"))
+#model = SBfeatureSearchOnly("titanic", getTitanicData(train = TRUE), "survived")
+enriched = model$enrich(getTitanicData(train = FALSE), featureCount = 10)
 colnames(enriched)
-predicted = model$predict(getTitanicFilename(train = FALSE), paste(getwd(),"titanic_test_predicted.tsv.gz",sep="/"))
+predicted = model$predict(getTitanicData(train = FALSE))
 colnames(predicted)
 predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
 eval = model$evaluate()
 #model$showFeatures()
 #model$showConfusionMatrix()
-#model$save("/tmp/myModel.Rdata")
 }
 

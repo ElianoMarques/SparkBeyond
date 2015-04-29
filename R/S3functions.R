@@ -12,9 +12,12 @@
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
-#' @param hints: Optional. A list of strings that represents a set of hints that will be used to guide the feature search. NA by default.
+#' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
+#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
+#' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
@@ -33,15 +36,18 @@ SBlearn <- function(projectName = "temp",
                     weightColumn = NA,
                     maxDepth = 2,
                     algorithmsWhiteList = NA, #list available algorithms
-                    hints = NA,
+                    functionsWhiteList = NA,
+                    functionsBlackList = NA,
                     useGraph = FALSE,
                     maxFeaturesCount = 300, #TODO: make it a list
+                    columnSubsetSize = 1,
+                    customColumnSubsets = NA,
                     evaluationMetric = "PREC", #add all options
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
                     allocatedMemoryMB = 1000,
                     weightByClass = FALSE,
-                    runBlocking = FALSE){
+                    runBlocking = TRUE){
 
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
   print(paste("Calling:", url))
@@ -54,9 +60,12 @@ SBlearn <- function(projectName = "temp",
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
                 algorithmsWhiteList = algorithmsWhiteList,
-                hints = hints,
+                hints = functionsWhiteList,
+                sessionBlackList = functionsBlackList,
                 useGraph = useGraph,
                 globalFeatureIterations = maxFeaturesCount,
+                columnSubsetSize = columnSubsetSize,
+                customColumnSubsets = customColumnSubsets,
                 evaluationMetric = evaluationMetric,
                 scoreOnTestSet = scoreOnTestSet,
                 crossValidation = crossValidation,
@@ -89,9 +98,12 @@ SBlearn <- function(projectName = "temp",
 #' @param target String of the column name of in the training file that conatins the target of the prediction.
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
-#' @param hints Optional. A list of strings that reprents a set of hints that will be used to guide the feature search. NA by default.
+#' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
+#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
+#' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @return SBmodel object that encapsulate the feature search result.
 #' @examples
 #' #model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
@@ -102,11 +114,14 @@ SBfeatureSearchOnly <- function(projectName = "temp",
                                 target,
                                 weightColumn = NA,
                                 maxDepth = 2,
-                                hints = NA,
+                                functionsWhiteList = NA,
+                                functionsBlackList = NA,
                                 useGraph = FALSE,
                                 maxFeaturesCount = 300, #TODO: make it a list
+                                columnSubsetSize = 1,
+                                customColumnSubsets = NA,
                                 allocatedMemoryMB = 1000,
-                                runBlocking = FALSE){
+                                runBlocking = TRUE){
 
   params <-list(projectName = projectName,
                 trainData = trainData,
@@ -116,9 +131,12 @@ SBfeatureSearchOnly <- function(projectName = "temp",
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
                 algorithmsWhiteList = list("ZeroR"),
-                hints = hints,
+                functionsWhiteList = functionsWhiteList,
+                functionsBlackList = functionsBlackList,
                 useGraph = useGraph,
                 maxFeaturesCount = maxFeaturesCount,
+                columnSubsetSize = columnSubsetSize,
+                customColumnSubsets = customColumnSubsets,
                 allocatedMemoryMB = allocatedMemoryMB,
                 runBlocking = runBlocking)
   model = do.call(SBlearn,c(params))

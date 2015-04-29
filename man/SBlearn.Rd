@@ -7,10 +7,11 @@
 SBlearn(projectName = "temp", trainData, trainDataFilename = "", target,
   testData = NA, testDataFilename = "", overridePreviousFiles = TRUE,
   trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
-  algorithmsWhiteList = NA, hints = NA, useGraph = FALSE,
-  maxFeaturesCount = 300, evaluationMetric = "PREC",
-  scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
-  weightByClass = FALSE, runBlocking = FALSE)
+  algorithmsWhiteList = NA, functionsWhiteList = NA,
+  functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
+  columnSubsetSize = 1, customColumnSubsets = NA,
+  evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
+  allocatedMemoryMB = 1000, weightByClass = FALSE, runBlocking = FALSE)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -35,11 +36,17 @@ SBlearn(projectName = "temp", trainData, trainDataFilename = "", target,
 
 \item{algorithmsWhiteList:}{Optional. A list of strings that represents the set of algorithms to run. NA by default}
 
-\item{hints:}{Optional. A list of strings that represents a set of hints that will be used to guide the feature search. NA by default.}
+\item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
+
+\item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.}
 
 \item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
 \item{maxFeaturesCount:}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
+
+\item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
+
+\item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
 
 \item{evaluationMetric:}{Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.}
 

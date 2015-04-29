@@ -10,17 +10,16 @@ library(methods) #to support RScript
 #' @field modelBuilt Indication for whether only a feature search was performed or a full model was created.
 #' @examples
 #' #model learn
-#' model = SBlearn("titanic", getTitanicFilename(train = TRUE), "survived",algorithmsWhiteList = list("RRandomForest"))
-#' #model = SBfeatureSearchOnly("titanic", getTitanicFilename(train = TRUE), "survived")
-#' enriched = model$enrich(getTitanicData(train = FALSE), paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), featureCount = 10)
+#' model = SBlearn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("RRandomForest"))
+#' #model = SBfeatureSearchOnly("titanic", getTitanicData(train = TRUE), target="survived")
+#' enriched = model$enrich(getTitanicData(train = FALSE), featureCount = 10)
 #' colnames(enriched)
-#' predicted = model$predict(getTitanicFilename(train = FALSE), paste(getwd(),"titanic_test_predicted.tsv.gz",sep="/"))
+#' predicted = model$predict(getTitanicData(train = FALSE))
 #' colnames(predicted)
 #' predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
 #' eval = model$evaluate()
 #' #model$showFeatures()
 #' #model$showConfusionMatrix()
-#' #model$save("/tmp/myModel.Rdata")
 SBmodel = setRefClass("SBmodel",
     fields = list(
       artifact_loc = "character",
@@ -251,8 +250,11 @@ SBmodel = setRefClass("SBmodel",
 #         return(loadedModel)
 #       }
 
+      # add columnSubSetSize
+      # add customColumnSubset
+      # sessionBlackList
 
-      # add features json
+      # add dashboard json
       # lift, regression plots
       # feature clusters report
       # featurePlots
