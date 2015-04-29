@@ -27,18 +27,19 @@ library('SBadapter')
 
 `SBlearn` is used to discover features & build a model, it requires the following input:
 
-1.  `sessionName`         - a name describring the analysis  
-2.  `training file path`  - the path to the training file (text file, comma or tab separated)
+1.  `projectName`         - a name describring the analysis  
+2.  `trainData`           - a data frame
 3.  `target`              - the column name in the input data denoting the label to learn
 
 
-```{r, echo=FALSE}
-train_file_path = getTitanicFilename(train = TRUE)
+```{r, echo=TRUE}
+setSBserverIOfolder("/tmp/")
 ```
 
 ```{r, eval=TRUE}
-model = SBlearn(sessionName = "titanic",
-                        trainingFilePath = train_file_path,
+train = getTitanicData(train = TRUE)
+model = SBlearn(projectName = "titanic",
+                        trainData = train,
                         target = "survived",
                         algorithmsWhiteList = list("RRandomForest"))
 ```
@@ -55,17 +56,16 @@ The returned object `model` encapsulates a predictive-model on which we can perf
 
 `enrich` adds new features to a `dataset` using a `model`, it requires the following input:
 
-1.  `datapath`      - data-file path (typically a test-set)
-2.  `outputPath`    - output file path
-3.  `featureCount`  - number of features  (use `NA` to get all features)
+1.  `data`          - a data frame
+2.  `featureCount`  - number of features  (use `NA` to get all features)
 
 ```{r, echo=FALSE}
-test_file_path = getTitanicFilename(train = FALSE)
+
 ```
 
 ```{r,  eval=TRUE}
-enriched = model$enrich(dataPath = test_file_path, 
-             outputPath = paste(getwd(),"titanic_test_enriched.tsv.gz",sep="/"), 
+test = getTitanicData(train = FALSE)
+enriched = model$enrich(data = test, 
              featureCount=10)
 ```
 
@@ -83,12 +83,10 @@ As you can see we now have 10 original *titanic* columns + 10 additional columns
 
 it requires the following input:
 
-1.  `datapath`   - data-file path (typically a test-set)
-2.  `outputPath` - output file path
+1.  `data`       - a data frame
 
 ```{r,  eval=TRUE}
-predicted = model$predict(dataPath = test_file_path, 
-             outputPath = paste(getwd(),"titanic_test_predicted.tsv.gz",sep="/"))
+predicted = model$predict(data = test)
 ```
 
 The resulting prediction is added to the `dataset` as a set of new columns
@@ -160,7 +158,7 @@ There is an option to perform only feature discovery at the learning stage using
 
 ```{r, eval = FALSE}
 model = SBfeatureSearchOnly(sessionName = "titanic",
-                        trainingFilePath = train_file_path,
+                        trainData = train,
                         target = "survived")
 ```
 In this case, the user will be able to call `evaluate` but will get an exception when calling `predict`.
