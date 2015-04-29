@@ -4,7 +4,10 @@
 \alias{writeGroupedData}
 \title{sugar to convert all columns to text and write to file}
 \usage{
-writeGroupedData(data, outputFile, groupColumns = NULL)
+writeGroupedData(data, outputFile, groupByColumns = NULL)
+}
+\arguments{
+\item{groupByColumns}{Optional. A vector of possible columns that were used for grouping the data. NULL by default.}
 }
 \description{
 sugar to convert all columns to text and write to file

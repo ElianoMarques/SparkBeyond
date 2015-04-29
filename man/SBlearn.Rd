@@ -6,8 +6,8 @@
 \usage{
 SBlearn(projectName = "temp", trainData, trainDataFilename = "", target,
   testData = NA, testDataFilename = "", overridePreviousFiles = TRUE,
-  trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
-  algorithmsWhiteList = NA, functionsWhiteList = NA,
+  groupByColumns = NULL, trainTestSplitRatio = 0.8, weightColumn = NA,
+  maxDepth = 2, algorithmsWhiteList = NA, functionsWhiteList = NA,
   functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
   columnSubsetSize = 1, customColumnSubsets = NA,
   evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
@@ -15,6 +15,8 @@ SBlearn(projectName = "temp", trainData, trainDataFilename = "", target,
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
+
+\item{groupByColumns}{Optional. A vector of possible columns that were used for grouping the data. NULL by default.}
 
 \item{projectName:}{Optional string of the session name. Setting a session name is highly recommended. "temp" by default.}
 

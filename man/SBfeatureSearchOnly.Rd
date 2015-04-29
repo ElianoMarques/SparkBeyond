@@ -5,13 +5,16 @@
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
 SBfeatureSearchOnly(projectName = "temp", trainData, trainDataFilename = "",
-  overridePreviousFile = TRUE, target, weightColumn = NA, maxDepth = 2,
-  functionsWhiteList = NA, functionsBlackList = NA, useGraph = FALSE,
-  maxFeaturesCount = 300, columnSubsetSize = 1, customColumnSubsets = NA,
+  overridePreviousFile = TRUE, groupByColumns = NULL, target,
+  weightColumn = NA, maxDepth = 2, functionsWhiteList = NA,
+  functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
+  columnSubsetSize = 1, customColumnSubsets = NA,
   allocatedMemoryMB = 1000, runBlocking = TRUE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
+
+\item{groupByColumns}{Optional. A vector of possible columns that were used for grouping the data. NULL by default.}
 
 \item{target}{String of the column name of in the training file that conatins the target of the prediction.}
 
