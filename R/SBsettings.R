@@ -49,11 +49,13 @@ printSBserverPort = function() {
 #' A function to set the SparkBeyond server I/O folder.
 #' @param port new port.
 setSBserverIOfolder = function(folder){
+  folder = paste0(folder, "/")
   if (is.null(folder) || folder == "") {stop("folder location is empty")}
   if (!file.exists(folder)) {
     print (paste("Folder ",  folder, " does not exists - attempting to create"))
     dir.create(folder)
-    if (!file.exists(folder)) {stop(paste("failed to create folder", folder))}
+
+    #if (!file.exists(folder)) {stop(paste("failed to create folder", folder))}
   }
   assign("IOfolder", folder, envir = globalenv())
   print(paste("Setting server IO folder to:", IOfolder))
