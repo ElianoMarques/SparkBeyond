@@ -51,8 +51,8 @@ SB object that encapsulates a model result
 }}
 \examples{
 #model learn
-model = SBlearn("titanic", getTitanicData(train = TRUE), "survived",algorithmsWhiteList = list("RRandomForest"))
-#model = SBfeatureSearchOnly("titanic", getTitanicData(train = TRUE), "survived")
+model = SBlearn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("RRandomForest"))
+#model = SBfeatureSearchOnly("titanic", getTitanicData(train = TRUE), target="survived")
 enriched = model$enrich(getTitanicData(train = FALSE), featureCount = 10)
 colnames(enriched)
 predicted = model$predict(getTitanicData(train = FALSE))
