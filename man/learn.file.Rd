@@ -48,6 +48,8 @@ learn.file(projectName = "temp", trainDataFilename, target,
 \item{crossValidation:}{Optional. Integer value representing how many cross validation splits should be used. 5 by default.}
 
 \item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
+
+\item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
 }
 \value{
 Session object that encapsulates the model.

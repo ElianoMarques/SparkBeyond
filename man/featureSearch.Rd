@@ -7,7 +7,8 @@
 featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
   maxDepth = 2, functionsWhiteList = NA, functionsBlackList = NA,
   useGraph = FALSE, maxFeaturesCount = 300, columnSubsetSize = 1,
-  customColumnSubsets = NA, allocatedMemoryMB = 1000, runBlocking = TRUE)
+  customColumnSubsets = NA, allocatedMemoryMB = 1000,
+  weightByClass = FALSE, runBlocking = TRUE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
@@ -31,6 +32,8 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 \item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
 
 \item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
+
+\item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
 }
 \value{
 Session object that encapsulate the feature search result.
