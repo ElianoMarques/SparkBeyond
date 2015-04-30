@@ -42,6 +42,7 @@ learn <- function(projectName = "temp",
                   crossValidation = 5,
                   allocatedMemoryMB = 1000,
                   weightByClass = FALSE,
+                  createFeatureClusters = TRUE,
                   runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -62,7 +63,8 @@ learn <- function(projectName = "temp",
                 scoreOnTestSet = scoreOnTestSet,
                 crossValidation = crossValidation,
                 allocatedMemoryMB = allocatedMemoryMB,
-                weightByClass = weightByClass)
+                weightByClass = weightByClass,
+                createFeatureClusters = createFeatureClusters)
 
   session = do.call(learn.file,c(params))
   session
@@ -110,6 +112,7 @@ learn.file <- function(projectName = "temp",
                     crossValidation = 5,
                     allocatedMemoryMB = 1000,
                     weightByClass = FALSE,
+                    createFeatureClusters = TRUE,
                     runBlocking = TRUE){
 
   if (!is.na(testDataFilename) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")
@@ -135,6 +138,7 @@ learn.file <- function(projectName = "temp",
                 crossValidation = crossValidation,
                 allocatedMemoryMB = allocatedMemoryMB,
                 weightByClass = weightByClass,
+                createFeatureClusters = createFeatureClusters,
                 pathPrefix = getSBserverIOfolder()
   )
 
@@ -184,6 +188,7 @@ featureSearch <- function(projectName = "temp",
                                 customColumnSubsets = NA,
                                 allocatedMemoryMB = 1000,
                                 weightByClass = FALSE,
+                                createFeatureClusters = TRUE,
                                 runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -200,6 +205,7 @@ featureSearch <- function(projectName = "temp",
                 customColumnSubsets = customColumnSubsets,
                 allocatedMemoryMB = allocatedMemoryMB,
                 weightByClass = weightByClass,
+                createFeatureClusters = createFeatureClusters,
                 runBlocking = runBlocking)
   model = do.call(featureSearch.file,c(params))
   model
@@ -234,6 +240,7 @@ featureSearch.file <- function(projectName = "temp",
                           customColumnSubsets = NA,
                           allocatedMemoryMB = 1000,
                           weightByClass = FALSE,
+                          createFeatureClusters = TRUE,
                           runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -250,6 +257,7 @@ featureSearch.file <- function(projectName = "temp",
                 customColumnSubsets = customColumnSubsets,
                 allocatedMemoryMB = allocatedMemoryMB,
                 weightByClass = weightByClass,
+                createFeatureClusters = createFeatureClusters,
                 runBlocking = runBlocking)
   model = do.call(learn,c(params))
   model$modelBuilt = FALSE
