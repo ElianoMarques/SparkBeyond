@@ -55,7 +55,7 @@ setSBserverIOfolder = function(folder){
     print (paste("Folder ",  folder, " does not exists - attempting to create"))
     dir.create(folder)
 
-    #if (!file.exists(folder)) {stop(paste("failed to create folder", folder))}
+    #if (!file.exists(folder)) {stop(paste("failed to create folder", folder))} #fails if ends with "/"
   }
   assign("IOfolder", folder, envir = globalenv())
   print(paste("Setting server IO folder to:", IOfolder))
