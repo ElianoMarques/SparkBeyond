@@ -37,12 +37,11 @@ SBmodel = setRefClass("SBmodel",
         i = 0
         finalStatus = repeat {
           i = i+1
-          if (i >= 3 && !serverResponded) {
-            res = "Server didn't respond for 30 seconds... check that server is up... terminating."
-            print(res)
-            flush.console()
-            stop(res)
-          }
+#           if (i > 10 && !serverResponded) {
+#             res = "Server didn't respond for too long... terminating."
+#             print(res)
+#             #stop(res)
+#           }
           status = checkStatus()
           switch (status,
             "DONE" = return ("Done"),
