@@ -19,7 +19,7 @@ SB object that encapsulates a model result
 
 \describe{
 \item{\code{enrich(data, featureCount = NA, dataFilename = "",
-  overridePreviousFile = TRUE, groupByCols = NULL)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be tested. \code{dataFilename} is optional name to write on the server. \code{overridePreviousFile} is indicator whether to override previous file that may exist on the server. \code{featureCount} Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling). \code{groupByColumns} Optional. A vector of possible columns that were used for grouping the data. NULL by default.}
+  overridePreviousFile = TRUE)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be tested. \code{dataFilename} is optional name to write on the server. \code{overridePreviousFile} is indicator whether to override previous file that may exist on the server. \code{featureCount} Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling).}
 
 \item{\code{evaluate()}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
@@ -27,8 +27,7 @@ SB object that encapsulates a model result
 
 \item{\code{initialize(artifact_loc, modelBuilt = FALSE)}}{initializes a model using a string provided as \code{loc}.}
 
-\item{\code{predict(data, dataFilename = "", overridePreviousFile = TRUE,
-  groupByCols = NULL)}}{Returns prediction on a created model. \code{data} is a dataframe to be tested. \code{dataFilename} is optional name to write on the server. \code{overridePreviousFile} is indicator whether to override previous file that may exist on the server. \code{groupByColumns} Optional. A vector of possible columns that were used for grouping the data. NULL by default.}
+\item{\code{predict(data, dataFilename = "", overridePreviousFile = TRUE)}}{Returns prediction on a created model. \code{data} is a dataframe to be tested. \code{dataFilename} is optional name to write on the server. \code{overridePreviousFile} is indicator whether to override previous file that may exist on the server.}
 
 \item{\code{showConfusionMatrix(normalized = FALSE, showInIDE = TRUE)}}{Shows a confusion matrix of a model in the IDE viewer on in the web browser.}
 

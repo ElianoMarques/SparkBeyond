@@ -88,14 +88,14 @@ SBmodel = setRefClass("SBmodel",
         if (status != "DONE") stop(paste("Model was not created - ", status))
       },
 
-      enrich = function(data, featureCount = NA, dataFilename = "", overridePreviousFile = TRUE, groupByCols = NULL) { #TODO: change documentation
-        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be tested. \\code{dataFilename} is optional name to write on the server. \\code{overridePreviousFile} is indicator whether to override previous file that may exist on the server. \\code{featureCount} Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling). \\code{groupByColumns} Optional. A vector of possible columns that were used for grouping the data. NULL by default."
+      enrich = function(data, featureCount = NA, dataFilename = "", overridePreviousFile = TRUE) { #TODO: change documentation
+        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be tested. \\code{dataFilename} is optional name to write on the server. \\code{overridePreviousFile} is indicator whether to override previous file that may exist on the server. \\code{featureCount} Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling)."
         statusException()
         url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich")
         print(paste("Calling:", url))
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
-                      dataPath = writeToServer(data, dataFilename, overridePreviousFile, groupByCols),
+                      dataPath = writeToServer(data, dataFilename, overridePreviousFile),
                       featureCount = featureCount,
                       outputPath = outputPath,
                       pathPrefix = getSBserverIOfolder())
@@ -124,15 +124,15 @@ SBmodel = setRefClass("SBmodel",
         return(finalRes)
       },
 
-      predict = function(data, dataFilename = "", overridePreviousFile = TRUE, groupByCols = NULL) { #TODO: change documentation
-        "Returns prediction on a created model. \\code{data} is a dataframe to be tested. \\code{dataFilename} is optional name to write on the server. \\code{overridePreviousFile} is indicator whether to override previous file that may exist on the server. \\code{groupByColumns} Optional. A vector of possible columns that were used for grouping the data. NULL by default."
+      predict = function(data, dataFilename = "", overridePreviousFile = TRUE) { #TODO: change documentation
+        "Returns prediction on a created model. \\code{data} is a dataframe to be tested. \\code{dataFilename} is optional name to write on the server. \\code{overridePreviousFile} is indicator whether to override previous file that may exist on the server."
         statusException()
         if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
         url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
         print(paste("Calling:", url))
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
-                      dataPath = writeToServer(data, dataFilename, overridePreviousFile,groupByCols),
+                      dataPath = writeToServer(data, dataFilename, overridePreviousFile),
                       outputPath = outputPath,
                       pathPrefix = getSBserverIOfolder())
 

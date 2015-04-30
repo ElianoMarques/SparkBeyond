@@ -4,7 +4,7 @@
 \alias{cols2Text}
 \title{sugar to convert all columns to text}
 \usage{
-cols2Text(data, groupColumns)
+cols2Text(data)
 }
 \description{
 sugar to convert all columns to text

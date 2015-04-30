@@ -4,13 +4,10 @@
 \alias{writeToServer}
 \title{A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.}
 \usage{
-writeToServer(data, filename = "", overridePreviousFile = TRUE,
-  groupByColumns = NULL)
+writeToServer(data, filename = "", overridePreviousFile = TRUE)
 }
 \arguments{
 \item{data}{Data frame or table to export to the server.}
-
-\item{groupByColumns}{Optional. A vector of possible columns that were used for grouping the data. NULL by default.}
 
 \item{filename:}{Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.}
 

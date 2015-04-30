@@ -42,15 +42,15 @@ col2Text = function(x) {
 }
 
 #' sugar to convert all columns to text
-cols2Text = function(data, groupColumns) {data[,lapply(.SD,col2Text), by=groupColumns]}
+cols2Text = function(data) {data[,lapply(.SD,col2Text)]}
 
 #' sugar to convert all columns to text and write to file
 #' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
-writeGroupedData = function(data, outputFile, groupByColumns = NULL) { #sugar for writing grouped data
+writeGroupedData = function(data, outputFile) { #sugar for writing grouped data
   library(data.table)
-  toWrite = if (!is.null(groupByColumns)) cols2Text(data, groupByColumns) else data
-  quote = if (!is.null(groupByColumns)) FALSE else TRUE
-  write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=quote)
+  data = as.data.table(data)
+  toWrite = cols2Text(data)
+  write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
 
 #dt <- data.table(dt, new = paste(dt$A, dt$B, sep = ""))

@@ -8,7 +8,6 @@
 #' @param testData: Optional. An independent test data frame to test the prediction on. NA by default.
 #' @param testDataFilename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.
 #' @param overridePreviousFiles: An indicator whether to override train / test files that were previously written to the server.
-#' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
@@ -33,7 +32,6 @@ SBlearn <- function(projectName = "temp",
                     testData = NA,
                     testDataFilename = "",
                     overridePreviousFiles = TRUE,
-                    groupByColumns = NULL,
                     trainTestSplitRatio = 0.8,
                     weightColumn = NA,
                     maxDepth = 2,
@@ -55,9 +53,9 @@ SBlearn <- function(projectName = "temp",
   print(paste("Calling:", url))
 
   params <-list(projectName = projectName,
-                trainingFilePath = writeToServer(trainData, trainDataFilename, overridePreviousFiles,groupByColumns), #TODO: add logic to pass filenames and see if need to override
+                trainingFilePath = writeToServer(trainData, trainDataFilename, overridePreviousFiles),
                 target = target,
-                testFilePath = if (!is.na(testData)) writeToServer(testData, testDataFilename, overridePreviousFiles) else NA, #TODO: add logic to pass filenames and see if need to override
+                testFilePath = if (!is.na(testData)) writeToServer(testData, testDataFilename, overridePreviousFiles) else NA,
                 trainTestSplitRatio = trainTestSplitRatio,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
@@ -97,7 +95,6 @@ SBlearn <- function(projectName = "temp",
 #' @param trainData: A data frame to analyze.
 #' @param trainDataFilename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFile} to cache files written to server.
 #' @param overridePreviousFile: An indicator whether to override file that was previously written to the server.
-#' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 #' @param target String of the column name of in the training file that conatins the target of the prediction.
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
@@ -114,7 +111,6 @@ SBfeatureSearchOnly <- function(projectName = "temp",
                                 trainData,
                                 trainDataFilename = "", #TODO:
                                 overridePreviousFile = TRUE,
-                                groupByColumns = NULL,
                                 target,
                                 weightColumn = NA,
                                 maxDepth = 2,
@@ -131,7 +127,6 @@ SBfeatureSearchOnly <- function(projectName = "temp",
                 trainData = trainData,
                 trainDataFilename = trainDataFilename,
                 overridePreviousFiles = overridePreviousFile,
-                groupByColumns = groupByColumns,
                 target = target,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
@@ -153,12 +148,11 @@ SBfeatureSearchOnly <- function(projectName = "temp",
 #' @param data Data frame or table to export to the server.
 #' @param filename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.
 #' @param overridePreviousFile: An indicator whether to override file that was previously written to the server.
-#' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 #' @return A filepath to the file on the server that was created.
-writeToServer = function(data, filename = "", overridePreviousFile = TRUE, groupByColumns = NULL){
+writeToServer = function(data, filename = "", overridePreviousFile = TRUE){
   final_filename = if (filename == "") tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext=".tsv") else paste0(getSBserverIOfolder(), filename)
   if (!file.exists(final_filename) || overridePreviousFile)
-    writeGroupedData(data, final_filename, groupByColumns)
+    writeGroupedData(data, final_filename)
   return (final_filename)
 }
 

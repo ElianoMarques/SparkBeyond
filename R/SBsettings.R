@@ -140,3 +140,8 @@ isServerAlive = function() {
 updatePackage = function() {
   devtools::install_github("zinman/SBadapter")
 }
+
+.onLoad <- function(libname = find.package("SBadapter"), pkgname = "SBadapter") {
+  print("Automatically trying to load settings saved in the current directory:")
+  loadSettings()
+}
