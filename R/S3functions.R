@@ -3,11 +3,8 @@
 #' Run SparkBeyond feature enrichment and learning process.
 #' @param projectName: Optional string of the session name. Setting a session name is highly recommended. "temp" by default.
 #' @param trainData: A data frame to analyze.
-#' @param trainDataFilename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.
 #' @param target String of the column name of in the training file that contains the target of the prediction.
 #' @param testData: Optional. An independent test data frame to test the prediction on. NA by default.
-#' @param testDataFilename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.
-#' @param overridePreviousFiles: An indicator whether to override train / test files that were previously written to the server.
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
@@ -22,16 +19,79 @@
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
-#' @return SBmodel object the encapsulate the prediction.
+#' @return Session object that encapsulates the model.
 #' @examples
-#' model = SBlearn("titanic", getTitanicData(train = TRUE), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
-SBlearn <- function(projectName = "temp",
-                    trainData,
-                    trainDataFilename = "",
+#' session = learn("titanic", getTitanicData(train = TRUE), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
+learn <- function(projectName = "temp",
+                  trainData,
+                  target,
+                  testData = NA,
+                  trainTestSplitRatio = 0.8,
+                  weightColumn = NA,
+                  maxDepth = 2,
+                  algorithmsWhiteList = NA, #list available algorithms
+                  functionsWhiteList = NA,
+                  functionsBlackList = NA,
+                  useGraph = FALSE,
+                  maxFeaturesCount = 300, #TODO: make it a list
+                  columnSubsetSize = 1,
+                  customColumnSubsets = NA,
+                  evaluationMetric = "PREC", #add all options
+                  scoreOnTestSet = FALSE,
+                  crossValidation = 5,
+                  allocatedMemoryMB = 1000,
+                  weightByClass = FALSE,
+                  runBlocking = TRUE){
+
+  params <-list(projectName = projectName,
+                trainDataFilename = writeToServer(trainData),
+                target = target,
+                testDataFilename= if (!is.na(testData)) writeToServer(testData) else NA,
+                trainTestSplitRatio = trainTestSplitRatio,
+                weightColumn = weightColumn,
+                maxDepth = maxDepth,
+                algorithmsWhiteList = algorithmsWhiteList,
+                functionsWhiteList = functionsWhiteList,
+                functionsBlackList = functionsBlackList,
+                useGraph = useGraph,
+                maxFeaturesCount = maxFeaturesCount,
+                columnSubsetSize = columnSubsetSize,
+                customColumnSubsets = customColumnSubsets,
+                evaluationMetric = evaluationMetric,
+                scoreOnTestSet = scoreOnTestSet,
+                crossValidation = crossValidation,
+                allocatedMemoryMB = allocatedMemoryMB)
+
+  session = do.call(learn.file,c(params))
+  session
+}
+
+#' Run SparkBeyond feature enrichment and learning process.
+#' @param projectName: Optional string of the session name. Setting a session name is highly recommended. "temp" by default.
+#' @param trainDataFilename: Define the path to the training data to use.
+#' @param target String of the column name of in the training file that contains the target of the prediction.
+#' @param testDataFilename: Optional. define a the path to the test data to use. NA by default.
+#' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
+#' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
+#' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
+#' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
+#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param maxFeaturesCount: Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
+#' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
+#' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
+#' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
+#' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
+#' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
+#' @return Session object that encapsulates the model.
+#' @examples
+#' #session = learn("titanic", titanic_file_path, target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
+learn.file <- function(projectName = "temp",
+                    trainDataFilename,
                     target,
-                    testData = NA,
-                    testDataFilename = "",
-                    overridePreviousFiles = TRUE,
+                    testDataFilename = NA,
                     trainTestSplitRatio = 0.8,
                     weightColumn = NA,
                     maxDepth = 2,
@@ -49,13 +109,14 @@ SBlearn <- function(projectName = "temp",
                     weightByClass = FALSE,
                     runBlocking = TRUE){
 
+  if (!is.na(testDataFilename) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
   print(paste("Calling:", url))
 
   params <-list(projectName = projectName,
-                trainingFilePath = writeToServer(trainData, trainDataFilename, overridePreviousFiles),
+                trainingFilePath = trainDataFilename,
                 target = target,
-                testFilePath = if (!is.na(testData)) writeToServer(testData, testDataFilename, overridePreviousFiles) else NA,
+                testFilePath = testDataFilename,
                 trainTestSplitRatio = trainTestSplitRatio,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
@@ -85,7 +146,7 @@ SBlearn <- function(projectName = "temp",
   }
 
   print(paste("Artifact location was created at:", res$artifactPath))
-  model = SBmodel(artifact_loc = res$artifactPath, TRUE)
+  model = Session(artifact_loc = res$artifactPath, TRUE)
   if (runBlocking) model$waitForProcess()
   return(model)
 }
@@ -93,8 +154,6 @@ SBlearn <- function(projectName = "temp",
 #' Run SparkBeyond feature enrichment and learning process.
 #' @param projectName Optional string of the session name. Setting a session name is highly recommened. "temp" by default.
 #' @param trainData: A data frame to analyze.
-#' @param trainDataFilename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFile} to cache files written to server.
-#' @param overridePreviousFile: An indicator whether to override file that was previously written to the server.
 #' @param target String of the column name of in the training file that conatins the target of the prediction.
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
@@ -104,13 +163,11 @@ SBlearn <- function(projectName = "temp",
 #' @param maxFeaturesCount Optional. An integer of how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
-#' @return SBmodel object that encapsulate the feature search result.
+#' @return Session object that encapsulate the feature search result.
 #' @examples
-#' #model = SBfeatureSearchOnly("titanic", titanic_train_filename, "survived")
-SBfeatureSearchOnly <- function(projectName = "temp",
+#' #session = featureSearch("titanic", getTitanicData(train = TRUE), "survived")
+featureSearch <- function(projectName = "temp",
                                 trainData,
-                                trainDataFilename = "", #TODO:
-                                overridePreviousFile = TRUE,
                                 target,
                                 weightColumn = NA,
                                 maxDepth = 2,
@@ -125,8 +182,6 @@ SBfeatureSearchOnly <- function(projectName = "temp",
 
   params <-list(projectName = projectName,
                 trainData = trainData,
-                trainDataFilename = trainDataFilename,
-                overridePreviousFiles = overridePreviousFile,
                 target = target,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
@@ -139,23 +194,67 @@ SBfeatureSearchOnly <- function(projectName = "temp",
                 customColumnSubsets = customColumnSubsets,
                 allocatedMemoryMB = allocatedMemoryMB,
                 runBlocking = runBlocking)
-  model = do.call(SBlearn,c(params))
+  model = do.call(featureSearch.file,c(params))
+  model
+}
+
+#' Run SparkBeyond feature enrichment and learning process.
+#' @param projectName Optional string of the session name. Setting a session name is highly recommened. "temp" by default.
+#' @param trainDataFilename: Define the path to where the data is saved.
+#' @param target String of the column name of in the training file that conatins the target of the prediction.
+#' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
+#' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
+#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param maxFeaturesCount Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
+#' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
+#' @return Session object that encapsulate the feature search result.
+#' @examples
+#' #session = featureSearch.file ("titanic", titanic_train_filename, "survived")
+featureSearch.file <- function(projectName = "temp",
+                          trainDataFilename,
+                          target,
+                          weightColumn = NA,
+                          maxDepth = 2,
+                          functionsWhiteList = NA,
+                          functionsBlackList = NA,
+                          useGraph = FALSE,
+                          maxFeaturesCount = 300, #TODO: make it a list
+                          columnSubsetSize = 1,
+                          customColumnSubsets = NA,
+                          allocatedMemoryMB = 1000,
+                          runBlocking = TRUE){
+
+  params <-list(projectName = projectName,
+                trainDataFilename = trainDataFilename,
+                target = target,
+                weightColumn = weightColumn,
+                maxDepth = maxDepth,
+                algorithmsWhiteList = list("ZeroR"),
+                functionsWhiteList = functionsWhiteList,
+                functionsBlackList = functionsBlackList,
+                useGraph = useGraph,
+                maxFeaturesCount = maxFeaturesCount,
+                columnSubsetSize = columnSubsetSize,
+                customColumnSubsets = customColumnSubsets,
+                allocatedMemoryMB = allocatedMemoryMB,
+                runBlocking = runBlocking)
+  model = do.call(learn,c(params))
   model$modelBuilt = FALSE
   model
 }
 
 #' A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.
 #' @param data Data frame or table to export to the server.
-#' @param filename: Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.
-#' @param overridePreviousFile: An indicator whether to override file that was previously written to the server.
+#' @param filename: Optional. define a name to save the data to. NA by default.
 #' @return A filepath to the file on the server that was created.
-writeToServer = function(data, filename = "", overridePreviousFile = TRUE){
-  final_filename = if (filename == "") tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext=".tsv") else paste0(getSBserverIOfolder(), filename)
-  if (!file.exists(final_filename) || overridePreviousFile)
-    writeGroupedData(data, final_filename)
+writeToServer = function(data, filename = NA){
+  final_filename = if (is.na(filename)) tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext=".tsv") else paste0(getSBserverIOfolder(), filename)
+  writeGroupedData(data, final_filename)
   return (final_filename)
 }
-
 
 
 # #' Run SparkBeyond prediction on a result of SBlearn.

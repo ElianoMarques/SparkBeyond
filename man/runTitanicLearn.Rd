@@ -7,7 +7,7 @@
 runTitanicLearn(configuration = "1", runBlocking = TRUE)
 }
 \arguments{
-\item{configuration}{Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList.}
+\item{configuration}{Configuration ID as string. 1 - use RRandomForest, 2 - use defaultList.}
 }
 \value{
 SBmodel object containing the result of the learning

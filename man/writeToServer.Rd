@@ -4,14 +4,12 @@
 \alias{writeToServer}
 \title{A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.}
 \usage{
-writeToServer(data, filename = "", overridePreviousFile = TRUE)
+writeToServer(data, filename = NA)
 }
 \arguments{
 \item{data}{Data frame or table to export to the server.}
 
-\item{filename:}{Optional. define a name to save the data to. Useful in combination with {overridePreviousFiles} to cache files written to server.}
-
-\item{overridePreviousFile:}{An indicator whether to override file that was previously written to the server.}
+\item{filename:}{Optional. define a name to save the data to. NA by default.}
 }
 \value{
 A filepath to the file on the server that was created.

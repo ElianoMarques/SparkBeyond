@@ -28,7 +28,7 @@ run_SB_examples <- function(configuration='1') {
 }
 
 #' Perform learn on SparkBeyond titanic example.
-#' @param configuration Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList.
+#' @param configuration Configuration ID as string. 1 - use RRandomForest, 2 - use defaultList.
 #' @return SBmodel object containing the result of the learning
 #' @examples
 #' model = runTitanicLearn()
@@ -36,8 +36,6 @@ runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
   params = list(
     projectName = "titanic",
     trainData = getTitanicData(train = TRUE),
-    trainDataFilename = "titanic_train.tsv",
-    overridePreviousFiles = FALSE,
     target = "survived",
     runBlocking = runBlocking
   )
@@ -46,7 +44,7 @@ runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
     "2" = list(algorithmsWhiteList = NA)
   )
 
-  model = do.call(SBlearn,c(params, additional_params))
+  model = do.call(learn,c(params, additional_params))
   return(model)
 }
 
@@ -57,7 +55,7 @@ runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
 #' enriched = runTitanicTestEnrich(model)
 runTitanicTestEnrich <- function(model, featureCount = 10) {
   print("Enriching titanic test data")
-  enrichRes = model$enrich(getTitanicData(train=FALSE), featureCount=featureCount, dataFilename = "titanic_test_enriched.tsv", overridePreviousFile = FALSE)
+  enrichRes = model$enrich(getTitanicData(train=FALSE), featureCount=featureCount)
   if (ncol(enrichRes) == 0) stop("Enrichment failed")
   return(enrichRes)
 }
@@ -69,7 +67,7 @@ runTitanicTestEnrich <- function(model, featureCount = 10) {
 #' # predicted = runTitanicTestPredict(model)
 runTitanicTestPredict <- function(model) {
   print("Running titanic test example")
-  predictRes = model$predict(getTitanicData(train=FALSE), dataFilename= "titanic_test.tsv", overridePreviousFile = FALSE)
+  predictRes = model$predict(getTitanicData(train=FALSE))
   if (nrow(predictRes) == 0) stop("Prediction failed")
   return(predictRes)
 }
@@ -77,13 +75,11 @@ runTitanicTestPredict <- function(model) {
 #' Perform feature search only on Titanic train data.
 #' @return data.frame containing a prediction for each sample in the test set.
 #' @examples
-#' # model = runTitanicFeatureSelectionOnly()
-runTitanicFeatureSelectionOnly <- function() {
+#' # model = runTitanicFeatureSelection()
+runTitanicFeatureSelection <- function() {
   print("Performing feature search only on Titanic train data")
-   model = SBfeatureSearchOnly(projectName = "titanic",
+   model = featureSearch(projectName = "titanic",
                          trainData = getTitanicData(train = TRUE),
-                         trainDataFilename = "titanic_train.tsv",
-                         overridePreviousFile = FALSE,
                          target = "survived"
   )
   return (model)

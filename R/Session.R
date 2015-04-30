@@ -1,38 +1,34 @@
 library(methods) #to support RScript
 
-#To enable tab completion on SBmodel classes
-.DollarNames.SBmodel <- function(x, pattern){
-  grep(pattern, getRefClass(class(x))$methods(), value=TRUE)
-}
-
-#' SB object that encapsulates a model result
+#' SB object that encapsulates a session
 #' @field artifact_loc String location pointing to the model artifact.
 #' @field modelBuilt Indication for whether only a feature search was performed or a full model was created.
 #' @examples
-#' #model learn
-#' model = SBlearn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("RRandomForest"))
-#' #model = SBfeatureSearchOnly("titanic", getTitanicData(train = TRUE), target="survived")
-#' enriched = model$enrich(getTitanicData(train = FALSE), featureCount = 10)
+#' # Learning example
+#' session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("RRandomForest"))
+#' #session = featureSearch("titanic", getTitanicData(train = TRUE), target="survived")
+#' enriched = session$enrich(getTitanicData(train = FALSE), featureCount = 10)
 #' colnames(enriched)
-#' predicted = model$predict(getTitanicData(train = FALSE))
+#' predicted = session$predict(getTitanicData(train = FALSE))
 #' colnames(predicted)
 #' predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
-#' eval = model$evaluate()
-#' #model$showFeatures()
-#' #model$showConfusionMatrix()
-SBmodel = setRefClass("SBmodel",
+#' eval = session$evaluate()
+#' #session$showFeatures()
+#' #session$showConfusionMatrix()
+Session = setRefClass("Session",
     fields = list(
       artifact_loc = "character",
       modelBuilt = "logical"       #TODO: replace to a function call
     ),
     methods = list(
       initialize = function(artifact_loc, modelBuilt = FALSE) {
-        "initializes a model using a string provided as \\code{loc}."
+        "initializes a session using a string provided as \\code{loc}."
         artifact_loc<<- artifact_loc
         modelBuilt <<- modelBuilt
       },
 
       waitForProcess = function() { #TODO: number of mintues as parameter?
+        "Blocking the R console until session is finished."
         serverResponded = FALSE
         i = 0
         finalStatus = repeat {
@@ -42,18 +38,18 @@ SBmodel = setRefClass("SBmodel",
 #             print(res)
 #             #stop(res)
 #           }
-          status = checkStatus()
-          switch (status,
+          curStatus = status()
+          switch (curStatus,
             "DONE" = return ("Done"),
             "NOT_ALIVE" = return ("Server is not alive"),
             "IN_PROCESS" = {serverResponded = TRUE},
             "NO_RESPONSE" = {serverResponded = FALSE}
           )
-          print(paste("In modeling process... please notice that this process may take some time... ",i))
+          print(paste("Session in progress... ",i))
           flush.console()
           if (i %% 6 == 0 ) {  #TODO: report status in a parsed way
             print(i)
-            print(status) #TODO: parse
+            print(curStatus) #TODO: parse
             flush.console()
           }
           Sys.sleep(10)
@@ -61,13 +57,14 @@ SBmodel = setRefClass("SBmodel",
         return (finalStatus)
       },
 
-      checkStatus = function() {
+      status = function() {
+        "Checking the status of the session."
         statusFile = paste0(artifact_loc,"/json/status.json")
         finalStatus = if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
           serverResponded = TRUE
-          status = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
-          if (status$evaluation == TRUE) return ("DONE")
-          if (status$alive == FALSE) return("NOT_ALIVE")
+          curStatus = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
+          if (curStatus$evaluation == TRUE) return ("DONE")
+          if (curStatus$alive == FALSE) return("NOT_ALIVE")
           return("IN_PROCESS")   #TODO: further parse status and refine to feature search, evaluation
         } else return("NO_RESPONSE")
       },
@@ -82,19 +79,19 @@ SBmodel = setRefClass("SBmodel",
 #       },
 
       statusException = function() {
-        status = checkStatus()
-        if (status == "IN_PROCESS") stop("Processing still didn't finish") #TODO: or more refined
-        if (status != "DONE") stop(paste("Model was not created - ", status))
+        curStatus = status()
+        if (curStatus == "IN_PROCESS") stop("Processing still didn't finish") #TODO: or more refined
+        if (curStatus != "DONE") stop(paste("Session was not completed - ", curStatus))
       },
 
-      enrich = function(data, featureCount = NA, dataFilename = "", overridePreviousFile = TRUE) { #TODO: change documentation
-        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be tested. \\code{dataFilename} is optional name to write on the server. \\code{overridePreviousFile} is indicator whether to override previous file that may exist on the server. \\code{featureCount} Integer value signaling how many enriched features would be returned. NA by default - marking maximum number possible (based on the number of features requested in modeling)."
+      enrich = function(data, featureCount = NA) { #TODO: change documentation
+        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched."
         statusException()
         url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich")
         print(paste("Calling:", url))
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
-                      dataPath = writeToServer(data, dataFilename, overridePreviousFile),
+                      dataPath = writeToServer(data),
                       featureCount = featureCount,
                       outputPath = outputPath,
                       pathPrefix = getSBserverIOfolder())
@@ -123,15 +120,15 @@ SBmodel = setRefClass("SBmodel",
         return(finalRes)
       },
 
-      predict = function(data, dataFilename = "", overridePreviousFile = TRUE) { #TODO: change documentation
-        "Returns prediction on a created model. \\code{data} is a dataframe to be tested. \\code{dataFilename} is optional name to write on the server. \\code{overridePreviousFile} is indicator whether to override previous file that may exist on the server."
+      predict = function(data) { #TODO: change documentation
+        "Returns prediction on a created model. \\code{data} is a dataframe to be predicted."
         statusException()
-        if (!modelBuilt) stop("Prediction requires full model building using SBlearn")
+        if (!modelBuilt) stop("Prediction requires full model building using learn")
         url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
         print(paste("Calling:", url))
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
-                      dataPath = writeToServer(data, dataFilename, overridePreviousFile),
+                      dataPath = writeToServer(data),
                       outputPath = outputPath,
                       pathPrefix = getSBserverIOfolder())
 
@@ -153,7 +150,7 @@ SBmodel = setRefClass("SBmodel",
       evaluate = function() {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
         statusException()
-        if (!modelBuilt) stop("Evaluation requires full model building using SBlearn")
+        if (!modelBuilt) stop("Evaluation requires full model building using learn")
         evaluationFile = paste0(artifact_loc,"/json/evaluation.json")
         evaluation = if (file.exists(evaluationFile)){
           lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
@@ -180,7 +177,7 @@ SBmodel = setRefClass("SBmodel",
                          "function", "InputSchema", "modelComparison", "roc_best", "roc_CV")
         if (is.na(report_name) || ! report_name %in% validReports ) stop("Report name is not valid")
         reportsThatRequireModel = c("confusionMatrix", "confusionMatrix_normalized", "modelComparison", "roc_best", "roc_CV")
-        if (!modelBuilt && report_name %in% reportsThatRequireModel) stop("This report requires full model building using SBlearn")
+        if (!modelBuilt && report_name %in% reportsThatRequireModel) stop("This report requires full model building using learn")
         #verify model created, check if classification, file exists
         statusException() #TODO: can be more refined here per report
         htmlSource <- paste0(artifact_loc,"/reports/", report_name, ".html")
@@ -196,33 +193,33 @@ SBmodel = setRefClass("SBmodel",
       },
 
       showExtractors = function(showInIDE = TRUE){
-        "Shows extractors used by a model in the IDE viewer on in the web browser."
+        "Shows extractors in the IDE viewer or in the web browser."
         showReport("extractor",showInIDE)
       },
       showFeatures = function(showInIDE = TRUE){
-        "Shows features used by a model in the IDE viewer on in the web browser."
+        "Shows features in the IDE viewer or in the web browser."
         showReport("features",showInIDE)
       },
       showFields = function(showInIDE = TRUE){
-        "Shows fields used by a model in the IDE viewer on in the web browser."
+        "Shows fields in the IDE viewer or in the web browser."
         showReport("field",showInIDE)
       },
       showFunctions = function(showInIDE = TRUE){
-        "Shows functions used by a model in the IDE viewer on in the web browser."
+        "Shows functions in the IDE viewer or in the web browser."
         showReport("function",showInIDE)
       },
       showInputSchema = function(showInIDE = TRUE){
-        "Shows the input schema a model in the IDE viewer on in the web browser."
+        "Shows the input schema in the IDE viewer or in the web browser."
         showReport("InputSchema",showInIDE)
       },
 
       #require model methods
       showConfusionMatrix = function(normalized = FALSE, showInIDE = TRUE){ #verify that this was a classification problem
-        "Shows a confusion matrix of a model in the IDE viewer on in the web browser."
+        "Shows a confusion matrix of a model in the IDE viewer or in the web browser."
         showReport(if (normalized) "confusionMatrix_normalized" else "confusionMatrix",showInIDE)
       },
       showModelComparison = function(showInIDE = TRUE){
-        "Shows cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
+        "Shows cross validation of various algorithms tested to create a model in the IDE viewer or in the web browser."
         showReport("modelComparison",showInIDE)
       },
       showROC = function(showInIDE = TRUE){
@@ -260,6 +257,7 @@ SBmodel = setRefClass("SBmodel",
       # add S3 methods of print, predict
   )
 );
+
 
 
 
