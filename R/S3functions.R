@@ -118,7 +118,13 @@ learn.file <- function(projectName = "temp",
                     createFeatureClusters = FALSE,
                     runBlocking = TRUE){
 
-  if (!is.na(testDataFilename) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")
+  if (!grepl(getSBserverIOfolder(), trainDataFilename)) trainDataFilename = paste0(getSBserverIOfolder(), trainDataFilename)
+  if (!file.exists(trainDataFilename)) stop(print(paste("Train file:", trainDataFilename, "does not exist")))
+  if (!is.na(testDataFilename)) {
+    if(!grepl(getSBserverIOfolder(), testDataFilename)) testDataFilename = paste0(getSBserverIOfolder(), testDataFilename)
+    if(!file.exists(testDataFilename)) stop(print(paste("Test file:", testDataFilename, "does not exist")))
+    if (!is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")
+  }
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
   print(paste("Calling:", url))
 
