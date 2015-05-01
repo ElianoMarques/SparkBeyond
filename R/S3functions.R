@@ -154,7 +154,7 @@ learn.file <- function(projectName = "temp",
   params = params[!is.na(params)]
 
   body = rjson::toJSON(params)
-  if (verbose) print(str(body))
+  if (verbose) print(body)
   res = httr::POST(url, body = body, httr::content_type_json())
   res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
   if (!is.null(res$error)) {
