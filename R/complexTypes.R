@@ -9,7 +9,10 @@ trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na
 #' Sugar to exclude columns
 excludeCols = function(data, cols) data[, (cols) := NULL] #note: parenthesis around cols are important
 #' groupBy sugar
-groupBy = function(data, keys)data[,lapply(.SD,list), by=keys]
+groupBy = function(data, keys){
+  data = as.data.table(data)
+  data[,lapply(.SD,list), by=keys]
+}
 
 #' zipCols sugar
 zipCols = function(data, newName, col1, col2) {
