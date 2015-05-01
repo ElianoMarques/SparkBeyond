@@ -116,7 +116,7 @@ learn.file <- function(projectName = "temp",
                     allocatedMemoryMB = 1000,
                     weightByClass = FALSE,
                     createFeatureClusters = FALSE,
-                    runBlocking = TRUE){
+                    runBlocking = TRUE, verbose = FALSE){
 
   if (!grepl(getSBserverIOfolder(), trainDataFilename)) trainDataFilename = paste0(getSBserverIOfolder(), trainDataFilename)
   if (!file.exists(trainDataFilename)) stop(print(paste("Train file:", trainDataFilename, "does not exist")))
@@ -154,6 +154,7 @@ learn.file <- function(projectName = "temp",
   params = params[!is.na(params)]
 
   body = rjson::toJSON(params)
+  if (verbose) print(str(body))
   res = httr::POST(url, body = body, httr::content_type_json())
   res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
   if (!is.null(res$error)) {
