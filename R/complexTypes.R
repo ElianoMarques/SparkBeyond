@@ -5,7 +5,7 @@ colLength = function(y) {if(length(y) == 1 && is.na(y)) list(NA) else length(unl
 #' Sugar to trim a list column by a number
 trimN = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y)) list(NA) else list(y[1:n])}
 #' Sugar to trim a column by another column variable
-trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))  list(NA) else list(list(y[1:n]))}
+trimByCol = function(y,n) {if(is.na(n)) y else if (length(y) == 1 && is.na(y))  NA else list(y[1:n])}
 #' Sugar to exclude columns
 excludeCols = function(data, cols) data[, (cols) := NULL] #note: parenthesis around cols are important
 #' groupBy sugar
