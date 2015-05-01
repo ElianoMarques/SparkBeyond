@@ -64,7 +64,7 @@ writeGroupedData = function(data, outputFile) { #sugar for writing grouped data
 writeGroupedDataExplicit = function(data, outputFile, groupCols) { #sugar for writing grouped data
   library(data.table)
   data = as.data.table(data)
-  toWrite = cols2Text(data, groupCols)
+  toWrite = cols2TextGrouped(data, groupCols)
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
 
