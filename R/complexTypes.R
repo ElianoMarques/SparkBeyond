@@ -44,12 +44,24 @@ col2Text = function(x) {
 #' sugar to convert all columns to text
 cols2Text = function(data) {data[,lapply(.SD,col2Text)]}
 
+#' sugar to convert all columns to text
+cols2TextGrouped = function(data, groupCols) {data[,lapply(.SD,col2Text), by = groupCols]}
+
 #' sugar to convert all columns to text and write to file
 #' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 writeGroupedData = function(data, outputFile) { #sugar for writing grouped data
   library(data.table)
   data = as.data.table(data)
   toWrite = cols2Text(data)
+  write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
+}
+
+#' sugar to convert all columns to text and write to file
+#' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
+writeGroupedDataExplicit = function(data, outputFile, groupCols) { #sugar for writing grouped data
+  library(data.table)
+  data = as.data.table(data)
+  toWrite = cols2Text(data, groupCols)
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
 
