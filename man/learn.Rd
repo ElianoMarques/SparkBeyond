@@ -10,7 +10,8 @@ learn(projectName = "temp", trainData, target, testData = NA,
   functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
   columnSubsetSize = 1, customColumnSubsets = NA,
   evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
-  allocatedMemoryMB = 1000, weightByClass = FALSE, runBlocking = TRUE)
+  allocatedMemoryMB = 1000, weightByClass = FALSE,
+  createFeatureClusters = TRUE, runBlocking = TRUE)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
