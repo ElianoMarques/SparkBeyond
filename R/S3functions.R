@@ -217,7 +217,7 @@ featureSearch <- function(projectName = "temp",
                 weightByClass = weightByClass,
                 createFeatureClusters = createFeatureClusters,
                 runBlocking = runBlocking)
-  model = do.call(featureSearch.file,c(params))
+    model = do.call(learn,c(params))
   model
 }
 
