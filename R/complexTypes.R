@@ -12,13 +12,39 @@ excludeCols = function(data, cols) data[, (cols) := NULL] #note: parenthesis aro
 groupBy = function(data, keys)data[,lapply(.SD,list), by=keys]
 
 #' zipCols sugar
-zipCols = function(data, newName, col1, col2) {
+zipCols = function(data, newName, col1, col2, sort = TRUE) {
+  setkeyv(data, cols = c(col1))
   data[,paste0(newName):=list(mapply(cbind.data.frame, eval(parse(text=paste0(col1))), eval(parse(text=paste0(col2))), stringsAsFactors = FALSE, SIMPLIFY=F))]
 }
 
 #' zipAllCols sugar
-zipAllCols = function(data, col1, by) {
+zipAllCols = function(data, col1, by, sort = TRUE) {
+  setkeyv(data, cols = c(col1))
   data[, lapply(.SD, function(x) list(mapply(cbind.data.frame, eval(parse(text=paste0(col1))), x, stringsAsFactors = FALSE, SIMPLIFY=F))), by=by]
+}
+
+limitTimeSeries = function(data, groupColumns, fromDate = NA, untilDate = NA){
+  from = if (is.na(fromDate)) NA else unclass(as.POSIXct(fromDate)) *1000
+  until = if (is.na(untilDate)) NA else unclass(as.POSIXct(untilDate)) *1000
+  if (is.na(fromDate) && is.na(untilDate)) stop("Both from and until dates were not provided")
+
+  checkDate = function(d) {
+    if(is.na(from) && !is.na(until) && d <=until) TRUE
+    else if (!is.na(from) && is.na(until) && d >= from) TRUE
+    else if (!is.na(from) && !is.na(until) && d >= from && d<= until) TRUE
+    else FALSE
+  }
+
+  data[, lapply(.SD, function(col) {
+        lapply(col, function(cell) {
+          if (length(unlist(cell))==1) cell
+          else{
+            l = unlist(lapply(cell, function(x) checkDate(x[[1]]) ))
+            cell[l]
+          }
+        })
+    }
+  ), by = groupColumns]
 }
 
 #' sugar to convert a column to text
