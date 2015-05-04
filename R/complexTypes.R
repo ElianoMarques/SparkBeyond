@@ -5,11 +5,14 @@ colLength = function(y) {if(length(y) == 1 && is.na(y)) list(NA) else length(unl
 #' Sugar to trim a list column by a number
 trimN = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y)) list(NA) else list(y[1:n])}
 #' Sugar to trim a column by another column variable
-trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))  list(NA) else list(list(y[1:n]))}
+trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))  list(NA) else list(y[1:n])}
 #' Sugar to exclude columns
 excludeCols = function(data, cols) data[, (cols) := NULL] #note: parenthesis around cols are important
 #' groupBy sugar
-groupBy = function(data, keys)data[,lapply(.SD,list), by=keys]
+groupBy = function(data, keys){
+  data = as.data.table(data)
+  data[,lapply(.SD,list), by=keys]
+}
 
 #' zipCols sugar
 zipCols = function(data, newName, col1, col2, sort = TRUE) {
@@ -70,12 +73,24 @@ col2Text = function(x) {
 #' sugar to convert all columns to text
 cols2Text = function(data) {data[,lapply(.SD,col2Text)]}
 
+#' sugar to convert all columns to text
+cols2TextGrouped = function(data, groupCols) {data[,lapply(.SD,col2Text), by = groupCols]}
+
 #' sugar to convert all columns to text and write to file
 #' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 writeGroupedData = function(data, outputFile) { #sugar for writing grouped data
   library(data.table)
   data = as.data.table(data)
   toWrite = cols2Text(data)
+  write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
+}
+
+#' sugar to convert all columns to text and write to file
+#' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
+writeGroupedDataExplicit = function(data, outputFile, groupCols) { #sugar for writing grouped data
+  library(data.table)
+  data = as.data.table(data)
+  toWrite = cols2TextGrouped(data, groupCols)
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
 

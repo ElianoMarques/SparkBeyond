@@ -20,6 +20,8 @@
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
+#' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
+#' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
 #' session = learn("titanic", getTitanicData(train = TRUE), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
@@ -42,7 +44,7 @@ learn <- function(projectName = "temp",
                   crossValidation = 5,
                   allocatedMemoryMB = 1000,
                   weightByClass = FALSE,
-                  createFeatureClusters = TRUE,
+                  produceFeatureClusteringReport = FALSE,
                   runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -64,7 +66,7 @@ learn <- function(projectName = "temp",
                 crossValidation = crossValidation,
                 allocatedMemoryMB = allocatedMemoryMB,
                 weightByClass = weightByClass,
-                createFeatureClusters = createFeatureClusters)
+                produceFeatureClusteringReport = produceFeatureClusteringReport)
 
   session = do.call(learn.file,c(params))
   session
@@ -90,6 +92,7 @@ learn <- function(projectName = "temp",
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
+#' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
 #' #session = learn("titanic", titanic_file_path, target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
@@ -112,8 +115,8 @@ learn.file <- function(projectName = "temp",
                     crossValidation = 5,
                     allocatedMemoryMB = 1000,
                     weightByClass = FALSE,
-                    createFeatureClusters = TRUE,
-                    runBlocking = TRUE){
+                    produceFeatureClusteringReport = FALSE,
+                    runBlocking = TRUE, verbose = FALSE){
 
   if (!grepl(getSBserverIOfolder(), trainDataFilename)) trainDataFilename = paste0(getSBserverIOfolder(), trainDataFilename)
   if (!file.exists(trainDataFilename)) stop(print(paste("Train file:", trainDataFilename, "does not exist")))
@@ -144,13 +147,14 @@ learn.file <- function(projectName = "temp",
                 crossValidation = crossValidation,
                 allocatedMemoryMB = allocatedMemoryMB,
                 weightByClass = weightByClass,
-                createFeatureClusters = createFeatureClusters,
+                produceFeatureClusteringReport = produceFeatureClusteringReport,
                 pathPrefix = getSBserverIOfolder()
   )
 
   params = params[!is.na(params)]
 
   body = rjson::toJSON(params)
+  if (verbose) print(body)
   res = httr::POST(url, body = body, httr::content_type_json())
   res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
   if (!is.null(res$error)) {
@@ -178,6 +182,7 @@ learn.file <- function(projectName = "temp",
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
+#' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @return Session object that encapsulate the feature search result.
 #' @examples
 #' #session = featureSearch("titanic", getTitanicData(train = TRUE), "survived")
@@ -194,7 +199,7 @@ featureSearch <- function(projectName = "temp",
                                 customColumnSubsets = NA,
                                 allocatedMemoryMB = 1000,
                                 weightByClass = FALSE,
-                                createFeatureClusters = TRUE,
+                                produceFeatureClusteringReport = FALSE,
                                 runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -211,9 +216,9 @@ featureSearch <- function(projectName = "temp",
                 customColumnSubsets = customColumnSubsets,
                 allocatedMemoryMB = allocatedMemoryMB,
                 weightByClass = weightByClass,
-                createFeatureClusters = createFeatureClusters,
+                produceFeatureClusteringReport = produceFeatureClusteringReport,
                 runBlocking = runBlocking)
-  model = do.call(featureSearch.file,c(params))
+    model = do.call(learn,c(params))
   model
 }
 
@@ -230,6 +235,7 @@ featureSearch <- function(projectName = "temp",
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
+#' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @return Session object that encapsulate the feature search result.
 #' @examples
 #' #session = featureSearch.file ("titanic", titanic_train_filename, "survived")
@@ -246,7 +252,7 @@ featureSearch.file <- function(projectName = "temp",
                           customColumnSubsets = NA,
                           allocatedMemoryMB = 1000,
                           weightByClass = FALSE,
-                          createFeatureClusters = TRUE,
+                          produceFeatureClusteringReport = FALSE,
                           runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -263,9 +269,9 @@ featureSearch.file <- function(projectName = "temp",
                 customColumnSubsets = customColumnSubsets,
                 allocatedMemoryMB = allocatedMemoryMB,
                 weightByClass = weightByClass,
-                createFeatureClusters = createFeatureClusters,
+                produceFeatureClusteringReport = produceFeatureClusteringReport,
                 runBlocking = runBlocking)
-  model = do.call(learn,c(params))
+  model = do.call(learn.file,c(params))
   model$modelBuilt = FALSE
   model
 }
