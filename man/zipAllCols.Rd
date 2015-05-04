@@ -4,7 +4,7 @@
 \alias{zipAllCols}
 \title{zipAllCols sugar}
 \usage{
-zipAllCols(data, col1, by)
+zipAllCols(data, col1, by, sort = TRUE)
 }
 \description{
 zipAllCols sugar

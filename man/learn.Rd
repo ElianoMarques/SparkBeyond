@@ -11,7 +11,7 @@ learn(projectName = "temp", trainData, target, testData = NA,
   columnSubsetSize = 1, customColumnSubsets = NA,
   evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
   allocatedMemoryMB = 1000, weightByClass = FALSE,
-  createFeatureClusters = TRUE, runBlocking = TRUE)
+  produceFeatureClusteringReport = FALSE, runBlocking = TRUE)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -51,6 +51,10 @@ learn(projectName = "temp", trainData, target, testData = NA,
 \item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
 
 \item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
+
+\item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
+
+\item{runBlocking:}{Block the R console while the session is running. FALSE by default.}
 }
 \value{
 Session object that encapsulates the model.

@@ -118,13 +118,16 @@ learn.file <- function(projectName = "temp",
                     produceFeatureClusteringReport = FALSE,
                     runBlocking = TRUE, verbose = FALSE){
 
-  if (!grepl(getSBserverIOfolder(), trainDataFilename)) trainDataFilename = paste0(getSBserverIOfolder(), trainDataFilename)
+  SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+  if (!grepl(SBdir, trainDataFilename)) trainDataFilename = paste0(getSBserverIOfolder(), trainDataFilename)
   if (!file.exists(trainDataFilename)) stop(print(paste("Train file:", trainDataFilename, "does not exist")))
   if (!is.na(testDataFilename)) {
-    if(!grepl(getSBserverIOfolder(), testDataFilename)) testDataFilename = paste0(getSBserverIOfolder(), testDataFilename)
+    if(!grepl(SBdir, testDataFilename)) testDataFilename = paste0(getSBserverIOfolder(), testDataFilename)
     if(!file.exists(testDataFilename)) stop(print(paste("Test file:", testDataFilename, "does not exist")))
     if (!is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")
   }
+
+  print (paste("Training on ",trainDataFilename))
   url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
   print(paste("Calling:", url))
 
@@ -282,6 +285,7 @@ featureSearch.file <- function(projectName = "temp",
 #' @return A filepath to the file on the server that was created.
 writeToServer = function(data, filename = NA){
   final_filename = if (is.na(filename)) tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext=".tsv") else paste0(getSBserverIOfolder(), filename)
+  final_filename = gsub("/+", "/", final_filename)
   writeGroupedData(data, final_filename)
   return (final_filename)
 }

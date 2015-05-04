@@ -11,7 +11,8 @@ learn.file(projectName = "temp", trainDataFilename, target,
   columnSubsetSize = 1, customColumnSubsets = NA,
   evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
   allocatedMemoryMB = 1000, weightByClass = FALSE,
-  createFeatureClusters = TRUE, runBlocking = TRUE)
+  produceFeatureClusteringReport = FALSE, runBlocking = TRUE,
+  verbose = FALSE)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -51,6 +52,8 @@ learn.file(projectName = "temp", trainDataFilename, target,
 \item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
 
 \item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
+
+\item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
 }
 \value{
 Session object that encapsulates the model.

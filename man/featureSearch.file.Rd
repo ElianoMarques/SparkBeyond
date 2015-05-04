@@ -9,7 +9,7 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
   functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
   columnSubsetSize = 1, customColumnSubsets = NA,
   allocatedMemoryMB = 1000, weightByClass = FALSE,
-  createFeatureClusters = TRUE, runBlocking = TRUE)
+  produceFeatureClusteringReport = FALSE, runBlocking = TRUE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
@@ -35,6 +35,8 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 \item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
 
 \item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
+
+\item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
 }
 \value{
 Session object that encapsulate the feature search result.
