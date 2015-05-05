@@ -49,6 +49,12 @@ printSBserverPort = function() {
 #' A function to set the SparkBeyond server I/O folder.
 #' @param port new port.
 setSBserverIOfolder = function(folder){
+  prefix = if (substr(folder, 1, 2) == "\\\\") {
+    curPrefix = substr(folder, 1, 2)
+    folder = substr(folder, 3, nchar(folder))
+    curPrefix
+  } else ""
+  folder = paste0(prefix,gsub("\\\\","/",folder))
   if (substr(folder, nchar(folder), nchar(folder)) != "/") folder = paste0(folder, "/")
   if (substr(folder, nchar(folder)-1, nchar(folder)) != "//") folder = paste0(folder, "/")
   if (is.null(folder) || folder == "") {stop("folder location is empty")}
