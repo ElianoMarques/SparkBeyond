@@ -41,8 +41,9 @@ Session = setRefClass("Session",
           curStatus = status()
           if(curStatus == "DONE") {serverResponded = TRUE
                                    return ("DONE")}
+          else if (curStatus == "INITIAL SETUP") serverReponded = TRUE
           else if (curStatus == "IN_PROGRESS") serverResponded = TRUE
-          else if (curStatus == "UNKNOWN ERROR") serverReponded = FALSE
+          else if (curStatus == "UNKNOWN ERROR") serverReponded = return (curStatus)
           else {
             serverResponded = TRUE
             return (curStatus)
@@ -61,13 +62,16 @@ Session = setRefClass("Session",
       status = function() {
         "Checking the status of the session."
 
-        checkIfError = function() {
+        checkIfError = function(status) {
           errorFile = paste0(artifact_loc,"/learningFailed.txt")
           if (file.exists(errorFile)){
             errorLines = readLines(errorFile)
             writeLines(errorLines)
             paste(errorLines, collapse = '             ')
-          }else "UNKNOWN ERROR"  #This may occur in the very begining of the run - status.json was not created and there is no error
+          }else {
+            if (status == FALSE) "UNKNOWN ERROR"
+            else "INITIAL SETUP" #This may occur in the very begining of the run - status.json was not created and there is no error
+          }
         }
 
         statusFile = paste0(artifact_loc,"/json/status.json")
@@ -75,9 +79,9 @@ Session = setRefClass("Session",
           serverResponded = TRUE
           curStatus = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
           if (curStatus$evaluation == TRUE) return ("DONE")
-          if (curStatus$alive == FALSE) return(checkIfError())
+          if (curStatus$alive == FALSE) return(checkIfError(FALSE))
           return("IN_PROGRESS")   #TODO: further parse status and refine to feature search, evaluation
-        } else return(checkIfError())
+        } else return(checkIfError(TRUE))
       },
 
 #       hasModelBuilt = function() {
@@ -91,7 +95,7 @@ Session = setRefClass("Session",
 
       statusException = function() {
         curStatus = status()
-        if (curStatus == "IN_PROGESS") stop("Processing still didn't finish") #TODO: or more refined
+        if (curStatus == "IN_PROGRESS") stop("Processing still didn't finish") #TODO: or more refined
         if (curStatus != "DONE") stop(paste("Session was not completed - ", curStatus))
       },
 
