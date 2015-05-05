@@ -39,18 +39,19 @@ Session = setRefClass("Session",
 #             #stop(res)
 #           }
           curStatus = status()
-          switch (curStatus,
-            "DONE" = return ("Done"),
-            "NOT_ALIVE" = return ("Server is not alive"),
-            "IN_PROGRESS" = {serverResponded = TRUE},
-            "NO_RESPONSE" = {serverResponded = FALSE}
-          )
+          if(curStatus == "DONE") {serverResponded = TRUE
+                                   return ("DONE")}
+          else if (curStatus == "IN_PROGRESS") serverResponded = TRUE
+          else if (curStatus == "UNKNOWN ERROR") serverReponded = FALSE
+          else {
+            serverResponded = TRUE
+            return (curStatus)
+          }
+
           print(paste("Session in progress... ",i))
           flush.console()
           if (i %% 6 == 0 ) {  #TODO: report status in a parsed way
-            print(i)
             print(curStatus) #TODO: parse
-            flush.console()
           }
           Sys.sleep(10)
         }
@@ -59,14 +60,24 @@ Session = setRefClass("Session",
 
       status = function() {
         "Checking the status of the session."
+
+        checkIfError = function() {
+          errorFile = paste0(artifact_loc,"/learningFailed.txt")
+          if (file.exists(errorFile)){
+            errorLines = readLines(errorFile)
+            writeLines(errorLines)
+            paste(errorLines, collapse = '             ')
+          }else "UNKNOWN ERROR"  #This may occur in the very begining of the run - status.json was not created and there is no error
+        }
+
         statusFile = paste0(artifact_loc,"/json/status.json")
         finalStatus = if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
           serverResponded = TRUE
           curStatus = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
           if (curStatus$evaluation == TRUE) return ("DONE")
-          if (curStatus$alive == FALSE) return("NOT_ALIVE")
-          return("IN_PROGESS")   #TODO: further parse status and refine to feature search, evaluation
-        } else return("NO_RESPONSE")
+          if (curStatus$alive == FALSE) return(checkIfError())
+          return("IN_PROGRESS")   #TODO: further parse status and refine to feature search, evaluation
+        } else return(checkIfError())
       },
 
 #       hasModelBuilt = function() {
