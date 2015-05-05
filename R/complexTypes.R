@@ -14,18 +14,14 @@ groupBy = function(data, keys){
   data[,lapply(.SD,list), by=keys]
 }
 
-#' zipCols sugar
-zipCols = function(data, newName, col1, col2, sort = TRUE) {
-  setkeyv(data, cols = c(col1))
-  data[,paste0(newName):=list(mapply(cbind.data.frame, eval(parse(text=paste0(col1))), eval(parse(text=paste0(col2))), stringsAsFactors = FALSE, SIMPLIFY=F))]
+setTimeColumn = function(DT, timeCol) { #assumption is can be called only if the data is grouped already, hence a data.table
+  if (! timeCol %in% names(DT)) stop (paste("error:", timeCol, "does not exist"))
+  if ("SB_times_col" %in% names(DT)) stop ("error: time column is already defined")
+  setnames(DT, timeCol, "SB_times_col")
 }
 
-#' zipAllCols sugar
-zipAllCols = function(data, col1, by, sort = TRUE) {
-  setkeyv(data, cols = c(col1))
-  data[, lapply(.SD, function(x) list(mapply(cbind.data.frame, eval(parse(text=paste0(col1))), x, stringsAsFactors = FALSE, SIMPLIFY=F))), by=by]
-}
-
+#' limitTimeSeries
+# TODO - change to new format
 limitTimeSeries = function(data, groupColumns, fromDate = NA, untilDate = NA){
   from = if (is.na(fromDate)) NA else unclass(as.POSIXct(fromDate)) *1000
   until = if (is.na(untilDate)) NA else unclass(as.POSIXct(untilDate)) *1000
@@ -52,7 +48,10 @@ limitTimeSeries = function(data, groupColumns, fromDate = NA, untilDate = NA){
 
 #' sugar to convert a column to text
 col2Text = function(x) {
-  escapeFun = function(s) gsub("\"","\"\"",s)
+  escapeFun = function(s) {
+    gsub("\"","\"\"",s)
+    gsub("\t","\\t",s)
+  }
   createContent = function(x1) {
     if (typeof(x1) == "character" || is.factor(x1)) {
       x2 = sapply(x1,  escapeFun) #deal with escaping
@@ -63,77 +62,69 @@ col2Text = function(x) {
   }
 
   if (is.list(x)){
-    x1 = unlist(x)
-    content = createContent(x1)
-    prefix = if (is.list(x[[1]])) paste0("TimeSeries[",typeof(x[[1]][[1]][[2]]),"]") else ""
-    paste0(prefix,"[",content,"]")
+    writeList = function (xi){
+      content = createContent(xi)
+      paste0("[",content,"]")
+    }
+    sapply(x, writeList)
   } else if (typeof(x) == "character" || is.factor(x)) paste0("\"",escapeFun(x),"\"") else x
 }
 
 #' sugar to convert all columns to text
-cols2Text = function(data) {data[,lapply(.SD,col2Text)]}
-
-#' sugar to convert all columns to text
-cols2TextGrouped = function(data, groupCols) {data[,lapply(.SD,col2Text), by = groupCols]}
+cols2Text = function(data) {
+    lapply(data,col2Text)
+}
 
 #' sugar to convert all columns to text and write to file
 #' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
 writeGroupedData = function(data, outputFile) { #sugar for writing grouped data
-  library(data.table)
-  data = as.data.table(data)
   toWrite = cols2Text(data)
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
 
-#' sugar to convert all columns to text and write to file
-#' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
-writeGroupedDataExplicit = function(data, outputFile, groupCols) { #sugar for writing grouped data
-  library(data.table)
-  data = as.data.table(data)
-  toWrite = cols2TextGrouped(data, groupCols)
-  write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
-}
+# add sugar to flatten unary columns
+
 
 #dt <- data.table(dt, new = paste(dt$A, dt$B, sep = ""))
 
 #joins
-joinExample = function () {
-  (dt1 <- data.table(A = letters[1:10], X = 1:10, key = "A"))
-  (dt2 <- data.table(A = letters[5:14], Y = 1:10, key = "A"))
-  merge(dt1, dt2) #join left # can add by = "A", allow.cartesian
-  merge(dt1, dt2, all = TRUE) #join all
-}
-
-#IDate
-dateTimeExample = function  () {
-  (seqdates <- seq(as.IDate("2001-01-01"), as.IDate("2001-08-03"), by = "3 weeks"))
-}
-
-
-runComplexTypeExample = function() {
-  library(data.table)
-  df = data.table(id = c(1,1,2), name = c("a","b","c"), num = c(1,2,3))
-  #grouped = df[,.(name=list(c(name)), num=list(c(num))),by="id"] #create grouped data frame
-  grouped = df[,lapply(.SD,list), by="id"]
-
-  library(dplyr)
-  mutate(grouped, id2=id*2)
-  mutate(grouped, num2=lapply(num,sum))
-  myTail = function(x) tail(x,n=1)
-  mutate(grouped, name2=lapply(name,myTail))
-
-  finalDF = mutate(grouped, name2=lapply(name,myPaste)) %>% select(-c(num,name))
-  write.table(finalDF, file="/tmp/finalDF.tsv", sep="\t", row.names=FALSE) # works!
-
-  write.table(df, file="/tmp/df.tsv", sep="\t", row.names=FALSE) #works
-  write.table(grouped, file="/tmp/grouped.tsv", sep="\t",  row.names=FALSE) #fails
-  capture.output(grouped, file="/tmp/grouped.txt") #not structured
-}
-
-runOperatorExample = function() {
-  # chain operator example
-  `%>>%` <- function(x,y) {sum(x,y)}
-
-  # Info on the := operator for data.table
-  # http://www.rdocumentation.org/packages/data.table/functions/assign.html
-}
+# joinExample = function () {
+#   (dt1 <- data.table(A = letters[1:10], X = 1:10, key = "A"))
+#   (dt2 <- data.table(A = letters[5:14], Y = 1:10, key = "A"))
+#   merge(dt1, dt2) #join left # can add by = "A", allow.cartesian
+#   merge(dt1, dt2, all = TRUE) #join all
+# }
+#
+# #IDate
+# dateTimeExample = function  () {
+#   (seqdates <- seq(as.IDate("2001-01-01"), as.IDate("2001-08-03"), by = "3 weeks"))
+# }
+#
+#
+# runComplexTypeExample = function() {
+#   library(data.table)
+#   df = data.table(id = c(1,1,2), name = c("a","b","c"), num = c(1,2,3))
+#   #grouped = df[,.(name=list(c(name)), num=list(c(num))),by="id"] #create grouped data frame
+#   grouped = df[,lapply(.SD,list), by="id"]
+#
+#   library(dplyr)
+#   mutate(grouped, id2=id*2)
+#   mutate(grouped, num2=lapply(num,sum))
+#   myTail = function(x) tail(x,n=1)
+#   mutate(grouped, name2=lapply(name,myTail))
+#
+#   finalDF = mutate(grouped, name2=lapply(name,myPaste)) %>% select(-c(num,name))
+#   write.table(finalDF, file="/tmp/finalDF.tsv", sep="\t", row.names=FALSE) # works!
+#
+#   write.table(df, file="/tmp/df.tsv", sep="\t", row.names=FALSE) #works
+#   write.table(grouped, file="/tmp/grouped.tsv", sep="\t",  row.names=FALSE) #fails
+#   capture.output(grouped, file="/tmp/grouped.txt") #not structured
+# }
+#
+# runOperatorExample = function() {
+#   # chain operator example
+#   `%>>%` <- function(x,y) {sum(x,y)}
+#
+#   # Info on the := operator for data.table
+#   # http://www.rdocumentation.org/packages/data.table/functions/assign.html
+# }
