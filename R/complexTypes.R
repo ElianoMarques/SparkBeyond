@@ -51,6 +51,7 @@ col2Text = function(x) {
   escapeFun = function(s) {
     gsub("\"","\"\"",s)
     gsub("\t","\\t",s)
+    gsub("\n","\\n",s)
   }
   createContent = function(x1) {
     if (typeof(x1) == "character" || is.factor(x1)) {
