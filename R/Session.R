@@ -56,6 +56,7 @@ Session = setRefClass("Session",
           }
           Sys.sleep(10)
         }
+        print ("DONE")
         return (finalStatus)
       },
 
