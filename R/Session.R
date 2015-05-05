@@ -68,7 +68,7 @@ Session = setRefClass("Session",
           if (file.exists(errorFile)){
             errorLines = readLines(errorFile)
             writeLines(errorLines)
-            paste(errorLines, collapse = '             ')
+            paste(errorLines, collapse = '\n')
           }else {
             if (status == FALSE) "UNKNOWN ERROR"
             else "INITIAL SETUP" #This may occur in the very begining of the run - status.json was not created and there is no error

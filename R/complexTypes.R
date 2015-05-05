@@ -49,9 +49,10 @@ limitTimeSeries = function(data, groupColumns, fromDate = NA, untilDate = NA){
 #' sugar to convert a column to text
 col2Text = function(x) {
   escapeFun = function(s) {
-    gsub("\"","\"\"",s)
-    gsub("\t","\\t",s)
-    gsub("\n","\\n",s)
+    s = gsub('"','""',s)
+    s = gsub("\\t","\\\\t",s)
+    s = gsub("\\n","\\\\n",s)
+    s
   }
   createContent = function(x1) {
     if (typeof(x1) == "character" || is.factor(x1)) {
