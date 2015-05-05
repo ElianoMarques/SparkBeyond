@@ -42,7 +42,7 @@ Session = setRefClass("Session",
           switch (curStatus,
             "DONE" = return ("Done"),
             "NOT_ALIVE" = return ("Server is not alive"),
-            "IN_PROCESS" = {serverResponded = TRUE},
+            "IN_PROGRESS" = {serverResponded = TRUE},
             "NO_RESPONSE" = {serverResponded = FALSE}
           )
           print(paste("Session in progress... ",i))
@@ -65,7 +65,7 @@ Session = setRefClass("Session",
           curStatus = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
           if (curStatus$evaluation == TRUE) return ("DONE")
           if (curStatus$alive == FALSE) return("NOT_ALIVE")
-          return("IN_PROCESS")   #TODO: further parse status and refine to feature search, evaluation
+          return("IN_PROGESS")   #TODO: further parse status and refine to feature search, evaluation
         } else return("NO_RESPONSE")
       },
 
@@ -80,16 +80,18 @@ Session = setRefClass("Session",
 
       statusException = function() {
         curStatus = status()
-        if (curStatus == "IN_PROCESS") stop("Processing still didn't finish") #TODO: or more refined
+        if (curStatus == "IN_PROGESS") stop("Processing still didn't finish") #TODO: or more refined
         if (curStatus != "DONE") stop(paste("Session was not completed - ", curStatus))
       },
 
       enrich = function(data, featureCount = NA) { #TODO: change documentation
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched."
         statusException()
-        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich")
-        print(paste("Calling:", url))
+
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
+
+
+
         params <-list(modelPath = artifact_loc,
                       dataPath = writeToServer(data),
                       featureCount = featureCount,
@@ -97,6 +99,10 @@ Session = setRefClass("Session",
                       pathPrefix = getSBserverIOfolder())
 
         params = params[!is.na(params)]
+
+        print (paste("Enriching ",params$dataPath))
+        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich")
+        print(paste("Calling:", url))
 
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
@@ -124,13 +130,16 @@ Session = setRefClass("Session",
         "Returns prediction on a created model. \\code{data} is a dataframe to be predicted."
         statusException()
         if (!modelBuilt) stop("Prediction requires full model building using learn")
-        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
-        print(paste("Calling:", url))
+
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
                       dataPath = writeToServer(data),
                       outputPath = outputPath,
                       pathPrefix = getSBserverIOfolder())
+
+        print (paste("Predicting ",params$dataPath))
+        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
+        print(paste("Calling:", url))
 
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
