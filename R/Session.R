@@ -39,24 +39,21 @@ Session = setRefClass("Session",
 #             #stop(res)
 #           }
           curStatus = status()
-          if(curStatus == "DONE") {serverResponded = TRUE
-                                   return ("DONE")}
-          else if (curStatus == "INITIAL SETUP") serverReponded = TRUE
-          else if (curStatus == "IN_PROGRESS") serverResponded = TRUE
-          else if (curStatus == "UNKNOWN ERROR") serverReponded = return (curStatus)
+          if(curStatus == "Done") {serverResponded = TRUE
+                                   print ("Done")
+                                   return ("Done")}
+          else if (curStatus == "Initial setup") serverReponded = TRUE
+          else if (grepl("Session in progress: " , curStatus)) serverResponded = TRUE
+          else if (curStatus == "Unknown error") serverReponded = return (curStatus)
           else {
             serverResponded = TRUE
             return (curStatus)
           }
 
-          print(paste("Session in progress... ",i))
-          flush.console()
-          if (i %% 6 == 0 ) {  #TODO: report status in a parsed way
-            print(curStatus) #TODO: parse
-          }
-          Sys.sleep(10)
+          print(paste(curStatus, "-" ,i))
+          secs = min(i*2, 10)
+          Sys.sleep(secs)
         }
-        print ("DONE")
         return (finalStatus)
       },
 
@@ -70,18 +67,27 @@ Session = setRefClass("Session",
             writeLines(errorLines)
             paste(errorLines, collapse = '\n')
           }else {
-            if (status == FALSE) "UNKNOWN ERROR"
-            else "INITIAL SETUP" #This may occur in the very begining of the run - status.json was not created and there is no error
+            if (status == FALSE) "Unknown error"
+            else "Initial setup" #This may occur in the very begining of the run - status.json was not created and there is no error
           }
+        }
+
+        currentState = function(statusJson) {
+          curState = "Creating features"
+          if (curStatus$fastFeatures == TRUE) curState = "Building model"
+          if (curStatus$model == TRUE) curState = "Evaluating model"
+          if (curStatus$errors == TRUE) curState = "errors occurred"
+          curState
         }
 
         statusFile = paste0(artifact_loc,"/json/status.json")
         finalStatus = if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
           serverResponded = TRUE
           curStatus = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
-          if (curStatus$evaluation == TRUE) return ("DONE")
+          if (curStatus$evaluation == TRUE) return ("Done")
           if (curStatus$alive == FALSE) return(checkIfError(FALSE))
-          return("IN_PROGRESS")   #TODO: further parse status and refine to feature search, evaluation
+
+          return(paste("Session in progress: ",currentState()))   #TODO: further parse status and refine to feature search, evaluation
         } else return(checkIfError(TRUE))
       },
 
@@ -96,8 +102,8 @@ Session = setRefClass("Session",
 
       statusException = function() {
         curStatus = status()
-        if (curStatus == "IN_PROGRESS") stop("Processing still didn't finish") #TODO: or more refined
-        if (curStatus != "DONE") stop(paste("Session was not completed - ", curStatus))
+        if (grepl("Session in progress: " , curStatus)) stop("Processing still didn't finish") #TODO: or more refined
+        if (curStatus != "Done") stop(paste("Session was not completed - ", curStatus))
       },
 
       enrich = function(data, featureCount = NA) { #TODO: change documentation
