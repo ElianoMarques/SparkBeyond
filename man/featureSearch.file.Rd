@@ -8,7 +8,7 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
   weightColumn = NA, maxDepth = 2, functionsWhiteList = NA,
   functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
   columnSubsetSize = 1, customColumnSubsets = NA,
-  allocatedMemoryMB = 1000, maxCollectionSize = 70000,
+  allocatedMemoryMB = 1000, maxCollectionSize = 80000,
   weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
   runBlocking = TRUE)
 }
@@ -35,7 +35,7 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 
 \item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
 
-\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 70K by default.}
+\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.}
 
 \item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
 

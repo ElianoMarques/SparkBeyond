@@ -10,7 +10,7 @@ learn.file(projectName = "temp", trainDataFilename, target,
   functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
   columnSubsetSize = 1, customColumnSubsets = NA,
   evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
-  allocatedMemoryMB = 1000, maxCollectionSize = 70000,
+  allocatedMemoryMB = 1000, maxCollectionSize = 80000,
   weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
   runBlocking = TRUE, verbose = FALSE)
 }
@@ -51,7 +51,7 @@ learn.file(projectName = "temp", trainDataFilename, target,
 
 \item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
 
-\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 70K by default.}
+\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.}
 
 \item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
 
