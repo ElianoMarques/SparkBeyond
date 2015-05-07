@@ -160,6 +160,7 @@ learn.file <- function(projectName = "temp",
                 allocatedMemoryMB = allocatedMemoryMB,
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
+                externalPrefixPath = getSBserverIOfolder(),
                 produceFeatureClusteringReport = produceFeatureClusteringReport
   )
 
