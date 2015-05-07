@@ -55,7 +55,7 @@ setSBserverIOfolder = function(folder){
     curPrefix
   } else ""
   folder = paste0(prefix,gsub("\\\\","/",folder))
- # if (substr(folder, nchar(folder), nchar(folder)) != "/") folder = paste0(folder, "/")
+  if (substr(folder, nchar(folder), nchar(folder)) != "/") folder = paste0(folder, "/")
   #if (substr(folder, nchar(folder)-1, nchar(folder)) != "//") folder = paste0(folder, "/")
   if (is.null(folder) || folder == "") {stop("folder location is empty")}
   if (!file.exists(folder)) {
