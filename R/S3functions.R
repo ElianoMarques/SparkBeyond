@@ -19,8 +19,10 @@
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
+#' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 70K by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
+#'
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
@@ -43,9 +45,11 @@ learn <- function(projectName = "temp",
                   scoreOnTestSet = FALSE,
                   crossValidation = 5,
                   allocatedMemoryMB = 1000,
+                  maxCollectionSize = 70000,
                   weightByClass = FALSE,
                   produceFeatureClusteringReport = FALSE,
-                  runBlocking = TRUE){
+                  runBlocking = TRUE,
+                  verbose = TRUE){
 
   params <-list(projectName = projectName,
                 trainDataFilename = writeToServer(trainData),
@@ -65,8 +69,10 @@ learn <- function(projectName = "temp",
                 scoreOnTestSet = scoreOnTestSet,
                 crossValidation = crossValidation,
                 allocatedMemoryMB = allocatedMemoryMB,
+                maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
-                produceFeatureClusteringReport = produceFeatureClusteringReport)
+                produceFeatureClusteringReport = produceFeatureClusteringReport,
+                verbose = verbose)
 
   session = do.call(learn.file,c(params))
   session
@@ -91,6 +97,7 @@ learn <- function(projectName = "temp",
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
+#' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 70K by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @return Session object that encapsulates the model.
@@ -114,9 +121,11 @@ learn.file <- function(projectName = "temp",
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
                     allocatedMemoryMB = 1000,
+                    maxCollectionSize = 70000,
                     weightByClass = FALSE,
                     produceFeatureClusteringReport = FALSE,
-                    runBlocking = TRUE, verbose = FALSE){
+                    runBlocking = TRUE,
+                    verbose = FALSE){
 
   SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
   if (!grepl(SBdir, trainDataFilename)) trainDataFilename = paste0(getSBserverIOfolder(), trainDataFilename)
@@ -149,9 +158,9 @@ learn.file <- function(projectName = "temp",
                 scoreOnTestSet = scoreOnTestSet,
                 crossValidation = crossValidation,
                 allocatedMemoryMB = allocatedMemoryMB,
+                maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
-                produceFeatureClusteringReport = produceFeatureClusteringReport,
-                pathPrefix = getSBserverIOfolder()
+                produceFeatureClusteringReport = produceFeatureClusteringReport
   )
 
   params = params[!is.na(params)]
@@ -183,6 +192,8 @@ learn.file <- function(projectName = "temp",
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount Optional. An integer of how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
+#' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
+#' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 70K by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
@@ -201,6 +212,7 @@ featureSearch <- function(projectName = "temp",
                                 columnSubsetSize = 1,
                                 customColumnSubsets = NA,
                                 allocatedMemoryMB = 1000,
+                                maxCollectionSize = 70000,
                                 weightByClass = FALSE,
                                 produceFeatureClusteringReport = FALSE,
                                 runBlocking = TRUE){
@@ -218,6 +230,7 @@ featureSearch <- function(projectName = "temp",
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
                 allocatedMemoryMB = allocatedMemoryMB,
+                maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
                 runBlocking = runBlocking)
@@ -236,6 +249,8 @@ featureSearch <- function(projectName = "temp",
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount Optional. An integer of how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
+#' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
+#' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 70K by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
@@ -254,6 +269,7 @@ featureSearch.file <- function(projectName = "temp",
                           columnSubsetSize = 1,
                           customColumnSubsets = NA,
                           allocatedMemoryMB = 1000,
+                          maxCollectionSize = 70000,
                           weightByClass = FALSE,
                           produceFeatureClusteringReport = FALSE,
                           runBlocking = TRUE){
@@ -271,6 +287,7 @@ featureSearch.file <- function(projectName = "temp",
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
                 allocatedMemoryMB = allocatedMemoryMB,
+                maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
                 runBlocking = runBlocking)

@@ -8,8 +8,9 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
   weightColumn = NA, maxDepth = 2, functionsWhiteList = NA,
   functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
   columnSubsetSize = 1, customColumnSubsets = NA,
-  allocatedMemoryMB = 1000, weightByClass = FALSE,
-  produceFeatureClusteringReport = FALSE, runBlocking = TRUE)
+  allocatedMemoryMB = 1000, maxCollectionSize = 70000,
+  weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
+  runBlocking = TRUE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
@@ -31,6 +32,10 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 \item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.}
 
 \item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
+
+\item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
+
+\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 70K by default.}
 
 \item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
 
