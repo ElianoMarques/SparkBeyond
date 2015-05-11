@@ -12,7 +12,7 @@ learn.file(projectName = "temp", trainDataFilename, target,
   evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
   allocatedMemoryMB = 1000, maxCollectionSize = 80000,
   weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
-  runBlocking = TRUE, verbose = FALSE)
+  fileEncoding = NA, runBlocking = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -56,6 +56,8 @@ learn.file(projectName = "temp", trainDataFilename, target,
 \item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
 
 \item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
+
+\item{fileEncoding:}{Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".}
 }
 \value{
 Session object that encapsulates the model.

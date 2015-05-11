@@ -22,7 +22,7 @@
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
-#'
+#' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
@@ -48,6 +48,7 @@ learn <- function(projectName = "temp",
                   maxCollectionSize = 80000,
                   weightByClass = FALSE,
                   produceFeatureClusteringReport = FALSE,
+                  fileEncoding = NA,
                   runBlocking = TRUE,
                   verbose = FALSE){
 
@@ -72,6 +73,7 @@ learn <- function(projectName = "temp",
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
+                fileEncoding = fileEncoding,
                 verbose = verbose)
 
   session = do.call(learn.file,c(params))
@@ -100,6 +102,7 @@ learn <- function(projectName = "temp",
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
+#' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @return Session object that encapsulates the model.
 #' @examples
 #' #session = learn("titanic", titanic_file_path, target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
@@ -124,6 +127,7 @@ learn.file <- function(projectName = "temp",
                     maxCollectionSize = 80000,
                     weightByClass = FALSE,
                     produceFeatureClusteringReport = FALSE,
+                    fileEncoding = NA,
                     runBlocking = TRUE,
                     verbose = FALSE){
 
@@ -161,7 +165,8 @@ learn.file <- function(projectName = "temp",
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 externalPrefixPath = getSBserverIOfolder(),
-                produceFeatureClusteringReport = produceFeatureClusteringReport
+                produceFeatureClusteringReport = produceFeatureClusteringReport,
+                fileEncoding = fileEncoding
   )
 
   params = params[!is.na(params)]
@@ -198,6 +203,7 @@ learn.file <- function(projectName = "temp",
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
+#' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @return Session object that encapsulate the feature search result.
 #' @examples
 #' #session = featureSearch("titanic", getTitanicData(train = TRUE), "survived")
@@ -216,6 +222,7 @@ featureSearch <- function(projectName = "temp",
                                 maxCollectionSize = 80000,
                                 weightByClass = FALSE,
                                 produceFeatureClusteringReport = FALSE,
+                                fileEncoding = NA,
                                 runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -234,6 +241,7 @@ featureSearch <- function(projectName = "temp",
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
+                fileEncoding = fileEncoding,
                 runBlocking = runBlocking)
     model = do.call(learn,c(params))
   model
@@ -255,6 +263,7 @@ featureSearch <- function(projectName = "temp",
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
+#' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @return Session object that encapsulate the feature search result.
 #' @examples
 #' #session = featureSearch.file ("titanic", titanic_train_filename, "survived")
@@ -273,6 +282,7 @@ featureSearch.file <- function(projectName = "temp",
                           maxCollectionSize = 80000,
                           weightByClass = FALSE,
                           produceFeatureClusteringReport = FALSE,
+                          fileEncoding = NA,
                           runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -291,6 +301,7 @@ featureSearch.file <- function(projectName = "temp",
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
+                fileEncoding = fileEncoding,
                 runBlocking = runBlocking)
   model = do.call(learn.file,c(params))
   model$modelBuilt = FALSE

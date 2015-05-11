@@ -10,7 +10,7 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
   columnSubsetSize = 1, customColumnSubsets = NA,
   allocatedMemoryMB = 1000, maxCollectionSize = 80000,
   weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
-  runBlocking = TRUE)
+  fileEncoding = NA, runBlocking = TRUE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
@@ -42,6 +42,8 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 \item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
 
 \item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
+
+\item{fileEncoding:}{Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".}
 }
 \value{
 Session object that encapsulate the feature search result.
