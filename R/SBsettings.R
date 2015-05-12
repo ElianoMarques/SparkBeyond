@@ -120,7 +120,16 @@ loadSettings = function() {
 restartServer = function() {
   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/die")
   res = httr::POST(url, body = FALSE, httr::content_type_json())
-  if (res$status == 200) "Server is restarting, please wait few seconds before sending a new job." else "Something went wrong"
+  i = 0
+  finalStatus = repeat {
+    i = i+1
+    print(paste("Waiting for server to load -" ,i))
+    secs = 8#min(i*2, 5)
+    Sys.sleep(secs)
+    if(isServerAlive()) return("Server is up.")
+    if (i > 15) return ("Server is failed to load automatically - please load manually.")
+  }
+  println(finalStatus)
 }
 
 #' A function to clear the cache of a specific project
@@ -138,8 +147,13 @@ clearCache = function(projectName) {
 #' @return The response from the server.
 isServerAlive = function() {
   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/heartbeat")
-  res = httr::POST(url, body = FALSE, httr::content_type_json())
-  if (res$status == 200) "ALIVE" else "He's dead, Jim!"
+  status = tryCatch({
+    res = httr::POST(url, body = FALSE, httr::content_type_json())
+    TRUE
+    },
+    error = function(cond) FALSE
+  )
+  status
 }
 
 #General:

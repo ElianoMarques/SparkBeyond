@@ -60,6 +60,7 @@ Session = setRefClass("Session",
       status = function() {
         "Checking the status of the session."
 
+        if (!isServerAlive()) stop("Server is down. Check server for errors (e.g., out of memory).")
         checkIfError = function(status) {
           errorFile = paste0(artifact_loc,"/learningFailed.txt")
           if (file.exists(errorFile)){
