@@ -61,7 +61,8 @@ Session = setRefClass("Session",
           if (prevStatus == "Detecting types" && curStatus == "Session in progress:  Creating features"){
             printFile("inputSchema.txt")
           }else if (prevStatus == "Session in progress:  Creating features" && curStatus == "Session in progress:  Building model"){
-            print(model$features()[1:20,.(idx,feature,RIG,support)])
+            f = features()
+            print(f[1:min(nrow(f),50),.(idx,feature,RIG,support)])
           }
 
           print(paste(curStatus, "-" ,i))
@@ -209,7 +210,7 @@ Session = setRefClass("Session",
 
       features = function() {
         "Returns a dataset with top feature information"
-        statusException()
+        #statusException() # TODO: check if features were generated already
         featuresFile = paste0(artifact_loc,"/reports/features.tsv")
         features = if (file.exists(featuresFile)){
           fread(featuresFile, sep="\t", header=TRUE)
