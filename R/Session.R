@@ -31,6 +31,8 @@ Session = setRefClass("Session",
         "Blocking the R console until session is finished."
         serverResponded = FALSE
         i = 0
+        curStatus = ""
+        prevStatus = ""
         finalStatus = repeat {
           i = i+1
 #           if (i > 10 && !serverResponded) {
@@ -38,16 +40,28 @@ Session = setRefClass("Session",
 #             print(res)
 #             #stop(res)
 #           }
+          prevStatus = curStatus
           curStatus = status()
           if(curStatus == "Done") {serverResponded = TRUE
                                    print ("Done")
                                    return ("Done")}
-          else if (curStatus == "Initial setup") serverReponded = TRUE
+          else if (curStatus == "Detecting types") serverReponded = TRUE
           else if (grepl("Session in progress: " , curStatus)) serverResponded = TRUE
           else if (curStatus == "Unknown error") serverReponded = return (curStatus)
           else {
             serverResponded = TRUE
             return (curStatus)
+          }
+
+          printFile = function(filename) {
+            file = paste0(artifact_loc,"/reports/",filename)
+            if (file.exists(file)) writeLines(readLines(file, warn = FALSE))
+          }
+
+          if (prevStatus == "Detecting types" && curStatus == "Session in progress:  Creating features"){
+            printFile("inputSchema.txt")
+          }else if (prevStatus == "Session in progress:  Creating features" && curStatus == "Session in progress:  Building model"){
+            print(model$features()[1:20,.(idx,feature,RIG,support)])
           }
 
           print(paste(curStatus, "-" ,i))
@@ -69,7 +83,7 @@ Session = setRefClass("Session",
             paste(errorLines, collapse = '\n')
           }else {
             if (status == FALSE) "Unknown error"
-            else "Initial setup" #This may occur in the very begining of the run - status.json was not created and there is no error
+            else "Detecting types" #This may occur in the very begining of the run - status.json was not created and there is no error
           }
         }
 
