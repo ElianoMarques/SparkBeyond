@@ -40,9 +40,15 @@ Session = setRefClass("Session",
 #             print(res)
 #             #stop(res)
 #           }
+          printFile = function(filename) {
+            file = paste0(artifact_loc,"/reports/",filename)
+            if (file.exists(file)) writeLines(readLines(file, warn = FALSE))
+          }
+
           prevStatus = curStatus
           curStatus = status()
           if(curStatus == "Done") {serverResponded = TRUE
+                                   printFile("evaluation.txt")
                                    print ("Done")
                                    return ("Done")}
           else if (curStatus == "Detecting types") serverReponded = TRUE
@@ -53,10 +59,7 @@ Session = setRefClass("Session",
             return (curStatus)
           }
 
-          printFile = function(filename) {
-            file = paste0(artifact_loc,"/reports/",filename)
-            if (file.exists(file)) writeLines(readLines(file, warn = FALSE))
-          }
+
 
           if (prevStatus == "Detecting types" && curStatus == "Session in progress:  Creating features"){
             printFile("inputSchema.txt")
