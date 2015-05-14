@@ -32,7 +32,8 @@ Session = setRefClass("Session",
         serverResponded = FALSE
         i = 0
         curStatus = ""
-        prevStatus = ""
+        hasShownInputSchema = FALSE
+        hasShownFeatures = FALSE
         finalStatus = repeat {
           i = i+1
 #           if (i > 10 && !serverResponded) {
@@ -42,10 +43,12 @@ Session = setRefClass("Session",
 #           }
           printFile = function(filename) {
             file = paste0(artifact_loc,"/reports/",filename)
-            if (file.exists(file)) writeLines(readLines(file, warn = FALSE))
+            if (file.exists(file)) {
+              writeLines(readLines(file, warn = FALSE))
+              TRUE
+            }else FALSE
           }
 
-          prevStatus = curStatus
           curStatus = status()
           if(curStatus == "Done") {serverResponded = TRUE
                                    printFile("evaluation.txt")
@@ -61,11 +64,17 @@ Session = setRefClass("Session",
 
 
 
-          if (prevStatus == "Detecting types" && curStatus == "Session in progress:  Creating features"){
-            printFile("inputSchema.txt")
-          }else if (prevStatus == "Session in progress:  Creating features" && curStatus == "Session in progress:  Building model"){
-            f = features()
-            print(f[1:min(nrow(f),50),.(idx,feature,RIG,support)])
+          if (!hasShownInputSchema){
+            hasShownInputSchema = printFile("inputSchema.txt")
+          }
+          if (!hasShownFeatures){
+            f = tryCatch(features(), error = function(cond) NA)
+            if (length(f)>1 || !is.na(f)){
+              featuresCount = nrow(f)
+              cntToShow = min(featuresCount, 50)
+              print(paste("Printing top", cntToShow, "features out of", featuresCount))
+              print(f[1:cntToShow,.(idx,feature,RIG,support)])
+            }
           }
 
           print(paste(curStatus, "-" ,i))
