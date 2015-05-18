@@ -223,7 +223,7 @@ Session = setRefClass("Session",
       features = function() {
         "Returns a dataset with top feature information"
         #statusException() # TODO: check if features were generated already
-        featuresFile = paste0(artifact_loc,"/reports/features.tsv")
+        featuresFile = paste0(artifact_loc,"/reports/train_features.tsv")
         features = if (file.exists(featuresFile)){
           fread(featuresFile, sep="\t", header=TRUE)
         } else {stop(paste("Features file does not exist in ", featuresFile))}
