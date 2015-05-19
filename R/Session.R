@@ -284,6 +284,12 @@ Session = setRefClass("Session",
       showROC_CV = function(){
         "Shows ROC of cross validation of various algorithms tested to create a model."
         showReport("roc_CV")
+      },
+      showFeatureClusters = function(){
+        "Shows the representative feature clusters pdf report."
+        pdfReport <- paste0(artifact_loc,"/reports/featureClusters/representativeFeatureIds.pdf")
+        if (file.exists(pdfReport)) viewer(pdfReport)
+        else {stop(paste("Feature clusters file does not exist in ", pdfReport, " (did you set the produceFeatureClusteringReport parameter in your learn call?)"))}
       }
 # save and load are probably more confusing at this time hence commented out. Just use regular save and load.
 #       ,

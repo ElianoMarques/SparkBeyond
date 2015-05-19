@@ -32,6 +32,8 @@ SB object that encapsulates a session
 
 \item{\code{showExtractors()}}{Shows extractors.}
 
+\item{\code{showFeatureClusters()}}{Shows the representative feature clusters pdf report.}
+
 \item{\code{showFeaturesTest()}}{Shows features performance on test.}
 
 \item{\code{showFeaturesTrain()}}{Shows features performance on train.}
