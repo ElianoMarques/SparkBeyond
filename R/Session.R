@@ -230,8 +230,8 @@ Session = setRefClass("Session",
         return (features)
       },
 
-      showReport = function(report_name = NA, showInIDE = TRUE){ #confine to a specific list
-        "\\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, features, field, function, InputSchema, modelComparison, roc_best, roc_CV"
+      showReport = function(report_name = NA){ #confine to a specific list
+        "\\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, train_features, train_unweighted_features, test_unweighted_features,field, function, InputSchema, modelComparison, roc_best, roc_CV"
         validReports = c("confusionMatrix", "confusionMatrix_normalized", "extractor", "features", "field",
                          "function", "InputSchema", "modelComparison", "roc_best", "roc_CV")
         if (is.na(report_name) || ! report_name %in% validReports ) stop("Report name is not valid")
@@ -240,54 +240,50 @@ Session = setRefClass("Session",
         #verify model created, check if classification, file exists
         statusException() #TODO: can be more refined here per report
         htmlSource <- paste0(artifact_loc,"/reports/", report_name, ".html")
-        viewer <- getOption("viewer")
-        if (!is.null(viewer) && showInIDE){
-          x <- paste(readLines(htmlSource, warn = F), collapse = '\n')
-          temp.f <- tempfile("plot", fileext=c(".html"))
-          writeLines(x, con = temp.f)
-          viewer(temp.f)
-        }
-        else
-          utils::browseURL(htmlSource)
+        file.show(htmlSource)
       },
 
-      showExtractors = function(showInIDE = TRUE){
-        "Shows extractors in the IDE viewer or in the web browser."
-        showReport("extractor",showInIDE)
+      showExtractors = function(){
+        "Shows extractors."
+        showReport("extractor")
       },
-      showFeatures = function(showInIDE = TRUE){
-        "Shows features in the IDE viewer or in the web browser."
-        showReport("features",showInIDE)
+      showFeaturesTrain = function(){
+        "Shows features performance on train."
+        showReport("train_features")
       },
-      showFields = function(showInIDE = TRUE){
-        "Shows fields in the IDE viewer or in the web browser."
-        showReport("field",showInIDE)
+      showFeaturesTest = function(){
+        "Shows features performance on test."
+        showReport("test_unweighted_features")
       },
-      showFunctions = function(showInIDE = TRUE){
-        "Shows functions in the IDE viewer or in the web browser."
-        showReport("function",showInIDE)
+      showFields = function(){
+        "Shows fields."
+        showReport("field")
       },
-      showInputSchema = function(showInIDE = TRUE){
-        "Shows the input schema in the IDE viewer or in the web browser."
-        showReport("InputSchema",showInIDE)
+      showFunctions = function(){
+        "Shows functions."
+        showReport("function")
+      },
+      showInputSchema = function(){
+        "Shows the input schema."
+        showReport("InputSchema")
       },
 
       #require model methods
-      showConfusionMatrix = function(normalized = FALSE, showInIDE = TRUE){ #verify that this was a classification problem
-        "Shows a confusion matrix of a model in the IDE viewer or in the web browser."
-        showReport(if (normalized) "confusionMatrix_normalized" else "confusionMatrix",showInIDE)
+      showConfusionMatrix = function(normalized = FALSE){ #verify that this was a classification problem
+        "Shows a confusion matrix of a model."
+        showReport(if (normalized) "confusionMatrix_normalized" else "confusionMatrix")
       },
-      showModelComparison = function(showInIDE = TRUE){
-        "Shows cross validation of various algorithms tested to create a model in the IDE viewer or in the web browser."
-        showReport("modelComparison",showInIDE)
+      showModelComparison = function(){
+        "Shows cross validation of various algorithms tested to create a model."
+        showReport("modelComparison")
       },
-      showROC = function(showInIDE = TRUE){
-        "Shows ROC of the model in the IDE viewer on in the web browser."
-        showReport("roc_best",showInIDE) #problematic to show in internal browser non local resources
+      showROC = function(){
+        "Shows ROC of the model."
+        showReport("roc_best") #problematic to show in internal browser non local resources
       },
-      showROC_CV = function(showInIDE = TRUE){
-        "Shows ROC of cross validation of various algorithms tested to create a model in the IDE viewer on in the web browser."
-        showReport("roc_CV",showInIDE) #problematic to show in internal browser non local resources
+      showROC_CV = function(){
+        "Shows ROC of cross validation of various algorithms tested to create a model."
+        showReport("roc_CV")
       }
 # save and load are probably more confusing at this time hence commented out. Just use regular save and load.
 #       ,
