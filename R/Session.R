@@ -74,6 +74,7 @@ Session = setRefClass("Session",
               cntToShow = min(featuresCount, 50)
               print(paste("Printing top", cntToShow, "features out of", featuresCount))
               print(f[1:cntToShow,.(idx,feature,RIG,support)])
+              hasShownFeatures = TRUE
             }
           }
 
