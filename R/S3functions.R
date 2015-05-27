@@ -12,7 +12,7 @@
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
-#' @param maxFeaturesCount: Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
@@ -38,7 +38,7 @@ learn <- function(projectName = "temp",
                   functionsWhiteList = NA,
                   functionsBlackList = NA,
                   useGraph = FALSE,
-                  maxFeaturesCount = 300, #TODO: make it a list
+                  maxFeaturesCount = list(300),
                   columnSubsetSize = 1,
                   customColumnSubsets = NA,
                   evaluationMetric = "PREC", #add all options
@@ -92,7 +92,7 @@ learn <- function(projectName = "temp",
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
-#' @param maxFeaturesCount: Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
@@ -117,7 +117,7 @@ learn.file <- function(projectName = "temp",
                     functionsWhiteList = NA,
                     functionsBlackList = NA,
                     useGraph = FALSE,
-                    maxFeaturesCount = 300, #TODO: make it a list
+                    maxFeaturesCount = list(300),
                     columnSubsetSize = 1,
                     customColumnSubsets = NA,
                     evaluationMetric = "PREC", #add all options
@@ -196,7 +196,7 @@ learn.file <- function(projectName = "temp",
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
-#' @param maxFeaturesCount Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
@@ -215,7 +215,7 @@ featureSearch <- function(projectName = "temp",
                                 functionsWhiteList = NA,
                                 functionsBlackList = NA,
                                 useGraph = FALSE,
-                                maxFeaturesCount = 300, #TODO: make it a list
+                                maxFeaturesCount = list(300),
                                 columnSubsetSize = 1,
                                 customColumnSubsets = NA,
                                 allocatedMemoryMB = 1000,
@@ -256,7 +256,7 @@ featureSearch <- function(projectName = "temp",
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
-#' @param maxFeaturesCount Optional. An integer of how many features should be created by the SB engine. 300 by default.
+#' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
@@ -275,7 +275,7 @@ featureSearch.file <- function(projectName = "temp",
                           functionsWhiteList = NA,
                           functionsBlackList = NA,
                           useGraph = FALSE,
-                          maxFeaturesCount = 300, #TODO: make it a list
+                          maxFeaturesCount = list(300),
                           columnSubsetSize = 1,
                           customColumnSubsets = NA,
                           allocatedMemoryMB = 1000,

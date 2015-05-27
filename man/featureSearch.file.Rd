@@ -6,7 +6,7 @@
 \usage{
 featureSearch.file(projectName = "temp", trainDataFilename, target,
   weightColumn = NA, maxDepth = 2, functionsWhiteList = NA,
-  functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
+  functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = list(300),
   columnSubsetSize = 1, customColumnSubsets = NA,
   allocatedMemoryMB = 1000, maxCollectionSize = 80000,
   weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
@@ -23,13 +23,13 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 
 \item{useGraph}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
-\item{maxFeaturesCount}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
-
 \item{trainDataFilename:}{Define the path to where the data is saved.}
 
 \item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
 
 \item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.}
+
+\item{maxFeaturesCount:}{Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.}
 
 \item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
 

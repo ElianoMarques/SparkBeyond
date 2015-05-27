@@ -7,7 +7,7 @@
 learn.file(projectName = "temp", trainDataFilename, target,
   testDataFilename = NA, trainTestSplitRatio = 0.8, weightColumn = NA,
   maxDepth = 2, algorithmsWhiteList = NA, functionsWhiteList = NA,
-  functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = 300,
+  functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = list(300),
   columnSubsetSize = 1, customColumnSubsets = NA,
   evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
   allocatedMemoryMB = 1000, maxCollectionSize = 80000,
@@ -37,7 +37,7 @@ learn.file(projectName = "temp", trainDataFilename, target,
 
 \item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
-\item{maxFeaturesCount:}{Optional. An integer of how many features should be created by the SB engine. 300 by default.}
+\item{maxFeaturesCount:}{Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.}
 
 \item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
 

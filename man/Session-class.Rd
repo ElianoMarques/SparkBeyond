@@ -28,6 +28,8 @@ SB object that encapsulates a session
 
 \item{\code{predict(data)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted.}
 
+\item{\code{predict.file(file)}}{Returns prediction on a created model. \code{file} is a dataframe to be predicted.}
+
 \item{\code{showConfusionMatrix(normalized = FALSE)}}{Shows a confusion matrix of a model.}
 
 \item{\code{showExtractors()}}{Shows extractors.}
