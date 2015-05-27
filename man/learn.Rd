@@ -9,11 +9,11 @@ learn(projectName = "temp", trainData, target, testData = NA,
   algorithmsWhiteList = NA, functionsWhiteList = NA,
   functionsBlackList = NA, booleanNumericFeatures = TRUE,
   useGraph = FALSE, maxFeaturesCount = list(300), columnSubsetSize = 1,
-  customColumnSubsets = NA, evaluationMetric = "PREC",
-  scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
-  maxCollectionSize = 80000, weightByClass = FALSE,
-  produceFeatureClusteringReport = FALSE, fileEncoding = NA,
-  runBlocking = TRUE, verbose = FALSE)
+  customColumnSubsets = NA, useCachedFeatures = FALSE,
+  evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
+  allocatedMemoryMB = 1000, maxCollectionSize = 80000,
+  weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
+  fileEncoding = NA, runBlocking = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -45,6 +45,8 @@ learn(projectName = "temp", trainData, target, testData = NA,
 \item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
 
 \item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
+
+\item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.}
 
 \item{evaluationMetric:}{Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.}
 

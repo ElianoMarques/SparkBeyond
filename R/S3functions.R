@@ -16,6 +16,7 @@
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
+#' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
@@ -43,6 +44,7 @@ learn <- function(projectName = "temp",
                   maxFeaturesCount = list(300),
                   columnSubsetSize = 1,
                   customColumnSubsets = NA,
+                  useCachedFeatures = FALSE,
                   evaluationMetric = "PREC", #add all options
                   scoreOnTestSet = FALSE,
                   crossValidation = 5,
@@ -69,6 +71,7 @@ learn <- function(projectName = "temp",
                 maxFeaturesCount = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
+                useCachedFeatures = useCachedFeatures,
                 evaluationMetric = evaluationMetric,
                 scoreOnTestSet = scoreOnTestSet,
                 crossValidation = crossValidation,
@@ -99,6 +102,7 @@ learn <- function(projectName = "temp",
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
+#' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
@@ -125,6 +129,7 @@ learn.file <- function(projectName = "temp",
                     maxFeaturesCount = list(300),
                     columnSubsetSize = 1,
                     customColumnSubsets = NA,
+                    useCachedFeatures = FALSE,
                     evaluationMetric = "PREC", #add all options
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
@@ -164,6 +169,7 @@ learn.file <- function(projectName = "temp",
                 globalFeatureIterations = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
+                useCachedFeatures = useCachedFeatures,
                 evaluationMetric = evaluationMetric,
                 scoreOnTestSet = scoreOnTestSet,
                 crossValidation = crossValidation,
@@ -208,6 +214,7 @@ learn.file <- function(projectName = "temp",
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
+#' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
@@ -226,6 +233,7 @@ featureSearch <- function(projectName = "temp",
                                 maxFeaturesCount = list(300),
                                 columnSubsetSize = 1,
                                 customColumnSubsets = NA,
+                                useCachedFeatures = FALSE,
                                 allocatedMemoryMB = 1000,
                                 maxCollectionSize = 80000,
                                 weightByClass = FALSE,
@@ -246,6 +254,7 @@ featureSearch <- function(projectName = "temp",
                 maxFeaturesCount = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
+                useCachedFeatures = useCachedFeatures,
                 allocatedMemoryMB = allocatedMemoryMB,
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
@@ -271,6 +280,7 @@ featureSearch <- function(projectName = "temp",
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
+#' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
@@ -289,6 +299,7 @@ featureSearch.file <- function(projectName = "temp",
                           maxFeaturesCount = list(300),
                           columnSubsetSize = 1,
                           customColumnSubsets = NA,
+                          useCachedFeatures = FALSE,
                           allocatedMemoryMB = 1000,
                           maxCollectionSize = 80000,
                           weightByClass = FALSE,
@@ -309,6 +320,7 @@ featureSearch.file <- function(projectName = "temp",
                 maxFeaturesCount = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
+                useCachedFeatures = useCachedFeatures,
                 allocatedMemoryMB = allocatedMemoryMB,
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
