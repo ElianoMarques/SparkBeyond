@@ -147,7 +147,7 @@ Session = setRefClass("Session",
                       dataPath = writeToServer(data),
                       featureCount = featureCount,
                       outputPath = outputPath,
-                      pathPrefix = getSBserverIOfolder())
+                      externalPrefixPath = getSBserverIOfolder())
 
         params = params[!is.na(params)]
 
@@ -187,7 +187,7 @@ Session = setRefClass("Session",
         params <-list(modelPath = artifact_loc,
                       dataPath = writeToServer(data),
                       outputPath = outputPath,
-                      pathPrefix = getSBserverIOfolder())
+                      externalPrefixPath = getSBserverIOfolder())
 
         print (paste("Predicting ",params$dataPath))
         url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
@@ -219,7 +219,7 @@ Session = setRefClass("Session",
         params <-list(modelPath = artifact_loc,
                       dataPath = file,
                       outputPath = outputPath,
-                      pathPrefix = getSBserverIOfolder())
+                      externalPrefixPath = getSBserverIOfolder())
 
         print (paste("Predicting ",params$dataPath))
         url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
