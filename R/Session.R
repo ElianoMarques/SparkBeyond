@@ -212,6 +212,9 @@ Session = setRefClass("Session",
         if (!modelBuilt) stop("Prediction requires full model building using learn")
 
         SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+        if (!grepl(SBdir, file)) file = paste0(getSBserverIOfolder(), file)
+        if (!file.exists(file)) stop(print(paste("Predict file:", file, "does not exist")))
+
         outputPath = tempfile(pattern = "data", tmpdir = SBdir, fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
                       dataPath = file,
