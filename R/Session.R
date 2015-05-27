@@ -206,7 +206,35 @@ Session = setRefClass("Session",
         }
         return(finalRes)
       },
+      predict.file = function(file) {
+        "Returns prediction on a created model. \\code{file} is a dataframe to be predicted."
+        statusException()
+        if (!modelBuilt) stop("Prediction requires full model building using learn")
 
+        SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+        outputPath = tempfile(pattern = "data", tmpdir = SBdir, fileext = ".tsv.gz") #TODO: complement with params
+        params <-list(modelPath = artifact_loc,
+                      dataPath = file,
+                      outputPath = outputPath,
+                      pathPrefix = getSBserverIOfolder())
+
+        print (paste("Predicting ",params$dataPath))
+        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
+        print(paste("Calling:", url))
+
+        body = rjson::toJSON(params)
+        res = httr::POST(url, body = body, httr::content_type_json())
+        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+
+        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
+          read.table(outputPath, header = TRUE, sep="\t")
+        } else {
+          message = paste("Prediction failed: ", res$error)
+          print(message)
+          stop(message)
+        }
+        return(finalRes)
+      },
 
       evaluate = function() {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
