@@ -6,11 +6,12 @@
 \usage{
 featureSearch.file(projectName = "temp", trainDataFilename, target,
   weightColumn = NA, maxDepth = 2, functionsWhiteList = NA,
-  functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = list(300),
-  columnSubsetSize = 1, customColumnSubsets = NA,
-  allocatedMemoryMB = 1000, maxCollectionSize = 80000,
-  weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
-  fileEncoding = NA, runBlocking = TRUE)
+  functionsBlackList = NA, booleanNumericFeatures = TRUE,
+  useGraph = FALSE, maxFeaturesCount = list(300), columnSubsetSize = 1,
+  customColumnSubsets = NA, allocatedMemoryMB = 1000,
+  maxCollectionSize = 80000, weightByClass = FALSE,
+  produceFeatureClusteringReport = FALSE, fileEncoding = NA,
+  runBlocking = TRUE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
@@ -28,6 +29,8 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 \item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
 
 \item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.}
+
+\item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. TRUE by default.}
 
 \item{maxFeaturesCount:}{Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.}
 

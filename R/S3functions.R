@@ -11,6 +11,7 @@
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
@@ -37,6 +38,7 @@ learn <- function(projectName = "temp",
                   algorithmsWhiteList = NA, #list available algorithms
                   functionsWhiteList = NA,
                   functionsBlackList = NA,
+                  booleanNumericFeatures = TRUE,
                   useGraph = FALSE,
                   maxFeaturesCount = list(300),
                   columnSubsetSize = 1,
@@ -62,6 +64,7 @@ learn <- function(projectName = "temp",
                 algorithmsWhiteList = algorithmsWhiteList,
                 functionsWhiteList = functionsWhiteList,
                 functionsBlackList = functionsBlackList,
+                booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
                 maxFeaturesCount = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
@@ -91,6 +94,7 @@ learn <- function(projectName = "temp",
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
@@ -116,6 +120,7 @@ learn.file <- function(projectName = "temp",
                     algorithmsWhiteList = NA, #list available algorithms
                     functionsWhiteList = NA,
                     functionsBlackList = NA,
+                    booleanNumericFeatures = TRUE,
                     useGraph = FALSE,
                     maxFeaturesCount = list(300),
                     columnSubsetSize = 1,
@@ -154,6 +159,7 @@ learn.file <- function(projectName = "temp",
                 algorithmsWhiteList = algorithmsWhiteList,
                 hints = functionsWhiteList,
                 sessionBlackList = functionsBlackList,
+                booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
                 globalFeatureIterations = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
@@ -195,6 +201,7 @@ learn.file <- function(projectName = "temp",
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
@@ -214,6 +221,7 @@ featureSearch <- function(projectName = "temp",
                                 maxDepth = 2,
                                 functionsWhiteList = NA,
                                 functionsBlackList = NA,
+                                booleanNumericFeatures = TRUE,
                                 useGraph = FALSE,
                                 maxFeaturesCount = list(300),
                                 columnSubsetSize = 1,
@@ -233,6 +241,7 @@ featureSearch <- function(projectName = "temp",
                 algorithmsWhiteList = list("ZeroR"),
                 functionsWhiteList = functionsWhiteList,
                 functionsBlackList = functionsBlackList,
+                booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
                 maxFeaturesCount = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
@@ -255,6 +264,7 @@ featureSearch <- function(projectName = "temp",
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
@@ -274,6 +284,7 @@ featureSearch.file <- function(projectName = "temp",
                           maxDepth = 2,
                           functionsWhiteList = NA,
                           functionsBlackList = NA,
+                          booleanNumericFeatures = TRUE,
                           useGraph = FALSE,
                           maxFeaturesCount = list(300),
                           columnSubsetSize = 1,
@@ -293,6 +304,7 @@ featureSearch.file <- function(projectName = "temp",
                 algorithmsWhiteList = list("ZeroR"),
                 functionsWhiteList = functionsWhiteList,
                 functionsBlackList = functionsBlackList,
+                booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
                 maxFeaturesCount = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,

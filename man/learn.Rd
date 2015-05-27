@@ -7,12 +7,13 @@
 learn(projectName = "temp", trainData, target, testData = NA,
   trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
   algorithmsWhiteList = NA, functionsWhiteList = NA,
-  functionsBlackList = NA, useGraph = FALSE, maxFeaturesCount = list(300),
-  columnSubsetSize = 1, customColumnSubsets = NA,
-  evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
-  allocatedMemoryMB = 1000, maxCollectionSize = 80000,
-  weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
-  fileEncoding = NA, runBlocking = TRUE, verbose = FALSE)
+  functionsBlackList = NA, booleanNumericFeatures = TRUE,
+  useGraph = FALSE, maxFeaturesCount = list(300), columnSubsetSize = 1,
+  customColumnSubsets = NA, evaluationMetric = "PREC",
+  scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
+  maxCollectionSize = 80000, weightByClass = FALSE,
+  produceFeatureClusteringReport = FALSE, fileEncoding = NA,
+  runBlocking = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -34,6 +35,8 @@ learn(projectName = "temp", trainData, target, testData = NA,
 \item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
 
 \item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.}
+
+\item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. TRUE by default.}
 
 \item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
