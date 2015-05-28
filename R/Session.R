@@ -239,6 +239,38 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
+      liftFromPrediction = function(data, labelColumn, probabilityColumn, desiredClass, title = "", percentOfPopulationToPlot = 0.1) { #TODO: change documentation
+        "Returns lift from a created model. \\code{data} is a dataframe to be analyzed."
+        statusException()
+        if (!modelBuilt) stop("Lift requires full model building using learn")
+
+        SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+        params <-list(modelPath = artifact_loc,
+                      dataPath = writeToServer(data),
+                      labelColumn = labelColumn,
+                      probabilityColumn = probabilityColumn,
+                      desiredClass = desiredClass,
+                      title=  title,
+                      percentOfPopulationToPlot= percentOfPopulationToPlot,
+                      externalPrefixPath = getSBserverIOfolder())
+
+        print (paste("Lift for ",params$dataPath))
+        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/liftFromPredictionResults")
+        print(paste("Calling:", url))
+
+        body = rjson::toJSON(params)
+        res = httr::POST(url, body = body, httr::content_type_json())
+        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+
+        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
+          read.table(paste0(artifact_loc, "/results/lift.tsv.gz"), header = TRUE, sep="\t")
+        } else {
+          message = paste("Lift failed: ", res$error)
+          print(message)
+          stop(message)
+        }
+        return(finalRes)
+      },
       evaluate = function() {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
         statusException()

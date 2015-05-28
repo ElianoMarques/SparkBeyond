@@ -26,6 +26,9 @@ SB object that encapsulates a session
 
 \item{\code{initialize(artifact_loc, modelBuilt = FALSE)}}{initializes a session using a string provided as \code{loc}.}
 
+\item{\code{liftFromPrediction(data, labelColumn, probabilityColumn, desiredClass,
+  title = "", percentOfPopulationToPlot = 0.1)}}{Returns lift from a created model. \code{data} is a dataframe to be analyzed.}
+
 \item{\code{predict(data)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted.}
 
 \item{\code{predict.file(file)}}{Returns prediction on a created model. \code{file} is a dataframe to be predicted.}
