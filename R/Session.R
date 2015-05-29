@@ -182,8 +182,9 @@ Session = setRefClass("Session",
         statusException()
         if (!modelBuilt) stop("Prediction requires full model building using learn")
 
+        print(paste("Output file should be in:", outputPath))
         SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
-        outputPath = tempfile(pattern = "data", tmpdir = SBdir, fileext = ".tsv.gz") #TODO: complement with params
+        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
         params <-list(modelPath = artifact_loc,
                       dataPath = writeToServer(data),
                       outputPath = outputPath,
@@ -216,7 +217,7 @@ Session = setRefClass("Session",
         if (!file.exists(file)) stop(print(paste("Predict file:", file, "does not exist")))
 
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
-        print(paste("output file should be in:", outputPath))
+        print(paste("Output file should be in:", outputPath))
         params <-list(modelPath = artifact_loc,
                       dataPath = file,
                       outputPath = outputPath,
