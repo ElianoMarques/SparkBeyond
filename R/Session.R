@@ -216,6 +216,7 @@ Session = setRefClass("Session",
         if (!file.exists(file)) stop(print(paste("Predict file:", file, "does not exist")))
 
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
+        print(paste("output file should be in:", outputPath))
         params <-list(modelPath = artifact_loc,
                       dataPath = file,
                       outputPath = outputPath,
