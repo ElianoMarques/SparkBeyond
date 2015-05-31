@@ -255,6 +255,7 @@ Session = setRefClass("Session",
           print(message)
           stop(message)
         }
+        print("Done.")
         return(finalRes)
       },
       evaluate = function() {
