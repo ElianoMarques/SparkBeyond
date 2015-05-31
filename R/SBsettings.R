@@ -119,7 +119,7 @@ loadSettings = function() {
 #' @return The response from the server.
 restartServer = function() {
   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/die")
-  res = httr::POST(url, body = FALSE, httr::content_type_json())
+  res = httr::GET(url, body = FALSE, httr::content_type_json())
   i = 0
   finalStatus = repeat {
     i = i+1
@@ -137,7 +137,7 @@ restartServer = function() {
 #' @return The response from the server.
 clearCache = function(projectName) {
   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/cleanCache/",projectName)
-  res = httr::POST(url, body = FALSE, httr::content_type_json())
+  res = httr::GET(url, body = FALSE, httr::content_type_json())
   #to verify: list.files(paste0(getSBserverIOfolder(),"/",getSBserverPort(),"/artifacts/",projectName))
   if (res$status == 200) paste("Cleared:",projectName) else "Something went wrong"
 }
@@ -148,10 +148,22 @@ clearCache = function(projectName) {
 isServerAlive = function() {
   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/heartbeat")
   status = tryCatch({
-    res = httr::POST(url, body = FALSE, httr::content_type_json())
+    res = httr::GET(url, body = FALSE, httr::content_type_json())
     TRUE
     },
     error = function(cond) FALSE
+  )
+  status
+}
+
+serverVersion = function(){
+  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/buildInfo")
+  status = tryCatch({
+    res = httr::GET(url, body = body, httr::content_type_json())
+    res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+    res
+  },
+  error = function(cond) NA
   )
   status
 }

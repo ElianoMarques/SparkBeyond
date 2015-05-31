@@ -135,16 +135,21 @@ Session = setRefClass("Session",
         if (curStatus != "Done") stop(paste("Session was not completed - ", curStatus))
       },
 
-      enrich = function(data, featureCount = NA) { #TODO: change documentation
+      enrich = function(data, featureCount = NA) {
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched."
+        statusException()
+        datapath = writeToServer(data)
+        enrich.file(datapath, featureCount)
+      },
+
+      enrich.file = function(file, featureCount = NA) {
+        "Returns a data frame containing the enrichedData. \\code{data} is a path to the file to be enriched."
         statusException()
 
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
 
-
-
         params <-list(modelPath = artifact_loc,
-                      dataPath = writeToServer(data),
+                      dataPath = file,
                       featureCount = featureCount,
                       outputPath = outputPath,
                       externalPrefixPath = getSBserverIOfolder())
@@ -177,39 +182,16 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
-      predict = function(data) { #TODO: change documentation
+      predict = function(data) { #
         "Returns prediction on a created model. \\code{data} is a dataframe to be predicted."
         statusException()
         if (!modelBuilt) stop("Prediction requires full model building using learn")
-
-
-        SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
-        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
-        print(paste("Output file should be in:", outputPath))
-        params <-list(modelPath = artifact_loc,
-                      dataPath = writeToServer(data),
-                      outputPath = outputPath,
-                      externalPrefixPath = getSBserverIOfolder())
-
-        print (paste("Predicting ",params$dataPath))
-        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
-        print(paste("Calling:", url))
-
-        body = rjson::toJSON(params)
-        res = httr::POST(url, body = body, httr::content_type_json())
-        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-
-        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
-          read.table(outputPath, header = TRUE, sep="\t")
-        } else {
-          message = paste("Prediction failed: ", res$error)
-          print(message)
-          stop(message)
-        }
-        return(finalRes)
+        datapath = writeToServer(data)
+        predict.file(datapath)
       },
+
       predict.file = function(file) {
-        "Returns prediction on a created model. \\code{file} is a dataframe to be predicted."
+        "Returns prediction on a created model. \\code{file} is the path of the file to be predicted."
         statusException()
         if (!modelBuilt) stop("Prediction requires full model building using learn")
 
@@ -243,7 +225,7 @@ Session = setRefClass("Session",
       },
 
       liftFromPrediction = function(data, labelColumn, probabilityColumn, desiredClass, title = "", percentOfPopulationToPlot = 0.1) { #TODO: change documentation
-        "Returns lift from a created model. \\code{data} is a dataframe to be analyzed."
+        "Returns lift from a created model and generates three plots. \\code{data} is a dataframe to be analyzed, \\code{labelColumn} name of column containing the label, \\code{probabilityColumn} name of probability column, \\code{desiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot."
         statusException()
         if (!modelBuilt) stop("Lift requires full model building using learn")
 
