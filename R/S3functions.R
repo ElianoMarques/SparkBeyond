@@ -141,6 +141,12 @@ learn.file <- function(projectName = "temp",
                     runBlocking = TRUE,
                     verbose = FALSE){
 
+  verifyList = function(l) {if(is.vector(l) && !is.na(l)) as.list(l) else l}
+  algorithmsWhiteList = verifyList(algorithmsWhiteList)
+  functionsWhiteList = verifyList(functionsWhiteList)
+  functionsBlackList = verifyList(functionsBlackList)
+  maxFeaturesCount = verifyList(maxFeaturesCount)
+
   SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
   if (!grepl(SBdir, trainDataFilename)) trainDataFilename = paste0(getSBserverIOfolder(), trainDataFilename)
   if (!file.exists(trainDataFilename)) stop(print(paste("Train file:", trainDataFilename, "does not exist")))
