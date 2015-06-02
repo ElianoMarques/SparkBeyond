@@ -17,8 +17,8 @@ run_SB_examples <- function(configuration='1') {
 
   res = tryCatch({
     model = runTitanicLearn(configuration)
-    #runTitanicTestEnrich(model)
-    #runTitanicTestPredict(model) #TODO: check why all the escaping in the scala output were produced, potentially return only last 3 columns and not the entire row
+    runTitanicTestEnrich(model)
+    runTitanicTestPredict(model) #TODO: check why all the escaping in the scala output were produced, potentially return only last 3 columns and not the entire row
     return ("Success")
   }, error = function(e) {
     write (e$message, stderr())
@@ -37,7 +37,8 @@ runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
     projectName = "titanic",
     trainData = getTitanicData(train = TRUE),
     target = "survived",
-    runBlocking = runBlocking
+    runBlocking = runBlocking,
+    useCachedFeatures = TRUE
   )
   additional_params = switch (configuration,
     "1" = list(algorithmsWhiteList = list("RRandomForest")),

@@ -29,7 +29,7 @@ SB object that encapsulates a session
 \item{\code{initialize(artifact_loc, modelBuilt = FALSE)}}{initializes a session using a string provided as \code{loc}.}
 
 \item{\code{liftFromPrediction(data, labelColumn, probabilityColumn, desiredClass,
-  title = "", percentOfPopulationToPlot = 0.1)}}{Returns lift from a created model and generates three plots. \code{data} is a dataframe to be analyzed, \code{labelColumn} name of column containing the label, \code{probabilityColumn} name of probability column, \code{desiredClass} the class in the label column to check the lift for (e.g. '1'), \code{title} optional: a title for the plot.}
+  title = NA, percentOfPopulationToPlot = 0.1)}}{Returns lift from a created model and generates three plots. \code{data} is a dataframe to be analyzed, \code{labelColumn} name of column containing the label, \code{probabilityColumn} name of probability column, \code{desiredClass} the class in the label column to check the lift for (e.g. '1'), \code{title} optional: a title for the plot. \code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis).}
 
 \item{\code{predict(data)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted.}
 

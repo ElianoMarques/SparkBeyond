@@ -226,7 +226,7 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
-      liftFromPrediction = function(data, labelColumn, probabilityColumn, desiredClass, title = "", percentOfPopulationToPlot = 0.1) { #TODO: change documentation
+      liftFromPrediction = function(data, labelColumn, probabilityColumn, desiredClass, title = NA, percentOfPopulationToPlot = 0.1) { #TODO: change documentation
         "Returns lift from a created model and generates three plots. \\code{data} is a dataframe to be analyzed, \\code{labelColumn} name of column containing the label, \\code{probabilityColumn} name of probability column, \\code{desiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
         statusException()
         if (!modelBuilt) stop("Lift requires full model building using learn")
@@ -237,20 +237,32 @@ Session = setRefClass("Session",
                       labelColumn = labelColumn,
                       probabilityColumn = probabilityColumn,
                       desiredClass = desiredClass,
-                      title=  title,
+                      title = title,
                       percentOfPopulationToPlot= percentOfPopulationToPlot,
                       externalPrefixPath = getSBserverIOfolder())
 
         print (paste("Lift for ",params$dataPath))
         url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/liftFromPredictionResults")
         print(paste("Calling:", url))
-
+        params = params[!is.na(params)]
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
-          read.table(paste0(artifact_loc, "/results/lift.tsv.gz"), header = TRUE, sep="\t")
+        finalRes = if (is.null(res$error) && !is.null(res$result)){
+          plotName = res$result
+          resultsLocation = paste0(artifact_loc, "/results/")
+          print (paste("Plots are available at:", resultsLocation))
+          table = read.table(paste0(resultsLocation, plotName, ".tsv.gz"), header = TRUE, sep="\t")
+          plotPrefixes = c("Lift_plot_", "CummGain_percent_plot_", "CummGain_counts_plot_")
+          showLiftPlot = function(prefix) {
+            liftPlotHtml <- paste0(resultsLocation,prefix, plotName, ".html")
+            if (file.exists(liftPlotHtml)){
+              file.show(liftPlotHtml)
+            }
+          }
+          lapply(plotPrefixes, function(prefix) showLiftPlot(prefix))
+          table
         } else {
           message = paste("Lift failed: ", res$error)
           print(message)
