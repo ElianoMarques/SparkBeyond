@@ -7,13 +7,28 @@ trimN = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))
 #' Sugar to trim a column by another column variable
 trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))  list(NA) else list(y[1:n])}
 #' Sugar to exclude columns
-excludeCols = function(data, cols) data[, (cols) := NULL] #note: parenthesis around cols are important
+excludeCols = function(data, cols) {
+  effectiveCols = intersect(cols,names(data))
+  if (length(effectiveCols > 0)) data[, (effectiveCols) := NULL] #note: parenthesis around cols are important
+  paste(if (length(effectiveCols) > 0) paste(effectiveCols, collapse=",") else "None", "were removed")
+}
+
+#' flatten column
+flattenCol = function(data, colName) {
+  data[,eval(as.symbol(colName)):=sapply(eval(as.symbol(colName)),`[[`,1,simplify=TRUE)]
+}
+#' flatten columns
+flattenCols = function(data, cols) {
+  for(col in cols) {flattenCol(data,col)} # can possibly be written without the loop
+}
+
 #' groupBy sugar
 groupBy = function(data, keys){
   data = as.data.table(data)
   data[,lapply(.SD,list), by=keys]
 }
 
+#' setTimeColumn
 setTimeColumn = function(DT, timeCol) { #assumption is can be called only if the data is grouped already, hence a data.table
   if (! timeCol %in% names(DT)) stop (paste("error:", timeCol, "does not exist"))
   if ("SB_times_col" %in% names(DT)) stop ("error: time column is already defined")
@@ -21,29 +36,9 @@ setTimeColumn = function(DT, timeCol) { #assumption is can be called only if the
 }
 
 #' limitTimeSeries
-# TODO - change to new format
-limitTimeSeries = function(data, groupColumns, fromDate = NA, untilDate = NA){
-  from = if (is.na(fromDate)) NA else unclass(as.POSIXct(fromDate)) *1000
-  until = if (is.na(untilDate)) NA else unclass(as.POSIXct(untilDate)) *1000
-  if (is.na(fromDate) && is.na(untilDate)) stop("Both from and until dates were not provided")
-
-  checkDate = function(d) {
-    if(is.na(from) && !is.na(until) && d <=until) TRUE
-    else if (!is.na(from) && is.na(until) && d >= from) TRUE
-    else if (!is.na(from) && !is.na(until) && d >= from && d<= until) TRUE
-    else FALSE
-  }
-
-  data[, lapply(.SD, function(col) {
-        lapply(col, function(cell) {
-          if (length(unlist(cell))==1) cell
-          else{
-            l = unlist(lapply(cell, function(x) checkDate(x[[1]]) ))
-            cell[l]
-          }
-        })
-    }
-  ), by = groupColumns]
+limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilDate = NA, datesFormat = "%m/%d/%Y"){
+  untilDateObject = strptime(untilDate, datesFormat)
+  data[sapply(eval(as.symbol(dateCol)), function(x) strptime(x, datesFormat) < untilDateObject)]
 }
 
 #' sugar to convert a column to text
@@ -84,7 +79,7 @@ writeGroupedData = function(data, outputFile) { #sugar for writing grouped data
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
 
-# add sugar to flatten unary columns
+
 
 
 #dt <- data.table(dt, new = paste(dt$A, dt$B, sep = ""))
@@ -129,4 +124,28 @@ writeGroupedData = function(data, outputFile) { #sugar for writing grouped data
 #
 #   # Info on the := operator for data.table
 #   # http://www.rdocumentation.org/packages/data.table/functions/assign.html
+# }
+
+# limitTimeSeries = function(data, groupColumns, fromDate = NA, untilDate = NA){
+#   from = if (is.na(fromDate)) NA else unclass(as.POSIXct(fromDate)) *1000
+#   until = if (is.na(untilDate)) NA else unclass(as.POSIXct(untilDate)) *1000
+#   if (is.na(fromDate) && is.na(untilDate)) stop("Both from and until dates were not provided")
+#
+#   checkDate = function(d) {
+#     if(is.na(from) && !is.na(until) && d <=until) TRUE
+#     else if (!is.na(from) && is.na(until) && d >= from) TRUE
+#     else if (!is.na(from) && !is.na(until) && d >= from && d<= until) TRUE
+#     else FALSE
+#   }
+#
+#   data[, lapply(.SD, function(col) {
+#     lapply(col, function(cell) {
+#       if (length(unlist(cell))==1) cell
+#       else{
+#         l = unlist(lapply(cell, function(x) checkDate(x[[1]]) ))
+#         cell[l]
+#       }
+#     })
+#   }
+#   ), by = groupColumns]
 # }
