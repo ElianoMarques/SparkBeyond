@@ -11,12 +11,12 @@
 #' @param configuration Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList
 #' @examples
 #' # run_SB_examples()
-run_SB_examples <- function(configuration='1') {
+run_SB_examples <- function(configuration='1', weightByClass = FALSE) {
   print(paste("Running titanic train example - configuration: ",   configuration))
   write(paste("Running titanic train example - configuration: ",   configuration), stderr())
 
   res = tryCatch({
-    model = runTitanicLearn(configuration)
+    model = runTitanicLearn(configuration, weightByClass)
     runTitanicTestEnrich(model)
     runTitanicTestPredict(model) #TODO: check why all the escaping in the scala output were produced, potentially return only last 3 columns and not the entire row
     return ("Success")
@@ -32,11 +32,12 @@ run_SB_examples <- function(configuration='1') {
 #' @return SBmodel object containing the result of the learning
 #' @examples
 #' model = runTitanicLearn()
-runTitanicLearn <- function(configuration='1', runBlocking = TRUE) {
+runTitanicLearn <- function(configuration='1', weightByClass = FALSE, runBlocking = TRUE) {
   params = list(
     projectName = "titanic",
     trainData = getTitanicData(train = TRUE),
     target = "survived",
+    weightByClass = weightByClass,
     runBlocking = runBlocking,
     useCachedFeatures = TRUE
   )

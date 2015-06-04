@@ -4,7 +4,7 @@
 \alias{run_SB_examples}
 \title{Run SparkBeyond titanic example.}
 \usage{
-run_SB_examples(configuration = "1")
+run_SB_examples(configuration = "1", weightByClass = FALSE)
 }
 \arguments{
 \item{configuration}{Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList}

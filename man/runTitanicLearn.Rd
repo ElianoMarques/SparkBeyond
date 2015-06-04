@@ -4,7 +4,8 @@
 \alias{runTitanicLearn}
 \title{Perform learn on SparkBeyond titanic example.}
 \usage{
-runTitanicLearn(configuration = "1", runBlocking = TRUE)
+runTitanicLearn(configuration = "1", weightByClass = FALSE,
+  runBlocking = TRUE)
 }
 \arguments{
 \item{configuration}{Configuration ID as string. 1 - use RRandomForest, 2 - use defaultList.}
