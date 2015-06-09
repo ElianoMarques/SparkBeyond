@@ -8,10 +8,11 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
   weightColumn = NA, maxDepth = 2, functionsWhiteList = NA,
   functionsBlackList = NA, booleanNumericFeatures = TRUE,
   useGraph = FALSE, maxFeaturesCount = list(300), columnSubsetSize = 1,
-  customColumnSubsets = NA, useCachedFeatures = FALSE,
-  allocatedMemoryMB = 1000, maxCollectionSize = 80000,
-  weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
-  fileEncoding = NA, runBlocking = TRUE)
+  customColumnSubsets = NA, maxFeatureDuration = 100,
+  useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
+  maxCollectionSize = 80000, weightByClass = FALSE,
+  produceFeatureClusteringReport = FALSE, fileEncoding = NA,
+  runBlocking = TRUE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
@@ -41,6 +42,8 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 \item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.}
 
 \item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
+
+\item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.}
 
 \item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.}
 

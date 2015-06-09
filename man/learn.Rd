@@ -9,11 +9,12 @@ learn(projectName = "temp", trainData, target, testData = NA,
   algorithmsWhiteList = NA, functionsWhiteList = NA,
   functionsBlackList = NA, booleanNumericFeatures = TRUE,
   useGraph = FALSE, maxFeaturesCount = list(300), columnSubsetSize = 1,
-  customColumnSubsets = NA, useCachedFeatures = FALSE,
-  evaluationMetric = "PREC", scoreOnTestSet = FALSE, crossValidation = 5,
-  allocatedMemoryMB = 1000, maxCollectionSize = 80000,
-  weightByClass = FALSE, produceFeatureClusteringReport = FALSE,
-  fileEncoding = NA, runBlocking = TRUE, verbose = FALSE)
+  customColumnSubsets = NA, maxFeatureDuration = 100,
+  useCachedFeatures = FALSE, evaluationMetric = "PREC",
+  scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
+  maxCollectionSize = 80000, weightByClass = FALSE,
+  produceFeatureClusteringReport = FALSE, fileEncoding = NA,
+  runBlocking = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -45,6 +46,8 @@ learn(projectName = "temp", trainData, target, testData = NA,
 \item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
 
 \item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
+
+\item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.}
 
 \item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.}
 
