@@ -5,13 +5,13 @@ library(methods) #to support RScript
 #' @field modelBuilt Indication for whether only a feature search was performed or a full model was created.
 #' @examples
 #' # Learning example
-#' session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("RRandomForest"))
+#' session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("xgboost"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
 #' #session = featureSearch("titanic", getTitanicData(train = TRUE), target="survived")
 #' enriched = session$enrich(getTitanicData(train = FALSE), featureCount = 10)
 #' colnames(enriched)
 #' predicted = session$predict(getTitanicData(train = FALSE))
 #' colnames(predicted)
-#' predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
+#' predicted[1:5,c("survived_predicted", "probability_0", "probability_1")]
 #' eval = session$evaluate()
 #' #session$showFeatures()
 #' #session$showConfusionMatrix()
@@ -51,7 +51,7 @@ Session = setRefClass("Session",
 
           curStatus = status()
           if(curStatus == "Done") {serverResponded = TRUE
-                                   printFile("evaluation.txt")
+                                   printFile("model/evaluation.txt")
                                    print ("Done")
                                    return ("Done")}
           else if (curStatus == "Detecting types") serverReponded = TRUE
@@ -65,7 +65,7 @@ Session = setRefClass("Session",
 
 
           if (!hasShownInputSchema){
-            hasShownInputSchema = printFile("inputSchema.txt")
+            hasShownInputSchema = printFile("preProcessing/inputSchema.txt")
           }
           if (!hasShownFeatures){
             f = tryCatch(features(), error = function(cond) NA)
@@ -135,15 +135,15 @@ Session = setRefClass("Session",
         if (curStatus != "Done") stop(paste("Session was not completed - ", curStatus))
       },
 
-      enrich = function(data, featureCount = NA) {
-        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched."
+      enrich = function(data, featureCount = NA, writePredictionColumnsOnly = TRUE) {
+        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
         datapath = writeToServer(data)
-        enrich.file(datapath, featureCount)
+        enrich.file(datapath, featureCount, writePredictionColumnsOnly)
       },
 
-      enrich.file = function(file, featureCount = NA) {
-        "Returns a data frame containing the enrichedData. \\code{data} is a path to the file to be enriched."
+      enrich.file = function(file, featureCount = NA, writePredictionColumnsOnly = TRUE) {
+        "Returns a data frame containing the enrichedData. \\code{file} is a path to the file to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
 
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
@@ -152,6 +152,7 @@ Session = setRefClass("Session",
                       dataPath = file,
                       featureCount = featureCount,
                       outputPath = outputPath,
+                      writePredictionColumnsOnly = writePredictionColumnsOnly,
                       externalPrefixPath = getSBserverIOfolder())
 
         params = params[!is.na(params)]
@@ -183,16 +184,16 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
-      predict = function(data) { #
-        "Returns prediction on a created model. \\code{data} is a dataframe to be predicted."
+      predict = function(data, writePredictionColumnsOnly = TRUE) { #
+        "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
         if (!modelBuilt) stop("Prediction requires full model building using learn")
         datapath = writeToServer(data)
-        predict.file(datapath)
+        predict.file(datapath, writePredictionColumnsOnly)
       },
 
-      predict.file = function(file) {
-        "Returns prediction on a created model. \\code{file} is the path of the file to be predicted."
+      predict.file = function(file, writePredictionColumnsOnly = TRUE) {
+        "Returns prediction on a created model. \\code{file} is the path of the file to be predicted. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
         if (!modelBuilt) stop("Prediction requires full model building using learn")
 
@@ -200,11 +201,9 @@ Session = setRefClass("Session",
         if (!grepl(SBdir, file)) file = paste0(getSBserverIOfolder(), file)
         if (!file.exists(file)) stop(print(paste("Predict file:", file, "does not exist")))
 
-        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
-        print(paste("Output file should be in:", outputPath))
         params <-list(modelPath = artifact_loc,
                       dataPath = file,
-                      outputPath = outputPath,
+                      writePredictionColumnsOnly = writePredictionColumnsOnly,
                       externalPrefixPath = getSBserverIOfolder())
 
         print (paste("Predicting ",params$dataPath))
@@ -215,8 +214,19 @@ Session = setRefClass("Session",
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
-          read.table(outputPath, header = TRUE, sep="\t")
+        finalRes = if (is.null(res$error) && !is.null(res$result)){
+          table = read.table(res$result, header = TRUE, sep="\t")
+          resultsLocation = paste0(artifact_loc, "/results/test/")
+          print (paste("Predictions and plots are available at:", resultsLocation))
+          files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
+          if (length(files) > 0){
+            htmlFilesInd = which(files)
+            if (length(htmlFilesInd>0)) {
+              htmlFiles = names(htmlFilesInd)
+              for(f in htmlFiles) file.show(paste0(resultsLocation, f))
+            }
+          }
+          table
         } else {
           message = paste("Prediction failed: ", res$error)
           print(message)
@@ -226,42 +236,43 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
-      liftFromPrediction = function(data, labelColumn, probabilityColumn, desiredClass, title = NA, percentOfPopulationToPlot = 0.1) { #TODO: change documentation
-        "Returns lift from a created model and generates three plots. \\code{data} is a dataframe to be analyzed, \\code{labelColumn} name of column containing the label, \\code{probabilityColumn} name of probability column, \\code{desiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
+      liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = NA, percentOfPopulationToPlot = 0.2) { #TODO: change documentation
+        "Returns lift from a created model and generates three plots. \\code{predictionResult} is a dataframe to be analyzed, \\code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
         statusException()
         if (!modelBuilt) stop("Lift requires full model building using learn")
 
         SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
         params <-list(modelPath = artifact_loc,
-                      dataPath = writeToServer(data),
-                      labelColumn = labelColumn,
-                      probabilityColumn = probabilityColumn,
-                      desiredClass = desiredClass,
+                      predictionPath = writeToServer(predictionResult),
                       title = title,
                       percentOfPopulationToPlot= percentOfPopulationToPlot,
                       externalPrefixPath = getSBserverIOfolder())
 
-        print (paste("Lift for ",params$dataPath))
+        params = params[!is.na(params)]
+
+        print (paste("Calculating lift for ",params$predictionPath))
+
         url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/liftFromPredictionResults")
         print(paste("Calling:", url))
-        params = params[!is.na(params)]
+
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
         finalRes = if (is.null(res$error) && !is.null(res$result)){
           plotName = res$result
-          resultsLocation = paste0(artifact_loc, "/results/")
+          subFolder = if (is.na(title)) "test" else gsub("\\s+","_", title)
+          resultsLocation = paste0(artifact_loc, "/results/", subFolder, "/")
           print (paste("Plots are available at:", resultsLocation))
-          table = read.table(paste0(resultsLocation, plotName, ".tsv.gz"), header = TRUE, sep="\t")
-          plotPrefixes = c("Lift_plot_", "CummGain_percent_plot_", "CummGain_counts_plot_")
-          showLiftPlot = function(prefix) {
-            liftPlotHtml <- paste0(resultsLocation,prefix, plotName, ".html")
-            if (file.exists(liftPlotHtml)){
-              file.show(liftPlotHtml)
+          table = read.table(paste0(resultsLocation, "lift_table_",plotName, ".tsv.gz"), header = TRUE, sep="\t")
+          files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
+          if (length(files) > 0){
+            htmlFilesInd = which(files)
+            if (length(htmlFilesInd>0)) {
+              htmlFiles = names(htmlFilesInd)
+              for(f in htmlFiles) file.show(paste0(resultsLocation, f))
             }
           }
-          lapply(plotPrefixes, function(prefix) showLiftPlot(prefix))
           table
         } else {
           message = paste("Lift failed: ", res$error)
@@ -271,6 +282,7 @@ Session = setRefClass("Session",
         print("Done.")
         return(finalRes)
       },
+
       evaluate = function() {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
         statusException()
@@ -288,7 +300,7 @@ Session = setRefClass("Session",
       features = function() {
         "Returns a dataset with top feature information"
         #statusException() # TODO: check if features were generated already
-        featuresFile = paste0(artifact_loc,"/reports/train_features.tsv")
+        featuresFile = paste0(artifact_loc,"/reports/features/train_features.tsv")
         features = if (file.exists(featuresFile)){
           fread(featuresFile, sep="\t", header=TRUE)
         } else {stop(paste("Features file does not exist in ", featuresFile))}
@@ -297,14 +309,20 @@ Session = setRefClass("Session",
 
       showReport = function(report_name = NA){ #confine to a specific list
         "\\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, train_features, train_unweighted_features, test_unweighted_features,field, function, InputSchema, modelComparison, roc_best, roc_CV"
-        validReports = c("confusionMatrix", "confusionMatrix_normalized", "extractor", "features", "field",
-                         "function", "InputSchema", "modelComparison", "roc_best", "roc_CV")
+        preProcessingReports = c("InputSchema")
+        featuresReports = c("extractor", "train_features", "train_unweighted_features", "test_unweighted_features","field", "function")
+        modelReports = c("confusionMatrix", "confusionMatrix_normalized", "modelComparison", "roc_best", "roc_CV")
+        validReports = c(preProcessingReports,featuresReports, modelReports)
         if (is.na(report_name) || ! report_name %in% validReports ) stop("Report name is not valid")
-        reportsThatRequireModel = c("confusionMatrix", "confusionMatrix_normalized", "modelComparison", "roc_best", "roc_CV")
-        if (!modelBuilt && report_name %in% reportsThatRequireModel) stop("This report requires full model building using learn")
+        if (!modelBuilt && report_name %in% modelReports) stop("This report requires full model building using learn")
         #verify model created, check if classification, file exists
         statusException() #TODO: can be more refined here per report
-        htmlSource <- paste0(artifact_loc,"/reports/", report_name, ".html")
+        subFolder = function(name) {
+          if (name %in% preProcessingReports) "preProcessing"
+          else if (name %in% modelReports) "model"
+          else "features"
+        }
+        htmlSource <- paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
         file.show(htmlSource)
       },
 

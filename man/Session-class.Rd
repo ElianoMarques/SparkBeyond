@@ -18,9 +18,9 @@ SB object that encapsulates a session
 \section{Methods}{
 
 \describe{
-\item{\code{enrich(data, featureCount = NA)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched.}
+\item{\code{enrich(data, featureCount = NA, writePredictionColumnsOnly = TRUE)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
-\item{\code{enrich.file(file, featureCount = NA)}}{Returns a data frame containing the enrichedData. \code{data} is a path to the file to be enriched.}
+\item{\code{enrich.file(file, featureCount = NA, writePredictionColumnsOnly = TRUE)}}{Returns a data frame containing the enrichedData. \code{file} is a path to the file to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
 \item{\code{evaluate()}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
@@ -28,12 +28,12 @@ SB object that encapsulates a session
 
 \item{\code{initialize(artifact_loc, modelBuilt = FALSE)}}{initializes a session using a string provided as \code{loc}.}
 
-\item{\code{liftFromPrediction(data, labelColumn, probabilityColumn, desiredClass,
-  title = NA, percentOfPopulationToPlot = 0.1)}}{Returns lift from a created model and generates three plots. \code{data} is a dataframe to be analyzed, \code{labelColumn} name of column containing the label, \code{probabilityColumn} name of probability column, \code{desiredClass} the class in the label column to check the lift for (e.g. '1'), \code{title} optional: a title for the plot. \code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis).}
+\item{\code{liftFromPrediction(predictionResult, overrideDesiredClass = NA, title = NA,
+  percentOfPopulationToPlot = 0.2)}}{Returns lift from a created model and generates three plots. \code{predictionResult} is a dataframe to be analyzed, \code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \code{title} optional: a title for the plot. \code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis).}
 
-\item{\code{predict(data)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted.}
+\item{\code{predict(data, writePredictionColumnsOnly = TRUE)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
-\item{\code{predict.file(file)}}{Returns prediction on a created model. \code{file} is the path of the file to be predicted.}
+\item{\code{predict.file(file, writePredictionColumnsOnly = TRUE)}}{Returns prediction on a created model. \code{file} is the path of the file to be predicted. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
 \item{\code{showConfusionMatrix(normalized = FALSE)}}{Shows a confusion matrix of a model.}
 
@@ -65,13 +65,13 @@ SB object that encapsulates a session
 }}
 \examples{
 # Learning example
-session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("RRandomForest"))
+session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("xgboost"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
 #session = featureSearch("titanic", getTitanicData(train = TRUE), target="survived")
 enriched = session$enrich(getTitanicData(train = FALSE), featureCount = 10)
 colnames(enriched)
 predicted = session$predict(getTitanicData(train = FALSE))
 colnames(predicted)
-predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
+predicted[1:5,c("survived_predicted", "probability_0", "probability_1")]
 eval = session$evaluate()
 #session$showFeatures()
 #session$showConfusionMatrix()
