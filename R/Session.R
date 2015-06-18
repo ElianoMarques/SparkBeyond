@@ -216,7 +216,7 @@ Session = setRefClass("Session",
 
         finalRes = if (is.null(res$error) && !is.null(res$result)){
           table = read.table(res$result, header = TRUE, sep="\t")
-          resultsLocation = paste0(artifact_loc, "/results/test/")
+          resultsLocation = paste0(artifact_loc, "/reports/predictions/test/")
           print (paste("Predictions and plots are available at:", resultsLocation))
           files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
           if (length(files) > 0){
@@ -262,7 +262,7 @@ Session = setRefClass("Session",
         finalRes = if (is.null(res$error) && !is.null(res$result)){
           plotName = res$result
           subFolder = if (is.na(title)) "test" else gsub("\\s+","_", title)
-          resultsLocation = paste0(artifact_loc, "/results/", subFolder, "/")
+          resultsLocation = paste0(artifact_loc, "/reports/predictions/", subFolder, "/")
           print (paste("Plots are available at:", resultsLocation))
           table = read.table(paste0(resultsLocation, "lift_table_",plotName, ".tsv.gz"), header = TRUE, sep="\t")
           files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
