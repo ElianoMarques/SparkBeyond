@@ -146,6 +146,7 @@ learn.file <- function(projectName = "temp",
                     runBlocking = TRUE,
                     verbose = FALSE){
 
+  isLatestVersion()
   verifyList = function(l) {if(is.vector(l) && !is.na(l)) as.list(l) else l}
   algorithmsWhiteList = verifyList(algorithmsWhiteList)
   functionsWhiteList = verifyList(functionsWhiteList)

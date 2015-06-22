@@ -142,7 +142,7 @@ clearCache = function(projectName) {
   if (res$status == 200) paste("Cleared:",projectName) else "Something went wrong"
 }
 
-#clear cache
+
 #' A function to check whether the server is alive
 #' @return The response from the server.
 isServerAlive = function() {
@@ -156,6 +156,8 @@ isServerAlive = function() {
   status
 }
 
+#' A function to get the server version information
+#' @return The server version information.
 serverVersion = function(){
   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/buildInfo")
   status = tryCatch({
@@ -167,6 +169,26 @@ serverVersion = function(){
   )
   status
 }
+
+#' A function to verify if we are using the latest server version
+#' @return Boolean indicating TRUE if we are using the latest version otherwise FALSE.
+isLatestVersion = function(){
+  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/isLastBuild")
+  latestBuild = tryCatch({
+    res = httr::GET(url, body = body, httr::content_type_json())
+    res <- httr::content(res, as="text")
+    res
+  },
+  error = function(cond) NA
+  )
+  trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+  res = if (trim(latestBuild) == serverVersion()$jenkinsBuild) TRUE else {
+    print ("Notice: you are currently not using the latest engine version. Please consider running restartServer().")
+    FALSE
+  }
+  #latestBuild
+}
+
 
 #General:
 #' A function to update the package from github

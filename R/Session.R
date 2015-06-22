@@ -145,7 +145,7 @@ Session = setRefClass("Session",
       enrich.file = function(file, featureCount = NA, writePredictionColumnsOnly = TRUE) {
         "Returns a data frame containing the enrichedData. \\code{file} is a path to the file to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
-
+        isLatestVersion()
         outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
 
         params <-list(modelPath = artifact_loc,
@@ -195,6 +195,7 @@ Session = setRefClass("Session",
       predict.file = function(file, writePredictionColumnsOnly = TRUE) {
         "Returns prediction on a created model. \\code{file} is the path of the file to be predicted. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
+        isLatestVersion()
         if (!modelBuilt) stop("Prediction requires full model building using learn")
 
         SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
@@ -239,6 +240,7 @@ Session = setRefClass("Session",
       liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = NA, percentOfPopulationToPlot = 0.2) { #TODO: change documentation
         "Returns lift from a created model and generates three plots. \\code{predictionResult} is a dataframe to be analyzed, \\code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
         statusException()
+        isLatestVersion()
         if (!modelBuilt) stop("Lift requires full model building using learn")
 
         SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
