@@ -42,7 +42,7 @@ runTitanicLearn <- function(configuration='1', weightByClass = FALSE, runBlockin
     useCachedFeatures = TRUE
   )
   additional_params = switch (configuration,
-    "1" = list(algorithmsWhiteList = list("RRandomForest")),
+    "1" = list(algorithmsWhiteList = list("RRandomForestClassifier")),
     "2" = list(algorithmsWhiteList = NA)
   )
 
