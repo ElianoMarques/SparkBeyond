@@ -31,6 +31,7 @@ Session = setRefClass("Session",
         "Blocking the R console until session is finished."
         serverResponded = FALSE
         i = 0
+        curStreamingLine = 0
         curStatus = ""
         hasShownInputSchema = FALSE
         hasShownFeatures = FALSE
@@ -78,8 +79,30 @@ Session = setRefClass("Session",
             }
           }
 
+          readStreaming = function(prevLine = 0){
+            stop = FALSE
+            notificationFile = paste0(artifact_loc,"/UInotification.log")
+            if (file.exists(notificationFile)){
+              #print(paste("read streaming:",  prevLine))
+              f = file(notificationFile, "r")
+              if (prevLine>0) readLines(f, n = prevLine)
+              while(!stop) {
+                next_line = readLines(f, n = 1)
+                if(length(next_line) == 0) {
+                  stop = TRUE
+                  close(f)
+                }else{
+                  print(next_line)
+                  prevLine = prevLine + 1
+                }
+              }
+            }
+            prevLine
+          }
+
+          curStreamingLine = readStreaming(curStreamingLine)
           print(paste(curStatus, "-" ,i))
-          secs = min(i*2, 10)
+          secs = min(i*(1.5), 20)
           Sys.sleep(secs)
         }
         return (finalStatus)
