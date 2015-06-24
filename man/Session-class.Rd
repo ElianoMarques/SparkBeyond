@@ -65,7 +65,7 @@ SB object that encapsulates a session
 }}
 \examples{
 # Learning example
-session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("xgboost"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
+session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("xgboostClassifier"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
 #session = featureSearch("titanic", getTitanicData(train = TRUE), target="survived")
 enriched = session$enrich(getTitanicData(train = FALSE), featureCount = 10)
 colnames(enriched)
