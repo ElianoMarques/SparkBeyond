@@ -198,7 +198,36 @@ isLatestVersion = function(){
 #General:
 #' A function to update the package from github
 updatePackage = function() {
-  devtools::install_github("zinman/SBadapter")
+  if (! isLatestRpackage()) devtools::install_github("zinman/SBadapter")
+}
+
+#' A function to check if the current version is the latest one
+isLatestRpackage = function() {
+  filename = "SBadapterLatestVersion.RData"
+  prevVersion = ""
+  if (file.exists(filename)) {
+    load(filename)
+    prevVersion = SBadapterLatestVersion
+  }
+  url = "https://api.github.com/repos/zinman/SBadapter/git/refs/heads/master"
+  res = httr::GET(url, httr::content_type_json())
+  res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+  SBadapterLatestVersion = res$object$sha
+
+  ret = if (prevVersion == "") {
+    save(SBadapterLatestVersion, file=filename)
+    FALSE
+  } else {
+    if (prevVersion == SBadapterLatestVersion) TRUE
+    else {
+      print("SBadapter package is outdated. Please consider updatePackage()")
+      FALSE
+    }
+  }
+
+  rm(prevVersion)
+  rm(SBadapterLatestVersion)
+  ret
 }
 
 .onLoad <- function(libname = find.package("SBadapter"), pkgname = "SBadapter") {
