@@ -5,7 +5,7 @@ library(methods) #to support RScript
 #' @field modelBuilt Indication for whether only a feature search was performed or a full model was created.
 #' @examples
 #' # Learning example
-#' session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("xgboost"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
+#' session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("xgboostClassifier"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
 #' #session = featureSearch("titanic", getTitanicData(train = TRUE), target="survived")
 #' enriched = session$enrich(getTitanicData(train = FALSE), featureCount = 10)
 #' colnames(enriched)
