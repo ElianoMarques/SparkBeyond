@@ -182,12 +182,12 @@ isLatestVersion = function(){
   error = function(cond) NA
   )
   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
-  res = if (is.na(latestBuild) || length(latestBuild) == 0){
+  res = if (is.null(latestBuild) || is.na(latestBuild) || length(latestBuild) == 0){
             print ("Notice: latest build version was not available - if this issue continues please notify SparkBeyond.")
             FALSE
   } else {
     jenkinsBuild = serverVersion()$jenkinsBuild
-    if (is.na(jenkinsBuild) || length(jenkinsBuild) == 0){
+    if (is.null(jenkinsBuild) || is.na(jenkinsBuild) || length(jenkinsBuild) == 0){
       print ("Notice: Jenkins build information was not available - if this issue continues please notify SparkBeyond.")
       FALSE
     } else { if (trim(latestBuild) == trim(jenkinsBuild)) TRUE else {
