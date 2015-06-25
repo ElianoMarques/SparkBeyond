@@ -204,16 +204,16 @@ isLatestVersion = function(){
 #General:
 #' A function to update the package from github
 updatePackage = function() {
-  if (! isLatestRpackage()) {
+  #if (! isLatestRpackage()) { #just to be on the safe side for now - not included in the if
     devtools::install_github("zinman/SBadapter")
-
-    filename = "SBadapterLatestVersion.RData"
-    url = "https://api.github.com/repos/zinman/SBadapter/git/refs/heads/master"
-    res = httr::GET(url, httr::content_type_json())
-    res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-    SBadapterLatestVersion = res$object$sha
-    save(SBadapterLatestVersion, file=filename)
-  }
+  #}
+  #assuming package updated successfully
+  filename = "SBadapterLatestVersion.RData"
+  url = "https://api.github.com/repos/zinman/SBadapter/git/refs/heads/master"
+  res = httr::GET(url, httr::content_type_json())
+  res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+  SBadapterLatestVersion = res$object$sha
+  save(SBadapterLatestVersion, file=filename)
 }
 
 #' A function to check if the current version is the latest one
