@@ -347,8 +347,16 @@ Session = setRefClass("Session",
           else if (name %in% modelReports) "model"
           else "features"
         }
-        htmlSource <- paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
-        file.show(htmlSource)
+        if (!report_name %in% c("roc_best", "roc_CV")){
+          paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
+          file.show(htmlSource)
+        }
+        else {
+          modelLocation = paste0(artifact_loc,"/reports/model/")
+          relFiles = names(which(sapply(list.files(modelLocation), function(f) grepl(report_name, f))))
+          for(f in relFiles) file.show(paste0(modelLocation, f))
+        }
+
       },
 
       showExtractors = function(){
