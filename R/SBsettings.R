@@ -173,31 +173,32 @@ serverVersion = function(){
 #' A function to verify if we are using the latest server version
 #' @return Boolean indicating TRUE if we are using the latest version otherwise FALSE.
 isLatestVersion = function(){
-  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/isLastBuild")
-  latestBuild = tryCatch({
-    res = httr::GET(url, body = body, httr::content_type_json())
-    res <- httr::content(res, as="text")
-    res
-  },
-  error = function(cond) NA
-  )
-  trim <- function (x) gsub("^\\s+|\\s+$", "", x)
-  res = if (is.null(latestBuild) || is.na(latestBuild) || length(latestBuild) == 0){
-            print ("Notice: latest build version was not available - if this issue continues please notify SparkBeyond.")
-            FALSE
-  } else {
-    jenkinsBuild = serverVersion()$jenkinsBuild
-    if (is.null(jenkinsBuild) || is.na(jenkinsBuild) || length(jenkinsBuild) == 0){
-      print ("Notice: Jenkins build information was not available - if this issue continues please notify SparkBeyond.")
-      FALSE
-    } else { if (trim(latestBuild) == trim(jenkinsBuild)) TRUE else {
-      print ("Notice: you are currently not using the latest engine version. Please consider running restartServer().")
-      FALSE
-    }
-  }
-  }
-  res
+#   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/isLastBuild")
+#   latestBuild = tryCatch({
+#     res = httr::GET(url, body = body, httr::content_type_json())
+#     res <- httr::content(res, as="text")
+#     res
+#   },
+#   error = function(cond) NA
+#   )
+#   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+#   res = if (is.null(latestBuild) || is.na(latestBuild) || length(latestBuild) == 0){
+#             print ("Notice: latest build version was not available - if this issue continues please notify SparkBeyond.")
+#             FALSE
+#   } else {
+#     jenkinsBuild = serverVersion()$jenkinsBuild
+#     if (is.null(jenkinsBuild) || is.na(jenkinsBuild) || length(jenkinsBuild) == 0){
+#       print ("Notice: Jenkins build information was not available - if this issue continues please notify SparkBeyond.")
+#       FALSE
+#     } else { if (trim(latestBuild) == trim(jenkinsBuild)) TRUE else {
+#       print ("Notice: you are currently not using the latest engine version. Please consider running restartServer().")
+#       FALSE
+#     }
+#   }
+#   }
+#   res
   #latestBuild
+  TRUE
 }
 
 
