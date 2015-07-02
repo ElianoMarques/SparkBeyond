@@ -308,6 +308,38 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
+      createPackage = function(sampleData = NA) { #
+        "Create a sharable package for the model."
+        if (!modelBuilt) stop("createPackage requires full model building using learn")
+
+        SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+        params <-list(modelPath = artifact_loc,
+                      dataPath = if (is.na(sampleData)) NA else writeToServer(sampleData),
+                      externalPrefixPath = getSBserverIOfolder())
+
+        params = params[!is.na(params)]
+
+        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/createPackage")
+        print(paste("Calling:", url))
+
+        body = rjson::toJSON(params)
+        res = httr::POST(url, body = body, httr::content_type_json())
+        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
+          print ("Package created successfully")
+          TRUE
+        } else{
+          errorFile = paste0(artifact_loc,"/package-errors.txt")
+          if (file.exists(errorFile)){
+            errorLines = readLines(errorFile)
+            writeLines(errorLines)
+          }
+          FALSE
+        }
+
+        return(finalRes)
+      },
+
       evaluate = function() {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
         statusException()

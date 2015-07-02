@@ -18,6 +18,8 @@ SB object that encapsulates a session
 \section{Methods}{
 
 \describe{
+\item{\code{createPackage(sampleData = NA)}}{Create a sharable package for the model.}
+
 \item{\code{enrich(data, featureCount = NA, writePredictionColumnsOnly = TRUE)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
 \item{\code{enrich.file(file, featureCount = NA, writePredictionColumnsOnly = TRUE)}}{Returns a data frame containing the enrichedData. \code{file} is a path to the file to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
