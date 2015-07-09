@@ -308,13 +308,13 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
-      createPackage = function(sampleData = NA) { #
+      createPackage = function(sampleData = NULL) { #
         "Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used."
         if (!modelBuilt) stop("createPackage requires full model building using learn")
 
         SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
         params <-list(modelPath = artifact_loc,
-                      dataPath = if (is.na(sampleData)) NA else writeToServer(sampleData[1:20,]),
+                      dataPath = if (is.null(sampleData)) NA else writeToServer(sampleData[1:20,]),
                       externalPrefixPath = getSBserverIOfolder())
 
         params = params[!is.na(params)]
