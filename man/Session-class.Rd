@@ -18,7 +18,9 @@ SB object that encapsulates a session
 \section{Methods}{
 
 \describe{
-\item{\code{createPackage(sampleData = NA)}}{Create a sharable package for the model.}
+\item{\code{buildNumber()}}{Returns the build number in which the model was generated.}
+
+\item{\code{createPackage(sampleData = NA)}}{Create a sharable package for the model. \code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used.}
 
 \item{\code{enrich(data, featureCount = NA, writePredictionColumnsOnly = TRUE)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 

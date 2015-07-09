@@ -340,6 +340,15 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
+      buildNumber = function() {
+        "Returns the build number in which the model was generated."
+        filename = paste0(artifact_loc,"/jenkinsBuild.txt")
+        if (file.exists(filename)){
+          lines = paste(readLines(filename, warn=FALSE), collapse="")
+          lines
+        } else NA
+      },
+
       evaluate = function() {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
         statusException()
