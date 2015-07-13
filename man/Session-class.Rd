@@ -20,7 +20,7 @@ SB object that encapsulates a session
 \describe{
 \item{\code{buildNumber()}}{Returns the build number in which the model was generated.}
 
-\item{\code{createPackage(sampleData = NA)}}{Create a sharable package for the model. \code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used.}
+\item{\code{createPackage(sampleData = NULL)}}{Create a sharable package for the model. \code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used.}
 
 \item{\code{enrich(data, featureCount = NA, writePredictionColumnsOnly = TRUE)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
@@ -69,11 +69,11 @@ SB object that encapsulates a session
 }}
 \examples{
 # Learning example
-session = learn("titanic", getTitanicData(train = TRUE), target="survived",algorithmsWhiteList = list("xgboostClassifier"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
-#session = featureSearch("titanic", getTitanicData(train = TRUE), target="survived")
-enriched = session$enrich(getTitanicData(train = FALSE), featureCount = 10)
+session = learn("titanic", getData("titanic_train"), target="survived",algorithmsWhiteList = list("xgboostClassifier"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
+#Do Not Run: session = featureSearch("titanic", getData("titanic_train"), target="survived")
+enriched = session$enrich(getData("titanic_train"), featureCount = 10)
 colnames(enriched)
-predicted = session$predict(getTitanicData(train = FALSE))
+predicted = session$predict(getData("titanic_test"))
 colnames(predicted)
 predicted[1:5,c("survived_predicted", "probability_0", "probability_1")]
 eval = session$evaluate()
