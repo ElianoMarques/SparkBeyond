@@ -1,6 +1,6 @@
 library(methods) #to support RScript
 
-\donttest{
+
 #' SB object that encapsulates a session
 #' @field artifact_loc String location pointing to the model artifact.
 #' @field modelBuilt Indication for whether only a feature search was performed or a full model was created.
@@ -16,7 +16,7 @@ library(methods) #to support RScript
 #' eval = session$evaluate()
 #' #session$showFeatures()
 #' #session$showConfusionMatrix()
-}
+
 Session = setRefClass("Session",
     fields = list(
       artifact_loc = "character",

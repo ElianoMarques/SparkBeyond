@@ -7,7 +7,7 @@
 run_SB_examples(configuration = "1", weightByClass = FALSE)
 }
 \arguments{
-\item{configuration}{Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList}
+\item{configuration}{Configuration ID as string. 1 - use RRandomForest, 2 - use defaultList}
 }
 \description{
 Run SparkBeyond titanic example.

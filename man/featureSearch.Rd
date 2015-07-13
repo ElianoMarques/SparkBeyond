@@ -60,6 +60,6 @@ Session object that encapsulate the feature search result.
 Run SparkBeyond feature enrichment and learning process.
 }
 \examples{
-#session = featureSearch("titanic", getTitanicData(train = TRUE), "survived")
+#session = featureSearch("titanic", getData("titanic_train"), "survived")
 }
 

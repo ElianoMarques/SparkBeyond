@@ -76,6 +76,6 @@ Session object that encapsulates the model.
 Run SparkBeyond feature enrichment and learning process.
 }
 \examples{
-session = learn("titanic", getTitanicData(train = TRUE), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
+#session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
 }
 
