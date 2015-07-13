@@ -6,6 +6,7 @@ library(methods) #to support RScript
 #' @field modelBuilt Indication for whether only a feature search was performed or a full model was created.
 #' @examples
 #' # Learning example
+#' \donttest {
 #' session = learn("titanic", getData("titanic_train"), target="survived",algorithmsWhiteList = list("xgboostClassifier"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
 #' #Do Not Run: session = featureSearch("titanic", getData("titanic_train"), target="survived")
 #' enriched = session$enrich(getData("titanic_train"), featureCount = 10)
@@ -16,6 +17,7 @@ library(methods) #to support RScript
 #' eval = session$evaluate()
 #' #session$showFeatures()
 #' #session$showConfusionMatrix()
+#' }
 
 Session = setRefClass("Session",
     fields = list(
