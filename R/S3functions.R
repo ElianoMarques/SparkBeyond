@@ -29,7 +29,7 @@
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
-#' session = learn("titanic", getTitanicData(train = TRUE), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
+#' #session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
 learn <- function(projectName = "temp",
                   trainData,
                   target,
@@ -235,7 +235,7 @@ learn.file <- function(projectName = "temp",
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @return Session object that encapsulate the feature search result.
 #' @examples
-#' #session = featureSearch("titanic", getTitanicData(train = TRUE), "survived")
+#' #session = featureSearch("titanic", getData("titanic_train"), "survived")
 featureSearch <- function(projectName = "temp",
                                 trainData,
                                 target,

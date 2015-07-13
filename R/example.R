@@ -8,7 +8,7 @@
 #library(SBadapter)
 
 #' Run SparkBeyond titanic example.
-#' @param configuration Configuration ID as string. 1 - use only J48, 2 - use RRandomForest, 3 - use defaultList
+#' @param configuration Configuration ID as string. 1 - use RRandomForest, 2 - use defaultList
 #' @examples
 #' # run_SB_examples()
 run_SB_examples <- function(configuration='1', weightByClass = FALSE) {

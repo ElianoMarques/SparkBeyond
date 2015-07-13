@@ -1,0 +1,132 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: Run SparkBeyond feature enrichment and learning process.</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for featureSearch {SBadapter}"><tr><td>featureSearch {SBadapter}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>Run SparkBeyond feature enrichment and learning process.</h2>
+
+<h3>Description</h3>
+
+<p>Run SparkBeyond feature enrichment and learning process.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
+  maxDepth = 2, functionsWhiteList = NA, functionsBlackList = NA,
+  booleanNumericFeatures = TRUE, useGraph = FALSE,
+  maxFeaturesCount = list(300), columnSubsetSize = 1,
+  customColumnSubsets = NA, maxFeatureDuration = 100,
+  useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
+  maxCollectionSize = 80000, weightByClass = FALSE,
+  produceFeatureClusteringReport = FALSE, fileEncoding = NA,
+  runBlocking = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>projectName</code></td>
+<td>
+<p>Optional string of the session name. Setting a session name is highly recommened. &quot;temp&quot; by default.</p>
+</td></tr>
+<tr valign="top"><td><code>target</code></td>
+<td>
+<p>String of the column name of in the training file that conatins the target of the prediction.</p>
+</td></tr>
+<tr valign="top"><td><code>weightColumn</code></td>
+<td>
+<p>Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>maxDepth</code></td>
+<td>
+<p>Optional. Integer &lt; 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.</p>
+</td></tr>
+<tr valign="top"><td><code>useGraph</code></td>
+<td>
+<p>Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>trainData:</code></td>
+<td>
+<p>A data frame to analyze.</p>
+</td></tr>
+<tr valign="top"><td><code>functionsWhiteList:</code></td>
+<td>
+<p>Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>functionsBlackList:</code></td>
+<td>
+<p>Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>booleanNumericFeatures:</code></td>
+<td>
+<p>A boolean indicating whether to transform all features to boolean values. TRUE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>maxFeaturesCount:</code></td>
+<td>
+<p>Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.</p>
+</td></tr>
+<tr valign="top"><td><code>columnSubsetSize:</code></td>
+<td>
+<p>Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.</p>
+</td></tr>
+<tr valign="top"><td><code>allocatedMemoryMB:</code></td>
+<td>
+<p>Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.</p>
+</td></tr>
+<tr valign="top"><td><code>maxCollectionSize:</code></td>
+<td>
+<p>Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.</p>
+</td></tr>
+<tr valign="top"><td><code>customColumnSubsets:</code></td>
+<td>
+<p>Optional. A List of lists containing specific column subsets to examine. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>maxFeatureDuration:</code></td>
+<td>
+<p>Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.</p>
+</td></tr>
+<tr valign="top"><td><code>useCachedFeatures:</code></td>
+<td>
+<p>Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>weightByClass:</code></td>
+<td>
+<p>Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>produceFeatureClusteringReport:</code></td>
+<td>
+<p>An indicator to produce feature cluster visualization. FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>fileEncoding:</code></td>
+<td>
+<p>Optional. NA by default. Options are: &quot;ISO-8859-1&quot;, &quot;UTF-8&quot;, &quot;US-ASCII&quot;.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>Session object that encapsulate the feature search result.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">#session = featureSearch(&quot;titanic&quot;, getTitanicData(train = TRUE), &quot;survived&quot;)
+</code></pre>
+
+
+<hr><div align="center">[Package <em>SBadapter</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

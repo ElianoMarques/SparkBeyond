@@ -10,13 +10,14 @@
 #dir.create(file.path('./', 'html'), showWarnings = FALSE)
 #static_help('SBadapter')
 
-createHelp = function() {
-  dir.create(file.path('./', 'html'), showWarnings = FALSE)
-  setwd("./html")
-  library(knitr)
-  setwd("..")
-}
-
-# knit_rd("SBadapter")
 
 # R CMD Rdconv -t html ./man/SBmodel-class.Rd  > SBmodel.html
+
+#RUN THESE COMMANDS TO CREATE THE HELP:
+# createHelp = function() {
+#   dir.create(file.path('./', 'html'), showWarnings = FALSE)
+#   setwd("./html")
+#   library(knitr)
+#   knit_rd("SBadapter")
+#   setwd("..")
+# }
