@@ -7,7 +7,7 @@
 getData(datasetName)
 }
 \arguments{
-\item{String}{of the name of the dataset.}
+\item{String}{of the name of the dataset. Should be one of "titanic_train", "titanic_test", "flights_delay"}
 }
 \value{
 DataFrame containing the data.

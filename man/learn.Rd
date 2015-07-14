@@ -76,6 +76,21 @@ Session object that encapsulates the model.
 Run SparkBeyond feature enrichment and learning process.
 }
 \examples{
-#session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
+\donttest{
+session = learn("titanic", getData("titanic_train"),
+   target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
+
+flights = getData("flights_delay")
+sampledFlights = sampleData(flights, 0.2)
+flightsModel = learn(projectName = "flights_delay_example",
+                    trainData = sampledFlights,
+                    target = "weatherDelay",
+                    algorithmsWhiteList = list("RRandomForestRegressor"),
+                    maxFeatureDuration = 500,
+                    functionsBlackList = list("trigonometry"),
+                    maxFeaturesCount = list(20)
+               )
+head(flightsModel$features)
+}
 }
 

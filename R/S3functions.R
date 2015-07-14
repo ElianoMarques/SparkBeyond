@@ -29,8 +29,10 @@
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
-#' #session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
-#' \donttest {
+#' \donttest{
+#' session = learn("titanic", getData("titanic_train"),
+#'    target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
+#'
 #' flights = getData("flights_delay")
 #' sampledFlights = sampleData(flights, 0.2)
 #' flightsModel = learn(projectName = "flights_delay_example",
@@ -40,7 +42,7 @@
 #'                     maxFeatureDuration = 500,
 #'                     functionsBlackList = list("trigonometry"),
 #'                     maxFeaturesCount = list(20)
-#' )
+#'                )
 #' head(flightsModel$features)
 #' }
 

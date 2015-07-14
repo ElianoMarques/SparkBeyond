@@ -69,7 +69,7 @@ SB object that encapsulates a session
 }}
 \examples{
 # Learning example
-\donttest {
+\donttest{
 session = learn("titanic", getData("titanic_train"), target="survived",algorithmsWhiteList = list("xgboostClassifier"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
 #Do Not Run: session = featureSearch("titanic", getData("titanic_train"), target="survived")
 enriched = session$enrich(getData("titanic_train"), featureCount = 10)
