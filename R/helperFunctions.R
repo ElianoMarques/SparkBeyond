@@ -1,3 +1,5 @@
+#' sampleData
+#'
 #' Sample data by ratio
 #' @param data dataframe to be sampled
 #' @return a sampled dataset
@@ -7,10 +9,13 @@ sampleData = function(data, ratio = 0.8) {
   data[sample(1:dataSize, sampleSize),]
 }
 
-#' Sample data by ratio
+#' sampleDataByClass
+#'
+#' Under/over sample data based on labels of \code{columnName}.
 #' @param data dataframe to be sampled
 #' @param columnName name of column with with labels by which to modify label distributions
-#' @param labels Optional. labels
+#' @param labels Optional. labels in columnName for which \code{desiredDistribution} will relate to. Default NA will assume equal distributions between all labels.
+#' @param desiredDistribution Optional. The requested distribution ratio of \code{labels}. Default NA will assume equal distributions between all labels.
 #' @return a sampled dataset with the requested distributions
 #' @examples
 #' hist(sampleDataByClass(getData("titanic_train"), "survived", c(0,1), c(3,1))$survived, plot = FALSE)$counts
@@ -44,6 +49,8 @@ sampleDataByClass = function(data, columnName, labels = NA, desiredDistribution 
   data[unlist(sampled),]
 }
 
+#' trainTestSplit
+#'
 #' Split data to train + test datasets by ratio
 #' @param data dataframe to be splitted
 #' @return a list of two elements with train dataframe as first element, and test dataframe as second element

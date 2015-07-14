@@ -2,7 +2,7 @@
 % Please edit documentation in R/helperFunctions.R
 \name{sampleData}
 \alias{sampleData}
-\title{Sample data by ratio}
+\title{sampleData}
 \usage{
 sampleData(data, ratio = 0.8)
 }

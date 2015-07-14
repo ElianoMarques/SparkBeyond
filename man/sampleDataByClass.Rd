@@ -2,7 +2,7 @@
 % Please edit documentation in R/helperFunctions.R
 \name{sampleDataByClass}
 \alias{sampleDataByClass}
-\title{Sample data by ratio}
+\title{sampleDataByClass}
 \usage{
 sampleDataByClass(data, columnName, labels = NA, desiredDistribution = NA)
 }
@@ -11,13 +11,15 @@ sampleDataByClass(data, columnName, labels = NA, desiredDistribution = NA)
 
 \item{columnName}{name of column with with labels by which to modify label distributions}
 
-\item{labels}{Optional. labels}
+\item{labels}{Optional. labels in columnName for which \code{desiredDistribution} will relate to. Default NA will assume equal distributions between all labels.}
+
+\item{desiredDistribution}{Optional. The requested distribution ratio of \code{labels}. Default NA will assume equal distributions between all labels.}
 }
 \value{
 a sampled dataset with the requested distributions
 }
 \description{
-Sample data by ratio
+Under/over sample data based on labels of \code{columnName}.
 }
 \examples{
 hist(sampleDataByClass(getData("titanic_train"), "survived", c(0,1), c(3,1))$survived, plot = FALSE)$counts

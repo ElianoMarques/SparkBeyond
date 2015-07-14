@@ -2,7 +2,7 @@
 % Please edit documentation in R/helperFunctions.R
 \name{trainTestSplit}
 \alias{trainTestSplit}
-\title{Split data to train + test datasets by ratio}
+\title{trainTestSplit}
 \usage{
 trainTestSplit(data, ratio = 0.8)
 }
