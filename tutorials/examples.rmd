@@ -1,0 +1,41 @@
+---
+title: "SparkBeyond R plugin tutorial"
+output: html_document
+---
+This tutorial shows advanced learning examples.
+
+### Flights weather delay
+
+Predict weather delays
+
+<!-- 
+  Comment:
+  ========
+  eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all 
+--> 
+  
+```{r, eval = FALSE}
+library('devtools')
+install_github('zinman/SBadapter')
+library('SBadapter')
+```
+```{r, echo=FALSE}
+library('SBadapter')
+```
+
+
+```{r, eval=TRUE}
+flights = getData("flights_delay")
+sampledFlights = sampleData(flights, 0.2)
+flightsModel = learn(projectName = "flights_delay_example",
+                        trainData = sampledFlights,
+                        target = "weatherDelay",
+                        algorithmsWhiteList = list("RRandomForestRegressor"),
+                        maxFeatureDuration = 500,
+                        functionsBlackList = list("trigonometry"),
+                        maxFeaturesCount = list(20)
+                    )
+head(flightsModel$features)
+```
+
+The returned object `model` should show include features of the type `weatherAt(<location>, <time>)`

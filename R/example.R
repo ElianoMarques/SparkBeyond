@@ -8,6 +8,7 @@
 #library(SBadapter)
 
 #' Run SparkBeyond titanic example.
+#'
 #' @param configuration Configuration ID as string. 1 - use RRandomForest, 2 - use defaultList
 #' @examples
 #' # run_SB_examples()
@@ -72,7 +73,8 @@ run_SB_examples <- function(configuration='1', weightByClass = FALSE) {
 
 
 #' Auxiliary function to get public test datasets.
-#' @param String of the name of the dataset.
+#'
+#' @param String of the name of the dataset. Should be one of "titanic_train", "titanic_test", "flights_delay"
 #' @return DataFrame containing the data.
 #' @examples
 #' # Do Not Run:
