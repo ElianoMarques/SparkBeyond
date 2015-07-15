@@ -1,7 +1,7 @@
 # Sample .travis.yml for R projects from https://github.com/craigcitro/r-travis
 
 language: c
-warnings_are_errors: true
+warnings_are_errors: false
 sudo: required
 
 before_install:
@@ -18,7 +18,7 @@ after_failure:
   - ./travis-tool.sh dump_logs
 
 env:
-  - WARNINGS_ARE_ERRORS=1
+  - WARNINGS_ARE_ERRORS=0
 
 notifications:
   email:
