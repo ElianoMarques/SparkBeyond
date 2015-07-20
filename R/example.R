@@ -84,26 +84,33 @@ getData <- function(datasetName) {
   datasetNameLC = tolower(datasetName)
 
   #auxiliary functions
-  getTitanicData <- function(train = TRUE) {
-    titanic_filename = system.file("extdata", if (train) "titanic_train.tsv" else "titanic_test.csv", package = "SBadapter")
-    sep = if (tools::file_ext(titanic_filename) == "tsv") "\t" else ","
-    data = read.table(titanic_filename, header = TRUE, sep = sep, stringsAsFactors=FALSE) #inspect file content
+  getExtData <- function(name) {
+    filename = system.file("extdata", name, package = "SBadapter")
+    sep = if (tools::file_ext(filename) == "tsv" || (tools::file_ext(filename) == "gz" && grepl("tsv", filename))) "\t" else ","
+    data = read.table(filename, header = TRUE, sep = sep, stringsAsFactors=FALSE) #inspect file content
     #str(data) #inspect file content
     return(data)
   }
 
   switch(datasetNameLC,
-    titanic_train = getTitanicData(TRUE),
-    titanic_test = getTitanicData(FALSE),
-    flights_delay = {
-      destName = "flights_weatherDelay.tsv.gz"
-      if (! file.exists(destName) || !file.info("flights_weatherDelay.tsv.gz")$size > 0) download.file("http://s3.amazonaws.com/public-sparkbeyond/flights_2008_weatherDelay.tsv.gz", destName)
-      if (file.exists(destName))
-        read.table("flights_weatherDelay.tsv.gz", sep="\t", header=TRUE)
-      else stop("Flight weather delay was not available")
-    },
+    titanic_train = getExtData("titanic_train.tsv"),
+    titanic_test = getExtData("titanic_test.csv"),
+    flights_delay = getExtData("flights_weatherDelay.tsv.gz"),
+#     flights_delay = {
+#       destName = "flights_weatherDelay.tsv.gz"
+#       if (! file.exists(destName) || !file.info("flights_weatherDelay.tsv.gz")$size > 0) download.file("http://s3.amazonaws.com/public-sparkbeyond/flights_2008_weatherDelay.tsv.gz", destName)
+#       if (file.exists(destName))
+#         read.table("flights_weatherDelay.tsv.gz", sep="\t", header=TRUE)
+#       else stop("Flight weather delay was not available")
+#     },
     stop(paste0("The requested dataset '",datasetName,"' does not exists in the datasets list"))
   )
+}
+
+#' Shows an html page with various learning examples
+#'
+examples <- function() {
+  file.show(system.file("extdata", "examples.html", package = "SBadapter"))
 }
 
 
