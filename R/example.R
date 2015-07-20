@@ -95,14 +95,14 @@ getData <- function(datasetName) {
   switch(datasetNameLC,
     titanic_train = getExtData("titanic_train.tsv"),
     titanic_test = getExtData("titanic_test.csv"),
-    flights_delay = getExtData("flights_weatherDelay.tsv.gz"),
-#     flights_delay = {
-#       destName = "flights_weatherDelay.tsv.gz"
-#       if (! file.exists(destName) || !file.info("flights_weatherDelay.tsv.gz")$size > 0) download.file("http://s3.amazonaws.com/public-sparkbeyond/flights_2008_weatherDelay.tsv.gz", destName)
-#       if (file.exists(destName))
-#         read.table("flights_weatherDelay.tsv.gz", sep="\t", header=TRUE)
-#       else stop("Flight weather delay was not available")
-#     },
+    #flights_delay = getExtData("flights_weatherDelay.tsv.gz"), #the git upload in RStudio doesn't support tsv.gz
+     flights_delay = {
+       destName = "flights_weatherDelay.tsv.gz"
+       if (! file.exists(destName) || !file.info("flights_weatherDelay.tsv.gz")$size > 0) download.file("http://s3.amazonaws.com/public-sparkbeyond/flights_2008_weatherDelay.tsv.gz", destName)
+       if (file.exists(destName))
+         read.table("flights_weatherDelay.tsv.gz", sep="\t", header=TRUE)
+       else stop("Flight weather delay was not available")
+     },
     stop(paste0("The requested dataset '",datasetName,"' does not exists in the datasets list"))
   )
 }
