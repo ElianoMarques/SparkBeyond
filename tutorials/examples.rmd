@@ -1,5 +1,5 @@
 ---
-title: "SparkBeyond R plugin tutorial"
+title: "SparkBeyond R package examples"
 output: html_document
 ---
 This tutorial shows advanced learning examples.
@@ -14,28 +14,31 @@ Predict weather delays
   eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all 
 --> 
   
-```{r, eval = FALSE}
-library('devtools')
-install_github('zinman/SBadapter')
+```{r, echo=FALSE, results='hide', message=FALSE}
 library('SBadapter')
 ```
-```{r, echo=FALSE}
-library('SBadapter')
+```{r, echo=FALSE, results='hide', message=FALSE}
+setSBserverIOfolder("/tmp/")
 ```
 
 
-```{r, eval=TRUE}
+```{r, eval=TRUE, message=FALSE, results='hide'}
 flights = getData("flights_delay")
-sampledFlights = sampleData(flights, 0.2)
+sampledFlights = sampleDataAbsolute(flights, 1000)
 flightsModel = learn(projectName = "flights_delay_example",
                         trainData = sampledFlights,
                         target = "weatherDelay",
                         algorithmsWhiteList = list("RRandomForestRegressor"),
                         maxFeatureDuration = 500,
                         functionsBlackList = list("trigonometry"),
-                        maxFeaturesCount = list(20)
+                        maxFeaturesCount = list(50)
                     )
-head(flightsModel$features)
+head(flightsModel$features())
 ```
 
-The returned object `model` should show include features of the type `weatherAt(<location>, <time>)`
+Notes:
+
+1. The first run may take more time as weather data will be downloaded and cached.
+2. The returned object `flightsModel` should show include features of the type `weatherAt(<location>, <time>)`.
+3. Running using all the flights data will improve RMSE significantly.
+

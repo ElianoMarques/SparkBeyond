@@ -173,32 +173,33 @@ serverVersion = function(){
 #' A function to verify if we are using the latest server version
 #' @return Boolean indicating TRUE if we are using the latest version otherwise FALSE.
 isLatestVersion = function(){
-#   url <- paste0(getSBserverHost(),":",getSBserverPort(),"/isLastBuild")
-#   latestBuild = tryCatch({
-#     res = httr::GET(url, httr::content_type_json())
-#     res <- httr::content(res, as="text")
-#     res
-#   },
-#   error = function(cond) NA
-#   )
-#   trim <- function (x) gsub("^\\s+|\\s+$", "", x)
-#   res = if (is.null(latestBuild) || is.na(latestBuild) || length(latestBuild) == 0){
-#             print ("Notice: latest build version was not available - if this issue continues please notify SparkBeyond.")
-#             FALSE
-#   } else {
-#     jenkinsBuild = serverVersion()$jenkinsBuild
-#     if (is.null(jenkinsBuild) || is.na(jenkinsBuild) || length(jenkinsBuild) == 0){
-#       print ("Notice: Jenkins build information was not available - if this issue continues please notify SparkBeyond.")
-#       FALSE
-#     } else { if (trim(latestBuild) == trim(jenkinsBuild)) TRUE else {
-#       print ("Notice: you are currently not using the latest engine version. Please consider running restartServer().")
-#       FALSE
-#     }
-#   }
-#   }
-#   res
-  #latestBuild
-  TRUE
+  tryCatch({
+     url <- paste0(getSBserverHost(),":",getSBserverPort(),"/isLastBuild")
+     latestBuild = tryCatch({
+       res = httr::GET(url, httr::content_type_json())
+       res <- httr::content(res, as="text")
+      res
+    },
+    error = function(cond) NA
+    )
+    trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+    res = if (is.null(latestBuild) || is.na(latestBuild) || length(latestBuild) == 0){
+              print ("Notice: latest build version was not available - if this issue continues please notify SparkBeyond.")
+              FALSE
+    } else {
+      jenkinsBuild = serverVersion()$jenkinsBuild
+      if (is.null(jenkinsBuild) || is.na(jenkinsBuild) || length(jenkinsBuild) == 0){
+        print ("Notice: Jenkins build information was not available - if this issue continues please notify SparkBeyond.")
+        FALSE
+      } else { if (trim(latestBuild) == trim(jenkinsBuild)) TRUE else {
+        print ("Notice: you are currently not using the latest engine version. Please consider running restartServer().")
+        FALSE
+      }
+    }
+    }
+    res
+  },error = function(e) TRUE #if there is no internet connection than we skip the check
+  )
 }
 
 
@@ -219,31 +220,34 @@ updatePackage = function() {
 
 #' A function to check if the current version is the latest one
 isLatestRpackage = function() {
-  filename = "SBadapterLatestVersion.RData"
-  prevVersion = ""
-  if (file.exists(filename)) {
-    load(filename)
-    prevVersion = SBadapterLatestVersion
-  }
-  url = "https://api.github.com/repos/zinman/SBadapter/git/refs/heads/master"
-  res = httr::GET(url, httr::content_type_json())
-  res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-  SBadapterLatestVersion = res$object$sha
-
-  ret = if (prevVersion == "") {
-    save(SBadapterLatestVersion, file=filename)
-    FALSE
-  } else {
-    if (prevVersion == SBadapterLatestVersion) TRUE
-    else {
-      print("SBadapter package is outdated. Please consider updatePackage()")
-      FALSE
+  tryCatch({
+    filename = "SBadapterLatestVersion.RData"
+    prevVersion = ""
+    if (file.exists(filename)) {
+      load(filename)
+      prevVersion = SBadapterLatestVersion
     }
-  }
+    url = "https://api.github.com/repos/zinman/SBadapter/git/refs/heads/master"
+    res = httr::GET(url, httr::content_type_json())
+    res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+    SBadapterLatestVersion = res$object$sha
 
-  rm(prevVersion)
-  rm(SBadapterLatestVersion)
-  ret
+    ret = if (prevVersion == "") {
+      save(SBadapterLatestVersion, file=filename)
+      FALSE
+    } else {
+      if (prevVersion == SBadapterLatestVersion) TRUE
+      else {
+        print("SBadapter package is outdated. Please consider updatePackage()")
+        FALSE
+      }
+    }
+
+    rm(prevVersion)
+    rm(SBadapterLatestVersion)
+    ret
+  }, error = function(e) TRUE #if there is no internet connection than we skip the check
+  )
 }
 
 .onLoad <- function(libname = find.package("SBadapter"), pkgname = "SBadapter") {

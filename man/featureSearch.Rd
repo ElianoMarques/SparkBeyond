@@ -29,7 +29,7 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 
 \item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
 
-\item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.}
+\item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.}
 
 \item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. TRUE by default.}
 

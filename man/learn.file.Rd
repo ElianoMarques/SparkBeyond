@@ -10,7 +10,7 @@ learn.file(projectName = "temp", trainDataFilename, target,
   functionsBlackList = NA, booleanNumericFeatures = TRUE,
   useGraph = FALSE, maxFeaturesCount = list(300), columnSubsetSize = 1,
   customColumnSubsets = NA, maxFeatureDuration = 100,
-  useCachedFeatures = FALSE, evaluationMetric = "PREC",
+  useCachedFeatures = FALSE, evaluationMetric = "AUC",
   scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
   produceFeatureClusteringReport = FALSE, fileEncoding = NA,
@@ -35,7 +35,7 @@ learn.file(projectName = "temp", trainDataFilename, target,
 
 \item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
 
-\item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.}
+\item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.}
 
 \item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. TRUE by default.}
 
@@ -51,7 +51,7 @@ learn.file(projectName = "temp", trainDataFilename, target,
 
 \item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.}
 
-\item{evaluationMetric:}{Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.}
+\item{evaluationMetric:}{Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "AUC" by default.}
 
 \item{scoreOnTestSet:}{Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.}
 

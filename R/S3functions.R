@@ -10,7 +10,7 @@
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
-#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
@@ -18,7 +18,7 @@
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
-#' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
+#' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "AUC" by default.
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
@@ -63,7 +63,7 @@ learn <- function(projectName = "temp",
                   customColumnSubsets = NA,
                   maxFeatureDuration = 100,
                   useCachedFeatures = FALSE,
-                  evaluationMetric = "PREC", #add all options
+                  evaluationMetric = "AUC", #add all options
                   scoreOnTestSet = FALSE,
                   crossValidation = 5,
                   allocatedMemoryMB = 1000,
@@ -115,7 +115,7 @@ learn <- function(projectName = "temp",
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
-#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
@@ -123,7 +123,7 @@ learn <- function(projectName = "temp",
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.
-#' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "PREC" by default.
+#' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "AUC" by default.
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
@@ -151,7 +151,7 @@ learn.file <- function(projectName = "temp",
                     customColumnSubsets = NA,
                     maxFeatureDuration = 100,
                     useCachedFeatures = FALSE,
-                    evaluationMetric = "PREC", #add all options
+                    evaluationMetric = "AUC", #add all options
                     scoreOnTestSet = FALSE,
                     crossValidation = 5,
                     allocatedMemoryMB = 1000,
@@ -236,7 +236,7 @@ learn.file <- function(projectName = "temp",
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
-#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
@@ -305,7 +305,7 @@ featureSearch <- function(projectName = "temp",
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
-#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.
+#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.

@@ -97,7 +97,7 @@ getData <- function(datasetName) {
     titanic_test = getTitanicData(FALSE),
     flights_delay = {
       destName = "flights_weatherDelay.tsv.gz"
-      if (! file.exists(destName)) download.file("http://s3.amazonaws.com/public-sparkbeyond/flights_2008_weatherDelay.tsv.gz", destName)
+      if (! file.exists(destName) || !file.info("flights_weatherDelay.tsv.gz")$size > 0) download.file("http://s3.amazonaws.com/public-sparkbeyond/flights_2008_weatherDelay.tsv.gz", destName)
       if (file.exists(destName))
         read.table("flights_weatherDelay.tsv.gz", sep="\t", header=TRUE)
       else stop("Flight weather delay was not available")
@@ -105,4 +105,5 @@ getData <- function(datasetName) {
     stop(paste0("The requested dataset '",datasetName,"' does not exists in the datasets list"))
   )
 }
+
 

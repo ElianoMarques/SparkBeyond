@@ -2,11 +2,24 @@
 #'
 #' Sample data by ratio
 #' @param data dataframe to be sampled
+#' @param ratio the ratio of data to keep
 #' @return a sampled dataset
 sampleData = function(data, ratio = 0.8) {
   dataSize = nrow(data)
   sampleSize = ceiling(ratio * dataSize)
   data[sample(1:dataSize, sampleSize),]
+}
+
+#' sampleData
+#'
+#' Sample data by an absolute row count
+#' @param data dataframe to be sampled
+#' @param count the number of elements to keep
+#' @return a sampled dataset
+sampleDataAbsolute = function(data, count) {
+  dataSize = nrow(data)
+  if (count > dataSize) print("The requested size is larger than the input size - input size will be used instead.")
+  data[sample(1:dataSize, min(dataSize, count)),]
 }
 
 #' sampleDataByClass
