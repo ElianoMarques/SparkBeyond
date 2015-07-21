@@ -7,8 +7,10 @@
 featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
   maxDepth = 2, functionsWhiteList = NA, functionsBlackList = NA,
   booleanNumericFeatures = TRUE, useGraph = FALSE,
-  maxFeaturesCount = list(300), columnSubsetSize = 1,
-  customColumnSubsets = NA, maxFeatureDuration = 100,
+  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
+  columnSubsetSize = 1, customColumnSubsets = NA,
+  maxFeatureDuration = 100,
+  overrideMaxFeatureDurationForExternalData = TRUE,
   useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
   produceFeatureClusteringReport = FALSE, fileEncoding = NA,
@@ -33,6 +35,8 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 
 \item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. TRUE by default.}
 
+\item{crossRowFeatureSearch.}{A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.}
+
 \item{maxFeaturesCount:}{Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.}
 
 \item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
@@ -43,7 +47,9 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 
 \item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
 
-\item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.}
+\item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.}
+
+\item{overrideMaxFeatureDurationForExternalData:}{A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.}
 
 \item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.}
 

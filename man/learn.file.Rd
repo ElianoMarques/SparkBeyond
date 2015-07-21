@@ -8,8 +8,10 @@ learn.file(projectName = "temp", trainDataFilename, target,
   testDataFilename = NA, trainTestSplitRatio = 0.8, weightColumn = NA,
   maxDepth = 2, algorithmsWhiteList = NA, functionsWhiteList = NA,
   functionsBlackList = NA, booleanNumericFeatures = TRUE,
-  useGraph = FALSE, maxFeaturesCount = list(300), columnSubsetSize = 1,
+  useGraph = FALSE, crossRowFeatureSearch = FALSE,
+  maxFeaturesCount = list(300), columnSubsetSize = 1,
   customColumnSubsets = NA, maxFeatureDuration = 100,
+  overrideMaxFeatureDurationForExternalData = TRUE,
   useCachedFeatures = FALSE, evaluationMetric = "AUC",
   scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
@@ -41,6 +43,8 @@ learn.file(projectName = "temp", trainDataFilename, target,
 
 \item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
+\item{crossRowFeatureSearch.}{A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.}
+
 \item{maxFeaturesCount:}{Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.}
 
 \item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
@@ -49,7 +53,9 @@ learn.file(projectName = "temp", trainDataFilename, target,
 
 \item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.}
 
-\item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.}
+\item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.}
+
+\item{overrideMaxFeatureDurationForExternalData:}{A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.}
 
 \item{evaluationMetric:}{Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "AUC" by default.}
 

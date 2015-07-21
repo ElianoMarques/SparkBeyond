@@ -1,4 +1,4 @@
-# S3 functions (De facto constructors of SBmodel)
+# S3 functions (De facto constructors of Session)
 
 #' Run SparkBeyond feature enrichment and learning process.
 #' @param projectName: Optional string of the session name. Setting a session name is highly recommended. "temp" by default.
@@ -13,10 +13,12 @@
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
+#' @param overrideMaxFeatureDurationForExternalData: A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "AUC" by default.
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
@@ -39,7 +41,6 @@
 #'                     trainData = sampledFlights,
 #'                     target = "weatherDelay",
 #'                     algorithmsWhiteList = list("RRandomForestRegressor"),
-#'                     maxFeatureDuration = 500,
 #'                     functionsBlackList = list("trigonometry"),
 #'                     maxFeaturesCount = list(20)
 #'                )
@@ -58,10 +59,12 @@ learn <- function(projectName = "temp",
                   functionsBlackList = NA,
                   booleanNumericFeatures = TRUE,
                   useGraph = FALSE,
+                  crossRowFeatureSearch = FALSE,
                   maxFeaturesCount = list(300),
                   columnSubsetSize = 1,
                   customColumnSubsets = NA,
                   maxFeatureDuration = 100,
+                  overrideMaxFeatureDurationForExternalData = TRUE,
                   useCachedFeatures = FALSE,
                   evaluationMetric = "AUC", #add all options
                   scoreOnTestSet = FALSE,
@@ -86,10 +89,12 @@ learn <- function(projectName = "temp",
                 functionsBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
+                crossRowFeatureSearch = crossRowFeatureSearch,
                 maxFeaturesCount = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
                 maxFeatureDuration = maxFeatureDuration,
+                overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
                 useCachedFeatures = useCachedFeatures,
                 evaluationMetric = evaluationMetric,
                 scoreOnTestSet = scoreOnTestSet,
@@ -118,11 +123,13 @@ learn <- function(projectName = "temp",
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
-#' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.
+#' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
+#' @param overrideMaxFeatureDurationForExternalData: A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "AUC" by default.
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
@@ -146,10 +153,12 @@ learn.file <- function(projectName = "temp",
                     functionsBlackList = NA,
                     booleanNumericFeatures = TRUE,
                     useGraph = FALSE,
+                    crossRowFeatureSearch = FALSE,
                     maxFeaturesCount = list(300),
                     columnSubsetSize = 1,
                     customColumnSubsets = NA,
                     maxFeatureDuration = 100,
+                    overrideMaxFeatureDurationForExternalData = TRUE,
                     useCachedFeatures = FALSE,
                     evaluationMetric = "AUC", #add all options
                     scoreOnTestSet = FALSE,
@@ -195,10 +204,12 @@ learn.file <- function(projectName = "temp",
                 sessionBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
+                crossRowFeatureSearch = crossRowFeatureSearch,
                 globalFeatureIterations = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
                 maxTimePerRowMillis = maxFeatureDuration,
+                overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
                 useCachedFeatures = useCachedFeatures,
                 evaluationMetric = evaluationMetric,
                 scoreOnTestSet = scoreOnTestSet,
@@ -239,12 +250,14 @@ learn.file <- function(projectName = "temp",
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
-#' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.
+#' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
+#' @param overrideMaxFeatureDurationForExternalData: A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
@@ -261,10 +274,12 @@ featureSearch <- function(projectName = "temp",
                                 functionsBlackList = NA,
                                 booleanNumericFeatures = TRUE,
                                 useGraph = FALSE,
+                                crossRowFeatureSearch = FALSE,
                                 maxFeaturesCount = list(300),
                                 columnSubsetSize = 1,
                                 customColumnSubsets = NA,
                                 maxFeatureDuration = 100,
+                                overrideMaxFeatureDurationForExternalData = TRUE,
                                 useCachedFeatures = FALSE,
                                 allocatedMemoryMB = 1000,
                                 maxCollectionSize = 80000,
@@ -283,10 +298,12 @@ featureSearch <- function(projectName = "temp",
                 functionsBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
+                crossRowFeatureSearch = crossRowFeatureSearch,
                 maxFeaturesCount = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
                 maxFeatureDuration = maxFeatureDuration,
+                overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
                 useCachedFeatures = useCachedFeatures,
                 allocatedMemoryMB = allocatedMemoryMB,
                 maxCollectionSize = maxCollectionSize,
@@ -308,12 +325,14 @@ featureSearch <- function(projectName = "temp",
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. NA by default.
-#' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.
+#' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
+#' @param overrideMaxFeatureDurationForExternalData: A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
@@ -330,10 +349,12 @@ featureSearch.file <- function(projectName = "temp",
                           functionsBlackList = NA,
                           booleanNumericFeatures = TRUE,
                           useGraph = FALSE,
+                          crossRowFeatureSearch = FALSE,
                           maxFeaturesCount = list(300),
                           columnSubsetSize = 1,
                           customColumnSubsets = NA,
                           maxFeatureDuration = 100,
+                          overrideMaxFeatureDurationForExternalData = TRUE,
                           useCachedFeatures = FALSE,
                           allocatedMemoryMB = 1000,
                           maxCollectionSize = 80000,
@@ -352,11 +373,13 @@ featureSearch.file <- function(projectName = "temp",
                 functionsBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
+                crossRowFeatureSearch = crossRowFeatureSearch,
                 maxFeaturesCount = maxFeaturesCount,
                 columnSubsetSize = columnSubsetSize,
                 customColumnSubsets = customColumnSubsets,
                 useCachedFeatures = useCachedFeatures,
                 maxFeatureDuration = maxFeatureDuration,
+                overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
                 allocatedMemoryMB = allocatedMemoryMB,
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
