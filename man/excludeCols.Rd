@@ -2,11 +2,35 @@
 % Please edit documentation in R/complexTypes.R
 \name{excludeCols}
 \alias{excludeCols}
-\title{Sugar to exclude columns}
+\title{excludeCols}
 \usage{
 excludeCols(data, cols)
 }
+\arguments{
+\item{data:}{dataframe / data data.table to modify.}
+
+\item{cols:}{a list of column names to remove.}
+}
+\value{
+if the input \code{data} is a dataframe than a dataframe with the excluded columns will be return. If the input \code{data} is a data.table object, nothing will be returned and the input object will be modified.
+}
 \description{
-Sugar to exclude columns
+Exclude columns from a data frame.
+}
+\examples{
+data = getData("titanic_train")
+
+## data.table case
+datatable = data.table(data)
+class(datatable)
+colnames(datatable)
+excludeCols(datatable, list("sex", "age"))
+colnames(datatable)
+
+## dataframe case
+class(data)
+colnames(data)
+excluded = excludeCols(data, list("sex", "age"))
+colnames(excluded)
 }
 

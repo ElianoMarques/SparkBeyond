@@ -2,11 +2,31 @@
 % Please edit documentation in R/complexTypes.R
 \name{groupBy}
 \alias{groupBy}
-\title{groupBy sugar}
+\title{groupBy}
 \usage{
-groupBy(data, keys)
+groupBy(data, by, flatten = TRUE)
+}
+\arguments{
+\item{data:}{dataframe or data.table to be grouped}
+
+\item{keys:}{a list of column names to perform the groupBy}
+
+\item{flatten:}{a boolean indicator for whether to flatten (into a vector) columns that after grouping are of size 1 for all keys. TRUE by default.}
+}
+\value{
+a new data.table object with the grouped data
 }
 \description{
-groupBy sugar
+group the input data by certain columns. The output will be an object of type data.table in which each cell will contain a list of items.
+}
+\examples{
+grouped = groupBy(getData("titanic_train"), by ="pclass")
+rownames(grouped)
+colSizes(grouped)
+head(grouped)
+grouped2 = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+rownames(grouped2)
+colSizes(grouped2)
+head(grouped2)
 }
 

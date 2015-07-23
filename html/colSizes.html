@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>R: groupBy</title>
+<html><head><title>R: colSizes</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
 
@@ -9,44 +9,36 @@
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
-<table width="100%" summary="page for groupBy {SBadapter}"><tr><td>groupBy {SBadapter}</td><td align="right">R Documentation</td></tr></table>
+<table width="100%" summary="page for colSizes {SBadapter}"><tr><td>colSizes {SBadapter}</td><td align="right">R Documentation</td></tr></table>
 
-<h2>groupBy</h2>
+<h2>colSizes</h2>
 
 <h3>Description</h3>
 
-<p>group the input data by certain columns. The output will be an object of type data.table in which each cell will contain a list of items.
+<p>Count the number of items in each column
 </p>
 
 
 <h3>Usage</h3>
 
 <pre>
-groupBy(data, by, flatten = TRUE)
+colSizes(data)
 </pre>
 
 
 <h3>Arguments</h3>
 
 <table summary="R argblock">
-<tr valign="top"><td><code>data:</code></td>
+<tr valign="top"><td><code>data</code></td>
 <td>
-<p>dataframe or data.table to be grouped</p>
-</td></tr>
-<tr valign="top"><td><code>keys:</code></td>
-<td>
-<p>a list of column names to perform the groupBy</p>
-</td></tr>
-<tr valign="top"><td><code>flatten:</code></td>
-<td>
-<p>a boolean indicator for whether to flatten (into a vector) columns that after grouping are of size 1 for all keys. TRUE by default.</p>
+<p>dataframe / data.table to be examined</p>
 </td></tr>
 </table>
 
 
 <h3>Value</h3>
 
-<p>a new data.table object with the grouped data
+<p>a summary of items counts per row
 </p>
 
 

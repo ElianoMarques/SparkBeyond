@@ -398,7 +398,7 @@ featureSearch.file <- function(projectName = "temp",
 writeToServer = function(data, filename = NA){
   final_filename = if (is.na(filename)) tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext=".tsv") else paste0(getSBserverIOfolder(), filename)
   final_filename = gsub("/+", "/", final_filename)
-  writeGroupedData(data, final_filename)
+  writeToFile(data, final_filename)
   return (final_filename)
 }
 

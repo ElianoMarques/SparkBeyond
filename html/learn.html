@@ -26,9 +26,11 @@ learn(projectName = "temp", trainData, target, testData = NA,
   trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
   algorithmsWhiteList = NA, functionsWhiteList = NA,
   functionsBlackList = NA, booleanNumericFeatures = TRUE,
-  useGraph = FALSE, maxFeaturesCount = list(300), columnSubsetSize = 1,
+  useGraph = FALSE, crossRowFeatureSearch = FALSE,
+  maxFeaturesCount = list(300), columnSubsetSize = 1,
   customColumnSubsets = NA, maxFeatureDuration = 100,
-  useCachedFeatures = FALSE, evaluationMetric = "PREC",
+  overrideMaxFeatureDurationForExternalData = TRUE,
+  useCachedFeatures = FALSE, evaluationMetric = "AUC",
   scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
   produceFeatureClusteringReport = FALSE, fileEncoding = NA,
@@ -77,7 +79,7 @@ learn(projectName = "temp", trainData, target, testData = NA,
 </td></tr>
 <tr valign="top"><td><code>functionsBlackList:</code></td>
 <td>
-<p>Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.</p>
+<p>Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.</p>
 </td></tr>
 <tr valign="top"><td><code>booleanNumericFeatures:</code></td>
 <td>
@@ -86,6 +88,10 @@ learn(projectName = "temp", trainData, target, testData = NA,
 <tr valign="top"><td><code>useGraph:</code></td>
 <td>
 <p>Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>crossRowFeatureSearch.</code></td>
+<td>
+<p>A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.</p>
 </td></tr>
 <tr valign="top"><td><code>maxFeaturesCount:</code></td>
 <td>
@@ -103,13 +109,17 @@ learn(projectName = "temp", trainData, target, testData = NA,
 <td>
 <p>Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.</p>
 </td></tr>
+<tr valign="top"><td><code>overrideMaxFeatureDurationForExternalData:</code></td>
+<td>
+<p>A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.</p>
+</td></tr>
 <tr valign="top"><td><code>useCachedFeatures:</code></td>
 <td>
 <p>Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.</p>
 </td></tr>
 <tr valign="top"><td><code>evaluationMetric:</code></td>
 <td>
-<p>Optional. A string representing the evaluation metric. Should be either &quot;AUC&quot;, &quot;PREC&quot;, or &quot;RMSE&quot;. &quot;PREC&quot; by default.</p>
+<p>Optional. A string representing the evaluation metric. Should be either &quot;AUC&quot;, &quot;PREC&quot;, or &quot;RMSE&quot;. &quot;AUC&quot; by default.</p>
 </td></tr>
 <tr valign="top"><td><code>scoreOnTestSet:</code></td>
 <td>
@@ -154,10 +164,47 @@ learn(projectName = "temp", trainData, target, testData = NA,
 
 <h3>Examples</h3>
 
-<pre><code class="r">session = learn(&quot;titanic&quot;, getTitanicData(train = TRUE), target = &quot;survived&quot;, algorithmsWhiteList = list(&quot;RRandomForest&quot;), runBlocking = TRUE)
+<pre><code class="r">## No test: 
+session = learn(&quot;titanic&quot;, getData(&quot;titanic_train&quot;),
+   target = &quot;survived&quot;, algorithmsWhiteList = list(&quot;RRandomForest&quot;), runBlocking = TRUE)
 </code></pre>
 
-<pre><code>## Error in lapply(data, col2Text): could not find function &quot;getTitanicData&quot;
+<pre><code>## [1] &quot;Notice: latest build version was not available - if this issue continues please notify SparkBeyond.&quot;
+## [1] &quot;SBadapter package is outdated. Please consider updatePackage()&quot;
+## [1] &quot;Training on  /tmp/data_in1ae73678dbb0.tsv&quot;
+## [1] &quot;Calling: http://127.0.0.1:9000/rapi/learn&quot;
+</code></pre>
+
+<pre><code>## Error in function (type, msg, asError = TRUE) : Failed to connect to 127.0.0.1 port 9000: Connection refused
+</code></pre>
+
+<pre><code class="r">flights = getData(&quot;flights_delay&quot;)
+sampledFlights = sampleData(flights, 0.2)
+flightsModel = learn(projectName = &quot;flights_delay_example&quot;,
+                    trainData = sampledFlights,
+                    target = &quot;weatherDelay&quot;,
+                    algorithmsWhiteList = list(&quot;RRandomForestRegressor&quot;),
+                    functionsBlackList = list(&quot;trigonometry&quot;),
+                    maxFeaturesCount = list(20)
+               )
+</code></pre>
+
+<pre><code>## [1] &quot;Notice: latest build version was not available - if this issue continues please notify SparkBeyond.&quot;
+## [1] &quot;SBadapter package is outdated. Please consider updatePackage()&quot;
+## [1] &quot;Training on  /tmp/data_in1ae7389f1bc0.tsv&quot;
+## [1] &quot;Calling: http://127.0.0.1:9000/rapi/learn&quot;
+</code></pre>
+
+<pre><code>## Error in function (type, msg, asError = TRUE) : Failed to connect to 127.0.0.1 port 9000: Connection refused
+</code></pre>
+
+<pre><code class="r">head(flightsModel$features)
+</code></pre>
+
+<pre><code>## Error in head(flightsModel$features): object &#39;flightsModel&#39; not found
+</code></pre>
+
+<pre><code class="r">## End(No test)
 </code></pre>
 
 

@@ -1,103 +1,274 @@
-#' Sugar to identify type of column
-colTypeOf = function(y) {typeof(y)}
-#' Sugar to identify size of a list column
-colLength = function(y) {if(length(y) == 1 && is.na(y)) list(NA) else length(unlist(y))}
-#' Sugar to trim a list column by a number
-trimN = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y)) list(NA) else list(y[1:n])}
-#' Sugar to trim a column by another column variable
-trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))  list(NA) else list(y[1:n])}
-#' Sugar to exclude columns
-excludeCols = function(data, cols) {
-  effectiveCols = intersect(cols,names(data))
-  if (length(effectiveCols > 0)) data[, (effectiveCols) := NULL] #note: parenthesis around cols are important
-  paste(if (length(effectiveCols) > 0) paste(effectiveCols, collapse=",") else "None", "were removed")
+
+#' groupBy
+#'
+#' group the input data by certain columns. The output will be an object of type data.table in which each cell will contain a list of items.
+#' @param data: dataframe or data.table to be grouped
+#' @param keys: a list of column names to perform the groupBy
+#' @param flatten: a boolean indicator for whether to flatten (into a vector) columns that after grouping are of size 1 for all keys. TRUE by default.
+#' @return a new data.table object with the grouped data
+#' @examples
+#' grouped = groupBy(getData("titanic_train"), by ="pclass")
+#' rownames(grouped)
+#' colSizes(grouped)
+#' head(grouped)
+#' grouped2 = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+#' rownames(grouped2)
+#' colSizes(grouped2)
+#' head(grouped2)
+groupBy = function(data, by, flatten = TRUE){
+  text = paste0("list(",paste(by, collapse = ","),")")
+  data = as.data.table(data)
+  grouped = data[,lapply(.SD,list), by=eval(parse(text=text))]
+  #set row names
+  rownames(grouped) = apply(grouped[,eval(parse(text=text))], 1, paste0,collapse = "_")
+  #flatten when single value
+  grouped = if (flatten){
+    rowsCount = nrow(grouped)
+    toFlatten = setdiff(names(which(rowsCount == apply(colSizes(grouped), 2, sum))), by)
+    if (length(toFlatten) > 0)
+      flattenCols(grouped, toFlatten)
+    else grouped
+  }
+  grouped
 }
 
-#' flatten column
-flattenCol = function(data, colName) {
-  data[,eval(as.symbol(colName)):=sapply(eval(as.symbol(colName)),`[[`,1,simplify=TRUE)]
+
+#' colSizes
+#'
+#' Count the number of items in each column
+#' @param data dataframe / data.table to be examined
+#' @return a summary of items counts per row
+#' @examples
+#' grouped = groupBy(getData("titanic_train"), by ="pclass")
+#' rownames(grouped)
+#' colSizes(grouped)
+#' head(grouped)
+#' grouped2 = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+#' rownames(grouped2)
+#' colSizes(grouped2)
+#' head(grouped2)
+colSizes = function(data) {
+  colLengthFunc = function(y) {if(length(y) == 1 && is.na(y)) list(NA) else length(unlist(y))}
+  sizes = sapply(data, function(x) sapply(x, function(y) colLengthFunc(y)))
+  rownames(sizes) = rownames(data)
+  sizes
 }
-#' flatten columns
+
+
+#' flattenCols
+#'
+#' Take the only the first element from each column defined in \code{cols} and set the column type into a vector
+#' @param data: data.table to flatten
+#' @param cols: list of columns to flatten
+#' @return nothing: operates on the input data object
+#' @examples
+#' grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+#' typeof(grouped$age)
+#' flattenCols(grouped, "age")
+#' typeof(grouped$age) ## notice that the type of the column changed
 flattenCols = function(data, cols) {
+  flattenCol = function(data, colName) {
+    data[,eval(as.symbol(colName)):=sapply(eval(as.symbol(colName)),`[[`,1,simplify=TRUE)]
+  }
   for(col in cols) {flattenCol(data,col)} # can possibly be written without the loop
 }
 
-#' groupBy sugar
-groupBy = function(data, keys){
-  data = as.data.table(data)
-  data[,lapply(.SD,list), by=keys]
+#' typeOfCols
+#'
+#' list the type of column for all columns in the input \code{data}
+#' @param data: data.table to examine.
+#' @return a vector of names for all \code{data} columns
+#' @examples
+#' grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+#' typeofCols(grouped$age)
+#' flattenCols(grouped, "age")
+#' typeofCols(grouped)
+typeOfCols = function(data) {
+  sapply(data, typeof)
 }
 
-#' setTimeColumn
-setTimeColumn = function(DT, timeCol) { #assumption is can be called only if the data is grouped already, hence a data.table
-  if (! timeCol %in% names(DT)) stop (paste("error:", timeCol, "does not exist"))
-  if ("SB_times_col" %in% names(DT)) stop ("error: time column is already defined")
-  setnames(DT, timeCol, "SB_times_col")
-}
-
-#' limitTimeSeries
-limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilDate = NA, datesFormat = "%m/%d/%Y"){
-  untilDateObject = strptime(untilDate, datesFormat)
-  data[sapply(eval(as.symbol(dateCol)), function(x) strptime(x, datesFormat) < untilDateObject)]
-}
-
-#' sugar to convert a column to text
-col2Text = function(x) {
-  escapeFun = function(s) {
-    s = gsub('"','""',s)
-    s = gsub("\\t","\\\\t",s)
-    s = gsub("\\n","\\\\n",s)
-    s
-  }
-  createContent = function(x1) {
-    if (typeof(x1) == "character" || is.factor(x1)) {
-      x2 = sapply(x1,  escapeFun) #deal with escaping
-      paste0("\"", paste0(x2,collapse = "\",\""), "\"")
-    } else {
-      paste0(x1,collapse = ",")
-    }
-  }
-
-  if (is.list(x)){
-    writeList = function (xi){
-      content = createContent(xi)
-      paste0("[",content,"]")
-    }
-    sapply(x, writeList)
-  } else if (typeof(x) == "character" || is.factor(x)) paste0("\"",escapeFun(x),"\"") else x
-}
-
-#' sugar to convert all columns to text
+#' cols2Text
+#'
+#' Convert all \code{data} columns into a serializable text/primitive representation. Cells that contain lists will be converted to [ , , ] representation. All strings will quoted.
+#' @param data: dataframe / data.table to convert to primitive represenation.
+#' @return a vector containing all input information in text/primitive representation
+#' @examples
+#' grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+#' textGrouped = cols2Text(grouped)
+#' typeOfCols(textGrouped)
+#' textGrouped[1,]
 cols2Text = function(data) {
-    lapply(data,col2Text)
+  col2Text = function(x) {
+    escapeFun = function(s) {
+      s = gsub('"','""',s)
+      s = gsub("\\t","\\\\t",s)
+      s = gsub("\\n","\\\\n",s)
+      s
+    }
+    createContent = function(x1) {
+      if (typeof(x1) == "character" || is.factor(x1)) {
+        x2 = sapply(x1,  escapeFun) #deal with escaping
+        paste0("\"", paste0(x2,collapse = "\",\""), "\"")
+      } else {
+        paste0(x1,collapse = ",")
+      }
+    }
+
+    if (is.list(x)){
+      writeList = function (xi){
+        content = createContent(xi)
+        paste0("[",content,"]")
+      }
+      sapply(x, writeList)
+    } else if (typeof(x) == "character" || is.factor(x)) paste0("\"",escapeFun(x),"\"") else x
+  }
+
+  sapply(data,col2Text)
 }
 
-#' sugar to convert all columns to text and write to file
-#' @param groupByColumns Optional. A vector of possible columns that were used for grouping the data. NULL by default.
-writeGroupedData = function(data, outputFile) { #sugar for writing grouped data
+#' writeToFile
+#'
+#' Convert all \code{data} columns into a serializable text/primitive representation and write them to a tab separated file.
+#' @param data: dataframe / data data.table to write.
+#' @examples
+#' grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+#' writeToFile(grouped, "titanic_grouped.tsv")
+writeToFile = function(data, outputFile) { #sugar for writing grouped data
   toWrite = cols2Text(data)
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
 
+#' excludeCols
+#'
+#' Exclude columns from a data frame.
+#' @param data: dataframe / data data.table to modify.
+#' @param cols: a list of column names to remove.
+#' @return if the input \code{data} is a dataframe than a dataframe with the excluded columns will be return. If the input \code{data} is a data.table object, nothing will be returned and the input object will be modified.
+#' @examples
+#' data = getData("titanic_train")
+#'
+#' ## data.table case
+#' datatable = data.table(data)
+#' class(datatable)
+#' colnames(datatable)
+#' excludeCols(datatable, list("sex", "age"))
+#' colnames(datatable)
+#'
+#' ## dataframe case
+#' class(data)
+#' colnames(data)
+#' excluded = excludeCols(data, list("sex", "age"))
+#' colnames(excluded)
+excludeCols = function(data, cols) {
+  effectiveCols = intersect(cols,names(data))
+  if (length(effectiveCols) > 0) {
+    print (paste(paste(effectiveCols, collapse=", "), "were removed"))
+    if ("data.table" %in% class(data)){
+      data[, (effectiveCols) := NULL] #note: parenthesis around cols are important
+      NA
+    } else {
+      data[ , -which(names(data) %in% cols)]
+    }
+  }
+  else print("No columns were removed")
+}
+
+
+##' Sugar to trim a list column by a number
+#trimN = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y)) list(NA) else list(y[1:n])}
+
+##' Sugar to trim a column by another column variable
+#trimByCol = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y))  list(NA) else list(y[1:n])}
+
+
+#' setTimeColumn
+#'
+#' Rename a requested column to "SB_times_col". When the exported data is read by the SparkBeyond engine, all other columns that contain lists that are of the same size as of the list in "SB_times_col" will be converted into time series data structures.
+#' @param data: the dataframe / data.table to be modified.
+#' @param timeCol: The column name in \code{data} to be renamed.
+setTimeColumn = function(data, timeCol) { #assumption is can be called only if the data is grouped already, hence a data.table
+  if (! timeCol %in% names(data)) stop (paste("error:", timeCol, "does not exist"))
+  if ("SB_times_col" %in% names(data)) stop ("error: time column is already defined")
+  setnames(data, timeCol, "SB_times_col")
+}
+
+#' limitTimeSeries
+#'
+#' filter rows to contain only rows that are in a certain time frame based on a from/until date inputs (inclusive). All dates are assumed to be of the same format. This function should be called before any filtering is performed.
+#'
+#' @param data: the dataframe / data.table to be modified.
+#' @param dateCol: The column name in \code{data} that will be used for filtering. "SB_times_col" by default
+#' @param fromDate: The starting date to filter from. NA by default.
+#' @param untilData: The end date to filter until. NA by default.
+#' @param datesFormat: the format of the from/until dates.month/day/year by default.
+#' @examples
+#' randDate <- function(N, st="2014/01/01", et="2014/12/31") {
+#'  st <- as.POSIXct(as.Date(st,tz = "EST"),tz = "EST")
+#'  et <- as.POSIXct(as.Date(et,tz = "EST"),tz = "EST")
+#'  dt <- as.numeric(difftime(et,st,unit="secs"))
+#'  ev <- sort(runif(N, 0, dt))
+#'  strftime(st+ev, format="%m/%d/%Y")
+#' }
+#' simulateData = function(n = 100, l = 10) {
+#'  data.table(ID = rep(1:n,l), value = rnorm(n*l), date = randDate(n*l))
+#' }
+#' tsData = simulateData()
+#' head(tsData)
+#' nrow(tsData)
+#' nrow(limitTimeSeries(tsData, "date", fromDate ="07/01/2014"))
+#' nrow(limitTimeSeries(tsData, "date", untilDate ="11/01/2014"))
+#' nrow(limitTimeSeries(tsData, "date", fromDate="07/01/2014", untilDate ="11/01/2014"))
+limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilDate = NA, datesFormat = "%m/%d/%Y"){
+
+  from = strptime(fromDate, datesFormat)
+  until = strptime(untilDate, datesFormat)
+
+  checkDate = function(colDate) {
+     d = strptime(colDate, datesFormat)
+     if(is.na(from) && !is.na(until) && d <= until) TRUE
+     else if (!is.na(from) && is.na(until) && d >= from) TRUE
+     else if (!is.na(from) && !is.na(until) && d >= from && d<= until) TRUE
+     else FALSE
+   }
+
+  data[sapply(eval(as.symbol(dateCol)), checkDate)]
+}
+
+#' join
+#'
+#' Joins two dataframes. Wrapper around data.table's \code{\link[data.table]{merge}}. It is required that the join will be on a unique set of keys, and that the join key columns will have the same name in both inputs.
+#' @param x, y: data tables. y is coerced to a data.table if it isn't one already.
+#' @param all: logical; all = TRUE is shorthand to save setting both all.x = TRUE and all.y = TRUE.
+#' @param all.x: logical; if TRUE, then extra rows will be added to the output, one for each row in x that has no matching row in y. These rows will have 'NA's in those columns that are usually filled with values from y. The default is FALSE, so that only rows with data from both x and y are included in the output.
+#' @param all.y: logical; analogous to all.x above.
+#' @param suffixes: A character(2) specifying the suffixes to be used for making non-by column names unique. The suffix behavior works in a similar fashion as the \code{\link[base]{merge}} method does.
+#' @return if the input \code{data} is a dataframe than a dataframe with the excluded columns will be return. If the input \code{data} is a data.table object, nothing will be returned and the input object will be modified.
+#' @examples
+#' data1 = data.table(id=1:2, text=c("a","b"))
+#' data2 = data.table(id=rep(1:2,each=3), num=1:6)
+#' grouped2 = groupBy(data2, "id")
+#' join(data1,grouped2,"id")
+join = function(x, y, by, all = FALSE, all.x =all, all.y=all, suffixes = c(".x", ".y")) {
+  merge(x,y, by, all, all.x, all.y, suffixes)
+}
 
 
 
-#dt <- data.table(dt, new = paste(dt$A, dt$B, sep = ""))
 
-#joins
-# joinExample = function () {
-#   (dt1 <- data.table(A = letters[1:10], X = 1:10, key = "A"))
-#   (dt2 <- data.table(A = letters[5:14], Y = 1:10, key = "A"))
-#   merge(dt1, dt2) #join left # can add by = "A", allow.cartesian
-#   merge(dt1, dt2, all = TRUE) #join all
-# }
+# runOperatorExample = function() {
+#   # chain operator example
+#   `%>>%` <- function(x,y) {sum(x,y)}
 #
+#   # Info on the := operator for data.table
+#   # http://www.rdocumentation.org/packages/data.table/functions/assign.html
+# }
+
 # #IDate
 # dateTimeExample = function  () {
 #   (seqdates <- seq(as.IDate("2001-01-01"), as.IDate("2001-08-03"), by = "3 weeks"))
 # }
 #
-#
+
 # runComplexTypeExample = function() {
 #   library(data.table)
 #   df = data.table(id = c(1,1,2), name = c("a","b","c"), num = c(1,2,3))
@@ -118,34 +289,3 @@ writeGroupedData = function(data, outputFile) { #sugar for writing grouped data
 #   capture.output(grouped, file="/tmp/grouped.txt") #not structured
 # }
 #
-# runOperatorExample = function() {
-#   # chain operator example
-#   `%>>%` <- function(x,y) {sum(x,y)}
-#
-#   # Info on the := operator for data.table
-#   # http://www.rdocumentation.org/packages/data.table/functions/assign.html
-# }
-
-# limitTimeSeries = function(data, groupColumns, fromDate = NA, untilDate = NA){
-#   from = if (is.na(fromDate)) NA else unclass(as.POSIXct(fromDate)) *1000
-#   until = if (is.na(untilDate)) NA else unclass(as.POSIXct(untilDate)) *1000
-#   if (is.na(fromDate) && is.na(untilDate)) stop("Both from and until dates were not provided")
-#
-#   checkDate = function(d) {
-#     if(is.na(from) && !is.na(until) && d <=until) TRUE
-#     else if (!is.na(from) && is.na(until) && d >= from) TRUE
-#     else if (!is.na(from) && !is.na(until) && d >= from && d<= until) TRUE
-#     else FALSE
-#   }
-#
-#   data[, lapply(.SD, function(col) {
-#     lapply(col, function(cell) {
-#       if (length(unlist(cell))==1) cell
-#       else{
-#         l = unlist(lapply(cell, function(x) checkDate(x[[1]]) ))
-#         cell[l]
-#       }
-#     })
-#   }
-#   ), by = groupColumns]
-# }

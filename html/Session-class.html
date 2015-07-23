@@ -89,307 +89,59 @@
 <h3>Examples</h3>
 
 <pre><code class="r"># Learning example
+## No test: 
 session = learn(&quot;titanic&quot;, getData(&quot;titanic_train&quot;), target=&quot;survived&quot;,algorithmsWhiteList = list(&quot;xgboostClassifier&quot;),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
 </code></pre>
 
-<pre><code>## [1] &quot;Training on  /tmp/data_in7096302b8447.tsv&quot;
+<pre><code>## [1] &quot;Notice: latest build version was not available - if this issue continues please notify SparkBeyond.&quot;
+## [1] &quot;SBadapter package is outdated. Please consider updatePackage()&quot;
+## [1] &quot;Training on  /tmp/data_in1ae7492f9fe3.tsv&quot;
 ## [1] &quot;Calling: http://127.0.0.1:9000/rapi/learn&quot;
-## [1] &quot;Artifact location was created at: /Users/zinman/localdata/artifacts/titanic/16&quot;
-## [1] &quot;Detecting types - 1&quot;
-## [1] &quot;Detecting types - 2&quot;
-## [1] &quot;Detecting types - 3&quot;
-## Feature Search training-set: 710.0
-## Original histogram (FS):
-## +-------+-----------+
-## | Label | Frequency |
-## +-------+-----------+
-## | 0     | 442       |
-## | 1     | 268       |
-## +-------+-----------+
-## Prior entropy: 0.9562317858093743
-## 
-## Input Schema
-## +-------+-----------+---------------+
-## | index | name      | type          |
-## +-------+-----------+---------------+
-## | 0     | *survived | Int           |
-## | 1     | pclass    | Int           |
-## | 2     | name      | core.nlp.Text |
-## | 3     | sex       | String        |
-## | 4     | age       | Double        |
-## | 5     | sibsp     | Int           |
-## | 6     | parch     | Int           |
-## | 7     | ticket    | core.nlp.Text |
-## | 8     | fare      | Double        |
-## | 9     | cabin     | String        |
-## | 10    | embarked  | String        |
-## +-------+-----------+---------------+
-## [1] &quot;13:07:28 INFO  Learner$ - Learning to predict survived as classification&quot;
-## [1] &quot;Session in progress:  Creating features - 4&quot;
-## [1] &quot;Session in progress:  Creating features - 5&quot;
-## [1] &quot;13:07:42 INFO  LocalFeatureGenerator$ - Finished discovering 3 features in pclass&quot;
-## [1] &quot;13:07:42 INFO  LocalFeatureGenerator$ - Finished discovering 6 features in parch&quot;
-## [1] &quot;13:07:43 INFO  LocalFeatureGenerator$ - Finished discovering 54 features in age&quot;
-## [1] &quot;13:07:43 INFO  LocalFeatureGenerator$ - Finished discovering 1 features in sex&quot;
-## [1] &quot;Session in progress:  Creating features - 6&quot;
-## [1] &quot;Printing top 50 features out of 300&quot;
-##     idx
-##  1:   0
-##  2:   1
-##  3:   2
-##  4:   3
-##  5:   4
-##  6:   5
-##  7:   6
-##  8:   7
-##  9:   8
-## 10:   9
-## 11:  10
-## 12:  11
-## 13:  12
-## 14:  13
-## 15:  14
-## 16:  15
-## 17:  16
-## 18:  17
-## 19:  18
-## 20:  19
-## 21:  20
-## 22:  21
-## 23:  22
-## 24:  23
-## 25:  24
-## 26:  25
-## 27:  26
-## 28:  27
-## 29:  28
-## 30:  29
-## 31:  30
-## 32:  31
-## 33:  32
-## 34:  33
-## 35:  34
-## 36:  35
-## 37:  36
-## 38:  37
-## 39:  38
-## 40:  39
-## 41:  40
-## 42:  41
-## 43:  42
-## 44:  43
-## 45:  44
-## 46:  45
-## 47:  46
-## 48:  47
-## 49:  48
-## 50:  49
-##     idx
-##                                                                     feature
-##  1:                         tokenizeByPunctuation(name) does not contain mr
-##  2:                                                             pclass != 3
-##  3:                                              fare &gt;= 15.172899999999998
-##  4:                                                             sex != male
-##  5:              abs(cos(fare) - -0.2994095593470102) &lt; 0.11486522725075635
-##  6:                                                             cabin != &quot;&quot;
-##  7:                                                         name contains &quot;
-##  8:                                                           embarked == C
-##  9:                                                             pclass == 1
-## 10:               abs(tan(age) - -0.9727759445199381) &gt;= 1.1379791699016033
-## 11:                                           upperCaseRatio(name) == 0.125
-## 12: abs(upperCaseRatio(ticket) - 0.09196428571428572) &lt; 0.04196428571428571
-## 13:                                         cos(fare) &lt; -0.9989278625592983
-## 14:                                                       round(fare) == 19
-## 15:                              upperCaseRatio(name) &lt; 0.15301003344481606
-## 16:                                                numberOfWords(name) == 7
-## 17:             abs(sin(fare) - 0.9989864568219151) &lt; 0.0005608210670511315
-## 18:                                                numberOfWords(name) &gt;= 6
-## 19:                                                    sigmoid(fare) == 1.0
-## 20:                                                              sibsp &gt;= 5
-## 21:                        normalizedNgrams(name) contains List(mr, joseph)
-## 22:                                tokenizeByPunctuation(ticket) contains o
-## 23:                                                      floor(fare) &lt; 10.5
-## 24:                                 smallSubsets(cabin) contains List(2, E)
-## 25:                               tokenizeByPunctuation(name) contains john
-## 26:                                                       ceil(fare) == 7.0
-## 27:                        normalizedNgrams(name) contains List(miss, anna)
-## 28:                stemmedWordsWithoutCommonTerms(name) does not contain mr
-## 29:                                                      ceil(fare) == 35.0
-## 30:                                            numericSuffix(cabin) == 20.0
-## 31:                                 smallSubsets(cabin) contains List(5, 2)
-## 32:                                 smallSubsets(cabin) contains List(1, D)
-## 33:                                             prefixes(cabin) contains E1
-## 34:                                                  mode(cabin) == Some(9)
-## 35:                                                           embarked != S
-## 36:                                                             age == 47.0
-## 37:                                 normalizedNgrams(name) contains List(j)
-## 38:                             sentimentDistribution(name) contains (0, 3)
-## 39:                                                     name contains david
-## 40:                                                       name contains van
-## 41:                                                      name contains kate
-## 42:                                                     floor(fare) == 57.0
-## 43:                                         sin(age) &lt; -0.21049876125431888
-## 44:                                                      ceil(fare) == 23.0
-## 45:                                                    name contains julian
-## 46:                        slidingSubsets(name).toSeq contains (mr, eugene)
-## 47:                      stemmedWordsWithoutCommonTerms(name) contains hugh
-## 48:                                 normalizedNgrams(name) contains List(e)
-## 49:                                                      abs(age - 4.5) &lt; 2
-## 50:                   normalizedNgrams(name) contains List(miss, elizabeth)
-##                                                                     feature
-##             RIG       support
-##  1: 0.246524231 299 (42.11%) 
-##  2: 0.076231905 315 (44.37%) 
-##  3: 0.068179011 333 (46.90%) 
-##  4: 0.242667723 251 (35.35%) 
-##  5: 0.026757770  72 (10.14%) 
-##  6: 0.066467876 163 (22.96%) 
-##  7: 0.025171897  44 (6.20%)  
-##  8: 0.023689570 139 (19.58%) 
-##  9: 0.062929319 172 (24.23%) 
-## 10: 0.016217111 336 (47.32%) 
-## 11: 0.011422643  12 (1.69%)  
-## 12: 0.018753223  26 (3.66%)  
-## 13: 0.012511649   6 (0.85%)  
-## 14: 0.012511649   6 (0.85%)  
-## 15: 0.051727079 345 (48.59%) 
-## 16: 0.032384616  29 (4.08%)  
-## 17: 0.023655675  31 (4.37%)  
-## 18: 0.058777034  82 (11.55%) 
-## 19: 0.046715422 163 (22.96%) 
-## 20: 0.011189840  11 (1.55%)  
-## 21: 0.008115772   8 (1.13%)  
-## 22: 0.009393665  16 (2.25%)  
-## 23: 0.064727877 299 (42.11%) 
-## 24: 0.012511649   6 (0.85%)  
-## 25: 0.008115772   8 (1.13%)  
-## 26: 0.010163270  10 (1.41%)  
-## 27: 0.016722656   8 (1.13%)  
-## 28: 0.093387963 197 (27.75%) 
-## 29: 0.006075752   6 (0.85%)  
-## 30: 0.010413798   5 (0.70%)  
-## 31: 0.010413798   5 (0.70%)  
-## 32: 0.010413798   5 (0.70%)  
-## 33: 0.010413798   5 (0.70%)  
-## 34: 0.010413798   5 (0.70%)  
-## 35: 0.026285346 208 (29.30%) 
-## 36: 0.007094831   7 (0.99%)  
-## 37: 0.007094831   7 (0.99%)  
-## 38: 0.017400935 279 (39.30%) 
-## 39: 0.006075752   6 (0.85%)  
-## 40: 0.005058528   5 (0.70%)  
-## 41: 0.012511649   6 (0.85%)  
-## 42: 0.008321012   4 (0.56%)  
-## 43: 0.011542697 248 (34.93%) 
-## 44: 0.007401255   7 (0.99%)  
-## 45: 0.004150531   2 (0.28%)  
-## 46: 0.004150531   2 (0.28%)  
-## 47: 0.004043152   4 (0.56%)  
-## 48: 0.005662242   6 (0.85%)  
-## 49: 0.018603209  16 (2.25%)  
-## 50: 0.010413798   5 (0.70%)  
-##             RIG       support
-## [1] &quot;13:07:43 INFO  LocalFeatureGenerator$ - Finished discovering 4 features in embarked&quot;
-## [1] &quot;13:07:43 INFO  LocalFeatureGenerator$ - Finished discovering 7 features in sibsp&quot;
-## [1] &quot;13:07:44 INFO  LocalFeatureGenerator$ - Finished discovering 163 features in fare&quot;
-## [1] &quot;13:07:44 INFO  LocalFeatureGenerator$ - Finished discovering 132 features in ticket&quot;
-## [1] &quot;13:07:44 INFO  LocalFeatureGenerator$ - Finished discovering 199 features in cabin&quot;
-## [1] &quot;13:07:45 INFO  LocalFeatureGenerator$ - Finished discovering 490 features in name&quot;
-## [1] &quot;13:07:45 INFO  FeatureAggregator - Selecting best features...&quot;
-## [1] &quot;Session in progress:  Building model - 7&quot;
-## [1] &quot;13:07:59 INFO  FeatureCompiler$ - finished compiling feature extractor&quot;
-## [1] &quot;13:07:59 INFO  Enricher$ - Enriching training set with discovered features...&quot;
-## [1] &quot;Session in progress:  Building model - 8&quot;
-## 
-## == Summary ==
-##                                                
-## Correctly Classified Instances     147   81.22%
-## Incorrectly Classified Instances   34    18.78%
-## Total Number of Instances          181         
-##                                                
-## === Detailed Accuracy By Class ===
-##                                                                                      
-## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
-##                                                                                      
-## 0               0.944     0.378     0.783       0.944    0.856       0.833      0.667
-## 1               0.622     0.056     0.885       0.622    0.73        0.833      0.667
-## Weighted Avg.   0.812     0.247     0.825       0.812    0.805       0.833      0.667
-##                                                                                      
-## Root Mean Prior Squared Error:0.0
-## Confusion Matrix:
-## 
-## +-----+----+
-## | 101 | 6  |
-## | 28  | 46 |
-## +-----+----+
-## [1] &quot;Done&quot;
+</code></pre>
+
+<pre><code>## Error in function (type, msg, asError = TRUE) : Failed to connect to 127.0.0.1 port 9000: Connection refused
 </code></pre>
 
 <pre><code class="r">#Do Not Run: session = featureSearch(&quot;titanic&quot;, getData(&quot;titanic_train&quot;), target=&quot;survived&quot;)
 enriched = session$enrich(getData(&quot;titanic_train&quot;), featureCount = 10)
 </code></pre>
 
-<pre><code>## [1] &quot;Enriching  /tmp/data_in709664e996a7.tsv&quot;
-## [1] &quot;Calling: http://127.0.0.1:9000/rapi/enrich&quot;
-## [1] &quot;Done.&quot;
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;session&#39; not found
 </code></pre>
 
 <pre><code class="r">colnames(enriched)
 </code></pre>
 
-<pre><code>##  [1] &quot;X.tokenizeByPunctuation.name..contains.mr&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-##  [2] &quot;pclass....3&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-##  [3] &quot;fare....15.172899999999998&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-##  [4] &quot;sex....male&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-##  [5] &quot;abs.cos.fare.....0.2994095593470102....0.11486522725075635&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                          
-##  [6] &quot;cabin....&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           
-##  [7] &quot;name.contains....embarked....C.pclass....1.abs.tan.age.....0.9727759445199381.....1.1379791699016033.false.false.false.false.false.false.false.false.false.false.true.true.true.true.false.true.false.true.true.true.true.false.false.true.false.false.false.false.false.true.true.true.true.true.false.true.false.false.true.true..tokenizeByPunctuation.name..contains.mr.pclass....3.fare....15.172899999999998.sex....male.abs.cos.fare.....0.2994095593470102....0.11486522725075635.cabin......name.contains..&quot;
-##  [8] &quot;embarked....C&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       
-##  [9] &quot;pclass....1&quot;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-## [10] &quot;abs.tan.age.....0.9727759445199381.....1.1379791699016033&quot;
+<pre><code>## Error in is.data.frame(x): object &#39;enriched&#39; not found
 </code></pre>
 
 <pre><code class="r">predicted = session$predict(getData(&quot;titanic_test&quot;))
 </code></pre>
 
-<pre><code>## [1] &quot;Predicting  /tmp/data_in709658e8c10b.tsv&quot;
-## [1] &quot;Calling: http://127.0.0.1:9000/rapi/predict&quot;
-## [1] &quot;Predictions and plots are available at: /Users/zinman/localdata/artifacts/titanic/16/reports/predictions/test/&quot;
-## [1] &quot;Done.&quot;
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;session&#39; not found
 </code></pre>
 
 <pre><code class="r">colnames(predicted)
 </code></pre>
 
-<pre><code>## [1] &quot;survived_predicted&quot; &quot;probability_0&quot;      &quot;probability_1&quot;
+<pre><code>## Error in is.data.frame(x): object &#39;predicted&#39; not found
 </code></pre>
 
 <pre><code class="r">predicted[1:5,c(&quot;survived_predicted&quot;, &quot;probability_0&quot;, &quot;probability_1&quot;)]
 </code></pre>
 
-<pre><code>##   survived_predicted probability_0 probability_1
-## 1                  0     0.9445565     0.0554435
-## 2                  1     0.3302991     0.6697009
-## 3                  0     0.7451480     0.2548520
-## 4                  0     0.8949008     0.1050992
-## 5                  1     0.2847269     0.7152731
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;predicted&#39; not found
 </code></pre>
 
 <pre><code class="r">eval = session$evaluate()
 </code></pre>
 
-<pre><code>## === Detailed Accuracy By Class ===
-##                                                                                      
-## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
-##                                                                                      
-## 0               0.944     0.378     0.783       0.944    0.856       0.833      0.667
-## 1               0.622     0.056     0.885       0.622    0.73        0.833      0.667
-## Weighted Avg.   0.812     0.247     0.825       0.812    0.805       0.833      0.667
-## 
+<pre><code>## Error in eval(expr, envir, enclos): object &#39;session&#39; not found
 </code></pre>
 
 <pre><code class="r">#session$showFeatures()
 #session$showConfusionMatrix()
+## End(No test)
 </code></pre>
 
 

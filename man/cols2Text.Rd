@@ -2,11 +2,23 @@
 % Please edit documentation in R/complexTypes.R
 \name{cols2Text}
 \alias{cols2Text}
-\title{sugar to convert all columns to text}
+\title{cols2Text}
 \usage{
 cols2Text(data)
 }
+\arguments{
+\item{data:}{dataframe / data.table to convert to primitive represenation.}
+}
+\value{
+a vector containing all input information in text/primitive representation
+}
 \description{
-sugar to convert all columns to text
+Convert all \code{data} columns into a serializable text/primitive representation. Cells that contain lists will be converted to [ , , ] representation. All strings will quoted.
+}
+\examples{
+grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+textGrouped = cols2Text(grouped)
+typeOfCols(textGrouped)
+textGrouped[1,]
 }
 

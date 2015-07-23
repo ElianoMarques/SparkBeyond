@@ -7,7 +7,36 @@
 limitTimeSeries(data, dateCol = "SB_times_col", fromDate = NA,
   untilDate = NA, datesFormat = "\%m/\%d/\%Y")
 }
+\arguments{
+\item{data:}{the dataframe / data.table to be modified.}
+
+\item{dateCol:}{The column name in \code{data} that will be used for filtering. "SB_times_col" by default}
+
+\item{fromDate:}{The starting date to filter from. NA by default.}
+
+\item{untilData:}{The end date to filter until. NA by default.}
+
+\item{datesFormat:}{the format of the from/until dates.month/day/year by default.}
+}
 \description{
-limitTimeSeries
+filter rows to contain only rows that are in a certain time frame based on a from/until date inputs (inclusive). All dates are assumed to be of the same format. This function should be called before any filtering is performed.
+}
+\examples{
+randDate <- function(N, st="2014/01/01", et="2014/12/31") {
+ st <- as.POSIXct(as.Date(st,tz = "EST"),tz = "EST")
+ et <- as.POSIXct(as.Date(et,tz = "EST"),tz = "EST")
+ dt <- as.numeric(difftime(et,st,unit="secs"))
+ ev <- sort(runif(N, 0, dt))
+ strftime(st+ev, format="\%m/\%d/\%Y")
+}
+simulateData = function(n = 100, l = 10) {
+ data.table(ID = rep(1:n,l), value = rnorm(n*l), date = randDate(n*l))
+}
+tsData = simulateData()
+head(tsData)
+nrow(tsData)
+nrow(limitTimeSeries(tsData, "date", fromDate ="07/01/2014"))
+nrow(limitTimeSeries(tsData, "date", untilDate ="11/01/2014"))
+nrow(limitTimeSeries(tsData, "date", fromDate="07/01/2014", untilDate ="11/01/2014"))
 }
 

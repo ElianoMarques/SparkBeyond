@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: join</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/languages/r.min.js"></script>
+<script>hljs.initHighlightingOnLoad();</script>
+</head><body>
+
+<table width="100%" summary="page for join {SBadapter}"><tr><td>join {SBadapter}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>join</h2>
+
+<h3>Description</h3>
+
+<p>Joins two dataframes. Wrapper around data.table's <code><a href="../../data.table/html/merge.html">merge</a></code>. It is required that the join will be on a unique set of keys, and that the join key columns will have the same name in both inputs.
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+join(x, y, by, all = FALSE, all.x = all, all.y = all, suffixes = c(".x",
+  ".y"))
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>x,</code></td>
+<td>
+<p>y: data tables. y is coerced to a data.table if it isn't one already.</p>
+</td></tr>
+<tr valign="top"><td><code>all:</code></td>
+<td>
+<p>logical; all = TRUE is shorthand to save setting both all.x = TRUE and all.y = TRUE.</p>
+</td></tr>
+<tr valign="top"><td><code>all.x:</code></td>
+<td>
+<p>logical; if TRUE, then extra rows will be added to the output, one for each row in x that has no matching row in y. These rows will have 'NA's in those columns that are usually filled with values from y. The default is FALSE, so that only rows with data from both x and y are included in the output.</p>
+</td></tr>
+<tr valign="top"><td><code>all.y:</code></td>
+<td>
+<p>logical; analogous to all.x above.</p>
+</td></tr>
+<tr valign="top"><td><code>suffixes:</code></td>
+<td>
+<p>A character(2) specifying the suffixes to be used for making non-by column names unique. The suffix behavior works in a similar fashion as the <code><a href="../../base/html/merge.html">merge</a></code> method does.</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>if the input <code>data</code> is a dataframe than a dataframe with the excluded columns will be return. If the input <code>data</code> is a data.table object, nothing will be returned and the input object will be modified.
+</p>
+
+
+<h3>Examples</h3>
+
+<pre><code class="r">data1 = data.table(id=1:2, text=c(&quot;a&quot;,&quot;b&quot;))
+data2 = data.table(id=rep(1:2,each=3), num=1:6)
+grouped2 = groupBy(data2, &quot;id&quot;)
+join(data1,grouped2,&quot;id&quot;)
+</code></pre>
+
+<pre><code>##    id text   num
+## 1:  1    a 1,2,3
+## 2:  2    b 4,5,6
+</code></pre>
+
+
+<hr><div align="center">[Package <em>SBadapter</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

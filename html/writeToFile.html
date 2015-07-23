@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>R: flattenCols</title>
+<html><head><title>R: writeToFile</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
 
@@ -9,20 +9,20 @@
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
-<table width="100%" summary="page for flattenCols {SBadapter}"><tr><td>flattenCols {SBadapter}</td><td align="right">R Documentation</td></tr></table>
+<table width="100%" summary="page for writeToFile {SBadapter}"><tr><td>writeToFile {SBadapter}</td><td align="right">R Documentation</td></tr></table>
 
-<h2>flattenCols</h2>
+<h2>writeToFile</h2>
 
 <h3>Description</h3>
 
-<p>Take the only the first element from each column defined in <code>cols</code> and set the column type into a vector
+<p>Convert all <code>data</code> columns into a serializable text/primitive representation and write them to a tab separated file.
 </p>
 
 
 <h3>Usage</h3>
 
 <pre>
-flattenCols(data, cols)
+writeToFile(data, outputFile)
 </pre>
 
 
@@ -31,35 +31,15 @@ flattenCols(data, cols)
 <table summary="R argblock">
 <tr valign="top"><td><code>data:</code></td>
 <td>
-<p>data.table to flatten</p>
-</td></tr>
-<tr valign="top"><td><code>cols:</code></td>
-<td>
-<p>list of columns to flatten</p>
+<p>dataframe / data data.table to write.</p>
 </td></tr>
 </table>
-
-
-<h3>Value</h3>
-
-<p>nothing: operates on the input data object
-</p>
 
 
 <h3>Examples</h3>
 
 <pre><code class="r">grouped = groupBy(getData(&quot;titanic_train&quot;), by =list(&quot;pclass&quot;,&quot;sex&quot;))
-typeof(grouped$age)
-</code></pre>
-
-<pre><code>## [1] &quot;list&quot;
-</code></pre>
-
-<pre><code class="r">flattenCols(grouped, &quot;age&quot;)
-typeof(grouped$age) ## notice that the type of the column changed
-</code></pre>
-
-<pre><code>## [1] &quot;double&quot;
+writeToFile(grouped, &quot;titanic_grouped.tsv&quot;)
 </code></pre>
 
 

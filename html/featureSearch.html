@@ -25,8 +25,10 @@
 featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
   maxDepth = 2, functionsWhiteList = NA, functionsBlackList = NA,
   booleanNumericFeatures = TRUE, useGraph = FALSE,
-  maxFeaturesCount = list(300), columnSubsetSize = 1,
-  customColumnSubsets = NA, maxFeatureDuration = 100,
+  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
+  columnSubsetSize = 1, customColumnSubsets = NA,
+  maxFeatureDuration = 100,
+  overrideMaxFeatureDurationForExternalData = TRUE,
   useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
   produceFeatureClusteringReport = FALSE, fileEncoding = NA,
@@ -67,11 +69,15 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 </td></tr>
 <tr valign="top"><td><code>functionsBlackList:</code></td>
 <td>
-<p>Optional. A list of strings that represents a set of function that will be excluded from the feature search. NA by default.</p>
+<p>Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.</p>
 </td></tr>
 <tr valign="top"><td><code>booleanNumericFeatures:</code></td>
 <td>
 <p>A boolean indicating whether to transform all features to boolean values. TRUE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>crossRowFeatureSearch.</code></td>
+<td>
+<p>A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.</p>
 </td></tr>
 <tr valign="top"><td><code>maxFeaturesCount:</code></td>
 <td>
@@ -95,7 +101,11 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 </td></tr>
 <tr valign="top"><td><code>maxFeatureDuration:</code></td>
 <td>
-<p>Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds.</p>
+<p>Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.</p>
+</td></tr>
+<tr valign="top"><td><code>overrideMaxFeatureDurationForExternalData:</code></td>
+<td>
+<p>A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.</p>
 </td></tr>
 <tr valign="top"><td><code>useCachedFeatures:</code></td>
 <td>
@@ -124,7 +134,7 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 
 <h3>Examples</h3>
 
-<pre><code class="r">#session = featureSearch(&quot;titanic&quot;, getTitanicData(train = TRUE), &quot;survived&quot;)
+<pre><code class="r">#session = featureSearch(&quot;titanic&quot;, getData(&quot;titanic_train&quot;), &quot;survived&quot;)
 </code></pre>
 
 

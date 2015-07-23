@@ -2,11 +2,25 @@
 % Please edit documentation in R/complexTypes.R
 \name{flattenCols}
 \alias{flattenCols}
-\title{flatten columns}
+\title{flattenCols}
 \usage{
 flattenCols(data, cols)
 }
+\arguments{
+\item{data:}{data.table to flatten}
+
+\item{cols:}{list of columns to flatten}
+}
+\value{
+nothing: operates on the input data object
+}
 \description{
-flatten columns
+Take the only the first element from each column defined in \code{cols} and set the column type into a vector
+}
+\examples{
+grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+typeof(grouped$age)
+flattenCols(grouped, "age")
+typeof(grouped$age) ## notice that the type of the column changed
 }
 
