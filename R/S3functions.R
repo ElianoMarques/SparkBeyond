@@ -28,6 +28,7 @@
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
+#' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
@@ -74,6 +75,7 @@ learn <- function(projectName = "temp",
                   weightByClass = FALSE,
                   produceFeatureClusteringReport = FALSE,
                   fileEncoding = NA,
+                  autoSave = TRUE,
                   runBlocking = TRUE,
                   verbose = FALSE){
 
@@ -103,6 +105,7 @@ learn <- function(projectName = "temp",
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
+                autoSave = autoSave,
                 fileEncoding = fileEncoding,
                 verbose = verbose)
 
@@ -138,6 +141,7 @@ learn <- function(projectName = "temp",
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
+#' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
 #' #session = learn("titanic", titanic_file_path, target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
@@ -168,6 +172,7 @@ learn.file <- function(projectName = "temp",
                     weightByClass = FALSE,
                     produceFeatureClusteringReport = FALSE,
                     fileEncoding = NA,
+                    autoSave = TRUE,
                     runBlocking = TRUE,
                     verbose = FALSE){
 
@@ -237,16 +242,18 @@ learn.file <- function(projectName = "temp",
   print(paste("Artifact location was created at:", res$artifactPath))
   session = Session(artifact_loc = res$artifactPath, !(length(algorithmsWhiteList) == 0 || tolower(algorithmsWhiteList[[1]]) == "zeror"))
 
-  tryCatch({
-    tokens = strsplit(session$artifact_loc, "/")[[1]]
-    varName = paste("backup", tokens[length(tokens)-1], tokens[length(tokens)], sep="_")
-    saveFilename = paste0(getwd(),.Platform$file.sep,varName,".RData")
-    assign(varName, session)
-    base::save(list=varName, file = saveFilename) #auto-saving the model
-    print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
-  })
-  if (runBlocking) session$waitForProcess()
-  return(session)
+  if (autoSave){
+    tryCatch({
+      tokens = strsplit(session$artifact_loc, "/")[[1]]
+      varName = paste("backup", tokens[length(tokens)-1], tokens[length(tokens)], sep="_")
+      saveFilename = paste0(getwd(),.Platform$file.sep,varName,".RData")
+      assign(varName, session)
+      base::save(list=varName, file = saveFilename) #auto-saving the model
+      print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
+    })
+    if (runBlocking) session$waitForProcess()
+    return(session)
+  }
 }
 
 #' Run SparkBeyond feature enrichment and learning process.
@@ -271,6 +278,7 @@ learn.file <- function(projectName = "temp",
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
+#' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @return Session object that encapsulate the feature search result.
 #' @examples
 #' #session = featureSearch("titanic", getData("titanic_train"), "survived")
@@ -295,6 +303,7 @@ featureSearch <- function(projectName = "temp",
                                 weightByClass = FALSE,
                                 produceFeatureClusteringReport = FALSE,
                                 fileEncoding = NA,
+                                autoSave = TRUE,
                                 runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -319,6 +328,7 @@ featureSearch <- function(projectName = "temp",
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
                 fileEncoding = fileEncoding,
+                autoSave = autoSave,
                 runBlocking = runBlocking)
     model = do.call(learn,c(params))
   model
@@ -346,6 +356,7 @@ featureSearch <- function(projectName = "temp",
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
+#' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @return Session object that encapsulate the feature search result.
 #' @examples
 #' #session = featureSearch.file ("titanic", titanic_train_filename, "survived")
@@ -370,6 +381,7 @@ featureSearch.file <- function(projectName = "temp",
                           weightByClass = FALSE,
                           produceFeatureClusteringReport = FALSE,
                           fileEncoding = NA,
+                          autoSave = TRUE,
                           runBlocking = TRUE){
 
   params <-list(projectName = projectName,
@@ -394,6 +406,7 @@ featureSearch.file <- function(projectName = "temp",
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
                 fileEncoding = fileEncoding,
+                autoSave = autoSave,
                 runBlocking = runBlocking)
   model = do.call(learn.file,c(params))
   model

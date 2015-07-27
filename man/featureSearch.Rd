@@ -14,7 +14,7 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
   useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
   produceFeatureClusteringReport = FALSE, fileEncoding = NA,
-  runBlocking = TRUE)
+  autoSave = TRUE, runBlocking = TRUE)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
@@ -58,6 +58,8 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 \item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
 
 \item{fileEncoding:}{Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".}
+
+\item{autoSave:}{Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.}
 }
 \value{
 Session object that encapsulate the feature search result.

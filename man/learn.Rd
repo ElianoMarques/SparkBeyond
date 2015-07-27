@@ -16,7 +16,7 @@ learn(projectName = "temp", trainData, target, testData = NA,
   scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
   produceFeatureClusteringReport = FALSE, fileEncoding = NA,
-  runBlocking = TRUE, verbose = FALSE)
+  autoSave = TRUE, runBlocking = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -72,6 +72,8 @@ learn(projectName = "temp", trainData, target, testData = NA,
 \item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
 
 \item{fileEncoding:}{Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".}
+
+\item{autoSave:}{Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.}
 
 \item{runBlocking:}{Block the R console while the session is running. FALSE by default.}
 }
