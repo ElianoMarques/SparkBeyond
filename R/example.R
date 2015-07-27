@@ -21,7 +21,8 @@ run_SB_examples <- function(configuration='1', weightByClass = FALSE) {
       target = "survived",
       weightByClass = weightByClass,
       runBlocking = runBlocking,
-      useCachedFeatures = TRUE
+      useCachedFeatures = TRUE,
+      autoSave = FALSE
     )
     additional_params = switch (configuration,
                                 "1" = list(algorithmsWhiteList = list("RRandomForestClassifier")),
@@ -50,7 +51,8 @@ run_SB_examples <- function(configuration='1', weightByClass = FALSE) {
     print("Performing feature search only on Titanic train data")
     model = featureSearch(projectName = "titanic",
                           trainData = getData("titanic_train"),
-                          target = "survived"
+                          target = "survived",
+                          autoSave = FALSE
     )
     return (model)
   }
