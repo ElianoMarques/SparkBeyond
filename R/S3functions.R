@@ -235,9 +235,18 @@ learn.file <- function(projectName = "temp",
   }
 
   print(paste("Artifact location was created at:", res$artifactPath))
-  model = Session(artifact_loc = res$artifactPath, TRUE)
-  if (runBlocking) model$waitForProcess()
-  return(model)
+  session = Session(artifact_loc = res$artifactPath, !(length(algorithmsWhiteList) == 0 || tolower(algorithmsWhiteList[[1]]) == "zeror"))
+
+  tryCatch({
+    tokens = strsplit(session$artifact_loc, "/")[[1]]
+    varName = paste("backup", tokens[length(tokens)-1], tokens[length(tokens)], sep="_")
+    saveFilename = paste0(getwd(),.Platform$file.sep,varName,".RData")
+    assign(varName, session)
+    base::save(list=varName, file = saveFilename) #auto-saving the model
+    print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
+  })
+  if (runBlocking) session$waitForProcess()
+  return(session)
 }
 
 #' Run SparkBeyond feature enrichment and learning process.
@@ -387,7 +396,6 @@ featureSearch.file <- function(projectName = "temp",
                 fileEncoding = fileEncoding,
                 runBlocking = runBlocking)
   model = do.call(learn.file,c(params))
-  model$modelBuilt = FALSE
   model
 }
 
