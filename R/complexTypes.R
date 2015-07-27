@@ -20,7 +20,7 @@ groupBy = function(data, by, flatten = TRUE){
   data = as.data.table(data)
   grouped = data[,lapply(.SD,list), by=eval(parse(text=text))]
   #set row names
-  rownames(grouped) = apply(grouped[,eval(parse(text=text))], 1, paste0,collapse = "_")
+  #rownames(grouped) = apply(grouped[,eval(parse(text=text))], 1, paste0,collapse = "_") #data.table does not use rownames()
   #flatten when single value
   grouped = if (flatten){
     rowsCount = nrow(grouped)
