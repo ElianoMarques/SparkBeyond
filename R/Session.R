@@ -78,7 +78,7 @@ Session = setRefClass("Session",
               featuresCount = nrow(f)
               cntToShow = min(featuresCount, 50)
               print(paste("Printing top", cntToShow, "features out of", featuresCount))
-              print(f[1:cntToShow,.(idx,feature,RIG,support)])
+              print(f[1:cntToShow,c("idx","feature","RIG", "lin..score", "support")])
               hasShownFeatures = TRUE
             }
           }
@@ -372,7 +372,7 @@ Session = setRefClass("Session",
         #statusException() # TODO: check if features were generated already
         featuresFile = paste0(artifact_loc,"/reports/features/train_features.tsv")
         features = if (file.exists(featuresFile)){
-          fread(featuresFile, sep="\t", header=TRUE)
+          read.table(featuresFile, sep="\t", header=TRUE)
         } else {stop(paste("Features file does not exist in ", featuresFile))}
         return (features)
       },
@@ -393,7 +393,7 @@ Session = setRefClass("Session",
           else "features"
         }
         if (!report_name %in% c("roc_best", "roc_CV")){
-          paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
+          htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
           file.show(htmlSource)
         }
         else {
