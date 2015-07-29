@@ -49,24 +49,31 @@ printSBserverPort = function() {
 #' A function to set the SparkBeyond server I/O folder.
 #' @param port new port.
 setSBserverIOfolder = function(folder){
-  prefix = if (substr(folder, 1, 2) == "\\\\") {
-    curPrefix = substr(folder, 1, 2)
-    folder = substr(folder, 3, nchar(folder))
-    curPrefix
-  } else ""
-  folder = paste0(prefix,gsub("\\\\","/",folder))
-  if (substr(folder, nchar(folder), nchar(folder)) != "/") folder = paste0(folder, "/")
-  #if (substr(folder, nchar(folder)-1, nchar(folder)) != "//") folder = paste0(folder, "/")
-  if (is.null(folder) || folder == "") {stop("folder location is empty")}
-  if (!file.exists(folder)) {
-    print (paste("Folder ",  folder, " does not exists - attempting to create"))
-    dir.create(folder)
+  finalFolder = tryCatch ({
+    if (is.null(folder) || nchar(folder) <= 2) stop("Empty folder name was provided to setSBserverIOfolder")
+    prefix = if (substr(folder, 1, 2) == "\\\\") {
+      curPrefix = substr(folder, 1, 2)
+      folder = substr(folder, 3, nchar(folder))
+      curPrefix
+    } else ""
+    folder = paste0(prefix,gsub("\\\\","/",folder))
+    if (substr(folder, nchar(folder), nchar(folder)) != "/") folder = paste0(folder, "/")
+    #if (substr(folder, nchar(folder)-1, nchar(folder)) != "//") folder = paste0(folder, "/")
+    if (is.null(folder) || folder == "") {stop("folder location is empty")}
+    if (!file.exists(folder)) {
+      print (paste("Folder ",  folder, " does not exists - attempting to create"))
+      dir.create(folder)
 
-    #if (!file.exists(folder)) {stop(paste("failed to create folder", folder))} #fails if ends with "/"
-  }
-  assign("IOfolder", folder, envir = globalenv())
-  print(paste("Setting server IO folder to:", IOfolder))
-  return(IOfolder)
+      #if (!file.exists(folder)) {stop(paste("failed to create folder", folder))} #fails if ends with "/"
+    }
+    assign("IOfolder", folder, envir = globalenv())
+    print(paste("Setting server IO folder to:", IOfolder))
+    return(IOfolder)
+  }, error = function(e) {
+    print(paste("Failed to set SBserverIOfolder. Details:",e))
+    return("")
+  })
+  finalFolder
 }
 
 #' A function to get the SparkBeyond server IO folder.
@@ -108,7 +115,8 @@ loadSettings = function() {
     setSBserverIOfolder(SB_IOfolder)
     setSBserverHost(SB_HOST)
     setSBserverPort(SB_PORT)
-  } else print("Settings file does not exist.")
+  } else print(paste("Settings file does not exist in", getwd()))
+  "Done"
 }
 
 
@@ -150,8 +158,7 @@ isServerAlive = function() {
   status = tryCatch({
     res = httr::GET(url, httr::content_type_json())
     TRUE
-    },
-    error = function(cond) FALSE
+    }, error = function(cond) FALSE
   )
   status
 }
@@ -251,6 +258,6 @@ isLatestRpackage = function() {
 }
 
 .onLoad <- function(libname = find.package("SBadapter"), pkgname = "SBadapter") {
-  print("Automatically trying to load settings saved in the current directory:")
+  print(paste0("Automatically trying to load settings saved in :",getwd()))
   loadSettings()
 }
