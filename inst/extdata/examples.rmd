@@ -4,22 +4,82 @@ output: html_document
 ---
 This tutorial shows advanced learning examples.
 
-### Flights weather delay
-
-Predict weather delays
-
 <!-- 
   Comment:
   ========
   eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all 
 --> 
-  
-```{r, echo=FALSE, results='hide', message=FALSE}
-library('SBadapter')
-```
-```{r, echo=FALSE, results='hide', message=FALSE}
+
+### Titanic example
+<!-- 
+Write text for all
+Show sampling, grouping examples - in a different section
+Show predict / create package etc example - should be in a different section
+-->
+```{r, echo=FALSE, eval=TRUE, message=FALSE, results='hide'}
+library(SBadapter)
 setSBserverIOfolder("/tmp/")
 ```
+
+```{r, eval=TRUE, message=FALSE, results='hide'}
+data = getData("titanic_train")
+titanicSurvivedModel = learn(projectName = "titanic_survived",
+                        trainData = data,
+                        target = "survived",
+                        algorithmsWhiteList = list("RRandomForestClassifier"),  
+                        maxFeaturesCount = 50,
+                        scoreOnTestSet = TRUE, 
+                        autoSave = FALSE
+                    )
+
+
+```
+```{r, eval=TRUE, message=FALSE}
+titanicSurvivedModel$features()[1:3,c("idx","feature")]
+```
+```{r, eval=FALSE, message=FALSE}
+titanicSurvivedModel$showFeaturesTest()
+```
+
+### Titanic age example
+```{r, eval=TRUE, message=FALSE, results='hide'}
+data = getData("titanic_train")
+titanicAgeModel = learn(projectName = "titanic_age",
+                        trainData = data,
+                        target = "age",
+                        algorithmsWhiteList = list("RRandomForestRegressor"),  
+                        maxFeaturesCount = 50,
+                        scoreOnTestSet = TRUE,
+                        autoSave = FALSE
+                    )
+
+```
+```{r, eval=TRUE, message=FALSE}
+titanicAgeModel$features()[1:3,c("idx","feature")]
+```
+
+### Density example
+```{r, eval=TRUE, message=FALSE, results='hide'}
+n = 500
+data = data.table(lat=runif(n), long = runif(n))
+data[,target:=sapply(1:n, function(i) 1/min({a = (data$lat[i]-data$lat)^2+(data$long[i]-data$long)^2; a[i] = Inf;a}))]
+densityModel = learn(projectName = "density_example",
+                        trainData = data,
+                        target = "target",
+                        algorithmsWhiteList = list("RRandomForestRegressor"),  
+                        crossRowFeatureSearch = TRUE,
+                        maxFeaturesCount = 30,
+                        maxDepth = 3,
+                        autoSave = FALSE
+                    )
+```
+```{r, eval=TRUE, message=FALSE}
+densityModel$features()[1:3,c("idx","feature")]
+```
+
+### Flights weather delay example
+
+Predict weather delays
 
 
 ```{r, eval=TRUE, message=FALSE, results='hide'}
@@ -29,16 +89,19 @@ flightsModel = learn(projectName = "flights_delay_example",
                         trainData = sampledFlights,
                         target = "weatherDelay",
                         algorithmsWhiteList = list("RRandomForestRegressor"),
-                        maxFeatureDuration = 500,
                         functionsBlackList = list("trigonometry"),
-                        maxFeaturesCount = list(50)
+                        maxFeaturesCount = list(20),
+                        autoSave = FALSE
                     )
-head(flightsModel$features())
 ```
-
+```{r, eval=TRUE, message=FALSE}
+flightsModel$features()[1:3,c("idx","feature")]
+```
 Notes:
 
-1. The first run may take more time as weather data will be downloaded and cached.
-2. The returned object `flightsModel` should show include features of the type `weatherAt(<location>, <time>)`.
-3. Running using all the flights data will improve RMSE significantly.
+1. Airport codes (in fields 'origin', 'dest') are automatically identified as airport entities and are enriched with the correspoding latitude and longitude information of the airport
+2. When elements of type date and location are encountered during the feature search, external data including weather are examined for their distinctive power.
+3. The first run may take more time as weather data will be downloaded and cached (to cancel this behaviour set overrideMaxFeatureDurationForExternalData = FALSE to prevent the ovveride given by default to external data sources). 
+4. The returned object `flightsModel` should include features of the type `weatherAt(<location>, <time>)`.
+5. Running using all the flights data will improve RMSE significantly.
 

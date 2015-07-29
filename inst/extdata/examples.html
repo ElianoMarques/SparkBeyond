@@ -65,29 +65,99 @@ img {
 
 
 <p>This tutorial shows advanced learning examples.</p>
-<div id="flights-weather-delay" class="section level3">
-<h3>Flights weather delay</h3>
-<p>Predict weather delays</p>
 <!-- 
   Comment:
   ========
   eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all 
 -->
+<div id="titanic-example" class="section level3">
+<h3>Titanic example</h3>
+<!-- 
+Write text for all
+Show sampling, grouping examples - in a different section
+Show predict / create package etc example - should be in a different section
+-->
+<pre class="r"><code>data = getData(&quot;titanic_train&quot;)
+titanicSurvivedModel = learn(projectName = &quot;titanic_survived&quot;,
+                        trainData = data,
+                        target = &quot;survived&quot;,
+                        algorithmsWhiteList = list(&quot;RRandomForestClassifier&quot;),  
+                        maxFeaturesCount = 50,
+                        scoreOnTestSet = TRUE, 
+                        autoSave = FALSE
+                    )</code></pre>
+<pre class="r"><code>titanicSurvivedModel$features()[1:3,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
+<pre><code>##   idx                                         feature
+## 1   0 tokenizeByPunctuation(name) does not contain mr
+## 2   1                                     pclass != 3
+## 3   2                      fare &gt;= 15.172899999999998</code></pre>
+<pre class="r"><code>titanicSurvivedModel$showFeaturesTest()</code></pre>
+</div>
+<div id="titanic-age-example" class="section level3">
+<h3>Titanic age example</h3>
+<pre class="r"><code>data = getData(&quot;titanic_train&quot;)
+titanicAgeModel = learn(projectName = &quot;titanic_age&quot;,
+                        trainData = data,
+                        target = &quot;age&quot;,
+                        algorithmsWhiteList = list(&quot;RRandomForestRegressor&quot;),  
+                        maxFeaturesCount = 50,
+                        scoreOnTestSet = TRUE,
+                        autoSave = FALSE
+                    )</code></pre>
+<pre class="r"><code>titanicAgeModel$features()[1:3,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
+<pre><code>##   idx              feature
+## 1   0 name contains master
+## 2   1           pclass &lt; 3
+## 3   2        embarked == Q</code></pre>
+</div>
+<div id="density-example" class="section level3">
+<h3>Density example</h3>
+<pre class="r"><code>n = 500
+data = data.table(lat=runif(n), long = runif(n))
+data[,target:=sapply(1:n, function(i) 1/min({a = (data$lat[i]-data$lat)^2+(data$long[i]-data$long)^2; a[i] = Inf;a}))]
+densityModel = learn(projectName = &quot;density_example&quot;,
+                        trainData = data,
+                        target = &quot;target&quot;,
+                        algorithmsWhiteList = list(&quot;RRandomForestRegressor&quot;),  
+                        crossRowFeatureSearch = TRUE,
+                        maxFeaturesCount = 30,
+                        maxDepth = 3,
+                        autoSave = FALSE
+                    )</code></pre>
+<pre class="r"><code>densityModel$features()[1:3,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
+<pre><code>##   idx
+## 1   0
+## 2   1
+## 3   2
+##                                                                                                    feature
+## 1                        inverse(distance of latLong from closest of latLong_column) &gt;= 0.6771952678141866
+## 2 abs(tan(distance of latLong from closest of latLong_column) - -0.8689761278043154) &gt;= 1.8937972806520662
+## 3  abs(sin(distance of latLong from closest of latLong_column) - 0.8279947586290533) &lt; 0.11227510011731207</code></pre>
+</div>
+<div id="flights-weather-delay-example" class="section level3">
+<h3>Flights weather delay example</h3>
+<p>Predict weather delays</p>
 <pre class="r"><code>flights = getData(&quot;flights_delay&quot;)
 sampledFlights = sampleDataAbsolute(flights, 1000)
 flightsModel = learn(projectName = &quot;flights_delay_example&quot;,
                         trainData = sampledFlights,
                         target = &quot;weatherDelay&quot;,
                         algorithmsWhiteList = list(&quot;RRandomForestRegressor&quot;),
-                        maxFeatureDuration = 500,
                         functionsBlackList = list(&quot;trigonometry&quot;),
-                        maxFeaturesCount = list(50)
-                    )
-head(flightsModel$features())</code></pre>
+                        maxFeaturesCount = list(20),
+                        autoSave = FALSE
+                    )</code></pre>
+<pre class="r"><code>flightsModel$features()[1:3,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
+<pre><code>##   idx                                feature
+## 1   0         abs(arrTime - 214.75) &lt; 172.25
+## 2   1                          taxiOut &gt;= 50
+## 3   2 abs(numberIn(tailNum) - 6605) &lt; 5616.5</code></pre>
 <p>Notes:</p>
 <ol style="list-style-type: decimal">
-<li>The first run may take more time as weather data will be downloaded and cached.</li>
-<li>The returned object <code>flightsModel</code> should show include features of the type <code>weatherAt(&lt;location&gt;, &lt;time&gt;)</code>.</li>
+<li>Airport codes (in fields ‘origin’, ‘dest’) are automatically identified as airport entities and are enriched with the correspoding latitude and longitude information of the airport</li>
+<li>When elements of type date and location are encountered during the feature search, external data including weather are examined for their distinctive power.</li>
+<li>The first run may take more time as weather data will be downloaded and cached (to cancel this behaviour set overrideMaxFeatureDurationForExternalData = FALSE to prevent the ovveride given by default to external data sources).</li>
+<li>The returned object <code>flightsModel</code> should include features of the type <code>weatherAt(&lt;location&gt;, &lt;time&gt;)</code>.</li>
 <li>Running using all the flights data will improve RMSE significantly.</li>
 </ol>
 </div>
