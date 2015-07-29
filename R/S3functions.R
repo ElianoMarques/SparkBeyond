@@ -251,9 +251,9 @@ learn.file <- function(projectName = "temp",
       base::save(list=varName, file = saveFilename) #auto-saving the model
       print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
     })
-    if (runBlocking) session$waitForProcess()
-    return(session)
   }
+  if (runBlocking) session$waitForProcess()
+  return(session)
 }
 
 #' Run SparkBeyond feature enrichment and learning process.
