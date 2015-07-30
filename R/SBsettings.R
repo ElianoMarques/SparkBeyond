@@ -168,6 +168,7 @@ isServerAlive = function() {
   status
 }
 
+
 #' A function to get the server version information
 #' @return The server version information.
 serverVersion = function(){
@@ -260,6 +261,13 @@ isLatestRpackage = function() {
     ret
   }, error = function(e) TRUE #if there is no internet connection than we skip the check
   )
+}
+
+#' functionCatalog
+
+#' Shows SparkBeyond current function catalog with possible
+functionCatalog = function() {
+  file.show(system.file("extdata", "functionCatalog.html", package = "SBadapter"))
 }
 
 .onLoad <- function(libname = find.package("SBadapter"), pkgname = "SBadapter") {
