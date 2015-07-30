@@ -68,50 +68,67 @@ img {
 <!-- 
   Comment:
   ========
-  eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all 
+  Set eval = FALSE (with spaces) in places that you would like not be to evaluated permanently (i.e., not be capture by the replace all) 
 -->
-<div id="titanic-example" class="section level3">
-<h3>Titanic example</h3>
 <!-- 
-Write text for all
+Write text for all examples
 Show sampling, grouping examples - in a different section
 Show predict / create package etc example - should be in a different section
 -->
+<div id="titanic---simple-classification-example" class="section level3">
+<h3>Titanic - simple classification example</h3>
+<p>This example demonstrates how to perform a simple classification using the SparkBeyond platform. We will use data from the famous Kaggle competition to predict who will die on the Titanic. We can get the titanic train data by calling <code>data = getData(&quot;titanic_train&quot;)</code>. The column <code>survived</code> contains the information for whether a Titanic passenger survived. In the following example we ask the engine to create and return the top 25 features.</p>
 <pre class="r"><code>data = getData(&quot;titanic_train&quot;)
 titanicSurvivedModel = learn(projectName = &quot;titanic_survived&quot;,
                         trainData = data,
                         target = &quot;survived&quot;,
                         algorithmsWhiteList = list(&quot;RRandomForestClassifier&quot;),  
-                        maxFeaturesCount = 50,
-                        scoreOnTestSet = TRUE, 
-                        autoSave = FALSE
+                        maxFeaturesCount = 25,  # number of feature counts to check (if a list is provided
+                                                # the best will be selected using cross validation)
+                        scoreOnTestSet = TRUE,  # will create lift plots and prediction table 
+                        autoSave = FALSE        # in order to avoid automatically creating a local object 
+                                                # pointing to the created model
                     )</code></pre>
-<pre class="r"><code>titanicSurvivedModel$features()[1:3,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
-<pre><code>##   idx                                         feature
-## 1   0 tokenizeByPunctuation(name) does not contain mr
-## 2   1                                     pclass != 3
-## 3   2                      fare &gt;= 15.172899999999998</code></pre>
+<pre class="r"><code>titanicSurvivedModel$features()[1:3,c(&quot;idx&quot;, &quot;feature&quot;, &quot;Lift.0&quot;, &quot;Lift.1&quot;)]</code></pre>
+<pre><code>##   idx                                                           feature
+## 1   0                   tokenizeByPunctuation(name) does not contain mr
+## 2   1                                                       pclass != 3
+## 3   2 abs(replaceNaNsWith(numberIn(ticket), 2) - 120393.25) &lt; 111538.75
+##      Lift.0   Lift.1
+## 1 0.4888845 1.842959
+## 2 0.7241255 1.454987
+## 3 0.6134746 1.637478</code></pre>
 <pre class="r"><code>titanicSurvivedModel$showFeaturesTest()</code></pre>
+<!-- 
+need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/Resources/library/SBadapter/extdata/" or externally (amazon?) or generate equivalent figure
+<iframe width="400" height="400" src="./Lift_plot_survived_1.html" frameborder="0" seamless></iframe>
+-->
+<p>On the Titanic most children and women were rescued first, hence had higher survival rates. The first feature that was generated, breaks down the <code>name</code> column into tokens and notes that the token “mr” is not included in the passenger name. This feature effectively identifies both the children and women populations.</p>
 </div>
-<div id="titanic-age-example" class="section level3">
-<h3>Titanic age example</h3>
+<div id="titanic-age---simple-regression-example" class="section level3">
+<h3>Titanic age - simple regression example</h3>
+<p>This example demonstrates how to perform a simple regression using the SparkBeyond platform. We will use the same titanic data but now we will aim to predict the column <code>age</code>.</p>
 <pre class="r"><code>data = getData(&quot;titanic_train&quot;)
 titanicAgeModel = learn(projectName = &quot;titanic_age&quot;,
                         trainData = data,
                         target = &quot;age&quot;,
                         algorithmsWhiteList = list(&quot;RRandomForestRegressor&quot;),  
-                        maxFeaturesCount = 50,
+                        maxFeaturesCount = 25,
                         scoreOnTestSet = TRUE,
                         autoSave = FALSE
                     )</code></pre>
-<pre class="r"><code>titanicAgeModel$features()[1:3,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
+<pre class="r"><code>titanicAgeModel$features()[1:5,c(&quot;idx&quot;, &quot;feature&quot;)]</code></pre>
 <pre><code>##   idx              feature
 ## 1   0 name contains master
 ## 2   1           pclass &lt; 3
-## 3   2        embarked == Q</code></pre>
+## 3   2        embarked == Q
+## 4   3           parch != 0
+## 5   4   name contains miss</code></pre>
+<p>From this examples, we can see that having the tokens ‘master’ and ‘miss’ in the passenger name are strong indicators of the gender.</p>
 </div>
-<div id="density-example" class="section level3">
-<h3>Density example</h3>
+<div id="density-example---cross-row-feature-search-and-depth-control" class="section level3">
+<h3>Density example - cross row feature search and depth control</h3>
+<p>In this example, we will generate 500 random points in Euclidean space, and we will set as target for each point, the inverse of the minimal distance from all other points.</p>
 <pre class="r"><code>n = 500
 data = data.table(lat=runif(n), long = runif(n))
 data[,target:=sapply(1:n, function(i) 1/min({a = (data$lat[i]-data$lat)^2+(data$long[i]-data$long)^2; a[i] = Inf;a}))]
@@ -119,24 +136,35 @@ densityModel = learn(projectName = &quot;density_example&quot;,
                         trainData = data,
                         target = &quot;target&quot;,
                         algorithmsWhiteList = list(&quot;RRandomForestRegressor&quot;),  
-                        crossRowFeatureSearch = TRUE,
-                        maxFeaturesCount = 30,
-                        maxDepth = 3,
+                        crossRowFeatureSearch = TRUE,  # indicates that points from all rows should be
+                                                       # considered together during feature search
+                        maxFeaturesCount = 5,
+                        maxDepth = 3,                               # allowing a higher search space depth
+                        functionsBlackList = list(&quot;trigonometry&quot;),  # blacklist trigonometric functions
                         autoSave = FALSE
                     )</code></pre>
-<pre class="r"><code>densityModel$features()[1:3,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
+<pre class="r"><code>densityModel$features()[1:5,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
 <pre><code>##   idx
 ## 1   0
 ## 2   1
 ## 3   2
-##                                                                                                    feature
-## 1                        inverse(distance of latLong from closest of latLong_column) &gt;= 0.6771952678141866
-## 2 abs(tan(distance of latLong from closest of latLong_column) - -0.8689761278043154) &gt;= 1.8937972806520662
-## 3  abs(sin(distance of latLong from closest of latLong_column) - 0.8279947586290533) &lt; 0.11227510011731207</code></pre>
+## 4   3
+## 5   4
+##                                                                                      feature
+## 1          inverse(distance of latLong from closest of latLong_column) &gt;= 0.6183368492535206
+## 2                            ceil(distance of latLong from closest of latLong_column) == 2.0
+## 3                             round(distance of latLong from closest of latLong_column) == 2
+## 4 normalizer(ceil(distance of latLong from closest of latLong_column)) &gt;= 0.6500000000000001
+## 5                            ceil(distance of latLong from closest of latLong_column) == 1.0</code></pre>
+<p>Note that in this example:</p>
+<ol style="list-style-type: decimal">
+<li>While we provided the columns <code>lat</code> and <code>long</code> as two separate columns, a new feature named <code>latLong</code> was created that can operate in the 2D space.</li>
+<li>The resulting best feature was able to capture our target by being able to generate features using the entire column information.</li>
+</ol>
 </div>
-<div id="flights-weather-delay-example" class="section level3">
-<h3>Flights weather delay example</h3>
-<p>Predict weather delays</p>
+<div id="flights-weather-delay-example---automatic-enrichment-using-external-sourcing" class="section level3">
+<h3>Flights weather delay example - automatic enrichment using external sourcing</h3>
+<p>In this example we use data from Kaggele that contains information of flight delays caused due to weather conditions. This example will show how airport codes (in fields <code>origin</code>, <code>dest</code>) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport. Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power. The first run may take more time as weather data will be downloaded and cached (to cancel this behavior set <code>overrideMaxFeatureDurationForExternalData = FALSE</code> to prevent the override given by default to external data sources).</p>
 <pre class="r"><code>flights = getData(&quot;flights_delay&quot;)
 sampledFlights = sampleDataAbsolute(flights, 1000)
 flightsModel = learn(projectName = &quot;flights_delay_example&quot;,
@@ -144,19 +172,34 @@ flightsModel = learn(projectName = &quot;flights_delay_example&quot;,
                         target = &quot;weatherDelay&quot;,
                         algorithmsWhiteList = list(&quot;RRandomForestRegressor&quot;),
                         functionsBlackList = list(&quot;trigonometry&quot;),
-                        maxFeaturesCount = list(20),
+                        maxFeaturesCount = list(10),
                         autoSave = FALSE
                     )</code></pre>
-<pre class="r"><code>flightsModel$features()[1:3,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
-<pre><code>##   idx                                feature
-## 1   0         abs(arrTime - 214.75) &lt; 172.25
-## 2   1                          taxiOut &gt;= 50
-## 3   2 abs(numberIn(tailNum) - 6605) &lt; 5616.5</code></pre>
-<p>Notes:</p>
+<pre class="r"><code>flightsModel$features()[1:10,c(&quot;idx&quot;,&quot;feature&quot;)]</code></pre>
+<pre><code>##    idx
+## 1    0
+## 2    1
+## 3    2
+## 4    3
+## 5    4
+## 6    5
+## 7    6
+## 8    7
+## 9    8
+## 10   9
+##                                                                                                                          feature
+## 1                                                                                                 abs(arrTime - 372.75) &lt; 341.75
+## 2                                             WeatherProvider.contentFor(latLong(airports(dest)),date).SNDP orIfMissing 0 &gt;= 4.5
+## 3                                                                                              abs(cRSArrTime - 2081.25) &lt; 44.25
+## 4                                                 WeatherProvider.contentFor(latLong(airports(origin)),date) contains (SLP2, 24)
+## 5                                                                                                   abs(flightNum - 995) &lt; 845.5
+## 6                                abs(WeatherProvider.contentFor(latLong(airports(dest)),date).PRCP orIfMissing 0 - 0.21) &lt; 0.205
+## 7                                           abs(distanceBetween(origin, date, airports) - 7879.729085177667) &lt; 59.13483957836797
+## 8  abs(WeatherProvider.contentFor(latLong(airports(dest)),date).TEMP orIfMissing 101.5 - 31.950000000000003) &lt; 2.700000000000003
+## 9                                             WeatherProvider.contentFor(latLong(airports(dest)),date).GUST orIfMissing 0 &lt; 17.6
+## 10 abs(WeatherProvider.contentFor(latLong(airports(dest)),date).MINTEMP orIfMissing 0 - 22.825000000000003) &lt; 2.2750000000000004</code></pre>
+<p>Note that in this example:</p>
 <ol style="list-style-type: decimal">
-<li>Airport codes (in fields ‘origin’, ‘dest’) are automatically identified as airport entities and are enriched with the correspoding latitude and longitude information of the airport</li>
-<li>When elements of type date and location are encountered during the feature search, external data including weather are examined for their distinctive power.</li>
-<li>The first run may take more time as weather data will be downloaded and cached (to cancel this behaviour set overrideMaxFeatureDurationForExternalData = FALSE to prevent the ovveride given by default to external data sources).</li>
 <li>The returned object <code>flightsModel</code> should include features of the type <code>weatherAt(&lt;location&gt;, &lt;time&gt;)</code>.</li>
 <li>Running using all the flights data will improve RMSE significantly.</li>
 </ol>

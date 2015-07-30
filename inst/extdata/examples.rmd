@@ -7,58 +7,79 @@ This tutorial shows advanced learning examples.
 <!-- 
   Comment:
   ========
-  eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all 
+  Set eval = FALSE (with spaces) in places that you would like not be to evaluated permanently (i.e., not be capture by the replace all) 
 --> 
 
-### Titanic example
 <!-- 
-Write text for all
+Write text for all examples
 Show sampling, grouping examples - in a different section
 Show predict / create package etc example - should be in a different section
 -->
-```{r, echo=FALSE, eval=TRUE, message=FALSE, results='hide'}
+
+```{r, echo=FALSE, eval = TRUE, message=FALSE, results='hide'}
 library(SBadapter)
 setSBserverIOfolder("/tmp/")
 ```
-
+  
+    
+### Titanic - simple classification example
+This example demonstrates how to perform a simple classification using the SparkBeyond platform.
+We will use data from the famous Kaggle competition to predict who will die on the Titanic.
+We can get the titanic train data by calling `data = getData("titanic_train")`. The column `survived` contains the information for whether a Titanic passenger survived.
+In the following example we ask the engine to create and return the top 25 features. 
 ```{r, eval=TRUE, message=FALSE, results='hide'}
 data = getData("titanic_train")
 titanicSurvivedModel = learn(projectName = "titanic_survived",
                         trainData = data,
                         target = "survived",
                         algorithmsWhiteList = list("RRandomForestClassifier"),  
-                        maxFeaturesCount = 50,
-                        scoreOnTestSet = TRUE, 
-                        autoSave = FALSE
+                        maxFeaturesCount = 25,  # number of feature counts to check (if a list is provided
+                                                # the best will be selected using cross validation)
+                        scoreOnTestSet = TRUE,  # will create lift plots and prediction table 
+                        autoSave = FALSE        # in order to avoid automatically creating a local object 
+                                                # pointing to the created model
                     )
-
-
 ```
 ```{r, eval=TRUE, message=FALSE}
-titanicSurvivedModel$features()[1:3,c("idx","feature")]
+titanicSurvivedModel$features()[1:3,c("idx", "feature", "Lift.0", "Lift.1")]
 ```
-```{r, eval=FALSE, message=FALSE}
+```{r, eval = FALSE, message=FALSE}
 titanicSurvivedModel$showFeaturesTest()
 ```
+```{r, echo=FALSE, eval = FALSE, message=FALSE}
+file.copy(paste0(titanicSurvivedModel$artifact_loc,"/reports/predictions/test/Lift_plot_survived_1.html"), getwd()) 
+```
+<!-- 
+need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/Resources/library/SBadapter/extdata/" or externally (amazon?) or generate equivalent figure
+<iframe width="400" height="400" src="./Lift_plot_survived_1.html" frameborder="0" seamless></iframe>
+-->
+On the Titanic most children and women were rescued first, hence had higher survival rates.
+The first feature that was generated, breaks down the `name` column into tokens and notes that the token "mr" is not included in the passenger name. This feature effectively identifies both the children and women populations.
 
-### Titanic age example
+  
+     
+### Titanic age - simple regression example
+This example demonstrates how to perform a simple regression using the SparkBeyond platform.
+We will use the same titanic data but now we will aim to predict the column `age`.
 ```{r, eval=TRUE, message=FALSE, results='hide'}
 data = getData("titanic_train")
 titanicAgeModel = learn(projectName = "titanic_age",
                         trainData = data,
                         target = "age",
                         algorithmsWhiteList = list("RRandomForestRegressor"),  
-                        maxFeaturesCount = 50,
+                        maxFeaturesCount = 25,
                         scoreOnTestSet = TRUE,
                         autoSave = FALSE
                     )
 
 ```
 ```{r, eval=TRUE, message=FALSE}
-titanicAgeModel$features()[1:3,c("idx","feature")]
+titanicAgeModel$features()[1:5,c("idx", "feature")]
 ```
+From this examples, we can see that having the tokens 'master' and 'miss' in the passenger name are strong indicators of the gender. 
 
-### Density example
+### Density example - cross row feature search and depth control
+In this example, we will generate 500 random points in Euclidean space, and we will set as target for each point, the inverse of the minimal distance from all other points. 
 ```{r, eval=TRUE, message=FALSE, results='hide'}
 n = 500
 data = data.table(lat=runif(n), long = runif(n))
@@ -67,20 +88,29 @@ densityModel = learn(projectName = "density_example",
                         trainData = data,
                         target = "target",
                         algorithmsWhiteList = list("RRandomForestRegressor"),  
-                        crossRowFeatureSearch = TRUE,
-                        maxFeaturesCount = 30,
-                        maxDepth = 3,
+                        crossRowFeatureSearch = TRUE,  # indicates that points from all rows should be
+                                                       # considered together during feature search
+                        maxFeaturesCount = 5,
+                        maxDepth = 3,                               # allowing a higher search space depth
+                        functionsBlackList = list("trigonometry"),  # blacklist trigonometric functions
                         autoSave = FALSE
                     )
 ```
 ```{r, eval=TRUE, message=FALSE}
-densityModel$features()[1:3,c("idx","feature")]
+densityModel$features()[1:5,c("idx","feature")]
 ```
+Note that in this example:
 
-### Flights weather delay example
+1. While we provided the columns `lat` and `long` as two separate columns, a new feature named `latLong` was created that can operate in the 2D space.
+2. The resulting best feature was able to capture our target by being able to generate features using the entire column information.
+  
+  
+### Flights weather delay example - automatic enrichment using external sourcing
 
-Predict weather delays
-
+In this example we use data from Kaggele that contains information of flight delays caused due to weather conditions.
+This example will show how airport codes (in fields `origin`, `dest`) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport.
+Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power.
+The first run may take more time as weather data will be downloaded and cached (to cancel this behavior set `overrideMaxFeatureDurationForExternalData = FALSE` to prevent the override given by default to external data sources). 
 
 ```{r, eval=TRUE, message=FALSE, results='hide'}
 flights = getData("flights_delay")
@@ -90,18 +120,15 @@ flightsModel = learn(projectName = "flights_delay_example",
                         target = "weatherDelay",
                         algorithmsWhiteList = list("RRandomForestRegressor"),
                         functionsBlackList = list("trigonometry"),
-                        maxFeaturesCount = list(20),
+                        maxFeaturesCount = list(10),
                         autoSave = FALSE
                     )
 ```
 ```{r, eval=TRUE, message=FALSE}
-flightsModel$features()[1:3,c("idx","feature")]
+flightsModel$features()[1:10,c("idx","feature")]
 ```
-Notes:
+Note that in this example:
 
-1. Airport codes (in fields 'origin', 'dest') are automatically identified as airport entities and are enriched with the correspoding latitude and longitude information of the airport
-2. When elements of type date and location are encountered during the feature search, external data including weather are examined for their distinctive power.
-3. The first run may take more time as weather data will be downloaded and cached (to cancel this behaviour set overrideMaxFeatureDurationForExternalData = FALSE to prevent the ovveride given by default to external data sources). 
-4. The returned object `flightsModel` should include features of the type `weatherAt(<location>, <time>)`.
-5. Running using all the flights data will improve RMSE significantly.
+1. The returned object `flightsModel` should include features of the type `weatherAt(<location>, <time>)`.
+2. Running using all the flights data will improve RMSE significantly.
 
