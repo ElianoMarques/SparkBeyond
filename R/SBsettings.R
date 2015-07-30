@@ -135,7 +135,9 @@ restartServer = function() {
     secs = 8#min(i*2, 5)
     Sys.sleep(secs)
     if(isServerAlive()) {
-      serverVersion()
+      version = serverVersion()
+      print(paste("Build:", version$jenkinsBuild))
+      print(paste("Time:", version$buildTime))
       return("Server is up.")
     }
     if (i > 15) return ("Server is failed to load automatically - please load manually.")
