@@ -134,7 +134,10 @@ restartServer = function() {
     print(paste("Waiting for server to load -" ,i))
     secs = 8#min(i*2, 5)
     Sys.sleep(secs)
-    if(isServerAlive()) return("Server is up.")
+    if(isServerAlive()) {
+      serverVersion()
+      return("Server is up.")
+    }
     if (i > 15) return ("Server is failed to load automatically - please load manually.")
   }
   println(finalStatus)
