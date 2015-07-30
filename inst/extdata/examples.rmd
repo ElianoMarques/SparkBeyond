@@ -22,7 +22,7 @@ setSBserverIOfolder("/tmp/")
 ```
   
     
-### Titanic - simple classification example
+### Predict Titanic Survival - simple classification example
 This example demonstrates how to perform a simple classification using the SparkBeyond platform.
 We will use data from the famous Kaggle competition to predict who will die on the Titanic.
 We can get the titanic train data by calling `data = getData("titanic_train")`. The column `survived` contains the information for whether a Titanic passenger survived.
@@ -58,7 +58,7 @@ The first feature that was generated, breaks down the `name` column into tokens 
 
   
      
-### Titanic age - simple regression example
+### Predict Titanic Passenger Age - simple regression example
 This example demonstrates how to perform a simple regression using the SparkBeyond platform.
 We will use the same titanic data but now we will aim to predict the column `age`.
 ```{r, eval=TRUE, message=FALSE, results='hide'}
@@ -74,9 +74,29 @@ titanicAgeModel = learn(projectName = "titanic_age",
 
 ```
 ```{r, eval=TRUE, message=FALSE}
-titanicAgeModel$features()[1:5,c("idx", "feature")]
+titanicAgeModel$features()[1:10,c("idx", "feature")]
 ```
 From this examples, we can see that having the tokens 'master' and 'miss' in the passenger name are strong indicators of the gender. 
+
+### Predict Titanic Passenger Age - feature exclusion examples
+This example demonstrates how to exclude elements from the generated features. 
+Let's say that for example that for whatever reason we would prefer to not create mathematical features (such as "abs"), trigonometry features, and also exclude features that contains the word "master". We can set the `functionsBlackList` parameter to exclude these two terms. Please refer to the SparkBeyond function catalog by calling `functionCatalog()` to view the list of functions and associated domains
+In this example we are using the featureSearch capability only without actually building a model.
+```{r, eval=TRUE, message=FALSE, results='hide'}
+data = getData("titanic_train")
+titanicAgeFeatures = featureSearch(projectName = "titanic_age_exclusions",
+                        trainData = data,
+                        target = "age", 
+                        maxFeaturesCount = 10,
+                        functionsBlackList = list("abs", "master", "trigonometry"),  # blacklist trigonometric functions "abs" and "master"
+                        autoSave = FALSE
+                    )
+
+```
+```{r, eval=TRUE, message=FALSE}
+titanicAgeFeatures$features()[1:10,c("idx", "feature")]
+```
+
 
 ### Density example - cross row feature search and depth control
 In this example, we will generate 500 random points in Euclidean space, and we will set as target for each point, the inverse of the minimal distance from all other points. 
