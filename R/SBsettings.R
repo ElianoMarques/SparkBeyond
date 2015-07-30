@@ -136,7 +136,7 @@ restartServer = function() {
     Sys.sleep(secs)
     if(isServerAlive()) {
       version = serverVersion()
-      print(paste("Build:", version$jenkinsBuild))
+      print(paste("Build:", version$jenkinsBuild)) #alternatively use cat to print multiline
       print(paste("Time:", version$buildTime))
       return("Server is up.")
     }
