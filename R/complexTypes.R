@@ -24,7 +24,8 @@ groupBy = function(data, by, flatten = TRUE){
   #flatten when single value
   grouped = if (flatten){
     rowsCount = nrow(grouped)
-    toFlatten = setdiff(names(which(rowsCount == apply(colSizes(grouped), 2, sum))), by)
+    #toFlatten = setdiff(names(which(rowsCount == apply(colSizes(grouped), 2, sum))), by)
+    toFlatten = setdiff(names(which(rowsCount == apply(colSizesUnique(grouped), 2, sum))), by)
     if (length(toFlatten) > 0)
       flattenCols(grouped, toFlatten)
     else grouped
@@ -49,6 +50,13 @@ groupBy = function(data, by, flatten = TRUE){
 #' head(grouped2)
 colSizes = function(data) {
   colLengthFunc = function(y) {if(length(y) == 1 && is.na(y)) list(NA) else length(unlist(y))}
+  sizes = sapply(data, function(x) sapply(x, function(y) colLengthFunc(y)))
+  rownames(sizes) = rownames(data)
+  sizes
+}
+
+colSizesUnique = function(data) {
+  colLengthFunc = function(y) {if(length(unique(y)) == 1 && is.na(y)) list(NA) else length(unique(unlist(y)))}
   sizes = sapply(data, function(x) sapply(x, function(y) colLengthFunc(y)))
   rownames(sizes) = rownames(data)
   sizes
