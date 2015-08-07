@@ -372,7 +372,7 @@ Session = setRefClass("Session",
         #statusException() # TODO: check if features were generated already
         featuresFile = paste0(artifact_loc,"/reports/features/train_features.tsv")
         features = if (file.exists(featuresFile)){
-          read.table(featuresFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = "")
+          suppressWarnings(read.table(featuresFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = ""))
         } else {stop(paste("Features file does not exist in ", featuresFile))}
         return (features)
       },

@@ -19,10 +19,12 @@ Count the unique number of items in each column
 grouped = groupBy(getData("titanic_train"), by ="pclass")
 rownames(grouped)
 colSizes(grouped)
+colSizesUnique(grouped)
 head(grouped)
 grouped2 = groupBy(getData("titanic_train"), by =list("pclass","sex"))
 rownames(grouped2)
 colSizes(grouped2)
+colSizesUnique(grouped2)
 head(grouped2)
 }
 
