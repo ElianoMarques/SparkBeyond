@@ -22,13 +22,11 @@ groupBy = function(data, by, flatten = TRUE){
   #set row names
   #rownames(grouped) = apply(grouped[,eval(parse(text=text))], 1, paste0,collapse = "_") #data.table does not use rownames()
   #flatten when single value
-  grouped = if (flatten){
+  if (flatten){
     rowsCount = nrow(grouped)
     #toFlatten = setdiff(names(which(rowsCount == apply(colSizes(grouped), 2, sum))), by)
-    toFlatten = setdiff(names(which(rowsCount == apply(colSizesUnique(grouped), 2, sum))), by)
-    if (length(toFlatten) > 0)
-      flattenCols(grouped, toFlatten)
-    else grouped
+    toFlatten = setdiff(names(which(rowsCount == apply(colSizesUnique(grouped), 2, sum) )), by)
+    if (length(toFlatten) > 0) flattenCols(grouped, toFlatten)
   }
   grouped
 }
@@ -49,15 +47,31 @@ groupBy = function(data, by, flatten = TRUE){
 #' colSizes(grouped2)
 #' head(grouped2)
 colSizes = function(data) {
-  colLengthFunc = function(y) {if(length(y) == 1 && is.na(y)) list(NA) else length(unlist(y))}
-  sizes = sapply(data, function(x) sapply(x, function(y) colLengthFunc(y)))
+  colLengthFunc = function(y) {length(unlist(y))}
+  sizes = sapply(data, function(x) sapply(x, function(y) colLengthFunc(y)), simplify=TRUE)
   rownames(sizes) = rownames(data)
   sizes
 }
 
+#' colSizesUnique
+#'
+#' Count the unique number of items in each column
+#' @param data dataframe / data.table to be examined
+#' @return a summary of unique items counts per row
+#' @examples
+#' grouped = groupBy(getData("titanic_train"), by ="pclass")
+#' rownames(grouped)
+#' colSizes(grouped)
+#' colSizesUnique(grouped)
+#' head(grouped)
+#' grouped2 = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+#' rownames(grouped2)
+#' colSizes(grouped2)
+#' colSizesUnique(grouped2)
+#' head(grouped2)
 colSizesUnique = function(data) {
-  colLengthFunc = function(y) {if(length(unique(y)) == 1 && is.na(y)) list(NA) else length(unique(unlist(y)))}
-  sizes = sapply(data, function(x) sapply(x, function(y) colLengthFunc(y)))
+  colLengthFunc = function(y) {length(unique(unlist(y)))}
+  sizes = sapply(data, function(x) sapply(x, function(y) colLengthFunc(y)), simplify=TRUE)
   rownames(sizes) = rownames(data)
   sizes
 }
