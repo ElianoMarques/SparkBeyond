@@ -49,7 +49,7 @@ learn.file(projectName = "temp", trainDataFilename, target,
 
 \item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
 
-\item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
+\item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.}
 
 \item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.}
 

@@ -45,7 +45,7 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 
 \item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.}
 
-\item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. NA by default.}
+\item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.}
 
 \item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.}
 
