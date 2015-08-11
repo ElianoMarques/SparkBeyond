@@ -44,7 +44,7 @@ sampleDataByClass = function(data, columnName, labels = NA, desiredDistribution 
   sumDesiredDistribution = sum(desiredDistribution)
   adjustedDesiredDistribution = desiredDistribution/sumDesiredDistribution
 
-  labIndices = sapply(labels, function(label) {which(data[,columnName]==label)})
+  labIndices = sapply(labels, function(label) {which(getCols(data,columnName)==label)})
   originalDistribution = sapply(labIndices, function(indices) {length(indices)} / dataSize)
 
   distRatios = mapply(function(original, desired) {original / desired}, originalDistribution, adjustedDesiredDistribution)
@@ -71,5 +71,5 @@ trainTestSplit = function(data, ratio = 0.8){
   dataSize = nrow(data)
   sampleSize = ceiling(ratio * dataSize)
   trainIndices = sample(1:dataSize, sampleSize)
-  list(data[trainIndices,], data[-trainIndices,])
+  list(train = data[trainIndices,], test = data[-trainIndices,])
 }

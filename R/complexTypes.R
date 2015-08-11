@@ -195,6 +195,20 @@ excludeCols = function(data, cols) {
   else print("No columns were removed")
 }
 
+#' getCols
+#'
+#' get columns content from a data frame / data.table.
+#' @param data: dataframe / data data.table to modify.
+#' @param cols: a list of column names to get.
+#' @return a dataframe / data.table with the requested columns will be return.
+getCols = function(data, cols){
+  if ("data.table" %in% class(data)){
+    data[,cols, with=FALSE]
+  }else{
+    data[,cols]
+  }
+}
+
 
 ##' Sugar to trim a list column by a number
 #trimN = function(y,n) {if(is.na(n)) list(y) else if (length(y) == 1 && is.na(y)) list(NA) else list(y[1:n])}
