@@ -162,10 +162,10 @@ writeToFile = function(data, outputFile) { #sugar for writing grouped data
 
 #' excludeCols
 #'
-#' Exclude columns from a data frame.
+#' Exclude columns from a data frame. Please notice that the function return value depends on the type of input. NA will be returned if the input is of type data.table and the input object will be modified. Otherwise a  data.frame object will be returned.
 #' @param data: dataframe / data data.table to modify.
 #' @param cols: a list of column names to remove.
-#' @return if the input \code{data} is a dataframe than a dataframe with the excluded columns will be return. If the input \code{data} is a data.table object, nothing will be returned and the input object will be modified.
+#' @return if the input \code{data} is a dataframe than a dataframe with the excluded columns will be return. If the input \code{data} is a data.table object, NA will be returned and the input object will be modified.
 #' @examples
 #' data = getData("titanic_train")
 #'
@@ -187,8 +187,10 @@ excludeCols = function(data, cols) {
     print (paste(paste(effectiveCols, collapse=", "), "were removed"))
     if ("data.table" %in% class(data)){
       data[, (effectiveCols) := NULL] #note: parenthesis around cols are important
+      print("Note: the input object is of type data.table hence, NA be returned and the input object will be modified,")
       NA
     } else {
+      print("Note: the input object is of type data.frame hence, a new data.frame with the excluded columns will be returned.")
       data[ , -which(names(data) %in% cols)]
     }
   }

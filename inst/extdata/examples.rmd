@@ -1,6 +1,10 @@
 ---
 title: "SparkBeyond R package examples"
-output: html_document
+output:
+  html_document:
+    toc: true
+    theme: united
+    highlight: zenburn
 ---
 This tutorial shows advanced learning examples.
 
@@ -22,7 +26,7 @@ setSBserverIOfolder("/tmp/")
 ```
   
     
-### Predict Titanic Survival - simple classification example
+### Predict Titanic Passenger Survival - simple classification example
 This example demonstrates how to perform a simple classification using the SparkBeyond platform.
 We will use data from the famous Kaggle competition to predict who will die on the Titanic.
 We can get the titanic train data by calling `data = getData("titanic_train")`. The column `survived` contains the information for whether a Titanic passenger survived.
@@ -56,7 +60,7 @@ need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/R
 On the Titanic most children and women were rescued first, hence had higher survival rates.
 The first feature that was generated, breaks down the `name` column into tokens and notes that the token "mr" is not included in the passenger name. This feature effectively identifies both the children and women populations.
 
-  
+<br>
      
 ### Predict Titanic Passenger Age - simple regression example
 This example demonstrates how to perform a simple regression using the SparkBeyond platform.

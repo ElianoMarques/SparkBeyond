@@ -12,10 +12,10 @@ excludeCols(data, cols)
 \item{cols:}{a list of column names to remove.}
 }
 \value{
-if the input \code{data} is a dataframe than a dataframe with the excluded columns will be return. If the input \code{data} is a data.table object, nothing will be returned and the input object will be modified.
+if the input \code{data} is a dataframe than a dataframe with the excluded columns will be return. If the input \code{data} is a data.table object, NA will be returned and the input object will be modified.
 }
 \description{
-Exclude columns from a data frame.
+Exclude columns from a data frame. Please notice that the function return value depends on the type of input. NA will be returned if the input is of type data.table and the input object will be modified. Otherwise a  data.frame object will be returned.
 }
 \examples{
 data = getData("titanic_train")
