@@ -18,7 +18,7 @@ testZip = function () {
     zipcode1 = c("15217","89830","98002","14905","14607","15001","01008","02186","18816","18817","18822","01238","05846","22807","34205","24243","26347","28203","29040"),
     zipcode2 = c("90210","14620","12858","94115","97423","01008","15001","18816","02186","34997","18817","05846","30655","23125","22807","26347","24243","29040","28203"),
     target = c(1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0), stringsAsFactors=FALSE)
-  zipModel = learn("zipModel",zipData,"target", algorithmsWhiteList=list("RRandomForest"))
+  zipModel = learn("zipModel",zipData,"target", algorithmsWhiteList=list("RRandomForestClassifier"), functionsBlackList = list("numericInfo"))
 }
 
 stam = function(){
