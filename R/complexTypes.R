@@ -187,7 +187,7 @@ excludeCols = function(data, cols) {
     print (paste(paste(effectiveCols, collapse=", "), "were removed"))
     if ("data.table" %in% class(data)){
       data[, (effectiveCols) := NULL] #note: parenthesis around cols are important
-      print("Note: the input object is of type data.table hence, NA be returned and the input object will be modified,")
+      print("Note: the input object is of type data.table hence NA is returned and the input object will be modified,")
       NA
     } else {
       print("Note: the input object is of type data.frame hence, a new data.frame with the excluded columns will be returned.")
@@ -270,6 +270,28 @@ limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilD
    }
 
   data[sapply(eval(as.symbol(dateCol)), checkDate)]
+}
+
+#' offsetTime
+#'
+#' Offsets a time-date column by a reference date to create a relative time series with respect to the reference date. Currently work only on data.table
+#'
+#' @param data: data.table to be modified.
+#' @param dateCol: The column name in \code{data} that will be modified. "SB_times_col" by default
+#' @param refDate: The reference date to use.
+#' @param datesFormat: the format of the from/until dates.month/day/year by default.
+#' @param units: the time span unit to use when creating the reference. Based on \code{\link[base]{difftime}} definitions. "days" by default.
+#' @return NA will be returned and the input file will be modified.
+offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m/%d/%Y", units = "days"){
+  ref = strptime(refDate, datesFormat)
+
+  offsetDateInternal = function(colDate) {
+    d = strptime(colDate, datesFormat)
+    difftime(d, ref, units = units)
+  }
+
+  data[,eval(as.symbol(dateCol)):=sapply(eval(as.symbol(dateCol)),offsetDateInternal)]
+  NA
 }
 
 #' join
