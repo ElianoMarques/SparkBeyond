@@ -8,7 +8,7 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
   weightColumn = NA, maxDepth = 2, functionsWhiteList = NA,
   functionsBlackList = NA, booleanNumericFeatures = TRUE,
   useGraph = FALSE, crossRowFeatureSearch = FALSE,
-  maxFeaturesCount = list(300), columnSubsetSize = 1,
+  maxFeaturesCount = list(300), autoColumnSubSets = list("CONCEPT"),
   customColumnSubsets = NA, maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
   useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
@@ -39,7 +39,7 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 
 \item{maxFeaturesCount:}{Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.}
 
-\item{columnSubsetSize:}{Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.}
+\item{autoColumnSubSets:}{Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.}
 
 \item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
 

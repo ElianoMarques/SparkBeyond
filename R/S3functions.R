@@ -8,6 +8,7 @@
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param contextDatasets: Optional. A list of paths to
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
@@ -15,7 +16,7 @@
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
-#' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
+#' @param autoColumnSubSets: Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.
 #' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
 #' @param overrideMaxFeatureDurationForExternalData: A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.
@@ -62,7 +63,7 @@ learn <- function(projectName = "temp",
                   useGraph = FALSE,
                   crossRowFeatureSearch = FALSE,
                   maxFeaturesCount = list(300),
-                  columnSubsetSize = 1,
+                  autoColumnSubSets = list("CONCEPT"),
                   customColumnSubsets = NA,
                   maxFeatureDuration = 100,
                   overrideMaxFeatureDurationForExternalData = TRUE,
@@ -82,7 +83,7 @@ learn <- function(projectName = "temp",
   params <-list(projectName = projectName,
                 trainDataFilename = writeToServer(trainData),
                 target = target,
-                testDataFilename= if (class(testData) == "data.frame") writeToServer(testData) else NA,
+                testDataFilename= if (class(testData) != "logical" && any(grep("data.frame", class(testData)))) writeToServer(testData) else NA,
                 trainTestSplitRatio = trainTestSplitRatio,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
@@ -93,7 +94,7 @@ learn <- function(projectName = "temp",
                 useGraph = useGraph,
                 crossRowFeatureSearch = crossRowFeatureSearch,
                 maxFeaturesCount = maxFeaturesCount,
-                columnSubsetSize = columnSubsetSize,
+                autoColumnSubSets = autoColumnSubSets,
                 customColumnSubsets = customColumnSubsets,
                 maxFeatureDuration = maxFeatureDuration,
                 overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
@@ -121,6 +122,7 @@ learn <- function(projectName = "temp",
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param contextDatasets: A list of
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
@@ -128,8 +130,8 @@ learn <- function(projectName = "temp",
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
-#' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
-#' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.
+#' @param autoColumnSubSets: Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
+#' @param customColumnSubsets: Optional. A list of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
 #' @param overrideMaxFeatureDurationForExternalData: A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.
@@ -159,7 +161,7 @@ learn.file <- function(projectName = "temp",
                     useGraph = FALSE,
                     crossRowFeatureSearch = FALSE,
                     maxFeaturesCount = list(300),
-                    columnSubsetSize = 1,
+                    autoColumnSubSets = list("CONCEPT"),
                     customColumnSubsets = NA,
                     maxFeatureDuration = 100,
                     overrideMaxFeatureDurationForExternalData = TRUE,
@@ -211,7 +213,7 @@ learn.file <- function(projectName = "temp",
                 useGraph = useGraph,
                 crossRowFeatureSearch = crossRowFeatureSearch,
                 globalFeatureIterations = maxFeaturesCount,
-                columnSubsetSize = columnSubsetSize,
+                autoColumnSubSets = autoColumnSubSets,
                 customColumnSubsets = customColumnSubsets,
                 maxTimePerRowMillis = maxFeatureDuration,
                 overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
@@ -268,7 +270,7 @@ learn.file <- function(projectName = "temp",
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
-#' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
+#' @param autoColumnSubSets: Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.
@@ -293,7 +295,7 @@ featureSearch <- function(projectName = "temp",
                                 useGraph = FALSE,
                                 crossRowFeatureSearch = FALSE,
                                 maxFeaturesCount = list(300),
-                                columnSubsetSize = 1,
+                                autoColumnSubSets = list("CONCEPT"),
                                 customColumnSubsets = NA,
                                 maxFeatureDuration = 100,
                                 overrideMaxFeatureDurationForExternalData = TRUE,
@@ -318,7 +320,7 @@ featureSearch <- function(projectName = "temp",
                 useGraph = useGraph,
                 crossRowFeatureSearch = crossRowFeatureSearch,
                 maxFeaturesCount = maxFeaturesCount,
-                columnSubsetSize = columnSubsetSize,
+                autoColumnSubSets = autoColumnSubSets,
                 customColumnSubsets = customColumnSubsets,
                 maxFeatureDuration = maxFeatureDuration,
                 overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
@@ -346,7 +348,7 @@ featureSearch <- function(projectName = "temp",
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
-#' @param columnSubsetSize: Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.
+#' @param autoColumnSubSets: Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.
@@ -371,7 +373,7 @@ featureSearch.file <- function(projectName = "temp",
                           useGraph = FALSE,
                           crossRowFeatureSearch = FALSE,
                           maxFeaturesCount = list(300),
-                          columnSubsetSize = 1,
+                          autoColumnSubSets = list("CONCEPT"),
                           customColumnSubsets = NA,
                           maxFeatureDuration = 100,
                           overrideMaxFeatureDurationForExternalData = TRUE,
@@ -396,7 +398,7 @@ featureSearch.file <- function(projectName = "temp",
                 useGraph = useGraph,
                 crossRowFeatureSearch = crossRowFeatureSearch,
                 maxFeaturesCount = maxFeaturesCount,
-                columnSubsetSize = columnSubsetSize,
+                autoColumnSubSets = autoColumnSubSets,
                 customColumnSubsets = customColumnSubsets,
                 useCachedFeatures = useCachedFeatures,
                 maxFeatureDuration = maxFeatureDuration,
