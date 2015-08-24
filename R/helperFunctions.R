@@ -62,7 +62,7 @@ sampleDataByClass = function(data, columnName, labels = NA, desiredDistribution 
 
   expectedDistribution = sapply(adjustedDesiredDistribution, function(desiredFreq) {minRatioKeyExpectedFreq * desiredFreq / minRatioKeyDesired})
 
-  samplingProbabilities = mapply(function(originalFreq, expected) {expected / originalFreq}, originalDistribution, expectedDistribution)
+  samplingProbabilities = round(mapply(function(originalFreq, expected) {expected / originalFreq}, originalDistribution, expectedDistribution), digits=8)
 
   sampled = mapply(function(indices, prob) {sample(indices, prob*length(indices))}, labIndices, samplingProbabilities, SIMPLIFY=FALSE)
   data[unlist(sampled),]
