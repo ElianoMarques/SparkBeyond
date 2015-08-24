@@ -3,8 +3,10 @@
 #' Sample data by ratio
 #' @param data dataframe to be sampled
 #' @param ratio the ratio of data to keep
+#' @param seed - Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.
 #' @return a sampled dataset
-sampleData = function(data, ratio = 0.8) {
+sampleData = function(data, ratio = 0.8, seed = 1) {
+  set.seed(seed)
   dataSize = nrow(data)
   sampleSize = ceiling(ratio * dataSize)
   data[sample(1:dataSize, sampleSize),]
@@ -15,8 +17,10 @@ sampleData = function(data, ratio = 0.8) {
 #' Sample data by an absolute row count
 #' @param data dataframe to be sampled
 #' @param count the number of elements to keep
+#' @param seed - Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.
 #' @return a sampled dataset
-sampleDataAbsolute = function(data, count) {
+sampleDataAbsolute = function(data, count, seed = 1) {
+  set.seed(seed)
   dataSize = nrow(data)
   if (count > dataSize) print("The requested size is larger than the input size - input size will be used instead.")
   data[sample(1:dataSize, min(dataSize, count)),]
@@ -29,10 +33,12 @@ sampleDataAbsolute = function(data, count) {
 #' @param columnName name of column with with labels by which to modify label distributions
 #' @param labels Optional. labels in columnName for which \code{desiredDistribution} will relate to. Default NA will assume equal distributions between all labels.
 #' @param desiredDistribution Optional. The requested distribution ratio of \code{labels}. Default NA will assume equal distributions between all labels.
+#' @param seed - Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.
 #' @return a sampled dataset with the requested distributions
 #' @examples
 #' hist(sampleDataByClass(getData("titanic_train"), "survived", c(0,1), c(3,1))$survived, plot = FALSE)$counts
-sampleDataByClass = function(data, columnName, labels = NA, desiredDistribution = NA) {
+sampleDataByClass = function(data, columnName, labels = NA, desiredDistribution = NA, seed = 1) {
+  set.seed(seed)
   dataSize = nrow(data)
 
   if (is.na(labels) || is.na(desiredDistribution)) {
@@ -66,8 +72,10 @@ sampleDataByClass = function(data, columnName, labels = NA, desiredDistribution 
 #'
 #' Split data to train + test datasets by ratio
 #' @param data dataframe to be splitted
+#' @param seed - Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.
 #' @return a list of two elements with train dataframe as first element, and test dataframe as second element
-trainTestSplit = function(data, ratio = 0.8){
+trainTestSplit = function(data, ratio = 0.8, seed = 1){
+  set.seed(seed)
   dataSize = nrow(data)
   sampleSize = ceiling(ratio * dataSize)
   trainIndices = sample(1:dataSize, sampleSize)

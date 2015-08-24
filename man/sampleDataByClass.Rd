@@ -4,7 +4,8 @@
 \alias{sampleDataByClass}
 \title{sampleDataByClass}
 \usage{
-sampleDataByClass(data, columnName, labels = NA, desiredDistribution = NA)
+sampleDataByClass(data, columnName, labels = NA, desiredDistribution = NA,
+  seed = 1)
 }
 \arguments{
 \item{data}{dataframe to be sampled}
@@ -14,6 +15,8 @@ sampleDataByClass(data, columnName, labels = NA, desiredDistribution = NA)
 \item{labels}{Optional. labels in columnName for which \code{desiredDistribution} will relate to. Default NA will assume equal distributions between all labels.}
 
 \item{desiredDistribution}{Optional. The requested distribution ratio of \code{labels}. Default NA will assume equal distributions between all labels.}
+
+\item{seed}{- Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.}
 }
 \value{
 a sampled dataset with the requested distributions

@@ -4,12 +4,14 @@
 \alias{sampleDataAbsolute}
 \title{sampleData}
 \usage{
-sampleDataAbsolute(data, count)
+sampleDataAbsolute(data, count, seed = 1)
 }
 \arguments{
 \item{data}{dataframe to be sampled}
 
 \item{count}{the number of elements to keep}
+
+\item{seed}{- Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.}
 }
 \value{
 a sampled dataset

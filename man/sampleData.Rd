@@ -4,12 +4,14 @@
 \alias{sampleData}
 \title{sampleData}
 \usage{
-sampleData(data, ratio = 0.8)
+sampleData(data, ratio = 0.8, seed = 1)
 }
 \arguments{
 \item{data}{dataframe to be sampled}
 
 \item{ratio}{the ratio of data to keep}
+
+\item{seed}{- Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.}
 }
 \value{
 a sampled dataset
