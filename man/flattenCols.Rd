@@ -4,12 +4,14 @@
 \alias{flattenCols}
 \title{flattenCols}
 \usage{
-flattenCols(data, cols)
+flattenCols(data, cols, keepLast = FALSE)
 }
 \arguments{
 \item{data:}{data.table to flatten}
 
 \item{cols:}{list of columns to flatten}
+
+\item{keepLast:}{Boolean. Indicates whether to keep the first or last element in the series.}
 }
 \value{
 nothing: operates on the input data object

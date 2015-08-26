@@ -82,15 +82,19 @@ colSizesUnique = function(data) {
 #' Take the only the first element from each column defined in \code{cols} and set the column type into a vector
 #' @param data: data.table to flatten
 #' @param cols: list of columns to flatten
+#' @param keepLast: Boolean. Indicates whether to keep the first or last element in the series.
 #' @return nothing: operates on the input data object
 #' @examples
 #' grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
 #' typeof(grouped$age)
 #' flattenCols(grouped, "age")
 #' typeof(grouped$age) ## notice that the type of the column changed
-flattenCols = function(data, cols) {
+flattenCols = function(data, cols, keepLast = FALSE) {
   flattenCol = function(data, colName) {
-    data[,eval(as.symbol(colName)):=sapply(eval(as.symbol(colName)),`[[`,1,simplify=TRUE)]
+    if (!keepLast)
+      data[,eval(as.symbol(colName)):=sapply(eval(as.symbol(colName)),`[[`,1,simplify=TRUE)]
+    else
+      data[,eval(as.symbol(colName)):=sapply(eval(as.symbol(colName)),last,simplify=TRUE)]
   }
   for(col in cols) {flattenCol(data,col)} # can possibly be written without the loop
 }
