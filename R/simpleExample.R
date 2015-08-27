@@ -21,6 +21,7 @@ testZip = function () {
   zipModel = learn("zipModel",zipData,"target", algorithmsWhiteList=list("RRandomForestClassifier"), functionsBlackList = list("numericInfo"))
 }
 
+# stam haara shel R
 stam = function(){
   cornellRaw=read.csv("~/Downloads/Cornell results 2015.csv")
   cornellRaw = cornellRaw[1:168,]
