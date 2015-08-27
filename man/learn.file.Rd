@@ -6,11 +6,12 @@
 \usage{
 learn.file(projectName = "temp", trainDataFilename, target,
   testDataFilename = NA, trainTestSplitRatio = 0.8, weightColumn = NA,
-  maxDepth = 2, algorithmsWhiteList = NA, functionsWhiteList = NA,
-  functionsBlackList = NA, booleanNumericFeatures = TRUE,
-  useGraph = FALSE, crossRowFeatureSearch = FALSE,
-  maxFeaturesCount = list(300), autoColumnSubSets = list("CONCEPT"),
-  customColumnSubsets = NA, maxFeatureDuration = 100,
+  maxDepth = 2, contextDatasets = NA, algorithmsWhiteList = NA,
+  functionsWhiteList = NA, functionsBlackList = NA,
+  booleanNumericFeatures = TRUE, useGraph = FALSE,
+  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
+  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
+  maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
   useCachedFeatures = FALSE, evaluationMetric = "AUC",
   scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
@@ -33,7 +34,7 @@ learn.file(projectName = "temp", trainDataFilename, target,
 
 \item{maxDepth:}{Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
 
-\item{contextDatasets:}{A list of}
+\item{contextDatasets:}{Optional. A list of paths to context datasets to be added to the learning.}
 
 \item{algorithmsWhiteList:}{Optional. A list of strings that represents the set of algorithms to run. NA by default}
 

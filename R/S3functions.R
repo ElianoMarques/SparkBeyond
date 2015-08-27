@@ -8,7 +8,7 @@
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
-#' @param contextDatasets: Optional. A list of paths to
+#' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
@@ -56,6 +56,7 @@ learn <- function(projectName = "temp",
                   trainTestSplitRatio = 0.8,
                   weightColumn = NA,
                   maxDepth = 2,
+                  contextDatasets = NA,
                   algorithmsWhiteList = NA, #list available algorithms
                   functionsWhiteList = NA,
                   functionsBlackList = NA,
@@ -87,6 +88,7 @@ learn <- function(projectName = "temp",
                 trainTestSplitRatio = trainTestSplitRatio,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
+                contextDatasets = contextDatasets,
                 algorithmsWhiteList = algorithmsWhiteList,
                 functionsWhiteList = functionsWhiteList,
                 functionsBlackList = functionsBlackList,
@@ -122,7 +124,7 @@ learn <- function(projectName = "temp",
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
-#' @param contextDatasets: A list of
+#' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
@@ -154,6 +156,7 @@ learn.file <- function(projectName = "temp",
                     trainTestSplitRatio = 0.8,
                     weightColumn = NA,
                     maxDepth = 2,
+                    contextDatasets = NA,
                     algorithmsWhiteList = NA, #list available algorithms
                     functionsWhiteList = NA,
                     functionsBlackList = NA,
@@ -206,6 +209,7 @@ learn.file <- function(projectName = "temp",
                 trainTestSplitRatio = trainTestSplitRatio,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
+                contextDatasets = contextDatasets,
                 algorithmsWhiteList = algorithmsWhiteList,
                 hints = functionsWhiteList,
                 sessionBlackList = functionsBlackList,
@@ -264,6 +268,7 @@ learn.file <- function(projectName = "temp",
 #' @param target String of the column name of in the training file that conatins the target of the prediction.
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
@@ -289,6 +294,7 @@ featureSearch <- function(projectName = "temp",
                                 target,
                                 weightColumn = NA,
                                 maxDepth = 2,
+                                contextDatasets = NA,
                                 functionsWhiteList = NA,
                                 functionsBlackList = NA,
                                 booleanNumericFeatures = TRUE,
@@ -313,6 +319,7 @@ featureSearch <- function(projectName = "temp",
                 target = target,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
+                contextDatasets = contextDatasets,
                 algorithmsWhiteList = list("ZeroR"),
                 functionsWhiteList = functionsWhiteList,
                 functionsBlackList = functionsBlackList,
@@ -342,6 +349,7 @@ featureSearch <- function(projectName = "temp",
 #' @param target String of the column name of in the training file that conatins the target of the prediction.
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param maxDepth Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
@@ -367,6 +375,7 @@ featureSearch.file <- function(projectName = "temp",
                           target,
                           weightColumn = NA,
                           maxDepth = 2,
+                          contextDatasets = NA,
                           functionsWhiteList = NA,
                           functionsBlackList = NA,
                           booleanNumericFeatures = TRUE,
@@ -391,6 +400,7 @@ featureSearch.file <- function(projectName = "temp",
                 target = target,
                 weightColumn = weightColumn,
                 maxDepth = maxDepth,
+                contextDatasets = contextDatasets,
                 algorithmsWhiteList = list("ZeroR"),
                 functionsWhiteList = functionsWhiteList,
                 functionsBlackList = functionsBlackList,

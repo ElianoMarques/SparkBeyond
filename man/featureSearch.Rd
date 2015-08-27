@@ -5,11 +5,11 @@
 \title{Run SparkBeyond feature enrichment and learning process.}
 \usage{
 featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
-  maxDepth = 2, functionsWhiteList = NA, functionsBlackList = NA,
-  booleanNumericFeatures = TRUE, useGraph = FALSE,
-  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
-  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
-  maxFeatureDuration = 100,
+  maxDepth = 2, contextDatasets = NA, functionsWhiteList = NA,
+  functionsBlackList = NA, booleanNumericFeatures = TRUE,
+  useGraph = FALSE, crossRowFeatureSearch = FALSE,
+  maxFeaturesCount = list(300), autoColumnSubSets = list("CONCEPT"),
+  customColumnSubsets = NA, maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
   useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
@@ -28,6 +28,8 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 \item{useGraph}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
 \item{trainData:}{A data frame to analyze.}
+
+\item{contextDatasets:}{Optional. A list of paths to context datasets to be added to the learning.}
 
 \item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
 
