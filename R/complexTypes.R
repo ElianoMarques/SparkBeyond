@@ -128,7 +128,7 @@ cols2Text = function(data) {
     escapeFun = function(s) {
       s = gsub('"','""',s)
       s = gsub("\\t","\\\\t",s)
-      s = gsub("\\n","\\\\n",s)
+      s = gsub("\\n"," ",s) #\\\\n
       s
     }
     createContent = function(x1) {
