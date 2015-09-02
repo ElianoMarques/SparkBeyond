@@ -97,6 +97,7 @@ getData <- function(datasetName) {
   switch(datasetNameLC,
     titanic_train = getExtData("titanic_train.tsv"),
     titanic_test = getExtData("titanic_test.csv"),
+    tweets_sentiment = getExtData("tweets_sentiment.tsv"),
     #flights_delay = getExtData("flights_weatherDelay.tsv.gz"), #the git upload in RStudio doesn't support tsv.gz
      flights_delay = {
        destName = "flights_weatherDelay.tsv.gz"
