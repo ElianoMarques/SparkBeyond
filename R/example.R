@@ -98,6 +98,15 @@ getData <- function(datasetName) {
     titanic_train = getExtData("titanic_train.tsv"),
     titanic_test = getExtData("titanic_test.csv"),
     tweets_sentiment = getExtData("tweets_sentiment.tsv"),
+    tweets_sentimentkaggle = getExtData("kaggleSentiment.tsv"),
+    sentiment_lexicon = getExtData("SentimentLexicon_Hu_Liu_KDD2004.tsv"),
+    sf_street_names = getExtData("SF_Street_Names.csv"),
+    la_street_names = getExtData("LA_Street_Names.tsv"),
+    sf_la_meta_id = getExtData("SF_LA_MetaID.tsv"),
+    test_context = getExtData("test_context.csv"),
+    screenname = getExtData("ScreenName.tsv"),
+    city_tweets = getExtData("City_tweets.csv"),
+    city_geocodeddb =getExtData("City_geocodedDB.csv"),
     #flights_delay = getExtData("flights_weatherDelay.tsv.gz"), #the git upload in RStudio doesn't support tsv.gz
      flights_delay = {
        destName = "flights_weatherDelay.tsv.gz"
