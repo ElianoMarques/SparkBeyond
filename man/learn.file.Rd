@@ -9,6 +9,8 @@ learn.file(projectName = "temp", trainDataFilename, target,
   maxDepth = 2, contextDatasets = NA, algorithmsWhiteList = NA,
   functionsWhiteList = NA, functionsBlackList = NA,
   booleanNumericFeatures = TRUE, useGraph = FALSE,
+  useCustomGraphs = FALSE, customGraphsWhiteList = NA,
+  customGraphsBlackList = NA, customFunctions = NA,
   crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
   autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
   maxFeatureDuration = 100,
@@ -45,6 +47,14 @@ learn.file(projectName = "temp", trainDataFilename, target,
 \item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. TRUE by default.}
 
 \item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
+
+\item{useCustomGraphs:}{A boolean indicating whether custom graphs should be used. FALSE by default.}
+
+\item{customGraphsWhiteList:}{Optional. A list that filters which domains should be used. NA by default.}
+
+\item{customGraphsBlackList:}{Optional. A list that filters which custom graphs should be ignored. NA by default.}
+
+\item{customFunctions:}{Optional. A list of additional functions that should be incorporated to the feature search. NA by default.}
 
 \item{crossRowFeatureSearch.}{A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.}
 

@@ -14,6 +14,10 @@
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
+#' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
+#' @param customGraphsBlackList: Optional. A list that filters which custom graphs should be ignored. NA by default.
+#' @param customFunctions: Optional. A list of additional functions that should be incorporated to the feature search. NA by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param autoColumnSubSets: Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
@@ -62,6 +66,10 @@ learn <- function(projectName = "temp",
                   functionsBlackList = NA,
                   booleanNumericFeatures = TRUE,
                   useGraph = FALSE,
+                  useCustomGraphs = FALSE,
+                  customGraphsWhiteList = NA,
+                  customGraphsBlackList = NA,
+                  customFunctions = NA,
                   crossRowFeatureSearch = FALSE,
                   maxFeaturesCount = list(300),
                   autoColumnSubSets = list("CONCEPT"),
@@ -94,6 +102,10 @@ learn <- function(projectName = "temp",
                 functionsBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
+                useCustomGraphs = useCustomGraphs,
+                customGraphsWhiteList = customGraphsWhiteList,
+                customGraphsBlackList = customGraphsBlackList,
+                customFunctions = customFunctions,
                 crossRowFeatureSearch = crossRowFeatureSearch,
                 maxFeaturesCount = maxFeaturesCount,
                 autoColumnSubSets = autoColumnSubSets,
@@ -130,6 +142,10 @@ learn <- function(projectName = "temp",
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
+#' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
+#' @param customGraphsBlackList: Optional. A list that filters which custom graphs should be ignored. NA by default.
+#' @param customFunctions: Optional. A list of additional functions that should be incorporated to the feature search. NA by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param autoColumnSubSets: Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
@@ -162,6 +178,10 @@ learn.file <- function(projectName = "temp",
                     functionsBlackList = NA,
                     booleanNumericFeatures = TRUE,
                     useGraph = FALSE,
+                    useCustomGraphs = FALSE,
+                    customGraphsWhiteList = NA,
+                    customGraphsBlackList = NA,
+                    customFunctions = NA,
                     crossRowFeatureSearch = FALSE,
                     maxFeaturesCount = list(300),
                     autoColumnSubSets = list("CONCEPT"),
@@ -215,6 +235,10 @@ learn.file <- function(projectName = "temp",
                 sessionBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
+                useCustomGraphs = useCustomGraphs,
+                customGraphsWhiteList = customGraphsWhiteList,
+                customGraphsBlackList = customGraphsBlackList,
+                customFunctions = customFunctions,
                 crossRowFeatureSearch = crossRowFeatureSearch,
                 globalFeatureIterations = maxFeaturesCount,
                 autoColumnSubSets = autoColumnSubSets,
@@ -273,6 +297,10 @@ learn.file <- function(projectName = "temp",
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
+#' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
+#' @param customGraphsBlackList: Optional. A list that filters which custom graphs should be ignored. NA by default.
+#' @param customFunctions: Optional. A list of additional functions that should be incorporated to the feature search. NA by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param autoColumnSubSets: Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
@@ -299,6 +327,10 @@ featureSearch <- function(projectName = "temp",
                                 functionsBlackList = NA,
                                 booleanNumericFeatures = TRUE,
                                 useGraph = FALSE,
+                                useCustomGraphs = FALSE,
+                                customGraphsWhiteList = NA,
+                                customGraphsBlackList = NA,
+                                customFunctions = NA,
                                 crossRowFeatureSearch = FALSE,
                                 maxFeaturesCount = list(300),
                                 autoColumnSubSets = list("CONCEPT"),
@@ -325,6 +357,10 @@ featureSearch <- function(projectName = "temp",
                 functionsBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
+                useCustomGraphs = useCustomGraphs,
+                customGraphsWhiteList = customGraphsWhiteList,
+                customGraphsBlackList = customGraphsBlackList,
+                customFunctions = customFunctions,
                 crossRowFeatureSearch = crossRowFeatureSearch,
                 maxFeaturesCount = maxFeaturesCount,
                 autoColumnSubSets = autoColumnSubSets,
@@ -354,6 +390,10 @@ featureSearch <- function(projectName = "temp",
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
+#' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
+#' @param customGraphsBlackList: Optional. A list that filters which custom graphs should be ignored. NA by default.
+#' @param customFunctions: Optional. A list of additional functions that should be incorporated to the feature search. NA by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
 #' @param autoColumnSubSets: Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
@@ -380,6 +420,10 @@ featureSearch.file <- function(projectName = "temp",
                           functionsBlackList = NA,
                           booleanNumericFeatures = TRUE,
                           useGraph = FALSE,
+                          useCustomGraphs = FALSE,
+                          customGraphsWhiteList = NA,
+                          customGraphsBlackList = NA,
+                          customFunctions = NA,
                           crossRowFeatureSearch = FALSE,
                           maxFeaturesCount = list(300),
                           autoColumnSubSets = list("CONCEPT"),
@@ -406,6 +450,10 @@ featureSearch.file <- function(projectName = "temp",
                 functionsBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
                 useGraph = useGraph,
+                useCustomGraphs = useCustomGraphs,
+                customGraphsWhiteList = customGraphsWhiteList,
+                customGraphsBlackList = customGraphsBlackList,
+                customFunctions = customFunctions,
                 crossRowFeatureSearch = crossRowFeatureSearch,
                 maxFeaturesCount = maxFeaturesCount,
                 autoColumnSubSets = autoColumnSubSets,

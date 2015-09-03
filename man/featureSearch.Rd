@@ -7,9 +7,11 @@
 featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
   maxDepth = 2, contextDatasets = NA, functionsWhiteList = NA,
   functionsBlackList = NA, booleanNumericFeatures = TRUE,
-  useGraph = FALSE, crossRowFeatureSearch = FALSE,
-  maxFeaturesCount = list(300), autoColumnSubSets = list("CONCEPT"),
-  customColumnSubsets = NA, maxFeatureDuration = 100,
+  useGraph = FALSE, useCustomGraphs = FALSE, customGraphsWhiteList = NA,
+  customGraphsBlackList = NA, customFunctions = NA,
+  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
+  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
+  maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
   useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
@@ -36,6 +38,14 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 \item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.}
 
 \item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. TRUE by default.}
+
+\item{useCustomGraphs:}{A boolean indicating whether custom graphs should be used. FALSE by default.}
+
+\item{customGraphsWhiteList:}{Optional. A list that filters which domains should be used. NA by default.}
+
+\item{customGraphsBlackList:}{Optional. A list that filters which custom graphs should be ignored. NA by default.}
+
+\item{customFunctions:}{Optional. A list of additional functions that should be incorporated to the feature search. NA by default.}
 
 \item{crossRowFeatureSearch.}{A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.}
 
