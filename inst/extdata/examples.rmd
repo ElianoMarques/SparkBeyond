@@ -26,7 +26,8 @@ setSBserverIOfolder("/tmp/")
 ```
   
     
-### Predict Titanic Passenger Survival - simple classification example
+### 1. Simple classification example
+Goal: Predict Titanic Passenger Survival
 This example demonstrates how to perform a simple classification using the SparkBeyond platform.
 We will use data from the famous Kaggle competition to predict who will die on the Titanic.
 We can get the titanic train data by calling `data = getData("titanic_train")`. The column `survived` contains the information for whether a Titanic passenger survived.
@@ -62,7 +63,8 @@ The first feature that was generated, breaks down the `name` column into tokens 
 
 <br>
      
-### Predict Titanic Passenger Age - simple regression example
+### 2. Simple regression example
+Goal: Predict Titanic Passenger
 This example demonstrates how to perform a simple regression using the SparkBeyond platform.
 We will use the same titanic data but now we will aim to predict the column `age`.
 ```{r, eval=TRUE, message=FALSE, results='hide'}
@@ -82,7 +84,8 @@ titanicAgeModel$features()[1:10,c("idx", "feature")]
 ```
 From this examples, we can see that having the tokens 'master' and 'miss' in the passenger name are strong indicators of the gender. 
 
-### Predict Titanic Passenger Age - feature exclusion examples
+### 3. Feature exclusion example
+Goal: Predict Titanic Passenger Age
 This example demonstrates how to exclude elements from the generated features. 
 Let's say that for example that for whatever reason we would prefer to not create mathematical features (such as "abs"), trigonometry features, and also exclude features that contains the word "master". We can set the `functionsBlackList` parameter to exclude these two terms. Please refer to the SparkBeyond function catalog by calling `functionCatalog()` to view the list of functions and associated domains
 In this example we are using the featureSearch capability only without actually building a model.
@@ -102,7 +105,8 @@ titanicAgeFeatures$features()[1:10,c("idx", "feature")]
 ```
 
 
-### Density example - cross row feature search and depth control
+### 4. Cross row feature search and depth control examples
+Goal: Identify changes in density of specific rows
 In this example, we will generate 500 random points in Euclidean space, and we will set as target for each point, the inverse of the minimal distance from all other points. 
 ```{r, eval=TRUE, message=FALSE, results='hide'}
 n = 500
@@ -127,10 +131,29 @@ Note that in this example:
 
 1. While we provided the columns `lat` and `long` as two separate columns, a new feature named `latLong` was created that can operate in the 2D space.
 2. The resulting best feature was able to capture our target by being able to generate features using the entire column information.
-  
-  
-### Flights weather delay example - automatic enrichment using external sourcing
 
+### 5. Add custom functions
+Goal: Identify numbers that are multiples of 7
+You can create your own functions, which will be used as building blocks during the feature search.
+All you need to do, is to specify the url/s of the source files containing the custom functions code (currently only Scala is supported).
+The file can be local (on the server) or on the web.
+```{r, eval=TRUE, message=FALSE, results='hide'}
+data = data.frame(number = 1:500, target = 1:500 %% 7 == 0)
+modModel = learn(projectName = "custom_function_example",
+                        trainData = data,
+                        target = "target",
+                        algorithmsWhiteList = list("RRandomForestClassifier"),  
+                        maxFeaturesCount = 5,                        
+                        customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala"),
+                        autoSave = FALSE
+                    )
+```
+```{r, eval=TRUE, message=FALSE}
+modModel$features()[1:1,c("idx","feature")]
+```  
+  
+### 6. Automatic enrichment using external sourcing example
+Goal: Flights weather delay
 In this example we use data from Kaggele that contains information of flight delays caused due to weather conditions.
 This example will show how airport codes (in fields `origin`, `dest`) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport.
 Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power.

@@ -77,11 +77,12 @@ img {
 
 <div id="TOC">
 <ul>
-<li><a href="#predict-titanic-passenger-survival---simple-classification-example">Predict Titanic Passenger Survival - simple classification example</a></li>
-<li><a href="#predict-titanic-passenger-age---simple-regression-example">Predict Titanic Passenger Age - simple regression example</a></li>
-<li><a href="#predict-titanic-passenger-age---feature-exclusion-examples">Predict Titanic Passenger Age - feature exclusion examples</a></li>
-<li><a href="#density-example---cross-row-feature-search-and-depth-control">Density example - cross row feature search and depth control</a></li>
-<li><a href="#flights-weather-delay-example---automatic-enrichment-using-external-sourcing">Flights weather delay example - automatic enrichment using external sourcing</a></li>
+<li><a href="#simple-classification-example">1. Simple classification example</a></li>
+<li><a href="#simple-regression-example">2. Simple regression example</a></li>
+<li><a href="#feature-exclusion-example">3. Feature exclusion example</a></li>
+<li><a href="#cross-row-feature-search-and-depth-control-examples">4. Cross row feature search and depth control examples</a></li>
+<li><a href="#add-custom-functions">5. Add custom functions</a></li>
+<li><a href="#automatic-enrichment-using-external-sourcing-example">6. Automatic enrichment using external sourcing example</a></li>
 </ul>
 </div>
 
@@ -96,9 +97,9 @@ Write text for all examples
 Show sampling, grouping examples - in a different section
 Show predict / create package etc example - should be in a different section
 -->
-<div id="predict-titanic-passenger-survival---simple-classification-example" class="section level3">
-<h3>Predict Titanic Passenger Survival - simple classification example</h3>
-<p>This example demonstrates how to perform a simple classification using the SparkBeyond platform. We will use data from the famous Kaggle competition to predict who will die on the Titanic. We can get the titanic train data by calling <code>data = getData(&quot;titanic_train&quot;)</code>. The column <code>survived</code> contains the information for whether a Titanic passenger survived. In the following example we ask the engine to create and return the top 25 features.</p>
+<div id="simple-classification-example" class="section level3">
+<h3>1. Simple classification example</h3>
+<p>Goal: Predict Titanic Passenger Survival This example demonstrates how to perform a simple classification using the SparkBeyond platform. We will use data from the famous Kaggle competition to predict who will die on the Titanic. We can get the titanic train data by calling <code>data = getData(&quot;titanic_train&quot;)</code>. The column <code>survived</code> contains the information for whether a Titanic passenger survived. In the following example we ask the engine to create and return the top 25 features.</p>
 <pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">getData</span>(<span class="st">&quot;titanic_train&quot;</span>)
 titanicSurvivedModel =<span class="st"> </span><span class="kw">learn</span>(<span class="dt">projectName =</span> <span class="st">&quot;titanic_survived&quot;</span>,
                         <span class="dt">trainData =</span> data,
@@ -111,14 +112,10 @@ titanicSurvivedModel =<span class="st"> </span><span class="kw">learn</span>(<sp
                                                 <span class="co"># pointing to the created model</span>
                     )</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">titanicSurvivedModel$<span class="kw">features</span>()[<span class="dv">1</span>:<span class="dv">3</span>,<span class="kw">c</span>(<span class="st">&quot;idx&quot;</span>, <span class="st">&quot;feature&quot;</span>, <span class="st">&quot;Lift.0&quot;</span>, <span class="st">&quot;Lift.1&quot;</span>)]</code></pre>
-<pre><code>##   idx                                                           feature
-## 1   0                   tokenizeByPunctuation(name) does not contain mr
-## 2   1                                                       pclass != 3
-## 3   2 abs(replaceNaNsWith(numberIn(ticket), 2) - 120393.25) &lt; 111538.75
-##      Lift.0   Lift.1
-## 1 0.4888845 1.842959
-## 2 0.7241255 1.454987
-## 3 0.6134746 1.637478</code></pre>
+<pre><code>##   idx                                         feature    Lift.0   Lift.1
+## 1   0 tokenizeByPunctuation(name) does not contain mr 0.4888845 1.842959
+## 2   1                                     pclass != 3 0.7241255 1.454987
+## 3   2      numberIn(ticket) in range (8854.5, 231932) 0.6134746 1.637478</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">titanicSurvivedModel$<span class="kw">showFeaturesTest</span>()</code></pre>
 <!-- 
 need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/Resources/library/SBadapter/extdata/" or externally (amazon?) or generate equivalent figure
@@ -127,9 +124,9 @@ need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/R
 <p>On the Titanic most children and women were rescued first, hence had higher survival rates. The first feature that was generated, breaks down the <code>name</code> column into tokens and notes that the token “mr” is not included in the passenger name. This feature effectively identifies both the children and women populations.</p>
 <p><br></p>
 </div>
-<div id="predict-titanic-passenger-age---simple-regression-example" class="section level3">
-<h3>Predict Titanic Passenger Age - simple regression example</h3>
-<p>This example demonstrates how to perform a simple regression using the SparkBeyond platform. We will use the same titanic data but now we will aim to predict the column <code>age</code>.</p>
+<div id="simple-regression-example" class="section level3">
+<h3>2. Simple regression example</h3>
+<p>Goal: Predict Titanic Passenger This example demonstrates how to perform a simple regression using the SparkBeyond platform. We will use the same titanic data but now we will aim to predict the column <code>age</code>.</p>
 <pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">getData</span>(<span class="st">&quot;titanic_train&quot;</span>)
 titanicAgeModel =<span class="st"> </span><span class="kw">learn</span>(<span class="dt">projectName =</span> <span class="st">&quot;titanic_age&quot;</span>,
                         <span class="dt">trainData =</span> data,
@@ -148,14 +145,14 @@ titanicAgeModel =<span class="st"> </span><span class="kw">learn</span>(<span cl
 ## 5    4                                       name contains miss
 ## 6    5                                           fare &lt; 9.54375
 ## 7    6 stemmedWordsWithoutCommonTerms(name) does not contain mr
-## 8    7                                     abs(sibsp - 5) &lt; 1.5
+## 8    7                                sibsp in range (3.5, 6.5)
 ## 9    8                                  numberOfWords(name) &lt; 4
-## 10   9                              abs(cabin.length - 3.5) &lt; 1</code></pre>
+## 10   9                         cabin.length in range (2.5, 4.5)</code></pre>
 <p>From this examples, we can see that having the tokens ‘master’ and ‘miss’ in the passenger name are strong indicators of the gender.</p>
 </div>
-<div id="predict-titanic-passenger-age---feature-exclusion-examples" class="section level3">
-<h3>Predict Titanic Passenger Age - feature exclusion examples</h3>
-<p>This example demonstrates how to exclude elements from the generated features. Let’s say that for example that for whatever reason we would prefer to not create mathematical features (such as “abs”), trigonometry features, and also exclude features that contains the word “master”. We can set the <code>functionsBlackList</code> parameter to exclude these two terms. Please refer to the SparkBeyond function catalog by calling <code>functionCatalog()</code> to view the list of functions and associated domains In this example we are using the featureSearch capability only without actually building a model.</p>
+<div id="feature-exclusion-example" class="section level3">
+<h3>3. Feature exclusion example</h3>
+<p>Goal: Predict Titanic Passenger Age This example demonstrates how to exclude elements from the generated features. Let’s say that for example that for whatever reason we would prefer to not create mathematical features (such as “abs”), trigonometry features, and also exclude features that contains the word “master”. We can set the <code>functionsBlackList</code> parameter to exclude these two terms. Please refer to the SparkBeyond function catalog by calling <code>functionCatalog()</code> to view the list of functions and associated domains In this example we are using the featureSearch capability only without actually building a model.</p>
 <pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">getData</span>(<span class="st">&quot;titanic_train&quot;</span>)
 titanicAgeFeatures =<span class="st"> </span><span class="kw">featureSearch</span>(<span class="dt">projectName =</span> <span class="st">&quot;titanic_age_exclusions&quot;</span>,
                         <span class="dt">trainData =</span> data,
@@ -166,20 +163,20 @@ titanicAgeFeatures =<span class="st"> </span><span class="kw">featureSearch</spa
                     )</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">titanicAgeFeatures$<span class="kw">features</span>()[<span class="dv">1</span>:<span class="dv">10</span>,<span class="kw">c</span>(<span class="st">&quot;idx&quot;</span>, <span class="st">&quot;feature&quot;</span>)]</code></pre>
 <pre><code>##    idx                                                  feature
-## 1    0                                               parch != 0
+## 1    0                                  parch in range (0, 3.5)
 ## 2    1 stemmedWordsWithoutCommonTerms(name) does not contain mr
 ## 3    2                                               pclass &lt; 3
 ## 4    3                                            embarked == Q
 ## 5    4                                           fare &lt; 9.54375
-## 6    5                                               sibsp &gt;= 4
-## 7    6          textSentimentScore(name) &gt;= 0.18333333333333335
-## 8    7                                  numberOfWords(name) &lt; 4
-## 9    8                                       name contains miss
-## 10   9               sentimentDistribution(name) == Map((0, 3))</code></pre>
+## 6    5                                sibsp in range (3.5, 6.5)
+## 7    6                                  numberOfWords(name) &lt; 4
+## 8    7                                       name contains miss
+## 9    8                         cabin.length in range (2.5, 4.5)
+## 10   9          textSentimentScore(name) &gt;= 0.18333333333333335</code></pre>
 </div>
-<div id="density-example---cross-row-feature-search-and-depth-control" class="section level3">
-<h3>Density example - cross row feature search and depth control</h3>
-<p>In this example, we will generate 500 random points in Euclidean space, and we will set as target for each point, the inverse of the minimal distance from all other points.</p>
+<div id="cross-row-feature-search-and-depth-control-examples" class="section level3">
+<h3>4. Cross row feature search and depth control examples</h3>
+<p>Goal: Identify changes in density of specific rows In this example, we will generate 500 random points in Euclidean space, and we will set as target for each point, the inverse of the minimal distance from all other points.</p>
 <pre class="sourceCode r"><code class="sourceCode r">n =<span class="st"> </span><span class="dv">500</span>
 data =<span class="st"> </span><span class="kw">data.table</span>(<span class="dt">lat=</span><span class="kw">runif</span>(n), <span class="dt">long =</span> <span class="kw">runif</span>(n))
 data[,target:<span class="er">=</span><span class="kw">sapply</span>(<span class="dv">1</span>:n, function(i) <span class="dv">1</span>/<span class="kw">min</span>({a =<span class="st"> </span>(data$lat[i]-data$lat)^<span class="dv">2</span>+(data$long[i]-data$long)^<span class="dv">2</span>; a[i] =<span class="st"> </span><span class="ot">Inf</span>;a}))]
@@ -202,20 +199,36 @@ densityModel =<span class="st"> </span><span class="kw">learn</span>(<span class
 ## 4   3
 ## 5   4
 ##                                                                             feature
-## 1 inverse(distance of latLong from closest of latLong_column) &gt;= 0.7266553212272722
+## 1 inverse(distance of latLong from closest of latLong_column) &gt;= 0.6328797815620884
 ## 2                   ceil(distance of latLong from closest of latLong_column) == 2.0
-## 3                   ceil(distance of latLong from closest of latLong_column) == 1.0
+## 3                   ceil(distance of latLong from closest of latLong_column) &gt;= 2.5
 ## 4                    round(distance of latLong from closest of latLong_column) == 2
-## 5                    round(distance of latLong from closest of latLong_column) == 1</code></pre>
+## 5                   ceil(distance of latLong from closest of latLong_column) == 1.0</code></pre>
 <p>Note that in this example:</p>
 <ol style="list-style-type: decimal">
 <li>While we provided the columns <code>lat</code> and <code>long</code> as two separate columns, a new feature named <code>latLong</code> was created that can operate in the 2D space.</li>
 <li>The resulting best feature was able to capture our target by being able to generate features using the entire column information.</li>
 </ol>
 </div>
-<div id="flights-weather-delay-example---automatic-enrichment-using-external-sourcing" class="section level3">
-<h3>Flights weather delay example - automatic enrichment using external sourcing</h3>
-<p>In this example we use data from Kaggele that contains information of flight delays caused due to weather conditions. This example will show how airport codes (in fields <code>origin</code>, <code>dest</code>) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport. Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power. The first run may take more time as weather data will be downloaded and cached (to cancel this behavior set <code>overrideMaxFeatureDurationForExternalData = FALSE</code> to prevent the override given by default to external data sources).</p>
+<div id="add-custom-functions" class="section level3">
+<h3>5. Add custom functions</h3>
+<p>Goal: Identify numbers that are multiples of 7 You can create your own functions, which will be used as building blocks during the feature search. All you need to do, is to specify the url/s of the source files containing the custom functions code (currently only Scala is supported). The file can be local (on the server) or on the web.</p>
+<pre class="sourceCode r"><code class="sourceCode r">data =<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">number =</span> <span class="dv">1</span>:<span class="dv">500</span>, <span class="dt">target =</span> <span class="dv">1</span>:<span class="dv">500</span> %%<span class="st"> </span><span class="dv">7</span> ==<span class="st"> </span><span class="dv">0</span>)
+modModel =<span class="st"> </span><span class="kw">learn</span>(<span class="dt">projectName =</span> <span class="st">&quot;custom_function_example&quot;</span>,
+                        <span class="dt">trainData =</span> data,
+                        <span class="dt">target =</span> <span class="st">&quot;target&quot;</span>,
+                        <span class="dt">algorithmsWhiteList =</span> <span class="kw">list</span>(<span class="st">&quot;RRandomForestClassifier&quot;</span>),  
+                        <span class="dt">maxFeaturesCount =</span> <span class="dv">5</span>,                        
+                        <span class="dt">customFunctions =</span> <span class="kw">list</span>(<span class="st">&quot;https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala&quot;</span>),
+                        <span class="dt">autoSave =</span> <span class="ot">FALSE</span>
+                    )</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">modModel$<span class="kw">features</span>()[<span class="dv">1</span>:<span class="dv">1</span>,<span class="kw">c</span>(<span class="st">&quot;idx&quot;</span>,<span class="st">&quot;feature&quot;</span>)]</code></pre>
+<pre><code>##   idx               feature
+## 1   0 isMultipleOf7(number)</code></pre>
+</div>
+<div id="automatic-enrichment-using-external-sourcing-example" class="section level3">
+<h3>6. Automatic enrichment using external sourcing example</h3>
+<p>Goal: Flights weather delay In this example we use data from Kaggele that contains information of flight delays caused due to weather conditions. This example will show how airport codes (in fields <code>origin</code>, <code>dest</code>) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport. Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power. The first run may take more time as weather data will be downloaded and cached (to cancel this behavior set <code>overrideMaxFeatureDurationForExternalData = FALSE</code> to prevent the override given by default to external data sources).</p>
 <pre class="sourceCode r"><code class="sourceCode r">flights =<span class="st"> </span><span class="kw">getData</span>(<span class="st">&quot;flights_delay&quot;</span>)
 sampledFlights =<span class="st"> </span><span class="kw">sampleDataAbsolute</span>(flights, <span class="dv">1000</span>)
 flightsModel =<span class="st"> </span><span class="kw">learn</span>(<span class="dt">projectName =</span> <span class="st">&quot;flights_delay_example&quot;</span>,
@@ -227,17 +240,28 @@ flightsModel =<span class="st"> </span><span class="kw">learn</span>(<span class
                         <span class="dt">autoSave =</span> <span class="ot">FALSE</span>
                     )</code></pre>
 <pre class="sourceCode r"><code class="sourceCode r">flightsModel$<span class="kw">features</span>()[<span class="dv">1</span>:<span class="dv">10</span>,<span class="kw">c</span>(<span class="st">&quot;idx&quot;</span>,<span class="st">&quot;feature&quot;</span>)]</code></pre>
-<pre><code>##    idx                                                      feature
-## 1    0 abs(log1p(arrTime) - 4.979434892017373) &lt; 1.2072688379905294
-## 2    1                                                taxiOut &gt;= 44
-## 3    2           abs(dateToDouble(date) - 1.2146976E+12) &lt; 9.072E+8
-## 4    3                                 abs(flightNum - 3051) &lt; 1010
-## 5    4                 smallSubsets(tailNum) contains List(0, 5, S)
-## 6    5                           abs(actualElapsedTime - 126.5) &lt; 6
-## 7    6                                      abs(airTime - 23.5) &lt; 4
-## 8    7                                     actualElapsedTime == 117
-## 9    8                             abs(cRSDepTime - 2119.75) &lt; 9.75
-## 10   9                    smallSubsets(tailNum) contains List(R, 6)</code></pre>
+<pre><code>##    idx
+## 1    0
+## 2    1
+## 3    2
+## 4    3
+## 5    4
+## 6    5
+## 7    6
+## 8    7
+## 9    8
+## 10   9
+##                                                                   feature
+## 1         log1p(arrTime) in range (3.7256208424938384, 6.503660291926409)
+## 2                                                           taxiOut &gt;= 50
+## 3                                                          depTime &lt; 1353
+## 4                                     cRSDepTime in range (752.5, 1307.5)
+## 5                        numericSuffix(tailNum) in range (16556, 31557.5)
+## 6                                        cRSArrTime in range (1304, 1334)
+## 7                                  sigmoid(taxiOut) &gt;= 0.9999999998092172
+## 8                                   numberIn(tailNum) in range (484, 517)
+## 9                            smallSubsets(tailNum) contains List(4, V, 6)
+## 10 sqrt(cRSElapsedTime) in range (13.435015956036224, 14.017743661619615)</code></pre>
 <p>Note that in this example:</p>
 <ol style="list-style-type: decimal">
 <li>The returned object <code>flightsModel</code> should include features of the type <code>weatherAt(&lt;location&gt;, &lt;time&gt;)</code>.</li>
