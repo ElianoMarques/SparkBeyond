@@ -1,6 +1,10 @@
 ---
 title: "SparkBeyond R plugin tutorial"
-output: html_document
+output:
+  html_document:
+    toc: true
+    theme: united
+    highlight: zenburn
 ---
 This tutorial explains how to use **R SparkBeyond plugin**.
 
@@ -14,7 +18,7 @@ Install and load the SBadatper plugin
   eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all 
 --> 
   
-```{r, eval = FALSE}
+```{r, eval = FALSE, message=FALSE, results='hide'}
 library('devtools')
 install_github('zinman/SBadapter')
 library('SBadapter')
@@ -32,11 +36,11 @@ library('SBadapter')
 3.  `target`              - the column name in the input data denoting the label to learn
 
 
-```{r, echo=TRUE}
+```{r, echo=TRUE, message=FALSE, results='hide'}
 setSBserverIOfolder("/tmp/")
 ```
 
-```{r, eval=TRUE}
+```{r, eval=FALSE}
 train = getTitanicData(train = TRUE)
 model = SBlearn(projectName = "titanic",
                         trainData = train,
@@ -63,7 +67,7 @@ The returned object `model` encapsulates a predictive-model on which we can perf
 
 ```
 
-```{r,  eval=TRUE}
+```{r,  eval=FALSE}
 test = getTitanicData(train = FALSE)
 enriched = model$enrich(data = test, 
              featureCount=10)
@@ -71,7 +75,7 @@ enriched = model$enrich(data = test,
 
 Each feature is added to the dataset as a new column
 
-```{r,  eval=TRUE}
+```{r,  eval=FALSE}
 colnames(enriched)
 ```
 
@@ -85,13 +89,13 @@ it requires the following input:
 
 1.  `data`       - a data frame
 
-```{r,  eval=TRUE}
+```{r,  eval=FALSE}
 predicted = model$predict(data = test)
 ```
 
 The resulting prediction is added to the `dataset` as a set of new columns
 
-```{r,  eval=TRUE}
+```{r,  eval=FALSE}
 colnames(predicted)
 predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
 ```
@@ -106,7 +110,7 @@ We now have 3 additional columns:
 
 `evaluate` summarizes `model` results in a short textual report. 
 
-```{r,  eval=TRUE}
+```{r,  eval=FALSE}
 eval = model$evaluate()
 ```
 It also returns an `eval` object containing evaluation metrics.
