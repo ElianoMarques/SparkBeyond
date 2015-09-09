@@ -1,0 +1,31 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 5}
+%\VignetteDepends{xtable}
+-->
+#Example 5 - Sentiment analysis#
+Goal: Identify sentiment in twitter tweets.
+<br>
+### Tweets sentiment ###
+```{r sentiment_example, eval=TRUE, message=FALSE, results='hide'}
+tweets = getData("tweets_sentiment")
+SentimentModel = learn(projectName="tweets",
+              trainData=tweets,
+              target="sentiment",
+              algorithmsWhiteList = list("RRandomForestClassifier"),
+              maxFeaturesCount = list(50),
+              evaluationMetric = "AUC",
+              autoSave = FALSE)
+```
+<br>
+```{r, eval=TRUE, results='asis'}
+library(xtable)
+print(xtable(SentimentModel$features()[1:10,c("idx","feature")]), type='html', comment=F) 
+```

@@ -1,0 +1,10 @@
+base
+data.table
+SBadapter
+devtools
+knitrBootstrap
+knitr
+rmarkdown
+xtable
+corrplot
+igraph

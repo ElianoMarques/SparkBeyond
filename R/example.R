@@ -121,8 +121,8 @@ getData <- function(datasetName) {
 
 #' Shows an html page with various learning examples
 #'
-examples <- function() {
-  file.show(system.file("extdata", "examples.html", package = "SBadapter"))
+examples = function() {
+  browseURL(system.file("extdata", "examples-master.html", package = "SBadapter"))
 }
 
 

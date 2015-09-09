@@ -1,0 +1,39 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 3}
+%\VignetteDepends{xtable}
+-->
+#Example 3 - feature exclusion#
+Goal: Predict Titanic Passenger Age
+<br>
+This example demonstrates how to exclude elements from the generated features. 
+Let's say that for example that for whatever reason we would prefer to not create mathematical features (such as "abs"), trigonometry features, and also exclude features that contains the word "master". We can set the `functionsBlackList` parameter to exclude these two terms. 
+<br>
+Please refer to the SparkBeyond function catalog by calling `functionCatalog()` to view the list of functions and associated domains
+In this example we are using the featureSearch capability only without actually building a model.
+<br>
+```{r titanic_feature_exclusion, eval=TRUE, message=FALSE, results='hide'}
+data = getData("titanic_train")
+titanicAgeFeatures = featureSearch(projectName = "titanic_age_exclusions",
+                        trainData = data,
+                        target = "age", 
+                        maxFeaturesCount = 10,
+                        functionsBlackList = list("abs", "master", "trigonometry"),  # blacklist trigonometric functions "abs" and "master"
+                        autoSave = FALSE
+                    )
+
+```
+<br>
+Note that compared to the previous example the `master` feature does not exist.
+<br>
+```{r, eval=TRUE, results='asis'}
+library(xtable)
+print(xtable(titanicAgeFeatures$features()[1:10,c("idx", "feature")]), type='html', comment=F) 
+```

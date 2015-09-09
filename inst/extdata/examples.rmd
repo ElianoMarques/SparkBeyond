@@ -165,9 +165,11 @@ sampledFlights = sampleDataAbsolute(flights, 1000)
 flightsModel = learn(projectName = "flights_delay_example",
                         trainData = sampledFlights,
                         target = "weatherDelay",
+                        useCustomGraphs = TRUE, 
                         algorithmsWhiteList = list("RRandomForestRegressor"),
                         functionsBlackList = list("trigonometry"),
                         maxFeaturesCount = list(10),
+                        customColumnSubsets = list(list("origin", 4)),
                         autoSave = FALSE
                     )
 ```

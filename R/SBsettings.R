@@ -267,7 +267,7 @@ isLatestRpackage = function() {
 
 #' Shows SparkBeyond current function catalog with possible
 functionCatalog = function() {
-  file.show(system.file("extdata", "functionCatalog.html", package = "SBadapter"))
+  browseURL(system.file("extdata", "functionCatalog.html", package = "SBadapter"))
 }
 
 .onLoad <- function(libname = find.package("SBadapter"), pkgname = "SBadapter") {

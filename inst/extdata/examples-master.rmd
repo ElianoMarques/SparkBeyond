@@ -1,0 +1,50 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    title: "Test file"
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{All examples}
+-->
+
+<!-- 
+  Comment:
+  ========
+  Set eval = FALSE (with spaces) in places that you would like not be to evaluated permanently (i.e., not be capture by the replace all) 
+  Use cache = TRUE to prevent recalculations => stored  per chunk identifier.
+--> 
+
+<!-- 
+Write text for all examples
+Show sampling, grouping examples - in a different section
+Show predict / create package etc example - should be in a different section
+-->
+
+# All examples #
+
+<br>
+```{r example1, child='example1.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+```{r example2, child='example2.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+```{r example3, child='example3.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+```{r example4, child='example4.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+```{r example5, child='example5.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+
+<!--  
+Currently put the weather example in a comment until we have our own knowledge cloud
+```{r example6, child='example6.rmd', eval = FALSE, cache=TRUE}
+```
+-->

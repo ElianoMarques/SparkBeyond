@@ -21,3 +21,14 @@
 #   knit_rd("SBadapter")
 #   setwd("../../")
 # }
+
+#https://github.com/jimhester/knitrBootstrap
+
+#library(devtools)
+#install_github('rstudio/rmarkdown')
+#install.packages('knitr', repos = c('http://rforge.net', 'http://cran.rstudio.org'),type = 'source')
+#install_github('jimhester/knitrBootstrap')
+
+#library(knitrBootstrap)
+#library(rmarkdown)
+#render('./Radapter/SBadapter/inst/extdata/master.rmd', 'knitrBootstrap::bootstrap_document')
