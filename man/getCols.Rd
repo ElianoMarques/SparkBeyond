@@ -12,7 +12,7 @@ getCols(data, cols)
 \item{cols:}{a list of column names to get.}
 }
 \value{
-a dataframe / data.table with the requested columns will be return.
+a dataframe / data.table with the requested columns will be returned.
 }
 \description{
 get columns content from a data frame / data.table.
