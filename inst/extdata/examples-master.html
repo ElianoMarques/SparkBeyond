@@ -1594,8 +1594,7 @@ Goal: Identify sentiment in twitter tweets. <br> ### Tweets sentiment ###
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">loadSettings()
-tweets = getData("tweets_sentiment")
+<pre style=""><code class="source r">tweets = getData("tweets_sentiment")
 SentimentModel = learn(projectName="tweets",
               trainData=tweets,
               target="sentiment",
@@ -1739,8 +1738,7 @@ sentimentDistribution(tweet).valueOf(2) orIfMissing 6 &lt; 4
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">loadSettings()
-sentimentLexicon = getData("sentiment_lexicon")
+<pre style=""><code class="source r">sentimentLexicon = getData("sentiment_lexicon")
 pathLexicon = writeToServer(sentimentLexicon)
 tweets = getData("tweets_sentiment")
 SentimentModelContext = learn(projectName="tweets",
@@ -1903,6 +1901,20 @@ Currently put the weather example in a comment until we have our own knowledge c
 <p class="navbar-text">
 Toggle
 </p>
+</li>
+<li class="dropup">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">Code <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li class="dropdown-header">
+Languages
+</li>
+<li class="active">
+<a href="#" class="toggle-global source R" type="source.R">R</a>
+</li>
+<li>
+<a href="#" type="all-source" class="toggle-global">All</a>
+</li>
+</ul>
 </li>
 <li class="active">
 <a href="#" type="figure" class="toggle-global">Figures</a>

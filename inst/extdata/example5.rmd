@@ -15,7 +15,6 @@ Goal: Identify sentiment in twitter tweets.
 <br>
 ### Tweets sentiment ###
 ```{r sentiment_example, eval=TRUE, message=FALSE, results='hide'}
-loadSettings()
 tweets = getData("tweets_sentiment")
 SentimentModel = learn(projectName="tweets",
               trainData=tweets,
@@ -38,7 +37,6 @@ print(xtable(SentimentModel$features()[1:10,c("idx","feature")]), type='html', c
 ### Tweets with a context database ###
 
 ```{r sentiment_example_with_context, eval=TRUE, message=FALSE, results='hide'}
-loadSettings()
 sentimentLexicon = getData("sentiment_lexicon")
 pathLexicon = writeToServer(sentimentLexicon)
 tweets = getData("tweets_sentiment")
