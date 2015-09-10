@@ -31,4 +31,4 @@
 
 #library(knitrBootstrap)
 #library(rmarkdown)
-#render('./Radapter/SBadapter/inst/extdata/master.rmd', 'knitrBootstrap::bootstrap_document')
+#render('./Radapter/SBadapter/inst/extdata/examples-master.rmd', 'knitrBootstrap::bootstrap_document')
