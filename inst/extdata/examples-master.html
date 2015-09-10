@@ -1601,7 +1601,8 @@ SentimentModel = learn(projectName="tweets",
               algorithmsWhiteList = list("RRandomForestClassifier"),
               maxFeaturesCount = list(50),
               evaluationMetric = "AUC",
-              autoSave = FALSE)</code></pre>
+              autoSave = FALSE)
+SentimentEval = SentimentModel$evaluate()</code></pre>
 </div>
 <p><br> In this example we load a sentiment dataset with a tweet column and a setiment target (-1 or 1). The top feature is a textSentimentScore which is automatically computed.</p>
 <div class="row">
@@ -1732,6 +1733,11 @@ sentimentDistribution(tweet).valueOf(2) orIfMissing 6 &lt; 4
 </td>
 </tr>
 </table>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("\n","<br>",SentimentEval$evaluation$summary))</code></pre>
+== Summary ==<br> <br>Correctly Classified Instances 43 86.0%<br>Incorrectly Classified Instances 7 14.0%<br>Total Number of Instances 50 <br><br />
 </div>
 <p><br> ### Tweets with a context database ###</p>
 <div class="row">
@@ -1748,7 +1754,9 @@ SentimentModelContext = learn(projectName="tweets",
               maxFeaturesCount = list(50),
               evaluationMetric = "AUC",
               autoSave = FALSE,
-              contextDatasets = list(pathLexicon))</code></pre>
+              contextDatasets = list(pathLexicon))
+
+SentimentContextEval = SentimentModelContext$evaluate()</code></pre>
 </div>
 <p><br></p>
 <p>In order to improve performance we can include a custom context Dataset. The sentimentLexicon includes over 6000 single words with a either a positive or negative sentiment. The top features now are actually derived by looking up the values in the lexcion (data_column) and the classificaiton performance is boosted.</p>
@@ -1777,7 +1785,7 @@ feature
 0
 </td>
 <td>
-entitiesHistogram(tweet, data_in88f68c26012_column).valueOf(-1) orIfMissing 0 &lt; 0.5
+entitiesHistogram(tweet, data_in938e50faafe3_column).valueOf(-1) orIfMissing 0 &lt; 0.5
 </td>
 </tr>
 <tr>
@@ -1788,7 +1796,7 @@ entitiesHistogram(tweet, data_in88f68c26012_column).valueOf(-1) orIfMissing 0 &l
 1
 </td>
 <td>
-entitiesHistogram(tweet, data_in88f68c26012_column).valueOf(1) orIfMissing 0 &gt;= 0.5
+entitiesHistogram(tweet, data_in938e50faafe3_column).valueOf(1) orIfMissing 0 &gt;= 0.5
 </td>
 </tr>
 <tr>
@@ -1821,7 +1829,7 @@ textSentimentScore(tweet) &lt; -0.017857142857142856
 4
 </td>
 <td>
-entitiesHistogram(tweet, data_in88f68c26012_column) == Map((1, 1))
+entitiesHistogram(tweet, data_in938e50faafe3_column) == Map((1, 1))
 </td>
 </tr>
 <tr>
@@ -1843,7 +1851,7 @@ tweet contains great
 6
 </td>
 <td>
-entitiesHistogram(tweet, data_in88f68c26012_column) == Map((1, 2))
+entitiesHistogram(tweet, data_in938e50faafe3_column) == Map((1, 2))
 </td>
 </tr>
 <tr>
@@ -1876,10 +1884,15 @@ slidingSubsets(tweet).toSeq contains (best, the)
 9
 </td>
 <td>
-entitiesHistogram(tweet, data_in88f68c26012_column) == Map((-1, 1))
+entitiesHistogram(tweet, data_in938e50faafe3_column) == Map((-1, 1))
 </td>
 </tr>
 </table>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("\n","<br>",SentimentContextEval$evaluation$summary))</code></pre>
+== Summary ==<br> <br>Correctly Classified Instances 45 90.0%<br>Incorrectly Classified Instances 5 10.0%<br>Total Number of Instances 50 <br><br />
 </div>
 <p><br></p>
 <!--  

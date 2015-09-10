@@ -23,6 +23,7 @@ SentimentModel = learn(projectName="tweets",
               maxFeaturesCount = list(50),
               evaluationMetric = "AUC",
               autoSave = FALSE)
+SentimentEval = SentimentModel$evaluate()
 ```
 <br>
 In this example we load a sentiment dataset with a tweet column and a setiment target (-1 or 1). The top feature is a textSentimentScore which is automatically computed.
@@ -30,7 +31,7 @@ In this example we load a sentiment dataset with a tweet column and a setiment t
 ```{r, eval=TRUE, results='asis'}
 library(xtable)
 print(xtable(SentimentModel$features()[1:10,c("idx","feature")]), type='html', comment=F) 
-
+writeLines(gsub("\n","<br>",SentimentEval$evaluation$summary))
 ```
 
 <br>
@@ -49,6 +50,7 @@ SentimentModelContext = learn(projectName="tweets",
               autoSave = FALSE,
               contextDatasets = list(pathLexicon))
 
+SentimentContextEval = SentimentModelContext$evaluate()
 ```
 <br>
 
@@ -57,4 +59,5 @@ In order to improve performance we can include a custom context Dataset. The sen
 ```{r, eval=TRUE, results='asis'}
 library(xtable)
 print(xtable(SentimentModelContext$features()[1:10,c("idx","feature")]), type='html', comment=F) 
+writeLines(gsub("\n","<br>",SentimentContextEval$evaluation$summary))
 ```
