@@ -262,33 +262,20 @@ setTimeColumn = function(data, timeCol) { #assumption is can be called only if t
 #' nrow(limitTimeSeries(tsData, "date", untilDate ="11/01/2014"))
 #' nrow(limitTimeSeries(tsData, "date", fromDate="07/01/2014", untilDate ="11/01/2014"))
 limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilDate = NA, datesFormat = "%m/%d/%Y"){
-  fromDateFormatted = as.Date(fromDate, datesFormat)
-  untilDateFormatted = as.Date(untilDate, datesFormat)
+  fromDateFormatted = strptime(fromDate, datesFormat)
+  untilDateFormatted = strptime(untilDate, datesFormat)
 
   if(is.na(fromDate) && !is.na(untilDate)) {
-    data[as.Date(eval(as.symbol(dateCol)), datesFormat) <= untilDateFormatted]
+    data[strptime(eval(as.symbol(dateCol)), datesFormat) <= untilDateFormatted]
   } else if (!is.na(fromDate) && is.na(untilDate)) {
-    data[as.Date(eval(as.symbol(dateCol)), datesFormat) >= fromDateFormatted]
+    data[strptime(eval(as.symbol(dateCol)), datesFormat) >= fromDateFormatted]
   } else if (!is.na(fromDate) && !is.na(untilDate))
-    data[as.Date(eval(as.symbol(dateCol)), datesFormat) >= fromDateFormatted & as.Date(eval(as.symbol(dateCol)), datesFormat) <= untilDateFormatted]
-
-#   from = strptime(fromDate, datesFormat)
-#   until = strptime(untilDate, datesFormat)
-#
-#   checkDate = function(colDate) {
-#      d = strptime(colDate, datesFormat)
-#      if(is.na(from) && !is.na(until) && d <= until) TRUE
-#      else if (!is.na(from) && is.na(until) && d >= from) TRUE
-#      else if (!is.na(from) && !is.na(until) && d >= from && d<= until) TRUE
-#      else FALSE
-#    }
-#
-#   data[sapply(eval(as.symbol(dateCol)), checkDate)]
+    data[strptime(eval(as.symbol(dateCol)), datesFormat) >= fromDateFormatted & strptime(eval(as.symbol(dateCol)), datesFormat) <= untilDateFormatted]
 }
 
 #' offsetTime
 #'
-#' Offsets a time-dkkvate column by a reference date to create a relative time series with respect to the reference date. Currently work only on data.table
+#' Offsets a time-date column by a reference date to create a relative time series with respect to the reference date. Currently work only on data.table
 #'
 #' @param data: data.table to be modified.
 #' @param dateCol: The column name in \code{data} that will be modified. "SB_times_col" by default
@@ -306,6 +293,13 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 
   data[,eval(as.symbol(dateCol)):=sapply(eval(as.symbol(dateCol)),offsetDateInternal)]
   NA
+}
+
+addSlidingTimeWindow = function(data, dateCol, window, units, sample = NA, key = NA, colNameOverride = NA) {
+  colName = paste0("last_", window)
+  # if (is.na(key))
+
+ # data[newCol := ]
 }
 
 #' join

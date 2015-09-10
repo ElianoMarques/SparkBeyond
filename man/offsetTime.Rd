@@ -22,6 +22,6 @@ offsetTime(data, dateCol = "SB_times_col", refDate,
 NA will be returned and the input file will be modified.
 }
 \description{
-Offsets a time-dkkvate column by a reference date to create a relative time series with respect to the reference date. Currently work only on data.table
+Offsets a time-date column by a reference date to create a relative time series with respect to the reference date. Currently work only on data.table
 }
 
