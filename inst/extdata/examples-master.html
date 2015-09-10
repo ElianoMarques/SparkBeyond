@@ -883,14 +883,14 @@ Write text for all examples
 Show sampling, grouping examples - in a different section
 Show predict / create package etc example - should be in a different section
 -->
-<h1 id="all-examples">All examples</h1>
+<h1>All examples</h1>
 <p><br></p>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Example 1}
 %\VignetteDepends{xtable}
 -->
-<h1 id="example-1---simple-classification">Example 1 - simple classification</h1>
+<h1>Example 1 - simple classification</h1>
 Goal: Predict Titanic Passenger Survival <br> This example demonstrates how to perform a simple classification using the SparkBeyond platform. We will use data from the famous Kaggle competition to predict who will die on the Titanic. We can get the titanic train data by calling <code>data = getData(&quot;titanic_train&quot;)</code>. The column <code>survived</code> contains the information for whether a Titanic passenger survived. In the following example we ask the engine to create and return the top 25 features.<br /><br> Data sample:
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -1237,7 +1237,7 @@ need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/R
 %\VignetteIndexEntry{Example 2}
 %\VignetteDepends{xtable}
 -->
-<h1 id="example-2---simple-regression">Example 2 - simple regression</h1>
+<h1>Example 2 - simple regression</h1>
 Goal: Predict Titanic Passenger <br> This example demonstrates how to perform a simple regression using the SparkBeyond platform. We will use the same titanic data but now we will aim to predict the column <code>age</code>. <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -1356,7 +1356,7 @@ stemmedWordsWithoutCommonTerms(name) does not contain mr
 %\VignetteIndexEntry{Example 3}
 %\VignetteDepends{xtable}
 -->
-<h1 id="example-3---feature-exclusion">Example 3 - feature exclusion</h1>
+<h1>Example 3 - feature exclusion</h1>
 Goal: Predict Titanic Passenger Age <br> This example demonstrates how to exclude elements from the generated features. Let's say that for example that for whatever reason we would prefer to not create mathematical features (such as &quot;abs&quot;), trigonometry features, and also exclude features that contains the word &quot;master&quot;. We can set the <code>functionsBlackList</code> parameter to exclude these two terms. <br> Please refer to the SparkBeyond function catalog by calling <code>functionCatalog()</code> to view the list of functions and associated domains In this example we are using the featureSearch capability only without actually building a model. <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -1507,7 +1507,7 @@ textSentimentScore(name) &gt;= 0.18333333333333335
 %\VignetteIndexEntry{Example 4}
 %\VignetteDepends{xtable}
 -->
-<h1 id="example-4---cross-row-search">Example 4 - cross row search</h1>
+<h1>Example 4 - cross row search</h1>
 Goal: Identify changes in density of specific rows <br> In this example, we will generate 500 random points in Euclidean space, and we will set as target for each point, the inverse of the minimal distance from all other points. <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -1588,7 +1588,7 @@ round(distance of latLong from closest of latLong_column) == 1
 %\VignetteIndexEntry{Example 5}
 %\VignetteDepends{xtable}
 -->
-<h1 id="example-5---sentiment-analysis">Example 5 - Sentiment analysis</h1>
+<h1>Example 5 - Sentiment analysis</h1>
 Goal: Identify sentiment in twitter tweets. <br> ### Tweets sentiment ###
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -1601,9 +1601,10 @@ SentimentModel = learn(projectName="tweets",
               algorithmsWhiteList = list("RRandomForestClassifier"),
               maxFeaturesCount = list(50),
               evaluationMetric = "AUC",
-              autoSave = FALSE)</code></pre>
+              autoSave = FALSE)
+SentimentEval = SentimentModel$evaluate()</code></pre>
 </div>
-<br>
+<p><br> In this example we load a sentiment dataset with a tweet column and a setiment target (-1 or 1). The top feature is a textSentimentScore which is automatically computed.</p>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -1732,6 +1733,166 @@ sentimentDistribution(tweet).valueOf(2) orIfMissing 6 &lt; 4
 </td>
 </tr>
 </table>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("\n","<br>",SentimentEval$evaluation$summary))</code></pre>
+== Summary ==<br> <br>Correctly Classified Instances 43 86.0%<br>Incorrectly Classified Instances 7 14.0%<br>Total Number of Instances 50 <br><br />
+</div>
+<p><br> ### Tweets with a context database ###</p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">sentimentLexicon = getData("sentiment_lexicon")
+pathLexicon = writeToServer(sentimentLexicon)
+tweets = getData("tweets_sentiment")
+SentimentModelContext = learn(projectName="tweets",
+              trainData=tweets,
+              target="sentiment",
+              algorithmsWhiteList = list("RRandomForestClassifier"),
+              maxFeaturesCount = list(50),
+              evaluationMetric = "AUC",
+              autoSave = FALSE,
+              contextDatasets = list(pathLexicon))
+
+SentimentContextEval = SentimentModelContext$evaluate()</code></pre>
+</div>
+<p><br></p>
+<p>In order to improve performance we can include a custom context Dataset. The sentimentLexicon includes over 6000 single words with a either a positive or negative sentiment. The top features now are actually derived by looking up the values in the lexcion (data_column) and the classificaiton performance is boosted.</p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+print(xtable(SentimentModelContext$features()[1:10,c("idx","feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+entitiesHistogram(tweet, data_in938e50faafe3_column).valueOf(-1) orIfMissing 0 &lt; 0.5
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+entitiesHistogram(tweet, data_in938e50faafe3_column).valueOf(1) orIfMissing 0 &gt;= 0.5
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+stemmedWordsWithoutCommonTerms(tweet) contains goal
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+textSentimentScore(tweet) &lt; -0.017857142857142856
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+entitiesHistogram(tweet, data_in938e50faafe3_column) == Map((1, 1))
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td align="right">
+5
+</td>
+<td>
+tweet contains great
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td align="right">
+6
+</td>
+<td>
+entitiesHistogram(tweet, data_in938e50faafe3_column) == Map((1, 2))
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td align="right">
+7
+</td>
+<td>
+numberIn(tweet) == 1.0
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td align="right">
+8
+</td>
+<td>
+slidingSubsets(tweet).toSeq contains (best, the)
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td align="right">
+9
+</td>
+<td>
+entitiesHistogram(tweet, data_in938e50faafe3_column) == Map((-1, 1))
+</td>
+</tr>
+</table>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("\n","<br>",SentimentContextEval$evaluation$summary))</code></pre>
+== Summary ==<br> <br>Correctly Classified Instances 45 90.0%<br>Incorrectly Classified Instances 5 10.0%<br>Total Number of Instances 50 <br><br />
 </div>
 <p><br></p>
 <!--  
@@ -1753,6 +1914,20 @@ Currently put the weather example in a comment until we have our own knowledge c
 <p class="navbar-text">
 Toggle
 </p>
+</li>
+<li class="dropup">
+<a href="#" class="dropdown-toggle" data-toggle="dropdown">Code <b class="caret"></b></a>
+<ul class="dropdown-menu">
+<li class="dropdown-header">
+Languages
+</li>
+<li class="active">
+<a href="#" class="toggle-global source R" type="source.R">R</a>
+</li>
+<li>
+<a href="#" type="all-source" class="toggle-global">All</a>
+</li>
+</ul>
 </li>
 <li class="active">
 <a href="#" type="figure" class="toggle-global">Figures</a>
