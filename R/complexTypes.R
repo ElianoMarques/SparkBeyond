@@ -201,13 +201,13 @@ excludeCols = function(data, cols) {
   else print("No columns were removed")
 }
 
-#' getCols
+#' colsWhiteList
 #'
 #' get columns content from a data frame / data.table.
 #' @param data: dataframe / data data.table to modify.
 #' @param cols: a list of column names to get.
 #' @return a dataframe / data.table with the requested columns will be returned.
-getCols = function(data, cols){
+colsWhiteList = function(data, cols){
   if ("data.table" %in% class(data)){
     data[,cols, with=FALSE]
   }else{
@@ -295,11 +295,24 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
   NA
 }
 
-addSlidingTimeWindow = function(data, dateCol, window, units, sample = NA, key = NA, colNameOverride = NA) {
+addSlidingTimeWindow = function(data, dateCol, window, unit, includeUntil = FALSE, relativeTime = TRUE, sample = NA, keyCol = NA, colNameOverride = NA) {
   colName = paste0("last_", window)
-  # if (is.na(key))
 
- # data[newCol := ]
+  unitVal = switch(unit,
+         "second" = 1,
+         "minute" = 60,
+         "hour" = 60*60,
+         "day" = 24 * 60*60,
+         "week" = 7 * 24 *60*60,
+  )
+
+  # if (is.na(key))
+  #KeyedTimeWindow(key=A, startDate=Thu Feb 12 12:16:20 IST 2015, endDate=Fri Feb 13 12:16:20 IST 2015, includeUntil=false, relativeTime=true)
+  generateKeyWindow = function(dateVal, keyVal) {
+    paste0("Window(k=",keyVal,",st=",dateVal)
+  }
+
+  data[newCol := sapply()]
 }
 
 #' join
