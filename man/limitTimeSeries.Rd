@@ -18,6 +18,9 @@ limitTimeSeries(data, dateCol = "SB_times_col", fromDate = NA,
 
 \item{datesFormat:}{the format of the from/until dates.month/day/year by default.}
 }
+\value{
+a new data.table with the filtered rows will be returned.
+}
 \description{
 filter rows to contain only rows that are in a certain time frame based on a from/until date inputs (inclusive). All dates are assumed to be of the same format. This function should be called before any filtering is performed.
 }

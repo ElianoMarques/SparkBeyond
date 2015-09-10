@@ -206,7 +206,7 @@ excludeCols = function(data, cols) {
 #' get columns content from a data frame / data.table.
 #' @param data: dataframe / data data.table to modify.
 #' @param cols: a list of column names to get.
-#' @return a dataframe / data.table with the requested columns will be return.
+#' @return a dataframe / data.table with the requested columns will be returned.
 getCols = function(data, cols){
   if ("data.table" %in% class(data)){
     data[,cols, with=FALSE]
@@ -243,6 +243,7 @@ setTimeColumn = function(data, timeCol) { #assumption is can be called only if t
 #' @param fromDate: The starting date to filter from. NA by default.
 #' @param untilData: The end date to filter until. NA by default.
 #' @param datesFormat: the format of the from/until dates.month/day/year by default.
+#' @return a new data.table with the filtered rows will be returned.
 #' @examples
 #' randDate <- function(N, st="2014/01/01", et="2014/12/31") {
 #'  st <- as.POSIXct(as.Date(st,tz = "EST"),tz = "EST")
@@ -261,24 +262,33 @@ setTimeColumn = function(data, timeCol) { #assumption is can be called only if t
 #' nrow(limitTimeSeries(tsData, "date", untilDate ="11/01/2014"))
 #' nrow(limitTimeSeries(tsData, "date", fromDate="07/01/2014", untilDate ="11/01/2014"))
 limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilDate = NA, datesFormat = "%m/%d/%Y"){
+  fromDateFormatted = as.Date(fromDate, datesFormat)
+  untilDateFormatted = as.Date(untilDate, datesFormat)
 
-  from = strptime(fromDate, datesFormat)
-  until = strptime(untilDate, datesFormat)
+  if(is.na(fromDate) && !is.na(untilDate)) {
+    data[as.Date(eval(as.symbol(dateCol)), datesFormat) <= untilDateFormatted]
+  } else if (!is.na(fromDate) && is.na(untilDate)) {
+    data[as.Date(eval(as.symbol(dateCol)), datesFormat) >= fromDateFormatted]
+  } else if (!is.na(fromDate) && !is.na(untilDate))
+    data[as.Date(eval(as.symbol(dateCol)), datesFormat) >= fromDateFormatted & as.Date(eval(as.symbol(dateCol)), datesFormat) <= untilDateFormatted]
 
-  checkDate = function(colDate) {
-     d = strptime(colDate, datesFormat)
-     if(is.na(from) && !is.na(until) && d <= until) TRUE
-     else if (!is.na(from) && is.na(until) && d >= from) TRUE
-     else if (!is.na(from) && !is.na(until) && d >= from && d<= until) TRUE
-     else FALSE
-   }
-
-  data[sapply(eval(as.symbol(dateCol)), checkDate)]
+#   from = strptime(fromDate, datesFormat)
+#   until = strptime(untilDate, datesFormat)
+#
+#   checkDate = function(colDate) {
+#      d = strptime(colDate, datesFormat)
+#      if(is.na(from) && !is.na(until) && d <= until) TRUE
+#      else if (!is.na(from) && is.na(until) && d >= from) TRUE
+#      else if (!is.na(from) && !is.na(until) && d >= from && d<= until) TRUE
+#      else FALSE
+#    }
+#
+#   data[sapply(eval(as.symbol(dateCol)), checkDate)]
 }
 
 #' offsetTime
 #'
-#' Offsets a time-date column by a reference date to create a relative time series with respect to the reference date. Currently work only on data.table
+#' Offsets a time-dkkvate column by a reference date to create a relative time series with respect to the reference date. Currently work only on data.table
 #'
 #' @param data: data.table to be modified.
 #' @param dateCol: The column name in \code{data} that will be modified. "SB_times_col" by default
