@@ -295,8 +295,12 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
   NA
 }
 
-addSlidingTimeWindow = function(data, dateCol, window, unit, includeUntil = FALSE, relativeTime = TRUE, sample = NA, keyCol = NA, colNameOverride = NA) {
-  colName = paste0("last_", window)
+addSlidingTimeWindow = function(data, dateCol, window, unit, includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, keyCol = NA, colNameOverride = NA) {
+  if (is.na(keyCol)){
+    newCol = paste0("last_", window)
+  }else{
+    newCol = paste0("last_keyed_", window)
+  }
 
   unitVal = switch(unit,
          "second" = 1,
@@ -304,15 +308,35 @@ addSlidingTimeWindow = function(data, dateCol, window, unit, includeUntil = FALS
          "hour" = 60*60,
          "day" = 24 * 60*60,
          "week" = 7 * 24 *60*60,
+         stop("Invalid time unit. Use: second, minute, hour, day or week")
   )
+# ds.slidingTimeSeriesView(windowSize = windowSize, timeUnit = SBTimeUnit.Hours, Some("runStartTime"),keyColumn = Some("toolName"))
 
   # if (is.na(key))
+  #TimeWindow(Thu Feb 12 20:54:13 EST 2015,Fri Feb 13 20:54:13 EST 2015,false,true,2147483647)
+
   #KeyedTimeWindow(key=A, startDate=Thu Feb 12 12:16:20 IST 2015, endDate=Fri Feb 13 12:16:20 IST 2015, includeUntil=false, relativeTime=true)
+
+  dateColInd = grep(dateCol,names(data))
+  datePOSIXformat = "%m/%d/%Y %I:%M:%S %p"
+  datePOSIXformatOut = "%m/%d/%Y %I:%M:%S %p %Z"
   generateKeyWindow = function(dateVal, keyVal) {
-    paste0("Window(k=",keyVal,",st=",dateVal)
+    dt = as.character.POSIXt(strptime(dateVal,datePOSIXformat,tz="EST"),format=datePOSIXformatOut)
+    dt_from =  as.character.POSIXt(strptime(dateVal,datePOSIXformat,tz="EST")-window*unitVal,format=datePOSIXformatOut)
+    paste0(keyVal,",",dt_from,",",dt,",",includeUntil,",",relativeTime,",NA")
   }
 
-  data[newCol := sapply()]
+  if (is.na(keyCol)){
+    data[,newCol] = sapply(data[,dateCol],function (x) {
+                      dt = as.character.POSIXt(strptime(x,datePOSIXformat,tz="EST"),format=datePOSIXformatOut)
+                      dt_from =  as.character.POSIXt(strptime(x,datePOSIXformat,tz="EST")-window*unitVal,format=datePOSIXformatOut)
+                      paste0("NA,",dt_from,",",dt,",",includeUntil,",",relativeTime,",",sample)
+                      })
+    #data[,eval(as.symbol(newCol)):= sapply(eval(as.symbol(dateCol)),function (x) {dt = as.double(as.POSIXlt(strptime(x,datePOSIXformat,tz="EST"))); paste0("Window(",dt - window*unitVal,",",dt,",",includeUntil,",",relativeTime,",",sample,")")})]
+  } else{
+    data[,newCol] = mapply(generateKeyWindow,data[,dateCol],data[,keyCol])
+  }
+  data[]
 }
 
 #' join

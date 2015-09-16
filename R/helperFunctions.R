@@ -50,7 +50,7 @@ sampleDataByClass = function(data, columnName, labels = NA, desiredDistribution 
   sumDesiredDistribution = sum(desiredDistribution)
   adjustedDesiredDistribution = desiredDistribution/sumDesiredDistribution
 
-  labIndices = sapply(labels, function(label) {which(getCols(data,columnName)==label)})
+  labIndices = sapply(labels, function(label) {which(colsWhiteList(data,columnName)==label)})
   originalDistribution = sapply(labIndices, function(indices) {length(indices)} / dataSize)
 
   distRatios = mapply(function(original, desired) {original / desired}, originalDistribution, adjustedDesiredDistribution)
