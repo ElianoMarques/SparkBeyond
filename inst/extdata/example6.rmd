@@ -11,34 +11,43 @@ output:
 %\VignetteDepends{xtable}
 -->
 
-# Example 6 - content enrichment #
+# Example 6 - Features combining customGraphs and weather API #
 Goal: Flights weather delay
-In this example we use data from Kaggele that contains information of flight delays caused due to weather conditions.
+In this example we use data from Kaggle that contains information of flight delays caused due to weather conditions.
+
 This example will show how airport codes (in fields `origin`, `dest`) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport.
 Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power.
 The first run may take more time as weather data will be downloaded and cached (to cancel this behavior set `overrideMaxFeatureDurationForExternalData = FALSE` to prevent the override given by default to external data sources). 
 <br>
-```{r weather_content_enrichment_example, eval=TRUE, message=FALSE, results='hide'}
+```{r, eval=TRUE, results='asis'}
 flights = getData("flights_delay")
-sampledFlights = sampleDataAbsolute(flights, 1000)
+names(flights)
+```
+
+```{r weather_content_enrichment_example, eval=TRUE, message=FALSE, results='hide'}
+flightSampled = sampleDataAbsolute(flights,5000)
 flightsModel = learn(projectName = "flights_delay_example",
-                        trainData = sampledFlights,
+                        trainData = flightSampled,
                         target = "weatherDelay",
                         useCustomGraphs = TRUE, 
-                        algorithmsWhiteList = list("RRandomForestRegressor"),
+                        algorithmsWhiteList = list("RXGBoostRegressor"),
                         functionsBlackList = list("trigonometry"),
-                        maxFeaturesCount = list(10),
-                        autoSave = FALSE
+                        maxFeaturesCount = list(30),
+                        autoSave = FALSE,
+                        evaluationMetric = "RMSE"
                     )
+flightsModelEval = flightsModel$evaluate()
 ```
 <br>
 Note that in this example:
 
-1. The returned object `flightsModel` should include features of the type `weatherAt(<location>, <time>)`.
-2. Running using all the flights data will improve RMSE significantly.
+1. For example, in the `flightsModel` feature 7 `dataForLatLongDate(lookupGeo(dest, general_airports_csv), date) contains (VISIB, 5)`the dest field is recognized as an IATA code and is enriched with geolocation data from an airport custom graph, aditionally the coordinates and date field are used to automatically download weather data and enrich with visibility data. Simillarly feature 19 assesses wind gust data at origin airport locations.
+
+2. Running using the entire flights data can take a long time due to the Weather API downloading approporaite data for each location (but should achieve better results).
 <br>
 
 ```{r, eval=TRUE, results='asis'}
 library(xtable)
-print(xtable(flightsModel$features()[1:10,c("idx","feature")]), type='html', comment=F) 
+print(xtable(flightsModel$features()[1:20,c("idx","feature")]), type='html', comment=F) 
+writeLines(gsub("\n","<br>",flightsModelEval$evaluation$summary))
 ```
