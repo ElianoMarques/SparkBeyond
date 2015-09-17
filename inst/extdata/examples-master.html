@@ -1895,7 +1895,525 @@ entitiesHistogram(tweet, data_in938e50faafe3_column) == Map((-1, 1))
 == Summary ==<br> <br>Correctly Classified Instances 45 90.0%<br>Incorrectly Classified Instances 5 10.0%<br>Total Number of Instances 50 <br><br />
 </div>
 <p><br></p>
-<!--  
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 6}
+%\VignetteDepends{xtable}
+-->
+<h1>Example 6 - Features combining customGraphs and weather API</h1>
+<p>Goal: Flights weather delay In this example we use data from Kaggle that contains information of flight delays caused due to weather conditions.</p>
+This example will show how airport codes (in fields <code>origin</code>, <code>dest</code>) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport. Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power. The first run may take more time as weather data will be downloaded and cached. <br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+flights = getData("flights_delay")
+airports = getData("airports")
+names(flights)</code></pre>
+[1] &quot;dest&quot; &quot;origin&quot; &quot;year&quot;<br /> [4] &quot;month&quot; &quot;dayofMonth&quot; &quot;dayOfWeek&quot;<br /> [7] &quot;depTime&quot; &quot;cRSDepTime&quot; &quot;arrTime&quot;<br />[10] &quot;cRSArrTime&quot; &quot;uniqueCarrier&quot; &quot;flightNum&quot;<br />[13] &quot;tailNum&quot; &quot;actualElapsedTime&quot; &quot;cRSElapsedTime&quot;<br />[16] &quot;airTime&quot; &quot;distance&quot; &quot;taxiIn&quot;<br />[19] &quot;taxiOut&quot; &quot;cancelled&quot; &quot;cancellationCode&quot; [22] &quot;diverted&quot; &quot;weatherDelay&quot; &quot;lateAircraftDelay&quot; [25] &quot;date&quot;<br />
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(tail(airports,n=5)), type='html', comment=F) # show the airport database</code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+Name
+</th>
+<th>
+City
+</th>
+<th>
+Country
+</th>
+<th>
+IATA
+</th>
+<th>
+ICAO
+</th>
+<th>
+Latitude
+</th>
+<th>
+Longitude
+</th>
+<th>
+Altitude
+</th>
+<th>
+Timezone
+</th>
+<th>
+DST
+</th>
+<th>
+TZ.timezone
+</th>
+</tr>
+<tr>
+<td align="right">
+5876
+</td>
+<td>
+Mansons Landing Water Aerodrome
+</td>
+<td>
+Mansons Landing
+</td>
+<td>
+Canada
+</td>
+<td>
+YMU
+</td>
+<td>
+
+</td>
+<td align="right">
+50.07
+</td>
+<td align="right">
+-124.98
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Vancouver
+</td>
+</tr>
+<tr>
+<td align="right">
+5877
+</td>
+<td>
+Port McNeill Airport
+</td>
+<td>
+Port McNeill
+</td>
+<td>
+Canada
+</td>
+<td>
+YMP
+</td>
+<td>
+
+</td>
+<td align="right">
+50.58
+</td>
+<td align="right">
+-127.03
+</td>
+<td align="right">
+225
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Vancouver
+</td>
+</tr>
+<tr>
+<td align="right">
+5878
+</td>
+<td>
+Sullivan Bay Water Aerodrome
+</td>
+<td>
+Sullivan Bay
+</td>
+<td>
+Canada
+</td>
+<td>
+YTG
+</td>
+<td>
+
+</td>
+<td align="right">
+50.88
+</td>
+<td align="right">
+-126.83
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Vancouver
+</td>
+</tr>
+<tr>
+<td align="right">
+5879
+</td>
+<td>
+Deer Harbor Seaplane
+</td>
+<td>
+Deer Harbor
+</td>
+<td>
+United States
+</td>
+<td>
+DHB
+</td>
+<td>
+
+</td>
+<td align="right">
+48.62
+</td>
+<td align="right">
+-123.01
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Los_Angeles
+</td>
+</tr>
+<tr>
+<td align="right">
+5880
+</td>
+<td>
+San Diego Old Town Transit Center
+</td>
+<td>
+San Diego
+</td>
+<td>
+United States
+</td>
+<td>
+OLT
+</td>
+<td>
+
+</td>
+<td align="right">
+32.76
+</td>
+<td align="right">
+-117.20
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Los_Angeles
+</td>
+</tr>
+</table>
+</div>
+<p><br> The airport data will be loaded automatically as a customGraph but you could explicitly send it using contextDatasets (as in Example 5). Regardless of modality (customGraph or contextDatasets) the functionality is identical and the engine will automatically detect relevant columns in the airport data (or any other dataset) <br></p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">flightSampled = sampleDataAbsolute(flights,5000)
+flightsModel = learn(projectName = "flights_delay_example",
+                        trainData = flightSampled,
+                        target = "weatherDelay",
+                        useCustomGraphs = TRUE, 
+                        algorithmsWhiteList = list("RXGBoostRegressor"),
+                        functionsBlackList = list("trigonometry"),
+                        maxFeaturesCount = list(30),
+                        autoSave = FALSE,
+                        evaluationMetric = "RMSE"
+                    )
+flightsModelEval = flightsModel$evaluate()</code></pre>
+</div>
+<p><br> Note that in this example:</p>
+<ol style="list-style-type: decimal">
+<li><p>For example, in the <code>flightsModel</code> feature 7 <code>dataForLatLongDate(lookupGeo(dest, general_airports_csv), date) contains (VISIB, 5)</code>the dest field is recognized as an IATA code and is enriched with geolocation data from an airport custom graph, aditionally the coordinates and date field are used to automatically download weather data and enrich with visibility data. Simillarly feature 19 assesses wind gust data at origin airport locations.</p></li>
+<li><p>Running using the entire flights data can take a long time due to the Weather API downloading approporaite data for each location (but should achieve better results). <br></p></li>
+</ol>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+print(xtable(flightsModel$features()[1:20,c("idx","feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+depTime not in range (424.5, 2256)
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+taxiOut &gt;= 52
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+log1p(arrTime) in range (3.8393944990995763, 6.372232398506984)
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+Histogram(uniqueCarrier) contains (V, 1)
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+date == Sat Jul 12 20:00:00 EDT 2008
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td align="right">
+5
+</td>
+<td>
+arrTime &lt; 586
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td align="right">
+6
+</td>
+<td>
+dataForLatLongDate(lookupGeo(dest, general_airports_csv), date) contains (VISIB, 5)
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td align="right">
+7
+</td>
+<td>
+uniqueCarrier.tail == A
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td align="right">
+8
+</td>
+<td>
+depTime &lt; 425
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td align="right">
+9
+</td>
+<td>
+arithmeticNot(depTime) not in range (-2223.5, -579)
+</td>
+</tr>
+<tr>
+<td align="right">
+11
+</td>
+<td align="right">
+10
+</td>
+<td>
+cRSArrTime not in range (1140.5, 2223.5)
+</td>
+</tr>
+<tr>
+<td align="right">
+12
+</td>
+<td align="right">
+11
+</td>
+<td>
+log1p(flightNum) in range (5.730078699715786, 7.778837644720181)
+</td>
+</tr>
+<tr>
+<td align="right">
+13
+</td>
+<td align="right">
+12
+</td>
+<td>
+origin.min == D
+</td>
+</tr>
+<tr>
+<td align="right">
+14
+</td>
+<td align="right">
+13
+</td>
+<td>
+lookupString(origin, general_airports_csv) contains (tZTimezone, America/Chicago)
+</td>
+</tr>
+<tr>
+<td align="right">
+15
+</td>
+<td align="right">
+14
+</td>
+<td>
+sigmoid(arrTime) &lt; 0.9999999999999968
+</td>
+</tr>
+<tr>
+<td align="right">
+16
+</td>
+<td align="right">
+15
+</td>
+<td>
+sigmoid(taxiOut) &gt;= 0.999999999999527
+</td>
+</tr>
+<tr>
+<td align="right">
+17
+</td>
+<td align="right">
+16
+</td>
+<td>
+numberIn(tailNum) in range (691.5, 738.5)
+</td>
+</tr>
+<tr>
+<td align="right">
+18
+</td>
+<td align="right">
+17
+</td>
+<td>
+uniqueCarrier == OO
+</td>
+</tr>
+<tr>
+<td align="right">
+19
+</td>
+<td align="right">
+18
+</td>
+<td>
+dataForLatLongDate(lookupGeo(origin, general_airports_csv), date) contains (GUST, 0)
+</td>
+</tr>
+<tr>
+<td align="right">
+20
+</td>
+<td align="right">
+19
+</td>
+<td>
+smallSubsets(tailNum) contains List(J, 5, 2)
+</td>
+</tr>
+</table>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("\n","<br>",flightsModelEval$evaluation$summary))</code></pre>
+== Summary ==<br> <br>Correlation coefficient 0.965334 <br>R2 0.93187 <br>Mean absolute error 10.281308 <br>Root mean squared error 17.573758 <br>Relative absolute error 22.91507307 %<br>Root relative squared error 26.52465355 %<br>Root relative prior squared error 66.25443074 <br>Actuals mean 67.84345351 <br>Estimations mean 67.07400302 <br>Actuals std 66.07009366 <br>Estimations std 60.48757678 <br>Total Number of Instances 1054 <br><br />
+</div>
+<br> <!--  
 Currently put the weather example in a comment until we have our own knowledge cloud
 
 -->
