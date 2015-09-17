@@ -105,14 +105,15 @@ getData <- function(datasetName) {
     test_context = getExtData("test_context.csv"),
     city_tweets = getExtData("City_tweets.csv"),
     city_geocodeddb =getExtData("City_geocodedDB.csv"),
+    flights_delay = getExtData("flights_weatherDelay.csv.gz"),
     #flights_delay = getExtData("flights_weatherDelay.tsv.gz"), #the git upload in RStudio doesn't support tsv.gz
-     flights_delay =       {
-       destName = "flights_weatherDelay.tsv.gz"
-       if (! file.exists(destName) || !file.info("flights_weatherDelay.tsv.gz")$size > 0) download.file("http://s3.amazonaws.com/public-sparkbeyond/flights_2008_weatherDelay.tsv.gz", destName)
-       if (file.exists(destName))
-         read.table("flights_weatherDelay.tsv.gz", sep="\t", header=TRUE)
-       else stop("Flight weather delay was not available")
-     },
+#      flights_delay =       {
+#        destName = "flights_weatherDelay.tsv.gz"
+#        if (! file.exists(destName) || !file.info("flights_weatherDelay.tsv.gz")$size > 0) download.file("http://s3.amazonaws.com/public-sparkbeyond/flights_2008_weatherDelay.tsv.gz", destName)
+#        if (file.exists(destName))
+#          read.table("flights_weatherDelay.tsv.gz", sep="\t", header=TRUE)
+#        else stop("Flight weather delay was not available")
+#      },
     airports = getExtData("airports.csv.gz"),
     stop(paste0("The requested dataset '",datasetName,"' does not exists in the datasets list"))
   )
@@ -125,3 +126,21 @@ examples = function() {
 }
 
 
+runSlidingWindowLearn <- function(configuration='1', weightByClass = FALSE, runBlocking = TRUE) {
+  ds = read.csv("~/Google Drive/data/datasets/private/McKinsey/semiconductor/PM_20150826.csv")
+  tsDS = addSlidingTimeWindow(ds, names(ds)[2], 24, "hour",keyCol = "ToolName")
+  params = list(
+    projectName = "tests",
+    trainData = tsDS,
+    target = "RunStartTime",
+    maxFeaturesCount = list(100),
+    useCachedFeatures = TRUE,
+    autoSave = FALSE
+  )
+  additional_params = switch (configuration,
+                              "1" = list(algorithmsWhiteList = list("RRandomForestClassifier")),
+                              "2" = list(algorithmsWhiteList = NA)
+  )
+  model = do.call(learn,c(params, additional_params))
+  return(model)
+}
