@@ -1902,11 +1902,16 @@ entitiesHistogram(tweet, data_in938e50faafe3_column) == Map((-1, 1))
 -->
 <h1>Example 6 - Features combining customGraphs and weather API</h1>
 <p>Goal: Flights weather delay In this example we use data from Kaggle that contains information of flight delays caused due to weather conditions.</p>
+<<<<<<< HEAD
 This example will show how airport codes (in fields <code>origin</code>, <code>dest</code>) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport. Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power. The first run may take more time as weather data will be downloaded and cached. <br>
+=======
+This example will show how airport codes (in fields <code>origin</code>, <code>dest</code>) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport. Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power. The first run may take more time as weather data will be downloaded and cached (to cancel this behavior set <code>overrideMaxFeatureDurationForExternalData = FALSE</code> to prevent the override given by default to external data sources). <br>
+>>>>>>> b2f28d89d58355cdb5c3e5f6740df7f8d2505736
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
+<<<<<<< HEAD
 <pre style=""><code class="source r">library(xtable)
 flights = getData("flights_delay")
 airports = getData("airports")
@@ -2147,6 +2152,12 @@ America/Los_Angeles
 </table>
 </div>
 <p><br> The airport data will be loaded automatically as a customGraph but you could explicitly send it using contextDatasets (as in Example 5). Regardless of modality (customGraph or contextDatasets) the functionality is identical and the engine will automatically detect relevant columns in the airport data (or any other dataset) <br></p>
+=======
+<pre style=""><code class="source r">flights = getData("flights_delay")
+names(flights)</code></pre>
+[1] &quot;dest&quot; &quot;origin&quot; &quot;year&quot;<br /> [4] &quot;month&quot; &quot;dayofMonth&quot; &quot;dayOfWeek&quot;<br /> [7] &quot;depTime&quot; &quot;cRSDepTime&quot; &quot;arrTime&quot;<br />[10] &quot;cRSArrTime&quot; &quot;uniqueCarrier&quot; &quot;flightNum&quot;<br />[13] &quot;tailNum&quot; &quot;actualElapsedTime&quot; &quot;cRSElapsedTime&quot;<br />[16] &quot;airTime&quot; &quot;distance&quot; &quot;taxiIn&quot;<br />[19] &quot;taxiOut&quot; &quot;cancelled&quot; &quot;cancellationCode&quot; [22] &quot;diverted&quot; &quot;weatherDelay&quot; &quot;lateAircraftDelay&quot; [25] &quot;date&quot;<br />
+</div>
+>>>>>>> b2f28d89d58355cdb5c3e5f6740df7f8d2505736
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2432,20 +2443,6 @@ Currently put the weather example in a comment until we have our own knowledge c
 <p class="navbar-text">
 Toggle
 </p>
-</li>
-<li class="dropup">
-<a href="#" class="dropdown-toggle" data-toggle="dropdown">Code <b class="caret"></b></a>
-<ul class="dropdown-menu">
-<li class="dropdown-header">
-Languages
-</li>
-<li class="active">
-<a href="#" class="toggle-global source R" type="source.R">R</a>
-</li>
-<li>
-<a href="#" type="all-source" class="toggle-global">All</a>
-</li>
-</ul>
 </li>
 <li class="active">
 <a href="#" type="figure" class="toggle-global">Figures</a>
