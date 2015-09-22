@@ -129,10 +129,31 @@ examples = function() {
 runSlidingWindowLearn <- function(configuration='1', weightByClass = FALSE, runBlocking = TRUE) {
   ds = read.csv("~/Google Drive/data/datasets/private/McKinsey/semiconductor/PM_20150826.csv")
   tsDS = addSlidingTimeWindow(ds, names(ds)[2], 24, "hour",keyCol = "ToolName")
+
+  tsDS_sampled = sampleDataAbsolute(tsDS[,!is.na(match(names(tsDS),c("RunStartTime","last_keyed_24","TTNF_hr")))],1000)
+  failureDS = ds[,!is.na(match(names(ds),c("ToolName","RunStartTime", "TTNF_hr")))]
+  failureDS = failureDS[(failureDS$TTNF_hr<1)==TRUE,]
+  failureDS$failureTime = as.character.POSIXt(as.POSIXlt(ceiling(as.double(strptime(failureDS$RunStartTime,"%m/%d/%Y %I:%M:%S %p",tz="EST")+failureDS$TTNF_hr*60*60)/60)*60,origin=as.POSIXlt('1970-01-01',tz="EST"),format =  "%m/%d/%Y %I:%M:%S %p %Z",tz="EST"),format =  "%m/%d/%Y %I:%M:%S %p %Z",tz="EST")
+  failureDS = unique(failureDS[,c(1,4)])
+  failureDS$constant = 1
+
+  failure_DSpth = writeToServer(failureDS)
+  ds_pth = writeToServer( ds[,!is.na(match(names(ds),c("waferId", "TTNF_hr")))])
+
+  Model = learn(projectName="tests",
+                tsDS_sampled,
+                target="TTNF_hr",
+                functionsBlackList = list("ICAO"),
+                #functionsWhiteList = list("isEmpty","sliceKeyedTS","constant"),
+                useCachedFeatures=FALSE,
+                autoSave = FALSE,
+                #contextDatasets = list(failure_DSpth,ds_pth),
+                verbose = TRUE)
+
   params = list(
-    projectName = "tests",
+    projectName = "SlidingWindowTests",
     trainData = tsDS,
-    target = "RunStartTime",
+    target = "TTNF_hr",
     maxFeaturesCount = list(100),
     useCachedFeatures = TRUE,
     autoSave = FALSE

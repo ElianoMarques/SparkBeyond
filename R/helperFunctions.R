@@ -31,7 +31,7 @@ sampleDataAbsolute = function(data, count, seed = 1) {
 #' Under/over sample data based on labels of \code{columnName}.
 #' @param data dataframe to be sampled
 #' @param columnName name of column with with labels by which to modify label distributions
-#' @param labels Optional. labels in columnName for which \code{desiredDistribution} will relate to. Default NA will assume equal distributions between all labels.
+#' @param labels Optional. labels in columnName?learn.file for which \code{desiredDistribution} will relate to. Default NA will assume equal distributions between all labels.
 #' @param desiredDistribution Optional. The requested distribution ratio of \code{labels}. Default NA will assume equal distributions between all labels.
 #' @param seed - Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.
 #' @return a sampled dataset with the requested distributions
