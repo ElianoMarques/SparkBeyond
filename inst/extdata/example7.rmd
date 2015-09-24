@@ -36,7 +36,7 @@ modModel = learn(projectName = "custom_function_example",
 modModel$features()[1:1,c("idx","feature")]
 ```
 
-```{r, eval = FALSE, message=FALSE}
+```{r, echo=FALSE,eval = FALSE, message=FALSE}
 writeLines(readLines(paste0(modModel$artifact_loc,"/reports/features/features_trace.txt"),n=7))
 ```
 
