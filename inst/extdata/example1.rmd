@@ -13,7 +13,7 @@ output:
 
 ```{r, echo=FALSE, eval = TRUE, message=FALSE, results='hide'}
 library(SBadapter)
-setSBserverIOfolder("/tmp/")
+setSBserverIOfolder("~/devel/localdata")
 ```
   
 # Example 1 - simple classification#    
@@ -58,6 +58,10 @@ titanicSurvivedModel$showFeaturesTrain()
 titanicSurvivedModel$showFeaturesTest()
 ```
   
+To view the feature trace report review /reports/features/features_trace.txt
+```{r, eval = TRUE, message=FALSE}
+writeLines(readLines(paste0(titanicSurvivedModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))
+```
 
 ```{r, echo=FALSE, eval = FALSE, message=FALSE}
 file.copy(paste0(titanicSurvivedModel$artifact_loc,"/reports/predictions/test/Lift_plot_survived_1.html"), getwd()) 

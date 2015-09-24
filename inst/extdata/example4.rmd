@@ -41,4 +41,8 @@ library(xtable)
 topFeatures = densityModel$features()[1:3,c("idx","feature")]
 print(xtable(topFeatures), type='html', comment=F) 
 ```
-<br>
+
+```{r, eval = TRUE, message=FALSE}
+writeLines(readLines(paste0(densityModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))
+```
+

@@ -1,0 +1,43 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 6}
+%\VignetteDepends{xtable}
+-->
+
+
+# Example 7 -  Add custom functions #
+Goal: Identify numbers that are multiples of 7 You can create your own functions, which will be used as building blocks during the feature search. All you need to do, is to specify the url/s of the source files containing the custom functions code (currently only Scala is supported). The file can be local (on the server) or on the web.
+
+<br>
+```{r, eval=TRUE, results='asis'}
+data = data.frame(number = 1:500, target = 1:500 %% 7 == 0)
+```
+
+
+```{r custom_function_example, eval=TRUE, message=FALSE, results='hide'}
+modModel = learn(projectName = "custom_function_example",
+                        trainData = data,
+                        target = "target",
+                        algorithmsWhiteList = list("RRandomForestClassifier"),  
+                        maxFeaturesCount = 5,                        
+                        customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala"),
+                        autoSave = FALSE
+                    )
+```
+
+```{r, eval=TRUE, results='asis'}
+modModel$features()[1:1,c("idx","feature")]
+```
+
+```{r, eval = TRUE, message=FALSE}
+writeLines(readLines(paste0(modModel$artifact_loc,"/reports/features/features_trace.txt"),n=7))
+```
+
+

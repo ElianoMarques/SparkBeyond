@@ -61,3 +61,8 @@ library(xtable)
 print(xtable(SentimentModelContext$features()[1:10,c("idx","feature")]), type='html', comment=F) 
 writeLines(gsub("\n","<br>",SentimentContextEval$evaluation$summary))
 ```
+
+```{r, eval = TRUE, message=FALSE}
+writeLines(readLines(paste0(SentimentModelContext$artifact_loc,"/reports/features/features_trace.txt"),n=9))
+```
+
