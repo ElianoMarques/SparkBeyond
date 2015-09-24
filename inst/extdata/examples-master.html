@@ -1227,23 +1227,23 @@ numberIn(ticket) in range (8854.5, 231932)
 <pre style=""><code class="source r">titanicSurvivedModel$showFeaturesTrain()
 titanicSurvivedModel$showFeaturesTest()</code></pre>
 </div>
-To view the feature trace report review /reports/features/features_trace.txt
+To view the feature trace report review /reports/features/features_trace.txt:<br> For example, the first feature &quot;tokenizeByPunctuation(name) does not contain mr&quot; has a positive example trace under the &quot;positive sample&quot; column. The trace starts with the &quot;name&quot; subexpression (bottom) &quot;Cumings, Mrs. John Bradley (Florence Briggs Thayer)&quot;, the next step of the trace is the subexpression &quot;tokenizeByPunctuation(name)&quot; which is directly on top of &quot;name&quot;. It evaluates to &quot;ArrayBuffer(cumings, mrs, john bradley, florence briggs thayer)&quot; which does not contain &quot;mr&quot;. The type and documentation of each subexpression function are listed in the last two columns.
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">writeLines(readLines(paste0(titanicSurvivedModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))</code></pre>
+<pre style=""><code class="source r">writeLines(gsub("-{2}","",readLines(paste0(titanicSurvivedModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))</code></pre>
 <button class="output R toggle btn btn-xs btn-success">
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
 <pre style=""><code class="output r">## Human friendly: tokenizeByPunctuation(name) does not contain mr
 ## Canonical: !core.Solving.TextFunctions.tokenizeByPunctuation(name).contains("mr")
-## +-----------------------------+--------------------------------------+-----------------------------------------------------------------+---------------+--------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------+
-## | sub-expression              | trace from 0                         | trace from 1                                                    | type          | root function                                                                              | reference / explanation                                                                       |
-## +-----------------------------+--------------------------------------+-----------------------------------------------------------------+---------------+--------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------+
-## | tokenizeByPunctuation(name) | ArrayBuffer(braund, mr, owen harris) | ArrayBuffer(cumings, mrs, john bradley, florence briggs thayer) | Seq[String]   | core.Solving.TextFunctions.tokenizeByPunctuation(s: core.nlp.SemanticWrapper): Seq[String] | Returns the list of words from the text, when splitting using standard punctuation characters |
-## |  name                       | Braund, Mr. Owen Harris              | Cumings, Mrs. John Bradley (Florence Briggs Thayer)             | core.nlp.Text | name                                                                                       | Input parameter 'name'                                                                        |
-## +-----------------------------+--------------------------------------+-----------------------------------------------------------------+---------------+--------------------------------------------------------------------------------------------+-----------------------------------------------------------------------------------------------+
+## +-+-++-++-+
+## | sub-expression              | positive sample                                                 | negative sample                      | type          | root function                                                                              | reference / explanation                                                                       |
+## +-+-++-++-+
+## | tokenizeByPunctuation(name) | ArrayBuffer(cumings, mrs, john bradley, florence briggs thayer) | ArrayBuffer(braund, mr, owen harris) | Seq[String]   | core.Solving.TextFunctions.tokenizeByPunctuation(s: core.nlp.SemanticWrapper): Seq[String] | Returns the list of words from the text, when splitting using standard punctuation characters |
+## |  name                       | Cumings, Mrs. John Bradley (Florence Briggs Thayer)             | Braund, Mr. Owen Harris              | core.nlp.Text | name                                                                                       | Input parameter 'name'                                                                        |
+## +-+-++-++-+
 </code></pre>
 </div>
 <!-- 
@@ -1369,22 +1369,23 @@ stemmedWordsWithoutCommonTerms(name) does not contain mr
 </tr>
 </table>
 </div>
+To view the feature trace report review /reports/features/features_trace.txt:<br> For example, the first feature &quot;name contains master&quot; has a positive example trace under the &quot;positive sample&quot; column. The trace starts with the &quot;name&quot; subexpression (bottom) &quot;Rice, Master. Eugene&quot;, the next step of the trace is the subexpression &quot;tokenizeByWordBoundary(name)&quot; which is directly on top of &quot;name&quot;. It evaluates to &quot;Vector(rice, master, eugene)&quot; which contains &quot;master&quot;. The type and documentation of each subexpression function are listed in the last two columns.
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">writeLines(readLines(paste0(titanicAgeModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))</code></pre>
+<pre style=""><code class="source r">writeLines(gsub("-{2}","",readLines(paste0(titanicAgeModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))</code></pre>
 <button class="output R toggle btn btn-xs btn-success">
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
 <pre style=""><code class="output r">## Human friendly: name contains master
 ## Canonical: core.Solving.TextFunctions.tokenizeByWordBoundary(name) contains "master"
-## +------------------------------+---------------------------------------+----------------------------------+------------------------------------------+---------------------------------------------------------------+-------------------------------+----------------+---------------------------------------------------------------------------------------------------+-------------------------+
-## | sub-expression               | trace from 29.375                     | trace from 22.5                  | trace from 9.71                          | trace from 38.875                                             | trace from 59.5               | type           | root function                                                                                     | reference / explanation |
-## +------------------------------+---------------------------------------+----------------------------------+------------------------------------------+---------------------------------------------------------------+-------------------------------+----------------+---------------------------------------------------------------------------------------------------+-------------------------+
-## | tokenizeByWordBoundary(name) | Vector(williams, mr, charles, eugene) | Vector(braund, mr, owen, harris) | Vector(sandstrom, miss, marguerite, rut) | Vector(cumings, mrs, john, bradley, florence, briggs, thayer) | Vector(mccarthy, mr, timothy) | Vector[String] | core.Solving.TextFunctions.tokenizeByWordBoundary(text: core.nlp.SemanticWrapper): Vector[String] |                         |
-## |  name                        | Williams, Mr. Charles Eugene          | Braund, Mr. Owen Harris          | Sandstrom, Miss. Marguerite Rut          | Cumings, Mrs. John Bradley (Florence Briggs Thayer)           | McCarthy, Mr. Timothy J       | core.nlp.Text  | name                                                                                              | Input parameter 'name'  |
-## +------------------------------+---------------------------------------+----------------------------------+------------------------------------------+---------------------------------------------------------------+-------------------------------+----------------+---------------------------------------------------------------------------------------------------+-------------------------+
+## +++++-+-+
+## | sub-expression               | positive sample              | negative sample                  | type           | root function                                                                                     | reference / explanation |
+## +++++-+-+
+## | tokenizeByWordBoundary(name) | Vector(rice, master, eugene) | Vector(braund, mr, owen, harris) | Vector[String] | core.Solving.TextFunctions.tokenizeByWordBoundary(text: core.nlp.SemanticWrapper): Vector[String] |                         |
+## |  name                        | Rice, Master. Eugene         | Braund, Mr. Owen Harris          | core.nlp.Text  | name                                                                                              | Input parameter 'name'  |
+## +++++-+-+
 </code></pre>
 </div>
 <p><br></p>
@@ -1548,13 +1549,13 @@ textSentimentScore(name) &gt;= 0.18333333333333335
 </button>
 <pre style=""><code class="output r">## Human friendly: parch in range (0, 3.5)
 ## Canonical: (scala.math.abs(parch - 1.75)) < 1.75
-## +-------------------+-------------------+-----------------+-----------------+-------------------+-----------------+--------+----------------------------------------+---------------------------------------------------------------+
-## | sub-expression    | trace from 29.375 | trace from 22.5 | trace from 9.71 | trace from 38.875 | trace from 59.5 | type   | root function                          | reference / explanation                                       |
-## +-------------------+-------------------+-----------------+-----------------+-------------------+-----------------+--------+----------------------------------------+---------------------------------------------------------------+
-## | abs(parch - 1.75) | 1.75              | 1.75            | 0.75            | 1.75              | 1.75            | Double | scala.math.abs(x: Double): Double      | http://www.scala-lang.org/api/current/index.html#scala.math   |
-## |  parch - 1.75     | -1.75             | -1.75           | -0.75           | -1.75             | -1.75           | Double | scala.Double.$minus(x: Double): Double | http://www.scala-lang.org/api/current/index.html#scala.Double |
-## |   parch           | 0                 | 0               | 1               | 0                 | 0               | Int    | parch                                  | Input parameter 'parch'                                       |
-## +-------------------+-------------------+-----------------+-----------------+-------------------+-----------------+--------+----------------------------------------+---------------------------------------------------------------+
+## +-------------------+-----------------+-----------------+--------+----------------------------------------+---------------------------------------------------------------+
+## | sub-expression    | positive sample | negative sample | type   | root function                          | reference / explanation                                       |
+## +-------------------+-----------------+-----------------+--------+----------------------------------------+---------------------------------------------------------------+
+## | abs(parch - 1.75) | 0.75            | 1.75            | Double | scala.math.abs(x: Double): Double      | http://www.scala-lang.org/api/current/index.html#scala.math   |
+## |  parch - 1.75     | -0.75           | -1.75           | Double | scala.Double.$minus(x: Double): Double | http://www.scala-lang.org/api/current/index.html#scala.Double |
+## |   parch           | 1               | 0               | Int    | parch                                  | Input parameter 'parch'                                       |
+## +-------------------+-----------------+-----------------+--------+----------------------------------------+---------------------------------------------------------------+
 </code></pre>
 </div>
 <p><br></p>
@@ -1647,14 +1648,14 @@ ceil(distance of latLong from closest of latLong_column) == 1.0
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
 <pre style=""><code class="output r">## Human friendly: inverse(distance of latLong from closest of latLong_column) >= 0.711911433968963
-## Canonical: (core.Solving.SpecialFunctions.inverse(core.common.zeroComplexity.ZeroComplexityFunctions.distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/adeen/localdata/artifacts/density_example/4/resources/latLong_column"), latLong))) >= 0.711911433968963
-## +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+---------------------------------------------+----------------------------------------------+----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
-## | sub-expression                                                                                                                                                                                        | trace from 538.302506315311                   | trace from 5453.22461532599                  | trace from 1177.8498181684636                 | trace from 1926.6536148738899               | trace from 3117.99080103353                  | trace from 366519.3699822312                 | type                        | root function                                                                                                                                               | reference / explanation   |
-## +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+---------------------------------------------+----------------------------------------------+----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
-## | inverse(distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/adeen/localdata/artifacts/density_example/4/resources/latLong_column"), latLong)) | 0.191742                                      | 1.180125                                     | 0.504245                                      | 0.609187                                    | 0.780459                                     | 1.408329                                     | Double                      | core.Solving.SpecialFunctions.inverse(num: Double): Double                                                                                                  | 1 / num                   |
-## |  distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/adeen/localdata/artifacts/density_example/4/resources/latLong_column"), latLong)         | 5.215342                                      | 0.847368                                     | 1.983164                                      | 1.641533                                    | 1.281297                                     | 0.710062                                     | Double                      | core.common.zeroComplexity.ZeroComplexityFunctions.distanceFromClosest(points: Seq[core.datastructures.LatLong],point: core.datastructures.LatLong): Double |                           |
-## |   latLong                                                                                                                                                                                             | LatLong(0.0912286809179932,0.729266624199226) | LatLong(0.355703649809584,0.935724608134478) | LatLong(0.0354995254892856,0.658993059769273) | LatLong(0.248872943455353,0.70185886672698) | LatLong(0.879180375020951,0.611318997340277) | LatLong(0.177286486141384,0.115792007884011) | core.datastructures.LatLong | latLong                                                                                                                                                     | Input parameter 'latLong' |
-## +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------+----------------------------------------------+-----------------------------------------------+---------------------------------------------+----------------------------------------------+----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+## Canonical: (core.Solving.SpecialFunctions.inverse(core.common.zeroComplexity.ZeroComplexityFunctions.distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/adeen/localdata/artifacts/density_example/9/resources/latLong_column"), latLong))) >= 0.711911433968963
+## +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------+-----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+## | sub-expression                                                                                                                                                                                        | positive sample                              | negative sample                               | type                        | root function                                                                                                                                               | reference / explanation   |
+## +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------+-----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+## | inverse(distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/adeen/localdata/artifacts/density_example/9/resources/latLong_column"), latLong)) | 1.180125                                     | 0.504245                                      | Double                      | core.Solving.SpecialFunctions.inverse(num: Double): Double                                                                                                  | 1 / num                   |
+## |  distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/adeen/localdata/artifacts/density_example/9/resources/latLong_column"), latLong)         | 0.847368                                     | 1.983164                                      | Double                      | core.common.zeroComplexity.ZeroComplexityFunctions.distanceFromClosest(points: Seq[core.datastructures.LatLong],point: core.datastructures.LatLong): Double |                           |
+## |   latLong                                                                                                                                                                                             | LatLong(0.355703649809584,0.935724608134478) | LatLong(0.0354995254892856,0.658993059769273) | core.datastructures.LatLong | latLong                                                                                                                                                     | Input parameter 'latLong' |
+## +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------+-----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
 </code></pre>
 </div>
 <p><br></p>
@@ -1860,7 +1861,7 @@ feature
 0
 </td>
 <td>
-entitiesHistogram(tweet, data_in22a12b006995_column).valueOf(-1) orIfMissing 0 &lt; 0.5
+entitiesHistogram(tweet, data_in31a55c9d6fb4_column).valueOf(-1) orIfMissing 0 &lt; 0.5
 </td>
 </tr>
 <tr>
@@ -1871,7 +1872,7 @@ entitiesHistogram(tweet, data_in22a12b006995_column).valueOf(-1) orIfMissing 0 &
 1
 </td>
 <td>
-entitiesHistogram(tweet, data_in22a12b006995_column).valueOf(1) orIfMissing 0 &gt;= 0.5
+entitiesHistogram(tweet, data_in31a55c9d6fb4_column).valueOf(1) orIfMissing 0 &gt;= 0.5
 </td>
 </tr>
 <tr>
@@ -1904,7 +1905,7 @@ textSentimentScore(tweet) &lt; -0.017857142857142856
 4
 </td>
 <td>
-entitiesHistogram(tweet, data_in22a12b006995_column) == Map((1, 1))
+entitiesHistogram(tweet, data_in31a55c9d6fb4_column) == Map((1, 1))
 </td>
 </tr>
 <tr>
@@ -1926,7 +1927,7 @@ tweet contains great
 6
 </td>
 <td>
-entitiesHistogram(tweet, data_in22a12b006995_column) == Map((1, 2))
+entitiesHistogram(tweet, data_in31a55c9d6fb4_column) == Map((1, 2))
 </td>
 </tr>
 <tr>
@@ -1959,7 +1960,7 @@ slidingSubsets(tweet).toSeq contains (best, the)
 9
 </td>
 <td>
-entitiesHistogram(tweet, data_in22a12b006995_column) == Map((-1, 1))
+entitiesHistogram(tweet, data_in31a55c9d6fb4_column) == Map((-1, 1))
 </td>
 </tr>
 </table>
@@ -1977,15 +1978,15 @@ entitiesHistogram(tweet, data_in22a12b006995_column) == Map((-1, 1))
 <button class="output R toggle btn btn-xs btn-success">
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
-<pre style=""><code class="output r">## Human friendly: entitiesHistogram(tweet, data_in22a12b006995_column).valueOf(-1) orIfMissing 0 < 0.5
-## Canonical: (core.Solving.SpecialFunctions.getOrElseSeq(core.common.zeroComplexity.ZeroComplexityFunctions.entitiesHistogram(tweet, core.LoadCached[core.datastructures.TermsMap[Int]]("/Users/adeen/localdata/artifacts/tweets/8/resources/data_in22a12b006995_column")), -1, 0.0)) < 0.5
-## +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------+-----------------------------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
-## | sub-expression                                                                                                                                                                        | trace from -1                                                         | trace from 1                            | type                               | root function                                                                                                                                                            | reference / explanation                                                                                                              |
-## +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------+-----------------------------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
-## | getOrElseSeq(entitiesHistogram(tweet, core.LoadCached[core.datastructures.TermsMap[Int]]("/Users/adeen/localdata/artifacts/tweets/8/resources/data_in22a12b006995_column")), -1, 0.0) | 1                                                                     | 0                                       | Double                             | core.Solving.SpecialFunctions.getOrElseSeq[KEY,VALUE,TDEFAULT>:VALUE](m: TraversableOnce[(KEY, VALUE)],key: KEY,default: TDEFAULT): TDEFAULT                             | given a list of (key, value) pairs, find the first pair for by key, and return the value. If none found, return the provided default |
-## |  entitiesHistogram(tweet, core.LoadCached[core.datastructures.TermsMap[Int]]("/Users/adeen/localdata/artifacts/tweets/8/resources/data_in22a12b006995_column"))                       | Map(-1 -> 1.0)                                                        | Map(1 -> 1.0)                           | core.datastructures.Histogram[Int] | core.common.zeroComplexity.ZeroComplexityFunctions.entitiesHistogram[T](text: core.nlp.Text,termsMap: core.datastructures.TermsMap[T]): core.datastructures.Histogram[T] | Returns a map of terms from termsMap found in the text and their respective frequencies                                              |
-## |   tweet                                                                                                                                                                               | The number of passes made which reached a player tonight Embarrassing | Performance proves is far from finished | core.nlp.Text                      | tweet                                                                                                                                                                    | Input parameter 'tweet'                                                                                                              |
-## +---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------------------------------------+-----------------------------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
+<pre style=""><code class="output r">## Human friendly: entitiesHistogram(tweet, data_in31a55c9d6fb4_column).valueOf(-1) orIfMissing 0 < 0.5
+## Canonical: (core.Solving.SpecialFunctions.getOrElseSeq(core.common.zeroComplexity.ZeroComplexityFunctions.entitiesHistogram(tweet, core.LoadCached[core.datastructures.TermsMap[Int]]("/Users/adeen/localdata/artifacts/tweets/16/resources/data_in31a55c9d6fb4_column")), -1, 0.0)) < 0.5
+## +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------+------------------------------------------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
+## | sub-expression                                                                                                                                                                         | positive sample                         | negative sample                                      | type                               | root function                                                                                                                                                            | reference / explanation                                                                                                              |
+## +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------+------------------------------------------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
+## | getOrElseSeq(entitiesHistogram(tweet, core.LoadCached[core.datastructures.TermsMap[Int]]("/Users/adeen/localdata/artifacts/tweets/16/resources/data_in31a55c9d6fb4_column")), -1, 0.0) | 0                                       | 1                                                    | Double                             | core.Solving.SpecialFunctions.getOrElseSeq[KEY,VALUE,TDEFAULT>:VALUE](m: TraversableOnce[(KEY, VALUE)],key: KEY,default: TDEFAULT): TDEFAULT                             | given a list of (key, value) pairs, find the first pair for by key, and return the value. If none found, return the provided default |
+## |  entitiesHistogram(tweet, core.LoadCached[core.datastructures.TermsMap[Int]]("/Users/adeen/localdata/artifacts/tweets/16/resources/data_in31a55c9d6fb4_column"))                       | Map(1 -> 1.0)                           | Map(-1 -> 1.0, 1 -> 1.0)                             | core.datastructures.Histogram[Int] | core.common.zeroComplexity.ZeroComplexityFunctions.entitiesHistogram[T](text: core.nlp.Text,termsMap: core.datastructures.TermsMap[T]): core.datastructures.Histogram[T] | Returns a map of terms from termsMap found in the text and their respective frequencies                                              |
+## |   tweet                                                                                                                                                                                | Performance proves is far from finished | Defensive show against Sunderland best of the season | core.nlp.Text                      | tweet                                                                                                                                                                    | Input parameter 'tweet'                                                                                                              |
+## +----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-----------------------------------------+------------------------------------------------------+------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------------------------------------------------------+
 </code></pre>
 </div>
 <p><br></p>
@@ -2005,7 +2006,7 @@ This example will show how airport codes (in fields <code>origin</code>, <code>d
 flights = getData("flights_delay")
 airports = getData("airports")
 names(flights)</code></pre>
-[1] &quot;dest&quot; &quot;origin&quot; &quot;year&quot; &quot;month&quot; &quot;dayofMonth&quot; &quot;dayOfWeek&quot; &quot;depTime&quot; &quot;cRSDepTime&quot; &quot;arrTime&quot; &quot;cRSArrTime&quot; &quot;uniqueCarrier&quot; &quot;flightNum&quot; &quot;tailNum&quot; &quot;actualElapsedTime&quot; &quot;cRSElapsedTime&quot; &quot;airTime&quot; &quot;distance&quot; &quot;taxiIn&quot; &quot;taxiOut&quot; &quot;cancelled&quot; &quot;cancellationCode&quot; &quot;diverted&quot; &quot;weatherDelay&quot; &quot;lateAircraftDelay&quot; &quot;date&quot;<br />
+[1] &quot;dest&quot; &quot;origin&quot; &quot;year&quot;<br /> [4] &quot;month&quot; &quot;dayofMonth&quot; &quot;dayOfWeek&quot;<br /> [7] &quot;depTime&quot; &quot;cRSDepTime&quot; &quot;arrTime&quot;<br />[10] &quot;cRSArrTime&quot; &quot;uniqueCarrier&quot; &quot;flightNum&quot;<br />[13] &quot;tailNum&quot; &quot;actualElapsedTime&quot; &quot;cRSElapsedTime&quot;<br />[16] &quot;airTime&quot; &quot;distance&quot; &quot;taxiIn&quot;<br />[19] &quot;taxiOut&quot; &quot;cancelled&quot; &quot;cancellationCode&quot; [22] &quot;diverted&quot; &quot;weatherDelay&quot; &quot;lateAircraftDelay&quot; [25] &quot;date&quot;<br />
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
@@ -2517,13 +2518,13 @@ smallSubsets(tailNum) contains List(J, 5, 2)
 </button>
 <pre style=""><code class="output r">## Human friendly: depTime not in range (424.5, 2256)
 ## Canonical: (scala.math.abs(depTime - 1340.25)) >= 915.75
-## +------------------------+-----------------+-----------------+-----------------+-----------------+-----------------+------------------+--------+----------------------------------------+---------------------------------------------------------------+
-## | sub-expression         | trace from 60.0 | trace from 18.5 | trace from 40.5 | trace from 98.5 | trace from 27.5 | trace from 452.0 | type   | root function                          | reference / explanation                                       |
-## +------------------------+-----------------+-----------------+-----------------+-----------------+-----------------+------------------+--------+----------------------------------------+---------------------------------------------------------------+
-## | abs(depTime - 1340.25) | 494.75          | 583.75          | 670.75          | 364.75          | 862.75          | 590.75           | Double | scala.math.abs(x: Double): Double      | http://www.scala-lang.org/api/current/index.html#scala.math   |
-## |  depTime - 1340.25     | 494.75          | 583.75          | 670.75          | 364.75          | 862.75          | 590.75           | Double | scala.Double.$minus(x: Double): Double | http://www.scala-lang.org/api/current/index.html#scala.Double |
-## |   depTime              | 1835            | 1924            | 2011            | 1705            | 2203            | 1931             | Int    | depTime                                | Input parameter 'depTime'                                     |
-## +------------------------+-----------------+-----------------+-----------------+-----------------+-----------------+------------------+--------+----------------------------------------+---------------------------------------------------------------+
+## +------------------------+-----------------+-----------------+--------+----------------------------------------+---------------------------------------------------------------+
+## | sub-expression         | positive sample | negative sample | type   | root function                          | reference / explanation                                       |
+## +------------------------+-----------------+-----------------+--------+----------------------------------------+---------------------------------------------------------------+
+## | abs(depTime - 1340.25) | 978.75          | 494.75          | Double | scala.math.abs(x: Double): Double      | http://www.scala-lang.org/api/current/index.html#scala.math   |
+## |  depTime - 1340.25     | 978.75          | 494.75          | Double | scala.Double.$minus(x: Double): Double | http://www.scala-lang.org/api/current/index.html#scala.Double |
+## |   depTime              | 2319            | 1835            | Int    | depTime                                | Input parameter 'depTime'                                     |
+## +------------------------+-----------------+-----------------+--------+----------------------------------------+---------------------------------------------------------------+
 </code></pre>
 </div>
 <p><br></p>
@@ -2566,17 +2567,6 @@ idx feature 1 0 isMultipleOf7(number)
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
 <pre style=""><code class="source r">writeLines(readLines(paste0(modModel$artifact_loc,"/reports/features/features_trace.txt"),n=7))</code></pre>
-<button class="output R toggle btn btn-xs btn-success">
-<span class="glyphicon glyphicon-chevron-down"></span> R output
-</button>
-<pre style=""><code class="output r">## Human friendly: isMultipleOf7(number)
-## Canonical: Extensions.isMultipleOf7(number)
-## +-----------------------+--------------+--------------+---------------+---------------------------------------------------------+--------------------------+
-## | sub-expression        | trace from 0 | trace from 1 | type          | root function                                           | reference / explanation  |
-## +-----------------------+--------------+--------------+---------------+---------------------------------------------------------+--------------------------+
-## | isMultipleOf7(number) | false        | true         | scala.Boolean | Extensions.isMultipleOf7(num: scala.Int): scala.Boolean |                          |
-## |  number               | 1            | 14           | Int           | number                                                  | Input parameter 'number' |
-</code></pre>
 </div>
 <p><br></p>
 <!--  
@@ -2610,20 +2600,6 @@ Languages
 </li>
 <li>
 <a href="#" type="all-source" class="toggle-global">All</a>
-</li>
-</ul>
-</li>
-<li class="dropup">
-<a href="#" class="dropdown-toggle" data-toggle="dropdown">Output <b class="caret"></b></a>
-<ul class="dropdown-menu">
-<li class="dropdown-header">
-Type
-</li>
-<li class="active">
-<a href="#" class="toggle-global output" type="output">output</a>
-</li>
-<li>
-<a href="#" type="all-output" class="toggle-global">All</a>
 </li>
 </ul>
 </li>

@@ -41,8 +41,8 @@ Here are the top features:
 library(xtable)
 print(xtable(titanicAgeModel$features()[1:7,c("idx", "feature")]), type='html', comment=F)
 ```
-
+To view the feature trace report review /reports/features/features_trace.txt:<br>
+For example, the first feature "name contains master" has a positive example trace under the "positive sample" column. The trace starts with the "name" subexpression (bottom) "Rice, Master. Eugene", the next step of the trace is the subexpression "tokenizeByWordBoundary(name)" which is directly on top of "name". It evaluates to "Vector(rice, master, eugene)" which contains "master". The type and documentation of each subexpression function are listed in the last two columns.
 ```{r, eval = TRUE, message=FALSE}
-writeLines(readLines(paste0(titanicAgeModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))
+writeLines(gsub("-{2}","",readLines(paste0(titanicAgeModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))
 ```
-

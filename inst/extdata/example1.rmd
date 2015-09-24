@@ -13,7 +13,7 @@ output:
 
 ```{r, echo=FALSE, eval = TRUE, message=FALSE, results='hide'}
 library(SBadapter)
-setSBserverIOfolder("~/devel/localdata")
+setSBserverIOfolder("/tmp/")
 ```
   
 # Example 1 - simple classification#    
@@ -58,9 +58,10 @@ titanicSurvivedModel$showFeaturesTrain()
 titanicSurvivedModel$showFeaturesTest()
 ```
   
-To view the feature trace report review /reports/features/features_trace.txt
+To view the feature trace report review /reports/features/features_trace.txt:<br>
+For example, the first feature "tokenizeByPunctuation(name) does not contain mr" has a positive example trace under the "positive sample" column. The trace starts with the "name" subexpression (bottom) "Cumings, Mrs. John Bradley (Florence Briggs Thayer)", the next step of the trace is the subexpression "tokenizeByPunctuation(name)" which is directly on top of "name". It evaluates to "ArrayBuffer(cumings, mrs, john bradley, florence briggs thayer)" which does not contain "mr". The type and documentation of each subexpression function are listed in the last two columns.
 ```{r, eval = TRUE, message=FALSE}
-writeLines(readLines(paste0(titanicSurvivedModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))
+writeLines(gsub("-{2}","",readLines(paste0(titanicSurvivedModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))
 ```
 
 ```{r, echo=FALSE, eval = FALSE, message=FALSE}
