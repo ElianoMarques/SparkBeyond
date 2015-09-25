@@ -87,7 +87,8 @@ learn <- function(projectName = "temp",
                   fileEncoding = NA,
                   autoSave = TRUE,
                   runBlocking = TRUE,
-                  verbose = FALSE){
+                  verbose = FALSE,
+                  numericEqualityFeatures = TRUE){
 
   params <-list(projectName = projectName,
                 trainDataFilename = writeToServer(trainData),
@@ -122,7 +123,9 @@ learn <- function(projectName = "temp",
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
                 autoSave = autoSave,
                 fileEncoding = fileEncoding,
-                verbose = verbose)
+                verbose = verbose,
+                numericEqualityFeatures = numericEqualityFeatures
+                )
 
   session = do.call(learn.file,c(params))
   session
@@ -199,7 +202,8 @@ learn.file <- function(projectName = "temp",
                     fileEncoding = NA,
                     autoSave = TRUE,
                     runBlocking = TRUE,
-                    verbose = FALSE){
+                    verbose = FALSE,
+                    numericEqualityFeatures = TRUE){
 
   isLatestVersion()
   isLatestRpackage()
@@ -254,7 +258,8 @@ learn.file <- function(projectName = "temp",
                 weightByClass = weightByClass,
                 externalPrefixPath = getSBserverIOfolder(),
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
-                fileEncoding = fileEncoding
+                fileEncoding = fileEncoding,
+                numericEqualityFeatures = numericEqualityFeatures
   )
 
   params = params[!is.na(params)]
