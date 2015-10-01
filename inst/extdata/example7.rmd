@@ -7,7 +7,7 @@ output:
 
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Example 6}
+%\VignetteIndexEntry{Example 7}
 %\VignetteDepends{xtable}
 -->
 

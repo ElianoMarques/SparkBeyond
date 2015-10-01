@@ -280,7 +280,7 @@ limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilD
 #' @param data: data.table to be modified.
 #' @param dateCol: The column name in \code{data} that will be modified. "SB_times_col" by default
 #' @param refDate: The reference date to use.
-#' @param datesFormat: the format of the from/until dates.month/day/year by default.
+#' @param dateFormat: the format of the from/until dates.month/day/year by default.
 #' @param units: the time span unit to use when creating the reference. Based on \code{\link[base]{difftime}} definitions. "days" by default.
 #' @return NA will be returned and the input file will be modified.
 offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m/%d/%Y", units = "days"){
@@ -295,7 +295,23 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
   NA
 }
 
-addSlidingTimeWindow = function(data, dateCol, window, unit, includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, keyCol = NA, colNameOverride = NA) {
+
+
+#' addSlidingTimeWindow
+#'
+#' Add a sliding window column to the data
+#'
+#' @param data: data.table to be modified.
+#' @param dateCol: The column name in \code{data} that will be used.
+#' @param window: The window length (numeric)
+#' @param unit: The window length unit (i.e. "second", "minute", "hour", "day", "week")
+#' @param dateFormat: provide date format for parsing. defaults to "%m/%d/%Y" see strtptime for more examples i.e. "%m/%d/%Y %I:%M:%S %p"
+#' @param keyCol: An optional key for the sliding window (NA as default)
+#' @param includeUntil: optional argument
+#' @param relativeTime: optional relative time boolean flag
+#' @param sample: optional maximal possible sample value (default to maxint)
+#' @return The new data
+addSlidingTimeWindow = function(data, dateCol, window, unit, dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, keyCol = NA) {
   if (is.na(keyCol)){
     newCol = paste0("last_", window)
   }else{
@@ -318,18 +334,17 @@ addSlidingTimeWindow = function(data, dateCol, window, unit, includeUntil = FALS
   #KeyedTimeWindow(key=A, startDate=Thu Feb 12 12:16:20 IST 2015, endDate=Fri Feb 13 12:16:20 IST 2015, includeUntil=false, relativeTime=true)
 
   dateColInd = grep(dateCol,names(data))
-  datePOSIXformat = "%m/%d/%Y %I:%M:%S %p"
-  datePOSIXformatOut = "%m/%d/%Y %I:%M:%S %p %Z"
+  datePOSIXformatOut = "%m/%d/%Y %H:%M:%S %p %Z"
   generateKeyWindow = function(dateVal, keyVal) {
-    dt = as.character.POSIXt(strptime(dateVal,datePOSIXformat,tz="EST"),format=datePOSIXformatOut)
-    dt_from =  as.character.POSIXt(strptime(dateVal,datePOSIXformat,tz="EST")-window*unitVal,format=datePOSIXformatOut)
+    dt = as.character(as.POSIXct(strptime(dateVal,dateFormat,tz="EST")),format=datePOSIXformatOut)
+    dt_from = as.character(as.POSIXct(strptime(dateVal,dateFormat,tz="EST")-window*unitVal),format=datePOSIXformatOut)
     paste0(keyVal,",",dt_from,",",dt,",",includeUntil,",",relativeTime,",NA")
   }
 
   if (is.na(keyCol)){
     data[,newCol] = sapply(data[,dateCol],function (x) {
-                      dt = as.character.POSIXt(strptime(x,datePOSIXformat,tz="EST"),format=datePOSIXformatOut)
-                      dt_from =  as.character.POSIXt(strptime(x,datePOSIXformat,tz="EST")-window*unitVal,format=datePOSIXformatOut)
+                      dt = as.character(as.POSIXct(strptime(x,dateFormat,tz="EST")),format=datePOSIXformatOut)
+                      dt_from = as.character(as.POSIXct(strptime(x,dateFormat,tz="EST")-window*unitVal),format=datePOSIXformatOut)
                       paste0("NA,",dt_from,",",dt,",",includeUntil,",",relativeTime,",",sample)
                       })
     #data[,eval(as.symbol(newCol)):= sapply(eval(as.symbol(dateCol)),function (x) {dt = as.double(as.POSIXlt(strptime(x,datePOSIXformat,tz="EST"))); paste0("Window(",dt - window*unitVal,",",dt,",",includeUntil,",",relativeTime,",",sample,")")})]

@@ -115,6 +115,7 @@ getData <- function(datasetName) {
 #        else stop("Flight weather delay was not available")
 #      },
     airports = getExtData("airports.csv.gz"),
+    frequencychange = getExtData("frequencyChangeDS.csv"),
     stop(paste0("The requested dataset '",datasetName,"' does not exists in the datasets list"))
   )
 }

@@ -48,7 +48,10 @@ Show predict / create package etc example - should be in a different section
 ```{r example7, child='example7.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
-
+<br>
+```{r example8, child='example8.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
 <!--  
 Currently put the weather example in a comment until we have our own knowledge cloud
 ```{r example6, child='example6.rmd', eval = FALSE, cache=TRUE}
