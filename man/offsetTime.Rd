@@ -14,7 +14,7 @@ offsetTime(data, dateCol = "SB_times_col", refDate,
 
 \item{refDate:}{The reference date to use.}
 
-\item{dateFormat:}{the format of the from/until dates.month/day/year by default.}
+\item{datesFormat:}{the format of the from/until dates. "\%m/\%d/\%Y" by default.}
 
 \item{units:}{the time span unit to use when creating the reference. Based on \code{\link[base]{difftime}} definitions. "days" by default.}
 }
