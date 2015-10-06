@@ -12,7 +12,7 @@ sampleDataByClass(data, columnName, labels = NA, desiredDistribution = NA,
 
 \item{columnName}{name of column with with labels by which to modify label distributions}
 
-\item{labels}{Optional. labels in columnName for which \code{desiredDistribution} will relate to. Default NA will assume equal distributions between all labels.}
+\item{labels}{Optional. labels in columnName?learn.file for which \code{desiredDistribution} will relate to. Default NA will assume equal distributions between all labels.}
 
 \item{desiredDistribution}{Optional. The requested distribution ratio of \code{labels}. Default NA will assume equal distributions between all labels.}
 
