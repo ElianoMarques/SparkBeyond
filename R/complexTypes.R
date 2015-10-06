@@ -305,7 +305,7 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @param dateCol: The column name in \code{data} that will be used.
 #' @param window: The window length (numeric)
 #' @param unit: The window length unit (i.e. "second", "minute", "hour", "day", "week")
-#' @param dateFormat: provide date format for parsing. defaults to "%m/%d/%Y" see strtptime for more examples i.e. "%m/%d/%Y %I:%M:%S %p"
+#' @param dateFormat: provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"
 #' @param keyCol: An optional key for the sliding window (NA as default)
 #' @param includeUntil: optional argument
 #' @param relativeTime: optional relative time boolean flag
