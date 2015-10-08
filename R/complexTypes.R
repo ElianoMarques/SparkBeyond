@@ -280,7 +280,7 @@ limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilD
 #' @param data: data.table to be modified.
 #' @param dateCol: The column name in \code{data} that will be modified. "SB_times_col" by default
 #' @param refDate: The reference date to use.
-#' @param dateFormat: the format of the from/until dates.month/day/year by default.
+#' @param datesFormat: the format of the from/until dates. "\%m/\%d/\%Y" by default.
 #' @param units: the time span unit to use when creating the reference. Based on \code{\link[base]{difftime}} definitions. "days" by default.
 #' @return NA will be returned and the input file will be modified.
 offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m/%d/%Y", units = "days"){
@@ -305,7 +305,7 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @param dateCol: The column name in \code{data} that will be used.
 #' @param window: The window length (numeric)
 #' @param unit: The window length unit (i.e. "second", "minute", "hour", "day", "week")
-#' @param dateFormat: provide date format for parsing. defaults to "%m/%d/%Y" see strtptime for more examples i.e. "%m/%d/%Y %I:%M:%S %p"
+#' @param dateFormat: provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"
 #' @param keyCol: An optional key for the sliding window (NA as default)
 #' @param includeUntil: optional argument
 #' @param relativeTime: optional relative time boolean flag

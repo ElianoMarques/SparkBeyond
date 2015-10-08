@@ -6,8 +6,9 @@
 \usage{
 featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
   maxDepth = 2, contextDatasets = NA, functionsWhiteList = NA,
-  functionsBlackList = NA, booleanNumericFeatures = TRUE,
-  useGraph = FALSE, useCustomGraphs = FALSE, customGraphsWhiteList = NA,
+  functionsBlackList = NA, booleanNumericFeatures = NA,
+  numericEqualityFeatures = TRUE, useGraph = FALSE,
+  useCustomGraphs = FALSE, customGraphsWhiteList = NA,
   customGraphsBlackList = NA, customFunctions = NA,
   crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
   autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
@@ -37,7 +38,9 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 
 \item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.}
 
-\item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. TRUE by default.}
+\item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.}
+
+\item{numericEqualityFeatures:}{A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.}
 
 \item{useCustomGraphs:}{A boolean indicating whether custom graphs should be used. FALSE by default.}
 

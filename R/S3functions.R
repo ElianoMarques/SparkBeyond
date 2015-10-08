@@ -12,7 +12,8 @@
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
-#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
+#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.
+#' @param numericEqualityFeatures: A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
 #' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
@@ -65,6 +66,7 @@ learn <- function(projectName = "temp",
                   functionsWhiteList = NA,
                   functionsBlackList = NA,
                   booleanNumericFeatures = NA,
+                  numericEqualityFeatures = TRUE,
                   useGraph = FALSE,
                   useCustomGraphs = FALSE,
                   customGraphsWhiteList = NA,
@@ -87,8 +89,8 @@ learn <- function(projectName = "temp",
                   fileEncoding = NA,
                   autoSave = TRUE,
                   runBlocking = TRUE,
-                  verbose = FALSE,
-                  numericEqualityFeatures = TRUE){
+                  verbose = FALSE
+                ){
 
   params <-list(projectName = projectName,
                 trainDataFilename = writeToServer(trainData),
@@ -102,6 +104,7 @@ learn <- function(projectName = "temp",
                 functionsWhiteList = functionsWhiteList,
                 functionsBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
+                numericEqualityFeatures = numericEqualityFeatures,
                 useGraph = useGraph,
                 useCustomGraphs = useCustomGraphs,
                 customGraphsWhiteList = customGraphsWhiteList,
@@ -123,8 +126,7 @@ learn <- function(projectName = "temp",
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
                 autoSave = autoSave,
                 fileEncoding = fileEncoding,
-                verbose = verbose,
-                numericEqualityFeatures = numericEqualityFeatures
+                verbose = verbose
                 )
 
   session = do.call(learn.file,c(params))
@@ -143,7 +145,8 @@ learn <- function(projectName = "temp",
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
-#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
+#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.
+#' @param numericEqualityFeatures: A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
 #' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
@@ -180,6 +183,7 @@ learn.file <- function(projectName = "temp",
                     functionsWhiteList = NA,
                     functionsBlackList = NA,
                     booleanNumericFeatures = NA,
+                    numericEqualityFeatures = TRUE,
                     useGraph = FALSE,
                     useCustomGraphs = FALSE,
                     customGraphsWhiteList = NA,
@@ -202,8 +206,8 @@ learn.file <- function(projectName = "temp",
                     fileEncoding = NA,
                     autoSave = TRUE,
                     runBlocking = TRUE,
-                    verbose = FALSE,
-                    numericEqualityFeatures = TRUE){
+                    verbose = FALSE
+                    ){
 
   isLatestVersion()
   isLatestRpackage()
@@ -238,6 +242,7 @@ learn.file <- function(projectName = "temp",
                 hints = functionsWhiteList,
                 sessionBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
+                numericEqualityFeatures = numericEqualityFeatures,
                 useGraph = useGraph,
                 useCustomGraphs = useCustomGraphs,
                 customGraphsWhiteList = customGraphsWhiteList,
@@ -258,8 +263,7 @@ learn.file <- function(projectName = "temp",
                 weightByClass = weightByClass,
                 externalPrefixPath = getSBserverIOfolder(),
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
-                fileEncoding = fileEncoding,
-                numericEqualityFeatures = numericEqualityFeatures
+                fileEncoding = fileEncoding
   )
 
   params = params[!is.na(params)]
@@ -300,7 +304,8 @@ learn.file <- function(projectName = "temp",
 #' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
-#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
+#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.
+#' @param numericEqualityFeatures: A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
 #' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
@@ -330,7 +335,8 @@ featureSearch <- function(projectName = "temp",
                                 contextDatasets = NA,
                                 functionsWhiteList = NA,
                                 functionsBlackList = NA,
-                                booleanNumericFeatures = TRUE,
+                                booleanNumericFeatures = NA,
+                                numericEqualityFeatures = TRUE,
                                 useGraph = FALSE,
                                 useCustomGraphs = FALSE,
                                 customGraphsWhiteList = NA,
@@ -361,6 +367,7 @@ featureSearch <- function(projectName = "temp",
                 functionsWhiteList = functionsWhiteList,
                 functionsBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
+                numericEqualityFeatures = numericEqualityFeatures,
                 useGraph = useGraph,
                 useCustomGraphs = useCustomGraphs,
                 customGraphsWhiteList = customGraphsWhiteList,
@@ -393,7 +400,8 @@ featureSearch <- function(projectName = "temp",
 #' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
-#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. TRUE by default.
+#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.
+#' @param numericEqualityFeatures: A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.
 #' @param useGraph Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
 #' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
 #' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
@@ -423,7 +431,8 @@ featureSearch.file <- function(projectName = "temp",
                           contextDatasets = NA,
                           functionsWhiteList = NA,
                           functionsBlackList = NA,
-                          booleanNumericFeatures = TRUE,
+                          booleanNumericFeatures = NA,
+                          numericEqualityFeatures = TRUE,
                           useGraph = FALSE,
                           useCustomGraphs = FALSE,
                           customGraphsWhiteList = NA,
@@ -454,6 +463,7 @@ featureSearch.file <- function(projectName = "temp",
                 functionsWhiteList = functionsWhiteList,
                 functionsBlackList = functionsBlackList,
                 booleanNumericFeatures = booleanNumericFeatures,
+                numericEqualityFeatures = numericEqualityFeatures,
                 useGraph = useGraph,
                 useCustomGraphs = useCustomGraphs,
                 customGraphsWhiteList = customGraphsWhiteList,
