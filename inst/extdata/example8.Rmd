@@ -56,7 +56,7 @@ print(xtable(head(frequencyChangeDSwindowed,n=5)), type='html', comment=F)
 ```
 
 <br>
-Now that we have the sliding window column prepared we will split the data temporally to a testing and training set. We will retain only the target and time window information (including the date) in the training and testing data and access the actual signal (and any other columns) in a context dataset (date will serve as a key)
+Now that we have the sliding window column prepared we will split the data temporally to a testing and training set. We will retain only the target and time window information (including the date) in the training and testing data and access the actual signal (and any other columns) in a context dataset (date will serve as a key). The train and test data only hold logical information regarding the time windows which is constructed during matching with the context data set which holds the actual signal. This allows us to construct the windows in memory and we do not need to hold all the overlapping time windows in the training and testing data.
 ```{r, eval=TRUE, results='asis'}
 temporalSplit = failures[round(length(failures)*0.6)]
 trainData = frequencyChangeDSwindowed[1:temporalSplit,c("date","failure",paste0("last_",timeWindow))] # keep only date, target and sliding window parameters
