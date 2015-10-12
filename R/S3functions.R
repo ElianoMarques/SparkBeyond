@@ -33,6 +33,7 @@
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
+#' @param produceReports: "EVALUATED_FUNCTIONS".
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
@@ -86,6 +87,7 @@ learn <- function(projectName = "temp",
                   maxCollectionSize = 80000,
                   weightByClass = FALSE,
                   produceFeatureClusteringReport = FALSE,
+                  produceReports = NA,
                   fileEncoding = NA,
                   autoSave = TRUE,
                   runBlocking = TRUE,
@@ -124,6 +126,7 @@ learn <- function(projectName = "temp",
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
+                produceReports = produceReports,
                 autoSave = autoSave,
                 fileEncoding = fileEncoding,
                 verbose = verbose
@@ -166,6 +169,7 @@ learn <- function(projectName = "temp",
 #' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
+#' @param produceReports: "EVALUATED_FUNCTIONS".
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @return Session object that encapsulates the model.
@@ -203,6 +207,7 @@ learn.file <- function(projectName = "temp",
                     maxCollectionSize = 80000,
                     weightByClass = FALSE,
                     produceFeatureClusteringReport = FALSE,
+                    produceReports = NA,
                     fileEncoding = NA,
                     autoSave = TRUE,
                     runBlocking = TRUE,
@@ -263,6 +268,7 @@ learn.file <- function(projectName = "temp",
                 weightByClass = weightByClass,
                 externalPrefixPath = getSBserverIOfolder(),
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
+                produceReports = produceReports,
                 fileEncoding = fileEncoding
   )
 
@@ -322,6 +328,7 @@ learn.file <- function(projectName = "temp",
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
+#' @param produceReports: "EVALUATED_FUNCTIONS".
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @return Session object that encapsulate the feature search result.
@@ -353,6 +360,7 @@ featureSearch <- function(projectName = "temp",
                                 maxCollectionSize = 80000,
                                 weightByClass = FALSE,
                                 produceFeatureClusteringReport = FALSE,
+                                produceReports = NA,
                                 fileEncoding = NA,
                                 autoSave = TRUE,
                                 runBlocking = TRUE){
@@ -384,6 +392,7 @@ featureSearch <- function(projectName = "temp",
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
+                produceReports = produceReports,
                 fileEncoding = fileEncoding,
                 autoSave = autoSave,
                 runBlocking = runBlocking)
@@ -418,6 +427,7 @@ featureSearch <- function(projectName = "temp",
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
+#' @param produceReports: "EVALUATED_FUNCTIONS".
 #' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @return Session object that encapsulate the feature search result.
@@ -449,6 +459,7 @@ featureSearch.file <- function(projectName = "temp",
                           maxCollectionSize = 80000,
                           weightByClass = FALSE,
                           produceFeatureClusteringReport = FALSE,
+                          produceReports = NA,
                           fileEncoding = NA,
                           autoSave = TRUE,
                           runBlocking = TRUE){
@@ -480,6 +491,7 @@ featureSearch.file <- function(projectName = "temp",
                 maxCollectionSize = maxCollectionSize,
                 weightByClass = weightByClass,
                 produceFeatureClusteringReport = produceFeatureClusteringReport,
+                produceReports = produceReports,
                 fileEncoding = fileEncoding,
                 autoSave = autoSave,
                 runBlocking = runBlocking)
