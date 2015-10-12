@@ -56,16 +56,16 @@ groupBy(data, by, flatten = TRUE)
 rownames(grouped)
 </code></pre>
 
-<pre><code>## [1] &quot;3&quot; &quot;1&quot; &quot;2&quot;
+<pre><code>## [1] &quot;1&quot; &quot;2&quot; &quot;3&quot;
 </code></pre>
 
 <pre><code class="r">colSizes(grouped)
 </code></pre>
 
 <pre><code>##   pclass survived name sex age sibsp parch ticket fare cabin embarked
-## 3      1      491  491 491 491   491   491    491  491   491      491
-## 1      1      216  216 216 216   216   216    216  216   216      216
-## 2      1      184  184 184 184   184   184    184  184   184      184
+## 1      1      491  491 491 491   491   491    491  491   491      491
+## 2      1      216  216 216 216   216   216    216  216   216      216
+## 3      1      184  184 184 184   184   184    184  184   184      184
 </code></pre>
 
 <pre><code class="r">head(grouped)
@@ -101,26 +101,19 @@ rownames(grouped)
 rownames(grouped2)
 </code></pre>
 
-<pre><code>## [1] &quot;3_male&quot;   &quot;1_female&quot; &quot;3_female&quot; &quot;1_male&quot;   &quot;2_female&quot; &quot;2_male&quot;
+<pre><code>## [1] &quot;1&quot; &quot;2&quot; &quot;3&quot; &quot;4&quot; &quot;5&quot; &quot;6&quot;
 </code></pre>
 
 <pre><code class="r">colSizes(grouped2)
 </code></pre>
 
-<pre><code>##          pclass sex survived name age sibsp parch ticket fare cabin
-## 3_male        1   1      347  347 347   347   347    347  347   347
-## 1_female      1   1       94   94  94    94    94     94   94    94
-## 3_female      1   1      144  144 144   144   144    144  144   144
-## 1_male        1   1      122  122 122   122   122    122  122   122
-## 2_female      1   1       76   76  76    76    76     76   76    76
-## 2_male        1   1      108  108 108   108   108    108  108   108
-##          embarked
-## 3_male        347
-## 1_female       94
-## 3_female      144
-## 1_male        122
-## 2_female       76
-## 2_male        108
+<pre><code>##   pclass sex survived name age sibsp parch ticket fare cabin embarked
+## 1      1   1      347  347 347   347   347    347  347   347      347
+## 2      1   1       94   94  94    94    94     94   94    94       94
+## 3      1   1      144  144 144   144   144    144  144   144      144
+## 4      1   1      122  122 122   122   122    122  122   122      122
+## 5      1   1       76   76  76    76    76     76   76    76       76
+## 6      1   1      108  108 108   108   108    108  108   108      108
 </code></pre>
 
 <pre><code class="r">head(grouped2)

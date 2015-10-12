@@ -53,6 +53,12 @@ limitTimeSeries(data, dateCol = "SB_times_col", fromDate = NA,
 </table>
 
 
+<h3>Value</h3>
+
+<p>a new data.table with the filtered rows will be returned.
+</p>
+
+
 <h3>Examples</h3>
 
 <pre><code class="r">randDate &lt;- function(N, st=&quot;2014/01/01&quot;, et=&quot;2014/12/31&quot;) {
@@ -70,12 +76,12 @@ head(tsData)
 </code></pre>
 
 <pre><code>##    ID      value       date
-## 1:  1  0.1784140 01/01/2014
-## 2:  2 -0.7357341 01/01/2014
-## 3:  3 -1.1869694 01/02/2014
-## 4:  4 -0.8242323 01/02/2014
-## 5:  5  1.2253920 01/02/2014
-## 6:  6 -2.6681490 01/03/2014
+## 1:  1 -0.6264538 01/01/2014
+## 2:  2  0.1836433 01/01/2014
+## 3:  3 -0.8356286 01/02/2014
+## 4:  4  1.5952808 01/02/2014
+## 5:  5  0.3295078 01/03/2014
+## 6:  6 -0.8204684 01/04/2014
 </code></pre>
 
 <pre><code class="r">nrow(tsData)
@@ -87,19 +93,19 @@ head(tsData)
 <pre><code class="r">nrow(limitTimeSeries(tsData, &quot;date&quot;, fromDate =&quot;07/01/2014&quot;))
 </code></pre>
 
-<pre><code>## [1] 501
+<pre><code>## [1] 486
 </code></pre>
 
 <pre><code class="r">nrow(limitTimeSeries(tsData, &quot;date&quot;, untilDate =&quot;11/01/2014&quot;))
 </code></pre>
 
-<pre><code>## [1] 862
+<pre><code>## [1] 837
 </code></pre>
 
 <pre><code class="r">nrow(limitTimeSeries(tsData, &quot;date&quot;, fromDate=&quot;07/01/2014&quot;, untilDate =&quot;11/01/2014&quot;))
 </code></pre>
 
-<pre><code>## [1] 363
+<pre><code>## [1] 323
 </code></pre>
 
 

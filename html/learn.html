@@ -24,17 +24,20 @@
 <pre>
 learn(projectName = "temp", trainData, target, testData = NA,
   trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
-  algorithmsWhiteList = NA, functionsWhiteList = NA,
-  functionsBlackList = NA, booleanNumericFeatures = TRUE,
-  useGraph = FALSE, crossRowFeatureSearch = FALSE,
-  maxFeaturesCount = list(300), columnSubsetSize = 1,
-  customColumnSubsets = NA, maxFeatureDuration = 100,
+  contextDatasets = NA, algorithmsWhiteList = NA, functionsWhiteList = NA,
+  functionsBlackList = NA, booleanNumericFeatures = NA,
+  numericEqualityFeatures = TRUE, useGraph = FALSE,
+  useCustomGraphs = FALSE, customGraphsWhiteList = NA,
+  customGraphsBlackList = NA, customFunctions = NA,
+  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
+  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
+  maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
   useCachedFeatures = FALSE, evaluationMetric = "AUC",
   scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
   produceFeatureClusteringReport = FALSE, fileEncoding = NA,
-  runBlocking = TRUE, verbose = FALSE)
+  autoSave = TRUE, runBlocking = TRUE, verbose = FALSE)
 </pre>
 
 
@@ -69,6 +72,10 @@ learn(projectName = "temp", trainData, target, testData = NA,
 <td>
 <p>Optional. Integer &lt; 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.</p>
 </td></tr>
+<tr valign="top"><td><code>contextDatasets:</code></td>
+<td>
+<p>Optional. A list of paths to context datasets to be added to the learning.</p>
+</td></tr>
 <tr valign="top"><td><code>algorithmsWhiteList:</code></td>
 <td>
 <p>Optional. A list of strings that represents the set of algorithms to run. NA by default</p>
@@ -83,11 +90,31 @@ learn(projectName = "temp", trainData, target, testData = NA,
 </td></tr>
 <tr valign="top"><td><code>booleanNumericFeatures:</code></td>
 <td>
-<p>A boolean indicating whether to transform all features to boolean values. TRUE by default.</p>
+<p>A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.</p>
+</td></tr>
+<tr valign="top"><td><code>numericEqualityFeatures:</code></td>
+<td>
+<p>A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.</p>
 </td></tr>
 <tr valign="top"><td><code>useGraph:</code></td>
 <td>
 <p>Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>useCustomGraphs:</code></td>
+<td>
+<p>A boolean indicating whether custom graphs should be used. FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>customGraphsWhiteList:</code></td>
+<td>
+<p>Optional. A list that filters which domains should be used. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>customGraphsBlackList:</code></td>
+<td>
+<p>Optional. A list that filters which custom graphs should be ignored. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>customFunctions:</code></td>
+<td>
+<p>Optional. A list of additional functions that should be incorporated to the feature search. NA by default.</p>
 </td></tr>
 <tr valign="top"><td><code>crossRowFeatureSearch.</code></td>
 <td>
@@ -97,13 +124,13 @@ learn(projectName = "temp", trainData, target, testData = NA,
 <td>
 <p>Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.</p>
 </td></tr>
-<tr valign="top"><td><code>columnSubsetSize:</code></td>
+<tr valign="top"><td><code>autoColumnSubSets:</code></td>
 <td>
-<p>Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.</p>
+<p>Optional. A list of values contain any of the following: &quot;CONCEPT&quot;, &quot;NUMERIC_PAIRS&quot;, &quot;ALL_PAIRS&quot;. &quot;CONCEPT&quot; will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. &quot;NUMERIC_PAIRS&quot; will create all column subsets for numeric columns. &quot;ALL_PAIRS&quot; will create subsets of size 2 from all columns. &quot;CONCEPT&quot; by default.</p>
 </td></tr>
 <tr valign="top"><td><code>customColumnSubsets:</code></td>
 <td>
-<p>Optional. A List of lists containing specific column subsets to examine. NA by default.</p>
+<p>Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.</p>
 </td></tr>
 <tr valign="top"><td><code>maxFeatureDuration:</code></td>
 <td>
@@ -149,6 +176,10 @@ learn(projectName = "temp", trainData, target, testData = NA,
 <td>
 <p>Optional. NA by default. Options are: &quot;ISO-8859-1&quot;, &quot;UTF-8&quot;, &quot;US-ASCII&quot;.</p>
 </td></tr>
+<tr valign="top"><td><code>autoSave:</code></td>
+<td>
+<p>Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.</p>
+</td></tr>
 <tr valign="top"><td><code>runBlocking:</code></td>
 <td>
 <p>Block the R console while the session is running. FALSE by default.</p>
@@ -169,18 +200,242 @@ session = learn(&quot;titanic&quot;, getData(&quot;titanic_train&quot;),
    target = &quot;survived&quot;, algorithmsWhiteList = list(&quot;RRandomForest&quot;), runBlocking = TRUE)
 </code></pre>
 
-<pre><code>## [1] &quot;Notice: latest build version was not available - if this issue continues please notify SparkBeyond.&quot;
+<pre><code>## [1] &quot;Notice: you are currently not using the latest engine version. Please consider running restartServer().&quot;
 ## [1] &quot;SBadapter package is outdated. Please consider updatePackage()&quot;
-## [1] &quot;Training on  /tmp/data_in1ae73678dbb0.tsv&quot;
+## [1] &quot;Training on  /tmp/data_in64e7668dc0b.tsv&quot;
 ## [1] &quot;Calling: http://127.0.0.1:9000/rapi/learn&quot;
-</code></pre>
-
-<pre><code>## Error in function (type, msg, asError = TRUE) : Failed to connect to 127.0.0.1 port 9000: Connection refused
+## [1] &quot;Artifact location was created at: /Users/zinman/localdata/artifacts/titanic/49&quot;
+## [1] &quot;auto saved Session object to a variable named &#39; backup_titanic_49 &#39;. To retrieve use: load(&#39;/Users/zinman/sparkBeyond/R/Radapter/SBadapter/html/backup_titanic_49.RData&#39;).&quot;
+## Feature Search training-set: 710.0
+## Original histogram (FS):
+## +-------+-----------+
+## | Label | Frequency |
+## +-------+-----------+
+## | 0     | 442       |
+## | 1     | 268       |
+## +-------+-----------+
+## Prior entropy: 0.9562317858093743
+## 
+## Input Schema
+## +-------+-----------+---------------+
+## | index | name      | type          |
+## +-------+-----------+---------------+
+## | 0     | *survived | Int           |
+## | 1     | pclass    | Int           |
+## | 2     | name      | core.nlp.Text |
+## | 3     | sex       | String        |
+## | 4     | age       | Double        |
+## | 5     | sibsp     | Int           |
+## | 6     | parch     | Int           |
+## | 7     | ticket    | core.nlp.Text |
+## | 8     | fare      | Double        |
+## | 9     | cabin     | String        |
+## | 10    | embarked  | String        |
+## +-------+-----------+---------------+
+## [1] &quot;16:19:07 INFO  Learner$ - Learning to predict survived (revision #49)&quot;
+## [1] &quot;16:19:07 INFO  Learner$ - evaluation metric: AUC&quot;
+## [1] &quot;Session in progress:  Creating features - 1&quot;
+## [1] &quot;Session in progress:  Creating features - 2&quot;
+## [1] &quot;Printing top 50 features out of 300&quot;
+##    idx
+## 1    0
+## 2    1
+## 3    2
+## 4    3
+## 5    4
+## 6    5
+## 7    6
+## 8    7
+## 9    8
+## 10   9
+## 11  10
+## 12  11
+## 13  12
+## 14  13
+## 15  14
+## 16  15
+## 17  16
+## 18  17
+## 19  18
+## 20  19
+## 21  20
+## 22  21
+## 23  22
+## 24  23
+## 25  24
+## 26  25
+## 27  26
+## 28  27
+## 29  28
+## 30  29
+## 31  30
+## 32  31
+## 33  32
+## 34  33
+## 35  34
+## 36  35
+## 37  36
+## 38  37
+## 39  38
+## 40  39
+## 41  40
+## 42  41
+## 43  42
+## 44  43
+## 45  44
+## 46  45
+## 47  46
+## 48  47
+## 49  48
+## 50  49
+##                                                                                                                 feature
+## 1                                                                       tokenizeByPunctuation(name) does not contain mr
+## 2                                                                                                           pclass != 3
+## 3                                                                            numberIn(ticket) in range (8854.5, 231932)
+## 4                                                                                            fare &gt;= 15.172899999999998
+## 5                                                                                numericSuffix(cabin) in range (3, 108)
+## 6                                                                                                           sex != male
+## 7                                                        cos(fare) in range (-0.4142747865977665, -0.18454433209625384)
+## 8                                                                                                         embarked == C
+## 9                                                                                                           pclass == 1
+## 10                                                                                                      name contains )
+## 11                                           upperCaseRatio(ticket) in range (0.05000000000000001, 0.13392857142857142)
+## 12                                                                                      cos(fare) &lt; -0.9989278625592983
+## 13                                                                                                    round(fare) == 19
+## 14                                                                                             numberOfWords(name) == 7
+## 15                                                           sin(fare) in range (0.998425635754864, 0.9995472778889662)
+## 16                                                           tan(age) in range (0.1652032253816651, 1.1682874182779286)
+## 17                                                                                             numberOfWords(name) &gt;= 6
+## 18                                                                              smallSubsets(cabin) contains List(2, E)
+## 19                                                                                                 sigmoid(fare) == 1.0
+## 20                                                                                                           sibsp &gt;= 5
+## 21                                             wordFrequencies(name).valueOf(john) orIfMissing 0 &gt;= 0.47360679774997894
+## 22                                                             wordFrequencies(name) contains (mrs, 0.3779644730092272)
+## 23                                                                                          prefixes(cabin) contains E1
+## 24                                                                                        upperCaseRatio(name) == 0.125
+## 25                                                                         normalizedNgrams(name) contains (mr, joseph)
+## 26                                                                             tokenizeByPunctuation(ticket) contains o
+## 27                                                                                                   floor(fare) &lt; 10.5
+## 28                                                                           upperCaseRatio(name) &lt; 0.15301003344481606
+## 29                                                                                               numberIn(cabin) == 2.0
+## 30                                                                                                    ceil(fare) == 7.0
+## 31                                                                         normalizedNgrams(name) contains (miss, anna)
+## 32                                                                                         numberIn(ticket) &gt;= 319372.5
+## 33                                                                              smallSubsets(cabin) contains List(5, 2)
+## 34                                                                                      sin(age) &lt; -0.21049876125431888
+## 35                                                             stemmedWordsWithoutCommonTerms(name) does not contain mr
+## 36                                                                                     Histogram(cabin) contains (2, 1)
+## 37                                                                                                   ceil(fare) == 35.0
+## 38                                                                                                        embarked != S
+## 39                                                                                                          age == 47.0
+## 40                                                                                  normalizedNgrams(name) contains (j)
+## 41                                                                                    mostCommonValue(cabin) == Some(9)
+## 42                                                                              smallSubsets(cabin) contains List(1, D)
+## 43                                                                          sentimentDistribution(name) contains (0, 3)
+## 44                                                                                                  name contains david
+## 45                                                                                                   name contains kate
+## 46                                         wordFrequencies(name).valueOf(margaret) orIfMissing 0 &gt;= 0.47360679774997894
+## 47                                            wordFrequencies(name).valueOf(alfred) orIfMissing 0 &gt;= 0.4125890342545926
+## 48                                                                                       upperCaseRatio(name) == 0.1667
+## 49                                                              wordFrequencies(name) contains (mr, 0.5773502691896258)
+## 50 wordFrequencies(name).valueOf(john) orIfMissing 0.5773502691896258 in range (0.3657589318012504, 0.4277309429819105)
+##            RIG lin..score       support
+## 1  0.246524231  0.4428309 299 (42.11%) 
+## 2  0.076231905  0.4828444 315 (44.37%) 
+## 3  0.071115835  0.6485446 199 (28.03%) 
+## 4  0.068179011  0.4857528 333 (46.90%) 
+## 5  0.065055070  0.6512270 145 (20.42%) 
+## 6  0.242667723  0.4214526 251 (35.35%) 
+## 7  0.026757770  0.6091381  72 (10.14%) 
+## 8  0.023689570  0.5007106 139 (19.58%) 
+## 9  0.062929319  0.4867891 172 (24.23%) 
+## 10 0.010550407  0.5306137  14 (1.97%)  
+## 11 0.018753223  0.6129032  26 (3.66%)  
+## 12 0.012511649  0.5306704   6 (0.85%)  
+## 13 0.012511649  0.5306704   6 (0.85%)  
+## 14 0.032384616  0.5229437  29 (4.08%)  
+## 15 0.023655675  0.6114767  31 (4.37%)  
+## 16 0.010770463  0.6141236 104 (14.65%) 
+## 17 0.058777034  0.5127108  82 (11.55%) 
+## 18 0.012511649  0.5306704   6 (0.85%)  
+## 19 0.046715422  0.5171947 163 (22.96%) 
+## 20 0.011189840  0.5065561  11 (1.55%)  
+## 21 0.014925332  0.6140232  22 (3.10%)  
+## 22 0.034832967  0.5228582  21 (2.96%)  
+## 23 0.010413798  0.5313050   5 (0.70%)  
+## 24 0.013092465  0.5296784  18 (2.54%)  
+## 25 0.008115772  0.5325901   8 (1.13%)  
+## 26 0.009393665  0.5318326  16 (2.25%)  
+## 27 0.064727877  0.5118701 299 (42.11%) 
+## 28 0.044987230  0.5183965 337 (47.46%) 
+## 29 0.011035286  0.5849946   9 (1.27%)  
+## 30 0.010163270  0.5321201  10 (1.41%)  
+## 31 0.016722656  0.5293936   8 (1.13%)  
+## 32 0.027003283  0.5796781  99 (13.94%) 
+## 33 0.010413798  0.5313050   5 (0.70%)  
+## 34 0.011542697  0.5302979 248 (34.93%) 
+## 35 0.093387963  0.4997182 197 (27.75%) 
+## 36 0.019477192  0.5272582  38 (5.35%)  
+## 37 0.006075752  0.5330571   6 (0.85%)  
+## 38 0.026285346  0.4998902 208 (29.30%) 
+## 39 0.007094831  0.5074514   7 (0.99%)  
+## 40 0.007094831  0.5328240   7 (0.99%)  
+## 41 0.010413798  0.5313050   5 (0.70%)  
+## 42 0.010413798  0.5313050   5 (0.70%)  
+## 43 0.017400935  0.5283457 279 (39.30%) 
+## 44 0.006075752  0.5330571   6 (0.85%)  
+## 45 0.012511649  0.5306704   6 (0.85%)  
+## 46 0.012511649  0.6143173   6 (0.85%)  
+## 47 0.009138583  0.6162681   9 (1.27%)  
+## 48 0.015498520  0.5294405  72 (10.14%) 
+## 49 0.090437205  0.5055971 182 (25.63%) 
+## 50 0.012511649  0.7111491   6 (0.85%)  
+## [1] &quot;Session in progress:  Building model - 3&quot;
+## [1] &quot;Session in progress:  Building model - 4&quot;
+## [1] &quot;Session in progress:  Building model - 5&quot;
+## [1] &quot;Session in progress:  Building model - 6&quot;
+## 
+## == Summary ==
+##                                                
+## Correctly Classified Instances     146   80.66%
+## Incorrectly Classified Instances   35    19.34%
+## Total Number of Instances          181         
+##                                                
+## === Detailed Accuracy By Class ===
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## 0               0.888     0.311     0.805       0.888    0.844       0.858      0.716
+## 1               0.689     0.112     0.81        0.689    0.745       0.858      0.716
+## Weighted Avg.   0.807     0.23      0.807       0.807    0.804       0.858      0.716
+##                                                                                      
+## Root Mean Prior Squared Error:0.0
+## Confusion Matrix:
+## 
+## +----+----+
+## | 95 | 12 |
+## | 23 | 51 |
+## +----+----+
+## [1] &quot;Done&quot;
 </code></pre>
 
 <pre><code class="r">flights = getData(&quot;flights_delay&quot;)
-sampledFlights = sampleData(flights, 0.2)
-flightsModel = learn(projectName = &quot;flights_delay_example&quot;,
+</code></pre>
+
+<pre><code>## Warning in file(file, &quot;rt&quot;): file(&quot;&quot;) only supports open = &quot;w+&quot; and open =
+## &quot;w+b&quot;: using the former
+</code></pre>
+
+<pre><code>## Error in read.table(filename, header = TRUE, sep = sep, stringsAsFactors = FALSE): no lines available in input
+</code></pre>
+
+<pre><code class="r">sampledFlights = sampleData(flights, 0.2)
+</code></pre>
+
+<pre><code>## Error in nrow(data): object &#39;flights&#39; not found
+</code></pre>
+
+<pre><code class="r">flightsModel = learn(projectName = &quot;flights_delay_example&quot;,
                     trainData = sampledFlights,
                     target = &quot;weatherDelay&quot;,
                     algorithmsWhiteList = list(&quot;RRandomForestRegressor&quot;),
@@ -189,13 +444,7 @@ flightsModel = learn(projectName = &quot;flights_delay_example&quot;,
                )
 </code></pre>
 
-<pre><code>## [1] &quot;Notice: latest build version was not available - if this issue continues please notify SparkBeyond.&quot;
-## [1] &quot;SBadapter package is outdated. Please consider updatePackage()&quot;
-## [1] &quot;Training on  /tmp/data_in1ae7389f1bc0.tsv&quot;
-## [1] &quot;Calling: http://127.0.0.1:9000/rapi/learn&quot;
-</code></pre>
-
-<pre><code>## Error in function (type, msg, asError = TRUE) : Failed to connect to 127.0.0.1 port 9000: Connection refused
+<pre><code>## Error in lapply(X = X, FUN = FUN, ...): object &#39;sampledFlights&#39; not found
 </code></pre>
 
 <pre><code class="r">head(flightsModel$features)

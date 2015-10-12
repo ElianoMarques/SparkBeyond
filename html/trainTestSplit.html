@@ -17,7 +17,7 @@
 <h3>Usage</h3>
 
 <pre>
-trainTestSplit(data, ratio = 0.8)
+trainTestSplit(data, ratio = 0.8, seed = 1)
 </pre>
 
 
@@ -27,6 +27,10 @@ trainTestSplit(data, ratio = 0.8)
 <tr valign="top"><td><code>data</code></td>
 <td>
 <p>dataframe to be splitted</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+<p>- Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.</p>
 </td></tr>
 </table>
 

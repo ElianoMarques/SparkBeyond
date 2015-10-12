@@ -22,7 +22,8 @@
 <h3>Usage</h3>
 
 <pre>
-sampleDataByClass(data, columnName, labels = NA, desiredDistribution = NA)
+sampleDataByClass(data, columnName, labels = NA, desiredDistribution = NA,
+  seed = 1)
 </pre>
 
 
@@ -39,11 +40,15 @@ sampleDataByClass(data, columnName, labels = NA, desiredDistribution = NA)
 </td></tr>
 <tr valign="top"><td><code>labels</code></td>
 <td>
-<p>Optional. labels in columnName for which <code>desiredDistribution</code> will relate to. Default NA will assume equal distributions between all labels.</p>
+<p>Optional. labels in columnName to which <code>desiredDistribution</code> will relate to. Default NA will assume equal distributions between all labels.</p>
 </td></tr>
 <tr valign="top"><td><code>desiredDistribution</code></td>
 <td>
 <p>Optional. The requested distribution ratio of <code>labels</code>. Default NA will assume equal distributions between all labels.</p>
+</td></tr>
+<tr valign="top"><td><code>seed</code></td>
+<td>
+<p>- Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.</p>
 </td></tr>
 </table>
 

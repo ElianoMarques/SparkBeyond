@@ -23,16 +23,19 @@
 
 <pre>
 featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
-  maxDepth = 2, functionsWhiteList = NA, functionsBlackList = NA,
-  booleanNumericFeatures = TRUE, useGraph = FALSE,
+  maxDepth = 2, contextDatasets = NA, functionsWhiteList = NA,
+  functionsBlackList = NA, booleanNumericFeatures = NA,
+  numericEqualityFeatures = TRUE, useGraph = FALSE,
+  useCustomGraphs = FALSE, customGraphsWhiteList = NA,
+  customGraphsBlackList = NA, customFunctions = NA,
   crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
-  columnSubsetSize = 1, customColumnSubsets = NA,
+  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
   maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
   useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
   produceFeatureClusteringReport = FALSE, fileEncoding = NA,
-  runBlocking = TRUE)
+  autoSave = TRUE, runBlocking = TRUE)
 </pre>
 
 
@@ -63,6 +66,10 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 <td>
 <p>A data frame to analyze.</p>
 </td></tr>
+<tr valign="top"><td><code>contextDatasets:</code></td>
+<td>
+<p>Optional. A list of paths to context datasets to be added to the learning.</p>
+</td></tr>
 <tr valign="top"><td><code>functionsWhiteList:</code></td>
 <td>
 <p>Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.</p>
@@ -73,7 +80,27 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 </td></tr>
 <tr valign="top"><td><code>booleanNumericFeatures:</code></td>
 <td>
-<p>A boolean indicating whether to transform all features to boolean values. TRUE by default.</p>
+<p>A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.</p>
+</td></tr>
+<tr valign="top"><td><code>numericEqualityFeatures:</code></td>
+<td>
+<p>A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>useCustomGraphs:</code></td>
+<td>
+<p>A boolean indicating whether custom graphs should be used. FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>customGraphsWhiteList:</code></td>
+<td>
+<p>Optional. A list that filters which domains should be used. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>customGraphsBlackList:</code></td>
+<td>
+<p>Optional. A list that filters which custom graphs should be ignored. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>customFunctions:</code></td>
+<td>
+<p>Optional. A list of additional functions that should be incorporated to the feature search. NA by default.</p>
 </td></tr>
 <tr valign="top"><td><code>crossRowFeatureSearch.</code></td>
 <td>
@@ -83,9 +110,9 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 <td>
 <p>Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.</p>
 </td></tr>
-<tr valign="top"><td><code>columnSubsetSize:</code></td>
+<tr valign="top"><td><code>autoColumnSubSets:</code></td>
 <td>
-<p>Optional. An integer denoting whether sets of columns should be looked at together. 1 by default.</p>
+<p>Optional. A list of values contain any of the following: &quot;CONCEPT&quot;, &quot;NUMERIC_PAIRS&quot;, &quot;ALL_PAIRS&quot;. &quot;CONCEPT&quot; will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. &quot;NUMERIC_PAIRS&quot; will create all column subsets for numeric columns. &quot;ALL_PAIRS&quot; will create subsets of size 2 from all columns. &quot;CONCEPT&quot; by default.</p>
 </td></tr>
 <tr valign="top"><td><code>allocatedMemoryMB:</code></td>
 <td>
@@ -97,7 +124,7 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 </td></tr>
 <tr valign="top"><td><code>customColumnSubsets:</code></td>
 <td>
-<p>Optional. A List of lists containing specific column subsets to examine. NA by default.</p>
+<p>Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.</p>
 </td></tr>
 <tr valign="top"><td><code>maxFeatureDuration:</code></td>
 <td>
@@ -122,6 +149,10 @@ featureSearch(projectName = "temp", trainData, target, weightColumn = NA,
 <tr valign="top"><td><code>fileEncoding:</code></td>
 <td>
 <p>Optional. NA by default. Options are: &quot;ISO-8859-1&quot;, &quot;UTF-8&quot;, &quot;US-ASCII&quot;.</p>
+</td></tr>
+<tr valign="top"><td><code>autoSave:</code></td>
+<td>
+<p>Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.</p>
 </td></tr>
 </table>
 

@@ -15,7 +15,7 @@
 
 <h3>Description</h3>
 
-<p>Exclude columns from a data frame.
+<p>Exclude columns from a data frame. Please notice that the function return value depends on the type of input. NA will be returned if the input is of type data.table and the input object will be modified. Otherwise a  data.frame object will be returned.
 </p>
 
 
@@ -42,7 +42,7 @@ excludeCols(data, cols)
 
 <h3>Value</h3>
 
-<p>if the input <code>data</code> is a dataframe than a dataframe with the excluded columns will be return. If the input <code>data</code> is a data.table object, nothing will be returned and the input object will be modified.
+<p>if the input <code>data</code> is a dataframe than a dataframe with the excluded columns will be return. If the input <code>data</code> is a data.table object, NA will be returned and the input object will be modified.
 </p>
 
 
@@ -69,6 +69,7 @@ class(datatable)
 </code></pre>
 
 <pre><code>## [1] &quot;sex, age were removed&quot;
+## [1] &quot;Note: the input object is of type data.table hence NA is returned and the input object will be modified,&quot;
 </code></pre>
 
 <pre><code>## [1] NA
@@ -99,6 +100,7 @@ class(data)
 </code></pre>
 
 <pre><code>## [1] &quot;sex, age were removed&quot;
+## [1] &quot;Note: the input object is of type data.frame hence, a new data.frame with the excluded columns will be returned.&quot;
 </code></pre>
 
 <pre><code class="r">colnames(excluded)
