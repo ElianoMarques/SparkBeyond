@@ -313,9 +313,9 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @return The new data
 addSlidingTimeWindow = function(data, dateCol, window, unit, dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, keyCol = NA) {
   if (is.na(keyCol)){
-    newCol = paste0("last_", window)
+    newCol = paste0("last_", window, "_", unit)
   }else{
-    newCol = paste0("last_keyed_", window)
+    newCol = paste0("last_keyed_", window, "_", unit)
   }
 
   unitVal = switch(unit,
@@ -333,23 +333,23 @@ addSlidingTimeWindow = function(data, dateCol, window, unit, dateFormat ="%m/%d/
 
   #KeyedTimeWindow(key=A, startDate=Thu Feb 12 12:16:20 IST 2015, endDate=Fri Feb 13 12:16:20 IST 2015, includeUntil=false, relativeTime=true)
 
-  dateColInd = grep(dateCol,names(data))
   datePOSIXformatOut = "%m/%d/%Y %H:%M:%S %p %Z"
-  generateKeyWindow = function(dateVal, keyVal) {
-    dt = as.character(as.POSIXct(strptime(dateVal,dateFormat,tz="EST")),format=datePOSIXformatOut)
-    dt_from = as.character(as.POSIXct(strptime(dateVal,dateFormat,tz="EST")-window*unitVal),format=datePOSIXformatOut)
-    paste0(keyVal,",",dt_from,",",dt,",",includeUntil,",",relativeTime,",NA")
-  }
-
+  dateColData = colsWhiteList(data, dateCol)
   if (is.na(keyCol)){
-    data[,newCol] = sapply(data[,dateCol],function (x) {
+    data[,newCol] = sapply(dateColData,function (x) {
                       dt = as.character(as.POSIXct(strptime(x,dateFormat,tz="EST")),format=datePOSIXformatOut)
                       dt_from = as.character(as.POSIXct(strptime(x,dateFormat,tz="EST")-window*unitVal),format=datePOSIXformatOut)
                       paste0("NA,",dt_from,",",dt,",",includeUntil,",",relativeTime,",",sample)
                       })
     #data[,eval(as.symbol(newCol)):= sapply(eval(as.symbol(dateCol)),function (x) {dt = as.double(as.POSIXlt(strptime(x,datePOSIXformat,tz="EST"))); paste0("Window(",dt - window*unitVal,",",dt,",",includeUntil,",",relativeTime,",",sample,")")})]
   } else{
-    data[,newCol] = mapply(generateKeyWindow,data[,dateCol],data[,keyCol])
+    generateKeyWindow = function(dateVal, keyVal) {
+      dt = as.character(as.POSIXct(strptime(dateVal,dateFormat,tz="EST")),format=datePOSIXformatOut)
+      dt_from = as.character(as.POSIXct(strptime(dateVal,dateFormat,tz="EST")-window*unitVal),format=datePOSIXformatOut)
+      paste0(keyVal,",",dt_from,",",dt,",",includeUntil,",",relativeTime,",NA")
+    }
+    keyColData = colsWhiteList(data, keyCol)
+    data[,newCol] = mapply(generateKeyWindow,dateColData,keyColData)
   }
   data[]
 }
