@@ -1,3 +1,15 @@
+#' distinctBy
+#'
+#' Keep only distinct rows in the input as specified by parameter "by". When multiple rows are encountered for a certain combination the first row will be selected.
+#' @param data: dataframe or data.table to be grouped
+#' @param by: a list of column names to distinct by
+#' @return a new data.table object with the distinct data
+distinctBy = function(data, by){
+  grouped = groupBy(data, by)
+  flattenCols(grouped, names(grouped))  #flatten all columns
+  grouped
+}
+
 
 #' groupBy
 #'

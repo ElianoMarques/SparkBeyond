@@ -129,7 +129,8 @@ learn <- function(projectName = "temp",
                 produceReports = produceReports,
                 autoSave = autoSave,
                 fileEncoding = fileEncoding,
-                verbose = verbose
+                verbose = verbose,
+                runBlocking = runBlocking
                 )
 
   session = do.call(learn.file,c(params))

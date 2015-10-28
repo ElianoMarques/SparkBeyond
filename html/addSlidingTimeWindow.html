@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: addSlidingTimeWindow</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for addSlidingTimeWindow {SBadapter}"><tr><td>addSlidingTimeWindow {SBadapter}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>addSlidingTimeWindow</h2>
+
+<h3>Description</h3>
+
+<p>Add a sliding window column to the data
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+addSlidingTimeWindow(data, dateCol, window, unit, dateFormat = "%m/%d/%Y",
+  includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647,
+  keyCol = NA)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>data:</code></td>
+<td>
+<p>data.table to be modified.</p>
+</td></tr>
+<tr valign="top"><td><code>dateCol:</code></td>
+<td>
+<p>The column name in <code>data</code> that will be used.</p>
+</td></tr>
+<tr valign="top"><td><code>window:</code></td>
+<td>
+<p>The window length (numeric)</p>
+</td></tr>
+<tr valign="top"><td><code>unit:</code></td>
+<td>
+<p>The window length unit (i.e. &quot;second&quot;, &quot;minute&quot;, &quot;hour&quot;, &quot;day&quot;, &quot;week&quot;)</p>
+</td></tr>
+<tr valign="top"><td><code>dateFormat:</code></td>
+<td>
+<p>provide date format for parsing. defaults to &quot;%m/%d/%Y &quot; see strtptime for more examples i.e. &quot;%m/%d/%Y %I:%M:%S %p&quot;</p>
+</td></tr>
+<tr valign="top"><td><code>keyCol:</code></td>
+<td>
+<p>An optional key for the sliding window (NA as default)</p>
+</td></tr>
+<tr valign="top"><td><code>includeUntil:</code></td>
+<td>
+<p>optional argument</p>
+</td></tr>
+<tr valign="top"><td><code>relativeTime:</code></td>
+<td>
+<p>optional relative time boolean flag</p>
+</td></tr>
+<tr valign="top"><td><code>sample:</code></td>
+<td>
+<p>optional maximal possible sample value (default to maxint)</p>
+</td></tr>
+</table>
+
+
+<h3>Value</h3>
+
+<p>The new data
+</p>
+
+<hr><div align="center">[Package <em>SBadapter</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+</body></html>
