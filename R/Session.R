@@ -312,7 +312,7 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
-      createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE) { #
+      createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE, debugMode = FALSE) { #
         "Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \\code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE)."
         if (!modelBuilt) stop("createPackage requires full model building using learn")
 
@@ -325,6 +325,7 @@ Session = setRefClass("Session",
         params <-list(modelPath = artifact_loc,
                       createRestAPIpackage = createRestAPIpackage,
                       dataPath = sampleDataFilename,
+                      debugMode = debugMode,
                       externalPrefixPath = getSBserverIOfolder())
 
         params = params[!is.na(params)]
