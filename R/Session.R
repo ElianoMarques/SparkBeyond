@@ -333,7 +333,7 @@ Session = setRefClass("Session",
         print(paste("Calling:", url))
 
         body = rjson::toJSON(params)
-        print(body)
+       # print(body)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
         finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
