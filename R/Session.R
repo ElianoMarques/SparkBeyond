@@ -316,10 +316,15 @@ Session = setRefClass("Session",
         "Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \\code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE)."
         if (!modelBuilt) stop("createPackage requires full model building using learn")
 
-        SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+        sampleDataFilename = if (is.null(sampleData)) NA else {
+          name = writeToServer(sampleData[1:20,])
+          SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+          if (!grepl(SBdir, name)) name = paste0(getSBserverIOfolder(), name)
+          name
+        }
         params <-list(modelPath = artifact_loc,
                       createRestAPIpackage = createRestAPIpackage,
-                      dataPath = if (is.null(sampleData)) NA else writeToServer(sampleData[1:20,]),
+                      dataPath = sampleDataFilename,
                       externalPrefixPath = getSBserverIOfolder())
 
         params = params[!is.na(params)]
