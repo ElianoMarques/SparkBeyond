@@ -126,6 +126,11 @@ examples = function() {
   browseURL(system.file("extdata", "examples-master.html", package = "SparkBeyond"))
 }
 
+#' Shows an html page with various learning examples
+#'
+tutorial = function() {
+	browseURL(system.file("extdata", "tutorial.html", package = "SparkBeyond"))
+}
 
 runSlidingWindowLearn <- function(configuration='1', weightByClass = FALSE, runBlocking = TRUE) {
   ds = read.csv("~/Google Drive/data/datasets/private/McKinsey/semiconductor/PM_20150826.csv")

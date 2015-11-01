@@ -1,7 +1,7 @@
 ---
 output:
   knitrBootstrap::bootstrap_document:
-    title: "Test file"
+    title: "Examples"
     theme.chooser: TRUE
     highlight.chooser: TRUE
 ---

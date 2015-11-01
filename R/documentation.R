@@ -32,3 +32,4 @@
 #library(knitrBootstrap)
 #library(rmarkdown)
 #render('./SparkBeyond/inst/extdata/examples-master.rmd', 'knitrBootstrap::bootstrap_document')
+#render('./SparkBeyond/inst/extdata/tutorial.rmd', 'knitrBootstrap::bootstrap_document')
