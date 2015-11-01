@@ -12,7 +12,7 @@ output:
 -->
 
 ```{r, echo=FALSE, eval = TRUE, message=FALSE, results='hide'}
-library(SBadapter)
+library(SparkBeyond)
 ```
   
 # Example 2 - simple regression#   

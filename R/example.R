@@ -2,10 +2,10 @@
 
 #Install package:
 #require(devtools)
-#install_github("zinman/SBadapter")
+#install_github("zinman/SparkBeyond")
 
 #load library
-#library(SBadapter)
+#library(SparkBeyond)
 
 #' Run SparkBeyond titanic example.
 #'
@@ -87,7 +87,7 @@ getData <- function(datasetName) {
 
   #auxiliary functions
   getExtData <- function(name) {
-    filename = system.file("extdata", name, package = "SBadapter")
+    filename = system.file("extdata", name, package = "SparkBeyond")
     sep = if (tools::file_ext(filename) == "tsv" || (tools::file_ext(filename) == "gz" && grepl("tsv", filename))) "\t" else ","
     data = read.table(filename, header = TRUE, sep = sep, stringsAsFactors=FALSE) #inspect file content
     #str(data) #inspect file content
@@ -123,7 +123,7 @@ getData <- function(datasetName) {
 #' Shows an html page with various learning examples
 #'
 examples = function() {
-  browseURL(system.file("extdata", "examples-master.html", package = "SBadapter"))
+  browseURL(system.file("extdata", "examples-master.html", package = "SparkBeyond"))
 }
 
 

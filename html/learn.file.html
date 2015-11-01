@@ -9,7 +9,7 @@
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
-<table width="100%" summary="page for learn.file {SBadapter}"><tr><td>learn.file {SBadapter}</td><td align="right">R Documentation</td></tr></table>
+<table width="100%" summary="page for learn.file {SparkBeyond}"><tr><td>learn.file {SparkBeyond}</td><td align="right">R Documentation</td></tr></table>
 
 <h2>Run SparkBeyond feature enrichment and learning process.</h2>
 
@@ -36,8 +36,9 @@ learn.file(projectName = "temp", trainDataFilename, target,
   useCachedFeatures = FALSE, evaluationMetric = "AUC",
   scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
   maxCollectionSize = 80000, weightByClass = FALSE,
-  produceFeatureClusteringReport = FALSE, fileEncoding = NA,
-  autoSave = TRUE, runBlocking = TRUE, verbose = FALSE)
+  produceFeatureClusteringReport = FALSE, produceReports = NA,
+  fileEncoding = NA, autoSave = TRUE, runBlocking = TRUE,
+  verbose = FALSE)
 </pre>
 
 
@@ -172,6 +173,10 @@ learn.file(projectName = "temp", trainDataFilename, target,
 <td>
 <p>An indicator to produce feature cluster visualization. FALSE by default.</p>
 </td></tr>
+<tr valign="top"><td><code>produceReports:</code></td>
+<td>
+<p>&quot;EVALUATED_FUNCTIONS&quot;.</p>
+</td></tr>
 <tr valign="top"><td><code>fileEncoding:</code></td>
 <td>
 <p>Optional. NA by default. Options are: &quot;ISO-8859-1&quot;, &quot;UTF-8&quot;, &quot;US-ASCII&quot;.</p>
@@ -195,5 +200,5 @@ learn.file(projectName = "temp", trainDataFilename, target,
 </code></pre>
 
 
-<hr><div align="center">[Package <em>SBadapter</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+<hr><div align="center">[Package <em>SparkBeyond</em> version 0.1 <a href="00Index.html">Index</a>]</div>
 </body></html>

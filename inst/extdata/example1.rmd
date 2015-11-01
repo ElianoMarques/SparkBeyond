@@ -12,7 +12,7 @@ output:
 -->
 
 ```{r, echo=FALSE, eval = TRUE, message=FALSE, results='hide'}
-library(SBadapter)
+library(SparkBeyond)
 setSBserverIOfolder("/tmp/")
 ```
   
@@ -68,6 +68,6 @@ writeLines(gsub("-{2}","",readLines(paste0(titanicSurvivedModel$artifact_loc,"/r
 file.copy(paste0(titanicSurvivedModel$artifact_loc,"/reports/predictions/test/Lift_plot_survived_1.html"), getwd()) 
 ```
 <!-- 
-need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/Resources/library/SBadapter/extdata/" or externally (amazon?) or generate equivalent figure
+need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/Resources/library/SparkBeyond/extdata/" or externally (amazon?) or generate equivalent figure
 <iframe width="400" height="400" src="./Lift_plot_survived_1.html" frameborder="0" seamless></iframe>
 -->

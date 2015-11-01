@@ -220,44 +220,44 @@ isLatestVersion = function(){
 #' A function to update the package from github
 updatePackage = function() {
   #if (! isLatestRpackage()) { #just to be on the safe side for now - not included in the if
-    devtools::install_github("zinman/SBadapter")
+    devtools::install_github("zinman/SparkBeyond")
   #}
   #assuming package updated successfully
-  filename = "SBadapterLatestVersion.RData"
-  url = "https://api.github.com/repos/zinman/SBadapter/git/refs/heads/master"
+  filename = "SparkBeyondLatestVersion.RData"
+  url = "https://api.github.com/repos/zinman/SparkBeyond/git/refs/heads/master"
   res = httr::GET(url, httr::content_type_json())
   res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-  SBadapterLatestVersion = res$object$sha
-  save(SBadapterLatestVersion, file=filename)
+  SparkBeyondLatestVersion = res$object$sha
+  save(SparkBeyondLatestVersion, file=filename)
 }
 
 #' A function to check if the current version is the latest one
 isLatestRpackage = function() {
   tryCatch({
-    filename = "SBadapterLatestVersion.RData"
+    filename = "SparkBeyondLatestVersion.RData"
     prevVersion = ""
     if (file.exists(filename)) {
       load(filename)
-      prevVersion = SBadapterLatestVersion
+      prevVersion = SparkBeyondLatestVersion
     }
-    url = "https://api.github.com/repos/zinman/SBadapter/git/refs/heads/master"
+    url = "https://api.github.com/repos/zinman/SparkBeyond/git/refs/heads/master"
     res = httr::GET(url, httr::content_type_json())
     res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-    SBadapterLatestVersion = res$object$sha
+    SparkBeyondLatestVersion = res$object$sha
 
     ret = if (prevVersion == "") {
-      save(SBadapterLatestVersion, file=filename)
+      save(SparkBeyondLatestVersion, file=filename)
       FALSE
     } else {
-      if (prevVersion == SBadapterLatestVersion) TRUE
+      if (prevVersion == SparkBeyondLatestVersion) TRUE
       else {
-        print("SBadapter package is outdated. Please consider updatePackage()")
+        print("SparkBeyond package is outdated. Please consider updatePackage()")
         FALSE
       }
     }
 
     rm(prevVersion)
-    rm(SBadapterLatestVersion)
+    rm(SparkBeyondLatestVersion)
     ret
   }, error = function(e) TRUE #if there is no internet connection than we skip the check
   )
@@ -267,10 +267,10 @@ isLatestRpackage = function() {
 
 #' Shows SparkBeyond current function catalog with possible
 functionCatalog = function() {
-  browseURL(system.file("extdata", "functionCatalog.html", package = "SBadapter"))
+  browseURL(system.file("extdata", "functionCatalog.html", package = "SparkBeyond"))
 }
 
-.onLoad <- function(libname = find.package("SBadapter"), pkgname = "SBadapter") {
+.onLoad <- function(libname = find.package("SparkBeyond"), pkgname = "SparkBeyond") {
   print(paste0("Automatically trying to load settings saved in :",getwd()))
   loadSettings()
 }

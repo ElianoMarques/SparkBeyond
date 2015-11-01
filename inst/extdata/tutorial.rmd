@@ -19,17 +19,17 @@ Install and load the SBadatper plugin
 --> 
   
 ```{r, eval = FALSE, message=FALSE, results='hide'}
-library('devtools')
-install_github('zinman/SBadapter')
-library('SBadapter')
+install.packages("devtools")
+devtools::install_github('zinman/SparkBeyond')
+library('SparkBeyond')
 ```
 ```{r, echo=FALSE}
-library('SBadapter')
+library('SparkBeyond')
 ```
 
 ### Feature search + Model building
 
-`SBlearn` is used to discover features & build a model, it requires the following input:
+`learn` is used to discover features & build a model, it requires the following input:
 
 1.  `projectName`         - a name describring the analysis  
 2.  `trainData`           - a data frame
@@ -42,7 +42,7 @@ setSBserverIOfolder("/tmp/")
 
 ```{r, eval=FALSE}
 train = getTitanicData(train = TRUE)
-model = SBlearn(projectName = "titanic",
+model = learn(projectName = "titanic",
                         trainData = train,
                         target = "survived",
                         algorithmsWhiteList = list("RRandomForest"))
@@ -53,7 +53,7 @@ The returned object `model` encapsulates a predictive-model on which we can perf
 <!-- 
   Comment:
   ========
-  The help file for `SBmodel` class contains additional information. 
+  The help file for `model` class contains additional information. 
 --> 
 
 ### Enriching a dataset
@@ -161,7 +161,7 @@ model$showROC()
 There is an option to perform only feature discovery at the learning stage using `SBfeatureSearchOnly`
 
 ```{r, eval = FALSE}
-model = SBfeatureSearchOnly(sessionName = "titanic",
+model = featureSearch(sessionName = "titanic",
                         trainData = train,
                         target = "survived")
 ```

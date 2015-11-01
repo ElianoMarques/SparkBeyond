@@ -8,18 +8,18 @@
 # }
 
 #dir.create(file.path('./', 'html'), showWarnings = FALSE)
-#static_help('SBadapter')
+#static_help('SparkBeyond')
 
 
 # R CMD Rdconv -t html ./man/SBmodel-class.Rd  > SBmodel.html
 
 #RUN THESE COMMANDS TO CREATE THE HELP:
 # createHelp = function() {
-#   dir.create(file.path('./SBadapter', 'html'), showWarnings = FALSE)
-#   setwd("./SBadapter/html")
-#   library(knitr)
-#   knit_rd("SBadapter")
-#   setwd("../../")
+#    dir.create(file.path('./SparkBeyond', 'html'), showWarnings = FALSE)
+#    setwd("./SparkBeyond/html")
+#    library(knitr)
+#    knit_rd("SparkBeyond")
+#    setwd("../../")
 # }
 
 #https://github.com/jimhester/knitrBootstrap
@@ -31,4 +31,4 @@
 
 #library(knitrBootstrap)
 #library(rmarkdown)
-#render('./Radapter/SBadapter/inst/extdata/examples-master.rmd', 'knitrBootstrap::bootstrap_document')
+#render('./SparkBeyond/inst/extdata/examples-master.rmd', 'knitrBootstrap::bootstrap_document')

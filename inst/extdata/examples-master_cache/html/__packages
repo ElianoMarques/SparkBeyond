@@ -1,6 +1,6 @@
 base
 data.table
-SBadapter
+SparkBeyond
 devtools
 knitrBootstrap
 knitr
