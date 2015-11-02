@@ -40,7 +40,7 @@ library('SparkBeyond')
 ```{r, eval = FALSE, message=FALSE, results='hide'}
 setSBserverHost("127.0.0.1") #server ip address
 setSBserverPort("9000") #server port
-setSBserverIOfolder("</path/to/server's/shared/folder>")
+setSBserverIOfolder("/path/to/server's/shared/folder") # shared folder on the server to which input data is being written and output files with results are being created  
 ```
 
 <br>
@@ -211,7 +211,16 @@ Models can be saved using regular R `load()` and `save()` methods. By default, t
 <br>
 
 #More info#
-For more information please check the examples page via the `examples()` command.
+For more information please check:
+
+ * `tutorial()`   : [this tutorial](https://s3.amazonaws.com/public-sparkbeyond/tutorial.html)
+ * `examples()`   : [html page with various examples](https://s3.amazonaws.com/public-sparkbeyond/examples-master.html)
+ * `SBhelp()`       : [html help of this package](https://s3.amazonaws.com/public-sparkbeyond/SBadapterDocs/index.html)
+ * `faq()`        : [Frequently Asked Quetions](https://docs.google.com/document/d/1MfUduRR2jZiLaZPfc8Q68ijvWctjNKgg7smeqEoH9yk/pub) 
+ * `reportsList()`: [explantion of all the reports produced by the SparkBeyond engine](https://docs.google.com/document/d/16ogU45DHrW0x_BVLS5TiyPMblORUGSxaScR8i_lIDI0) 
+ * `resources()`  : [various SparkBeyond resources](https://docs.google.com/document/d/1wF7EkdyEB8409blpkianOyQxvi-OWasVEGegdLk-MOI/pub)
+
+
 
 
 

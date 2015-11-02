@@ -20,7 +20,8 @@ SB object that encapsulates a session
 \describe{
 \item{\code{buildNumber()}}{Returns the build number in which the model was generated.}
 
-\item{\code{createPackage(sampleData = NULL, createRestAPIpackage = FALSE)}}{Create a sharable package for the model. \code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE).}
+\item{\code{createPackage(sampleData = NULL, createRestAPIpackage = FALSE,
+  debugMode = FALSE)}}{Create a sharable package for the model. \code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE).}
 
 \item{\code{enrich(data, featureCount = NA, writePredictionColumnsOnly = TRUE)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
@@ -57,11 +58,11 @@ SB object that encapsulates a session
 
 \item{\code{showModelComparison()}}{Shows cross validation of various algorithms tested to create a model.}
 
+\item{\code{showReport(report_name = NA)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, train_features, train_unweighted_features, test_unweighted_features,field, function, InputSchema, modelComparison, roc_best, roc_CV}
+
 \item{\code{showROC()}}{Shows ROC of the model.}
 
 \item{\code{showROC_CV()}}{Shows ROC of cross validation of various algorithms tested to create a model.}
-
-\item{\code{showReport(report_name = NA)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, train_features, train_unweighted_features, test_unweighted_features,field, function, InputSchema, modelComparison, roc_best, roc_CV}
 
 \item{\code{status()}}{Checking the status of the session.}
 

@@ -111,7 +111,7 @@ flattenCols = function(data, cols, keepLast = FALSE) {
   for(col in cols) {flattenCol(data,col)} # can possibly be written without the loop
 }
 
-#' typeOfCols
+#' typeofCols
 #'
 #' list the type of column for all columns in the input \code{data}
 #' @param data: data.table to examine.
@@ -121,7 +121,7 @@ flattenCols = function(data, cols, keepLast = FALSE) {
 #' typeofCols(grouped$age)
 #' flattenCols(grouped, "age")
 #' typeofCols(grouped)
-typeOfCols = function(data) {
+typeofCols = function(data) {
   sapply(data, typeof)
 }
 
@@ -133,7 +133,7 @@ typeOfCols = function(data) {
 #' @examples
 #' grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
 #' textGrouped = cols2Text(grouped)
-#' typeOfCols(textGrouped)
+#' typeofCols(textGrouped)
 #' textGrouped[1,]
 cols2Text = function(data) {
   col2Text = function(x) {

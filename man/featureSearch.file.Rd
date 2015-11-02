@@ -2,22 +2,21 @@
 % Please edit documentation in R/S3functions.R
 \name{featureSearch.file}
 \alias{featureSearch.file}
-\title{Run SparkBeyond feature enrichment and learning process.}
+\title{featureSearch.file}
 \usage{
 featureSearch.file(projectName = "temp", trainDataFilename, target,
-  weightColumn = NA, maxDepth = 2, contextDatasets = NA,
-  functionsWhiteList = NA, functionsBlackList = NA,
-  booleanNumericFeatures = NA, numericEqualityFeatures = TRUE,
-  useGraph = FALSE, useCustomGraphs = FALSE, customGraphsWhiteList = NA,
-  customGraphsBlackList = NA, customFunctions = NA,
-  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
-  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
-  maxFeatureDuration = 100,
-  overrideMaxFeatureDurationForExternalData = TRUE,
-  useCachedFeatures = FALSE, allocatedMemoryMB = 1000,
-  maxCollectionSize = 80000, weightByClass = FALSE,
-  produceFeatureClusteringReport = FALSE, produceReports = NA,
-  fileEncoding = NA, autoSave = TRUE, runBlocking = TRUE)
+  weightColumn = NA, weightByClass = FALSE, contextDatasets = NA,
+  featureGenerationCtrl = featureGenerationControl(),
+  reportingCtrl = reportingControl(), fileEncoding = NA, autoSave = TRUE,
+  runBlocking = TRUE, maxDepth = NA, functionsWhiteList = NA,
+  functionsBlackList = NA, booleanNumericFeatures = NA,
+  numericEqualityFeatures = NA, useGraph = NA, useCustomGraphs = NA,
+  customGraphsWhiteList = NA, customGraphsBlackList = NA,
+  customFunctions = NA, crossRowFeatureSearch = NA, maxFeaturesCount = NA,
+  autoColumnSubSets = NA, customColumnSubsets = NA,
+  maxFeatureDuration = NA, overrideMaxFeatureDurationForExternalData = NA,
+  useCachedFeatures = NA, allocatedMemoryMB = NA, maxCollectionSize = NA,
+  produceFeatureClusteringReport = NA, produceReports = NA)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}
@@ -26,53 +25,15 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 
 \item{weightColumn}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}
 
-\item{maxDepth}{Optional. Integer < 8 which represent the maximun number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
-
-\item{useGraph}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
-
 \item{trainDataFilename:}{Define the path to where the data is saved.}
-
-\item{contextDatasets:}{Optional. A list of paths to context datasets to be added to the learning.}
-
-\item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
-
-\item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.}
-
-\item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.}
-
-\item{numericEqualityFeatures:}{A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.}
-
-\item{useCustomGraphs:}{A boolean indicating whether custom graphs should be used. FALSE by default.}
-
-\item{customGraphsWhiteList:}{Optional. A list that filters which domains should be used. NA by default.}
-
-\item{customGraphsBlackList:}{Optional. A list that filters which custom graphs should be ignored. NA by default.}
-
-\item{customFunctions:}{Optional. A list of additional functions that should be incorporated to the feature search. NA by default.}
-
-\item{crossRowFeatureSearch.}{A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.}
-
-\item{maxFeaturesCount:}{Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.}
-
-\item{autoColumnSubSets:}{Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.}
-
-\item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
-
-\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.}
-
-\item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.}
-
-\item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.}
-
-\item{overrideMaxFeatureDurationForExternalData:}{A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.}
-
-\item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.}
 
 \item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
 
-\item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
+\item{contextDatasets:}{Optional. A list of paths to context datasets to be added to the learning.}
 
-\item{produceReports:}{"EVALUATED_FUNCTIONS".}
+\item{featureGenerationControl:}{A \code{\link{featureGenerationControl}} object with specific feature generation parameters.}
+
+\item{reportingControl:}{A \code{\link{reportingControl}} object with specific reporting parameters.}
 
 \item{fileEncoding:}{Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".}
 
@@ -82,7 +43,7 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
 Session object that encapsulate the feature search result.
 }
 \description{
-Run SparkBeyond feature enrichment and learning process.
+Run SparkBeyond feature enrichment only.
 }
 \examples{
 #session = featureSearch.file ("titanic", titanic_train_filename, "survived")

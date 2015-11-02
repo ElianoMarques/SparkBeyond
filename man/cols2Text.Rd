@@ -18,7 +18,7 @@ Convert all \code{data} columns into a serializable text/primitive representatio
 \examples{
 grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
 textGrouped = cols2Text(grouped)
-typeOfCols(textGrouped)
+typeofCols(textGrouped)
 textGrouped[1,]
 }
 

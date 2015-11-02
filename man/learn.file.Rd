@@ -2,25 +2,25 @@
 % Please edit documentation in R/S3functions.R
 \name{learn.file}
 \alias{learn.file}
-\title{Run SparkBeyond feature enrichment and learning process.}
+\title{learn.file}
 \usage{
 learn.file(projectName = "temp", trainDataFilename, target,
   testDataFilename = NA, trainTestSplitRatio = 0.8, weightColumn = NA,
-  maxDepth = 2, contextDatasets = NA, algorithmsWhiteList = NA,
-  functionsWhiteList = NA, functionsBlackList = NA,
-  booleanNumericFeatures = NA, numericEqualityFeatures = TRUE,
-  useGraph = FALSE, useCustomGraphs = FALSE, customGraphsWhiteList = NA,
-  customGraphsBlackList = NA, customFunctions = NA,
-  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
-  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
-  maxFeatureDuration = 100,
-  overrideMaxFeatureDurationForExternalData = TRUE,
-  useCachedFeatures = FALSE, evaluationMetric = "AUC",
-  scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
-  maxCollectionSize = 80000, weightByClass = FALSE,
-  produceFeatureClusteringReport = FALSE, produceReports = NA,
-  fileEncoding = NA, autoSave = TRUE, runBlocking = TRUE,
-  verbose = FALSE)
+  weightByClass = FALSE, contextDatasets = NA,
+  featureGenerationCtrl = featureGenerationControl(),
+  modelBuildingCtrl = modelBuildingControl(),
+  reportingCtrl = reportingControl(), verbose = FALSE, fileEncoding = NA,
+  autoSave = TRUE, runBlocking = TRUE, maxDepth = NA,
+  algorithmsWhiteList = NA, functionsWhiteList = NA,
+  functionsBlackList = NA, booleanNumericFeatures = NA,
+  numericEqualityFeatures = NA, useGraph = NA, useCustomGraphs = NA,
+  customGraphsWhiteList = NA, customGraphsBlackList = NA,
+  customFunctions = NA, crossRowFeatureSearch = NA, maxFeaturesCount = NA,
+  autoColumnSubSets = NA, customColumnSubsets = NA,
+  maxFeatureDuration = NA, overrideMaxFeatureDurationForExternalData = NA,
+  useCachedFeatures = NA, evaluationMetric = NA, scoreOnTestSet = NA,
+  crossValidation = NA, allocatedMemoryMB = NA, maxCollectionSize = NA,
+  produceFeatureClusteringReport = NA, produceReports = NA)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -35,69 +35,27 @@ learn.file(projectName = "temp", trainDataFilename, target,
 
 \item{weightColumn:}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}
 
-\item{maxDepth:}{Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
+\item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
 
 \item{contextDatasets:}{Optional. A list of paths to context datasets to be added to the learning.}
 
-\item{algorithmsWhiteList:}{Optional. A list of strings that represents the set of algorithms to run. NA by default}
+\item{featureGenerationControl:}{A \code{\link{featureGenerationControl}} object with specific feature generation parameters.}
 
-\item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
+\item{modelBuildingControl:}{A \code{\link{modelBuildingControl}} object with specific model building parameters.}
 
-\item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.}
-
-\item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.}
-
-\item{numericEqualityFeatures:}{A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.}
-
-\item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
-
-\item{useCustomGraphs:}{A boolean indicating whether custom graphs should be used. FALSE by default.}
-
-\item{customGraphsWhiteList:}{Optional. A list that filters which domains should be used. NA by default.}
-
-\item{customGraphsBlackList:}{Optional. A list that filters which custom graphs should be ignored. NA by default.}
-
-\item{customFunctions:}{Optional. A list of additional functions that should be incorporated to the feature search. NA by default.}
-
-\item{crossRowFeatureSearch.}{A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.}
-
-\item{maxFeaturesCount:}{Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.}
-
-\item{autoColumnSubSets:}{Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.}
-
-\item{customColumnSubsets:}{Optional. A list of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.}
-
-\item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.}
-
-\item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.}
-
-\item{overrideMaxFeatureDurationForExternalData:}{A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.}
-
-\item{evaluationMetric:}{Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". "AUC" by default.}
-
-\item{scoreOnTestSet:}{Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.}
-
-\item{crossValidation:}{Optional. Integer value representing how many cross validation splits should be used. 5 by default.}
-
-\item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
-
-\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.}
-
-\item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
-
-\item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
-
-\item{produceReports:}{"EVALUATED_FUNCTIONS".}
+\item{reportingControl:}{A \code{\link{reportingControl}} object with specific reporting parameters.}
 
 \item{fileEncoding:}{Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".}
 
 \item{autoSave:}{Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.}
+
+\item{runBlocking:}{Block the R console while the session is running. FALSE by default.}
 }
 \value{
 Session object that encapsulates the model.
 }
 \description{
-Run SparkBeyond feature enrichment and learning process.
+Runs SparkBeyond feature enrichment and learning process.
 }
 \examples{
 #session = learn("titanic", titanic_file_path, target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)

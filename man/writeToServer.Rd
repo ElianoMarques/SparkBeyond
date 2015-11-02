@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3functions.R
 \name{writeToServer}
 \alias{writeToServer}
-\title{A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.}
+\title{writeToServer}
 \usage{
 writeToServer(data, filename = NA)
 }

@@ -126,48 +126,33 @@ examples = function() {
   browseURL(system.file("extdata", "examples-master.html", package = "SparkBeyond"))
 }
 
-#' Shows an html page with various learning examples
+#' Shows getting started tutorial
 #'
 tutorial = function() {
 	browseURL(system.file("extdata", "tutorial.html", package = "SparkBeyond"))
 }
 
-runSlidingWindowLearn <- function(configuration='1', weightByClass = FALSE, runBlocking = TRUE) {
-  ds = read.csv("~/Google Drive/data/datasets/private/McKinsey/semiconductor/PM_20150826.csv")
-  tsDS = addSlidingTimeWindow(ds, names(ds)[2], 24, "hour",keyCol = "ToolName")
+#' Shows various sparkbeyond resources
+#'
+resources = function() {
+	browseURL("https://docs.google.com/document/d/1wF7EkdyEB8409blpkianOyQxvi-OWasVEGegdLk-MOI/pub")
+}
 
-  tsDS_sampled = sampleDataAbsolute(tsDS[,!is.na(match(names(tsDS),c("RunStartTime","last_keyed_24","TTNF_hr")))],1000)
-  failureDS = ds[,!is.na(match(names(ds),c("ToolName","RunStartTime", "TTNF_hr")))]
-  failureDS = failureDS[(failureDS$TTNF_hr<1)==TRUE,]
-  failureDS$failureTime = as.character.POSIXt(as.POSIXlt(ceiling(as.double(strptime(failureDS$RunStartTime,"%m/%d/%Y %I:%M:%S %p",tz="EST")+failureDS$TTNF_hr*60*60)/60)*60,origin=as.POSIXlt('1970-01-01',tz="EST"),format =  "%m/%d/%Y %I:%M:%S %p %Z",tz="EST"),format =  "%m/%d/%Y %I:%M:%S %p %Z",tz="EST")
-  failureDS = unique(failureDS[,c(1,4)])
-  failureDS$constant = 1
+#' Shows html help of this package
+#'
+SBhelp = function() {
+	browseURL("https://s3.amazonaws.com/public-sparkbeyond/SBadapterDocs/index.html")
+}
 
-  failure_DSpth = writeToServer(failureDS)
-  ds_pth = writeToServer( ds[,!is.na(match(names(ds),c("waferId", "TTNF_hr")))])
 
-  Model = learn(projectName="tests",
-                tsDS_sampled,
-                target="TTNF_hr",
-                functionsBlackList = list("ICAO"),
-                #functionsWhiteList = list("isEmpty","sliceKeyedTS","constant"),
-                useCachedFeatures=FALSE,
-                autoSave = FALSE,
-                #contextDatasets = list(failure_DSpth,ds_pth),
-                verbose = TRUE)
+#' Shows FAQ
+#'
+faq = function() {
+	browseURL("https://docs.google.com/document/d/1MfUduRR2jZiLaZPfc8Q68ijvWctjNKgg7smeqEoH9yk/pub")
+}
 
-  params = list(
-    projectName = "SlidingWindowTests",
-    trainData = tsDS,
-    target = "TTNF_hr",
-    maxFeaturesCount = list(100),
-    useCachedFeatures = TRUE,
-    autoSave = FALSE
-  )
-  additional_params = switch (configuration,
-                              "1" = list(algorithmsWhiteList = list("RRandomForestClassifier")),
-                              "2" = list(algorithmsWhiteList = NA)
-  )
-  model = do.call(learn,c(params, additional_params))
-  return(model)
+#' Shows explantion of all the reports produced by the SparkBeyond enginet
+#'
+reportsList = function() {
+	browseURL("https://docs.google.com/document/d/16ogU45DHrW0x_BVLS5TiyPMblORUGSxaScR8i_lIDI0")
 }

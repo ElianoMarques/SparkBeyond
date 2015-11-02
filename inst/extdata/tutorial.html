@@ -896,7 +896,7 @@ library('SparkBeyond')</code></pre>
 </button>
 <pre style=""><code class="source r">setSBserverHost("127.0.0.1") #server ip address
 setSBserverPort("9000") #server port
-setSBserverIOfolder("</path/to/server's/shared/folder>")</code></pre>
+setSBserverIOfolder("/path/to/server's/shared/folder") # shared folder on the server to which input data is being written and output files with results are being created  </code></pre>
 </div>
 <p><br> <br></p>
 <h1 id="feature-search-model-building">Feature search + Model building</h1>
@@ -1053,7 +1053,15 @@ predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]</co
 <p>Models can be saved using regular R <code>load()</code> and <code>save()</code> methods. By default, the result of each learning session is saved into the current directory.</p>
 <p><br> <br></p>
 <h1 id="more-info">More info</h1>
-<p>For more information please check the examples page via the <code>examples()</code> command.</p>
+<p>For more information please check:</p>
+<ul>
+<li><code>tutorial()</code> : <a href="https://s3.amazonaws.com/public-sparkbeyond/tutorial.html">this tutorial</a></li>
+<li><code>examples()</code> : <a href="https://s3.amazonaws.com/public-sparkbeyond/examples-master.html">html page with various examples</a></li>
+<li><code>SBhelp()</code> : <a href="https://s3.amazonaws.com/public-sparkbeyond/SBadapterDocs/index.html">html help of this package</a></li>
+<li><code>faq()</code> : <a href="https://docs.google.com/document/d/1MfUduRR2jZiLaZPfc8Q68ijvWctjNKgg7smeqEoH9yk/pub">Frequently Asked Quetions</a></li>
+<li><code>reportsList()</code>: <a href="https://docs.google.com/document/d/16ogU45DHrW0x_BVLS5TiyPMblORUGSxaScR8i_lIDI0">explantion of all the reports produced by the SparkBeyond engine</a></li>
+<li><code>resources()</code> : <a href="https://docs.google.com/document/d/1wF7EkdyEB8409blpkianOyQxvi-OWasVEGegdLk-MOI/pub">various SparkBeyond resources</a></li>
+</ul>
 </div>
 </div>
 <div class="navbar navbar-fixed-bottom navbar-inverse">
