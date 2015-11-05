@@ -4,6 +4,7 @@
 #' 
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param enablePolywalk. A switch to enable polywalk - a genetic algorithm heuristic to explore the feature search space. 
+#' @param digDeep A switch to enable greater depth in the polywalk algorithm
 #' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.
@@ -25,6 +26,7 @@
 featureGenerationControl = function(
 	maxDepth = 2,
 	enablePolywalk = FALSE,
+	digDeep = FALSE,
 	functionsWhiteList = NA,
 	functionsBlackList = NA,
 	booleanNumericFeatures = NA,
@@ -47,6 +49,7 @@ featureGenerationControl = function(
 	list(
 		maxDepth = maxDepth,
 		enablePolywalk = enablePolywalk,
+		digDeep = digDeep,
 		functionsWhiteList = functionsWhiteList,
 		functionsBlackList = functionsBlackList,
 		booleanNumericFeatures = booleanNumericFeatures,
@@ -323,6 +326,7 @@ learn.file <- function(projectName = "temp",
 								contextDatasets = contextDatasets,
 								
 								enablePolywalk = featureGenerationCtrl$enablePolywalk,
+								digDeep = featureGenerationCtrl$digDeep,
 								hints = if(!is.na(functionsWhiteList)) functionsWhiteList else featureGenerationCtrl$functionsWhiteList, #changed naming
 								sessionBlackList = if(!is.na(functionsBlackList)) functionsBlackList else featureGenerationCtrl$functionsBlackList, #changed naming
 								booleanNumericFeatures = if(!is.na(booleanNumericFeatures)) booleanNumericFeatures else featureGenerationCtrl$booleanNumericFeatures,
