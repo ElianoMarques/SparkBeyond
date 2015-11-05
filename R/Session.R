@@ -364,7 +364,7 @@ Session = setRefClass("Session",
       evaluate = function() {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
         statusException()
-        if (is.na(googleModel$modelBuilt) | !googleModel$modelBuilt) warning("Evaluation requires full model building using learn")
+        if (is.na(modelBuilt) || !modelBuilt) warning("Evaluation requires full model building using learn")
         evaluationFile = paste0(artifact_loc,"/json/evaluation.json")
         evaluation = if (file.exists(evaluationFile)){
           lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
@@ -392,7 +392,7 @@ Session = setRefClass("Session",
         modelReports = c("confusionMatrix", "confusionMatrix_normalized", "modelComparison", "roc_best", "roc_CV")
         validReports = c(preProcessingReports,featuresReports, modelReports)
         if (is.na(report_name) || ! report_name %in% validReports ) stop("Report name is not valid")
-        if (!modelBuilt && report_name %in% modelReports) stop("This report requires full model building using learn")
+        if ((is.na(modelBuilt) || !modelBuilt) && report_name %in% modelReports) warning("This report requires full model building using learn")
         #verify model created, check if classification, file exists
         statusException() #TODO: can be more refined here per report
         subFolder = function(name) {
