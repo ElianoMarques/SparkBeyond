@@ -1,0 +1,59 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 8}
+%\VignetteDepends{xtable}
+-->
+
+
+# Example 10 -  Deep Feature Search Complex Sum#
+<br>
+Goal: Complex Sum
+<br>
+```{r, eval=TRUE, results='asis'}
+complexSum = getData("complexSum")
+print(xtable(head(complexSum,n=5)), type='html', comment=F)
+```
+```{r complexSum_example, eval=TRUE, message=FALSE, results='hide'}
+googleModel = learn(projectName = "complexSum",
+                        trainData = complexSum,
+                        target = "tgt",
+											 	featureGenerationCtrl = featureGenerationControl(
+								 													maxFeaturesCount = 100,
+											 										maxFeatureDuration=5),
+											  modelBuildingCtrl = modelBuildingControl(
+											  									algorithmsWhiteList = list("zeroR", "^BoundedRegression$")),
+                        autoSave = FALSE
+                    )
+googleModelEval = frequencyModel$evaluate()
+```
+
+
+```{r complexSumPoly_example, eval=TRUE, message=FALSE, results='hide'}
+complexSumModel = learn(projectName = "complexSum",
+                        trainData = complexSum,
+                        target = "tgt",
+											 	featureGenerationCtrl = featureGenerationControl(
+											 										enablePolywalk = TRUE,
+											 										digDeep = TRUE,
+								 													maxFeaturesCount = 100,
+											 										maxFeatureDuration=5),
+											  modelBuildingCtrl = modelBuildingControl(
+											  									algorithmsWhiteList = list("zeroR", "^BoundedRegression$")),
+                        autoSave = FALSE
+                    )
+complexSumModelEval = complexSumModel$evaluate()
+```
+
+```{r, eval=TRUE, results='asis'}
+library(xtable)
+print(xtable(complexSumModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
+writeLines(gsub("\n","<br>",complexSumModelEval$evaluation$summary))
+```
+

@@ -214,7 +214,7 @@ Session = setRefClass("Session",
       predict = function(data, writePredictionColumnsOnly = TRUE) { #
         "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
-        if (!modelBuilt) stop("Prediction requires full model building using learn")
+        if (!modelBuilt) warning("Prediction requires full model building using learn")
         datapath = writeToServer(data)
         predict.file(datapath, writePredictionColumnsOnly)
       },
@@ -223,7 +223,7 @@ Session = setRefClass("Session",
         "Returns prediction on a created model. \\code{file} is the path of the file to be predicted. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
         isLatestVersion()
-        if (!modelBuilt) stop("Prediction requires full model building using learn")
+        if (!modelBuilt) warning("Prediction requires full model building using learn")
 
         SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
         if (!grepl(SBdir, file)) file = paste0(getSBserverIOfolder(), file)
@@ -268,7 +268,7 @@ Session = setRefClass("Session",
         "Returns lift from a created model and generates three plots. \\code{predictionResult} is a dataframe to be analyzed, \\code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
         statusException()
         isLatestVersion()
-        if (!modelBuilt) stop("Lift requires full model building using learn")
+        if (!modelBuilt) warning("Lift requires full model building using learn")
 
         SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
         params <-list(modelPath = artifact_loc,
@@ -314,7 +314,7 @@ Session = setRefClass("Session",
 
       createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE, debugMode = FALSE) { #
         "Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \\code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE)."
-        if (!modelBuilt) stop("createPackage requires full model building using learn")
+        if (!modelBuilt) warning("createPackage requires full model building using learn")
 
         sampleDataFilename = if (is.null(sampleData)) NA else {
           name = writeToServer(sampleData[1:20,])
@@ -364,7 +364,7 @@ Session = setRefClass("Session",
       evaluate = function() {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
         statusException()
-        if (!modelBuilt) stop("Evaluation requires full model building using learn")
+        if (is.na(googleModel$modelBuilt) | !googleModel$modelBuilt) warning("Evaluation requires full model building using learn")
         evaluationFile = paste0(artifact_loc,"/json/evaluation.json")
         evaluation = if (file.exists(evaluationFile)){
           lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
