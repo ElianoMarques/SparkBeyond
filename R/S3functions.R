@@ -142,6 +142,15 @@ reportingControl = function(
 #' head(flightsModel$features)
 #' }
 
+# contextObject = function(a=3) { obj = list(a)
+# 																class(obj) = "contextObject"
+# 																obj
+# }
+# obj1 = contextObject()
+# obj1
+# is(obj1, "contextObject")
+
+# f2 = function(...) {l=list(...); if("a" %in% names(l)) {print (paste("got a", l$a))}}
 learn <- function(projectName = "temp",
 									trainData,
 									target,
@@ -229,6 +238,7 @@ learn <- function(projectName = "temp",
 	)
 	
 	session = do.call(learn.file,c(params))
+	session$modelBuilt = TRUE
 	session
 }
 
@@ -385,6 +395,7 @@ learn.file <- function(projectName = "temp",
 		})
 	}
 	if (runBlocking) session$waitForProcess()
+	session$modelBuilt = TRUE
 	return(session)
 }
 
@@ -476,6 +487,7 @@ featureSearch <- function(projectName = "temp",
 								autoSave = autoSave,
 								runBlocking = runBlocking)
 	model = do.call(learn,c(params))
+	model$modelBuilt = FALSE
 	model
 }
 
@@ -566,6 +578,7 @@ featureSearch.file <- function(projectName = "temp",
 								autoSave = autoSave,
 								runBlocking = runBlocking)
 	model = do.call(learn.file,c(params))
+	model$modelBuilt = FALSE
 	model
 }
 
