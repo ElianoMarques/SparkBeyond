@@ -4,7 +4,7 @@
 \alias{writeToServer}
 \title{writeToServer}
 \usage{
-writeToServer(data, filename = NA)
+writeToServer(data, filename = NA, prefix = "data_in")
 }
 \arguments{
 \item{data}{Data frame or table to export to the server.}

@@ -435,10 +435,19 @@ featureSearch.file <- function(projectName = "temp",
 #' @param data Data frame or table to export to the server.
 #' @param filename: Optional. define a name to save the data to. NA by default.
 #' @return A filepath to the file on the server that was created.
-writeToServer = function(data, filename = NA){
-	final_filename = if (is.na(filename)) tempfile("data_in",  tmpdir = getSBserverIOfolder(), fileext=".tsv") else paste0(getSBserverIOfolder(), filename)
-	final_filename = gsub("/+", "/", final_filename)
-	writeToFile(data, final_filename)
+writeToServer = function(data, filename = NA, prefix = "data_in"){
+	final_filename = if (is.na(filename)) {
+			hash = digest(data)
+			final_filename = paste0(getSBserverIOfolder(), prefix, "_", hash, ".tsv") 
+			final_filename = gsub("/+", "/", final_filename)
+			if (!file.exists(final_filename)) writeToFile(data, final_filename) #due to hashing we rewrite file only if data has changed
+			final_filename		
+		} else {
+			final_filename = paste0(getSBserverIOfolder(), filename)
+			final_filename = gsub("/+", "/", final_filename)
+			writeToFile(data, final_filename)
+			final_filename
+	}
 	return (final_filename)
 }
 
