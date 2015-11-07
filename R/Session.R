@@ -165,7 +165,7 @@ Session = setRefClass("Session",
       enrich = function(data, featureCount = NA, writePredictionColumnsOnly = TRUE) {
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
-        datapath = writeToServer(data)
+        datapath = writeToServer(data, prefix = "enrich") # projectName?
         enrich.file(datapath, featureCount, writePredictionColumnsOnly)
       },
 
@@ -215,7 +215,7 @@ Session = setRefClass("Session",
         "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         statusException()
         if (is.na(modelBuilt) || !modelBuilt) warning("Prediction requires full model building using learn")
-        datapath = writeToServer(data)
+        datapath = writeToServer(data, prefix = "predict") #project name
         predict.file(datapath, writePredictionColumnsOnly)
       },
 
@@ -272,7 +272,7 @@ Session = setRefClass("Session",
 
         SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
         params <-list(modelPath = artifact_loc,
-                      predictionPath = writeToServer(predictionResult),
+                      predictionPath = writeToServer(predictionResult, prefix = "lift"), #projectName? 
                       title = title,
                       percentOfPopulationToPlot= percentOfPopulationToPlot,
                       externalPrefixPath = getSBserverIOfolder())
@@ -317,7 +317,7 @@ Session = setRefClass("Session",
         if (is.na(modelBuilt) || !modelBuilt) warning("createPackage requires full model building using learn")
 
         sampleDataFilename = if (is.null(sampleData)) NA else {
-          name = writeToServer(sampleData[1:20,])
+          name = writeToServer(sampleData[1:20,], prefix="createPackage_sample") #projectName
           SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
           if (!grepl(SBdir, name)) name = paste0(getSBserverIOfolder(), name)
           name

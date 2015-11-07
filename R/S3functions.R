@@ -313,10 +313,10 @@ learn <- function(projectName = "temp",
 									...
 ){	
 	params <-list(projectName = projectName,
-								trainDataFilename = writeToServer(trainData),
+								trainDataFilename = writeToServer(trainData, prefix = paste0(projectName,"_train")),
 								target = target,
 								testDataFilename= if (class(testData) != "logical" && any(grep("data.frame", class(testData))))
-																	writeToServer(testData) else NA,
+																	writeToServer(testData, prefix = paste0(projectName,"_test")) else NA,
 								trainTestSplitRatio = trainTestSplitRatio,
 								weightColumn = weightColumn,
 								weightByClass = weightByClass,
