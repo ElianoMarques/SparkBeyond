@@ -9,17 +9,7 @@ learn(projectName = "temp", trainData, target, testData = NA,
   contextDatasets = NA, featureGenerationCtrl = featureGenerationControl(),
   modelBuildingCtrl = modelBuildingControl(),
   reportingCtrl = reportingControl(), verbose = FALSE, fileEncoding = NA,
-  autoSave = TRUE, runBlocking = TRUE, maxDepth = NA,
-  algorithmsWhiteList = NA, functionsWhiteList = NA,
-  functionsBlackList = NA, booleanNumericFeatures = NA,
-  numericEqualityFeatures = NA, useGraph = NA, useCustomGraphs = NA,
-  customGraphsWhiteList = NA, customGraphsBlackList = NA,
-  customFunctions = NA, crossRowFeatureSearch = NA, maxFeaturesCount = NA,
-  autoColumnSubSets = NA, customColumnSubsets = NA,
-  maxFeatureDuration = NA, overrideMaxFeatureDurationForExternalData = NA,
-  useCachedFeatures = NA, evaluationMetric = NA, scoreOnTestSet = NA,
-  crossValidation = NA, allocatedMemoryMB = NA, maxCollectionSize = NA,
-  produceFeatureClusteringReport = NA, produceReports = NA)
+  autoSave = TRUE, runBlocking = TRUE, ...)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}

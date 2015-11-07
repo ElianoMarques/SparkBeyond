@@ -133,55 +133,25 @@ reportingControl = function(
 #' @examples
 #' #session = learn("titanic", titanic_file_path, target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
 learn.file <- function(projectName = "temp",
-											 trainDataFilename,
-											 target,
-											 testDataFilename = NA,
-											 trainTestSplitRatio = 0.8,
-											 weightColumn = NA,
-											 weightByClass = FALSE,
-											 contextDatasets = NA,
-											 featureGenerationCtrl = featureGenerationControl(),
-											 modelBuildingCtrl = modelBuildingControl(),
-											 reportingCtrl = reportingControl(),
-											 verbose = FALSE,
-											 fileEncoding = NA,
-											 autoSave = TRUE,
-											 runBlocking = TRUE,
-											 
-											 maxDepth = NA, #deprecated
-											 algorithmsWhiteList = NA, #deprecated
-											 functionsWhiteList = NA, #deprecated
-											 functionsBlackList = NA, #deprecated
-											 booleanNumericFeatures = NA, #deprecated
-											 numericEqualityFeatures = NA, #deprecated
-											 useGraph = NA, #deprecated
-											 useCustomGraphs = NA, #deprecated
-											 customGraphsWhiteList = NA, #deprecated
-											 customGraphsBlackList = NA, #deprecated
-											 customFunctions = NA, #deprecated
-											 crossRowFeatureSearch = NA, #deprecated
-											 maxFeaturesCount = NA, #deprecated
-											 autoColumnSubSets = NA,#deprecated
-											 customColumnSubsets = NA, #deprecated
-											 maxFeatureDuration = NA, #deprecated
-											 overrideMaxFeatureDurationForExternalData = NA, #deprecated
-											 useCachedFeatures = NA, #deprecated
-											 evaluationMetric = NA, #deprecated
-											 scoreOnTestSet = NA, #deprecated
-											 crossValidation = NA, #deprecated
-											 allocatedMemoryMB = NA, #deprecated
-											 maxCollectionSize = NA, #deprecated
-											 produceFeatureClusteringReport = NA, #deprecated
-											 produceReports = NA#deprecated
+				 trainDataFilename,
+				 target,
+				 testDataFilename = NA,
+				 trainTestSplitRatio = 0.8,
+				 weightColumn = NA,
+				 weightByClass = FALSE,
+				 contextDatasets = NA,
+				 featureGenerationCtrl = featureGenerationControl(),
+				 modelBuildingCtrl = modelBuildingControl(),
+				 reportingCtrl = reportingControl(),
+				 verbose = FALSE,
+				 fileEncoding = NA,
+				 autoSave = TRUE,
+				 runBlocking = TRUE,
+				 ...
 ){
-	
 	isLatestVersion()
 	isLatestRpackage()
-	verifyList = function(l) {if(is.vector(l) && !is.na(l)) as.list(l) else l}
-	algorithmsWhiteList = verifyList(algorithmsWhiteList)
-	functionsWhiteList = verifyList(functionsWhiteList)
-	functionsBlackList = verifyList(functionsBlackList)
-	maxFeaturesCount = verifyList(maxFeaturesCount)
+	extraParams = list(...)
 	
 	SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
 	if (!grepl(SBdir, trainDataFilename)) trainDataFilename = paste0(getSBserverIOfolder(), trainDataFilename)
@@ -205,41 +175,46 @@ learn.file <- function(projectName = "temp",
 								weightByClass = weightByClass,
 								contextDatasets = contextDatasets,
 								
-								featureSearchMode = featureGenerationCtrl$featureSearchMode,
-								hints = if(!is.na(functionsWhiteList)) functionsWhiteList else featureGenerationCtrl$functionsWhiteList, #changed naming
-								sessionBlackList = if(!is.na(functionsBlackList)) functionsBlackList else featureGenerationCtrl$functionsBlackList, #changed naming
-								booleanNumericFeatures = if(!is.na(booleanNumericFeatures)) booleanNumericFeatures else featureGenerationCtrl$booleanNumericFeatures,
-								numericEqualityFeatures = if(!is.na(numericEqualityFeatures)) numericEqualityFeatures else featureGenerationCtrl$numericEqualityFeatures,
-								allowRangeFeatures = featureGenerationCtrl$allowRangeFeatures,
+								featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,
+								hints = if(!is.null(extraParams$functionsWhiteList)) extraParams$functionsWhiteList else featureGenerationCtrl$functionsWhiteList, #changed naming
+								sessionBlackList = if(!is.null(extraParams$functionsBlackList)) extraParams$functionsBlackList else featureGenerationCtrl$functionsBlackList, #changed naming
+								booleanNumericFeatures = if(!is.null(extraParams$booleanNumericFeatures)) extraParams$booleanNumericFeatures else featureGenerationCtrl$booleanNumericFeatures,
+								numericEqualityFeatures = if(!is.null(extraParams$numericEqualityFeatures)) extraParams$numericEqualityFeatures else featureGenerationCtrl$numericEqualityFeatures,
+								allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGenerationCtrl$allowRangeFeatures,
 								
-								useGraph = if(!is.na(useGraph)) useGraph else featureGenerationCtrl$useGraph,
-								useCustomGraphs = if(!is.na(useCustomGraphs)) useCustomGraphs else featureGenerationCtrl$useCustomGraphs,
-								customGraphsWhiteList = if(!is.na(customGraphsWhiteList)) customGraphsWhiteList else featureGenerationCtrl$customGraphsWhiteList,
-								customGraphsBlackList = if(!is.na(customGraphsBlackList)) customGraphsBlackList else featureGenerationCtrl$customGraphsBlackList,
-								customFunctions = if(!is.na(customFunctions)) customFunctions else featureGenerationCtrl$customFunctions,
-								crossRowFeatureSearch = if(!is.na(crossRowFeatureSearch)) crossRowFeatureSearch else featureGenerationCtrl$crossRowFeatureSearch,
-								globalFeatureIterations = if(!is.na(maxFeaturesCount)) maxFeaturesCount else featureGenerationCtrl$maxFeaturesCount, #changed naming
-								autoColumnSubSets = if(!is.na(autoColumnSubSets)) autoColumnSubSets else featureGenerationCtrl$autoColumnSubSets,
-								customColumnSubsets = if(!is.na(customColumnSubsets)) customColumnSubsets else featureGenerationCtrl$customColumnSubsets,
-								maxTimePerRowMillis = if(!is.na(maxFeatureDuration)) maxFeatureDuration else featureGenerationCtrl$maxFeatureDuration, #changed naming
-								overrideMaxFeatureDurationForExternalData = if(!is.na(overrideMaxFeatureDurationForExternalData)) overrideMaxFeatureDurationForExternalData else featureGenerationCtrl$overrideMaxFeatureDurationForExternalData,
-								useCachedFeatures = if(!is.na(useCachedFeatures)) useCachedFeatures else featureGenerationCtrl$useCachedFeatures,
-								allocatedMemoryMB = if(!is.na(allocatedMemoryMB)) allocatedMemoryMB else featureGenerationCtrl$allocatedMemoryMB,
-								maxCollectionSize = if(!is.na(maxCollectionSize)) maxCollectionSize else featureGenerationCtrl$maxCollectionSize,
+								useGraph = if(!is.null(extraParams$useGraph)) extraParams$useGraph else featureGenerationCtrl$useGraph,
+								useCustomGraphs = if(!is.null(extraParams$useCustomGraphs)) extraParams$useCustomGraphs else featureGenerationCtrl$useCustomGraphs,
+								customGraphsWhiteList = if(!is.null(extraParams$customGraphsWhiteList)) extraParams$customGraphsWhiteList else featureGenerationCtrl$customGraphsWhiteList,
+								customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else featureGenerationCtrl$customGraphsBlackList,
+								customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else featureGenerationCtrl$customFunctions,
+								crossRowFeatureSearch = if(!is.null(extraParams$crossRowFeatureSearch)) extraParams$crossRowFeatureSearch else featureGenerationCtrl$crossRowFeatureSearch,
+								globalFeatureIterations = if(!is.null(extraParams$maxFeaturesCount)) extraParams$maxFeaturesCount else featureGenerationCtrl$maxFeaturesCount, #changed naming
+								autoColumnSubSets = if(!is.null(extraParams$autoColumnSubSets)) extraParams$autoColumnSubSets else featureGenerationCtrl$autoColumnSubSets,
+								customColumnSubsets = if(!is.null(extraParams$customColumnSubsets)) extraParams$customColumnSubsets else featureGenerationCtrl$customColumnSubsets,
+								maxTimePerRowMillis = if(!is.null(extraParams$maxFeatureDuration)) extraParams$maxFeatureDuration else featureGenerationCtrl$maxFeatureDuration, #changed naming
+								overrideMaxFeatureDurationForExternalData = if(!is.null(extraParams$overrideMaxFeatureDurationForExternalData)) extraParams$overrideMaxFeatureDurationForExternalData else featureGenerationCtrl$overrideMaxFeatureDurationForExternalData,
+								useCachedFeatures = if(!is.null(extraParams$useCachedFeatures)) extraParams$useCachedFeatures else featureGenerationCtrl$useCachedFeatures,
+								allocatedMemoryMB = if(!is.null(extraParams$allocatedMemoryMB)) extraParams$allocatedMemoryMB else featureGenerationCtrl$allocatedMemoryMB,
+								maxCollectionSize = if(!is.null(extraParams$maxCollectionSize)) extraParams$maxCollectionSize else featureGenerationCtrl$maxCollectionSize,
 								
-								maxDepth = if(!is.na(maxDepth)) maxDepth else modelBuildingCtrl$maxDepth,
-								algorithmsWhiteList = if(!is.na(algorithmsWhiteList)) algorithmsWhiteList else modelBuildingCtrl$algorithmsWhiteList,
-								evaluationMetric = if(!is.na(evaluationMetric)) evaluationMetric else modelBuildingCtrl$evaluationMetric,
-								crossValidation = if(!is.na(crossValidation)) crossValidation else modelBuildingCtrl$crossValidation,
+								maxDepth = if(!is.null(extraParams$maxDepth)) extraParams$maxDepth else modelBuildingCtrl$maxDepth,
+								algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuildingCtrl$algorithmsWhiteList,
+								evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuildingCtrl$evaluationMetric,
+								crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuildingCtrl$crossValidation,
 								
-								produceFeatureClusteringReport = if(!is.na(produceFeatureClusteringReport)) produceFeatureClusteringReport else reportingCtrl$produceFeatureClusteringReport,
-								produceReports = if(!is.na(produceReports)) produceReports else reportingCtrl$produceReports,
-								scoreOnTestSet = if(!is.na(scoreOnTestSet)) scoreOnTestSet else reportingCtrl$scoreOnTestSet,
+								produceFeatureClusteringReport = if(!is.null(extraParams$produceFeatureClusteringReport)) extraParams$produceFeatureClusteringReport else reportingCtrl$produceFeatureClusteringReport,
+								produceReports = if(!is.null(extraParams$produceReports)) extraParams$produceReports else reportingCtrl$produceReports,
+								scoreOnTestSet = if(!is.null(extraParams$scoreOnTestSet)) extraParams$scoreOnTestSet else reportingCtrl$scoreOnTestSet,
 								
 								externalPrefixPath = getSBserverIOfolder(),
 								fileEncoding = fileEncoding
 	)
 	
+	verifyList = function(l) {if(is.vector(l) && !is.na(l)) as.list(l) else l}
+	params$algorithmsWhiteList = verifyList(params$algorithmsWhiteList)
+	params$functionsWhiteList = verifyList(params$functionsWhiteList)
+	params$functionsBlackList = verifyList(params$functionsBlackList)
+	params$maxFeaturesCount = verifyList(params$maxFeaturesCount)
 	params = params[!is.na(params)]
 	
 	body = rjson::toJSON(params)
@@ -253,7 +228,11 @@ learn.file <- function(projectName = "temp",
 	}
 	
 	print(paste("Artifact location was created at:", res$artifactPath))
-	session = Session(artifact_loc = res$artifactPath, !(length(algorithmsWhiteList) == 0 || tolower(algorithmsWhiteList[[1]]) == "zeror"))
+	session = Session(artifact_loc = res$artifactPath, 
+							modelBuilt = is.null(params$algorithmsWhiteList) || 
+							!(length(params$algorithmsWhiteList) == 1 && 
+								tolower(params$algorithmsWhiteList[[1]]) == "zeror")
+					)
 	
 	if (autoSave){
 		tryCatch({
@@ -314,7 +293,8 @@ learn.file <- function(projectName = "temp",
 # obj1
 # is(obj1, "contextObject")
 
-# f2 = function(...) {l=list(...); if("a" %in% names(l)) {print (paste("got a", l$a))}}
+# f2 = function(...) {l=list(...); ifelse("a" %in% names(l),l$a,NA)}
+
 learn <- function(projectName = "temp",
 									trainData,
 									target,
@@ -330,32 +310,7 @@ learn <- function(projectName = "temp",
 									fileEncoding = NA,
 									autoSave = TRUE,
 									runBlocking = TRUE,
-									
-									maxDepth = NA, #deprecated
-									algorithmsWhiteList = NA, #deprecated
-									functionsWhiteList = NA, #deprecated
-									functionsBlackList = NA, #deprecated
-									booleanNumericFeatures = NA, #deprecated
-									numericEqualityFeatures = NA, #deprecated
-									useGraph = NA, #deprecated
-									useCustomGraphs = NA, #deprecated
-									customGraphsWhiteList = NA, #deprecated
-									customGraphsBlackList = NA, #deprecated
-									customFunctions = NA, #deprecated
-									crossRowFeatureSearch = NA, #deprecated
-									maxFeaturesCount = NA, #deprecated
-									autoColumnSubSets = NA,#deprecated
-									customColumnSubsets = NA, #deprecated
-									maxFeatureDuration = NA, #deprecated
-									overrideMaxFeatureDurationForExternalData = NA, #deprecated
-									useCachedFeatures = NA, #deprecated
-									evaluationMetric = NA, #deprecated
-									scoreOnTestSet = NA, #deprecated
-									crossValidation = NA, #deprecated
-									allocatedMemoryMB = NA, #deprecated
-									maxCollectionSize = NA, #deprecated
-									produceFeatureClusteringReport = NA, #deprecated
-									produceReports = NA#deprecated
+									...
 ){	
 	params <-list(projectName = projectName,
 								trainDataFilename = writeToServer(trainData),
@@ -373,35 +328,10 @@ learn <- function(projectName = "temp",
 								fileEncoding = fileEncoding,
 								verbose = verbose,
 								runBlocking = runBlocking,
-								
-								maxDepth = maxDepth,
-								algorithmsWhiteList = algorithmsWhiteList,
-								functionsWhiteList = functionsWhiteList,
-								functionsBlackList = functionsBlackList,
-								booleanNumericFeatures = booleanNumericFeatures,
-								numericEqualityFeatures = numericEqualityFeatures,
-								useGraph = useGraph,
-								useCustomGraphs = useCustomGraphs,
-								customGraphsWhiteList = customGraphsWhiteList,
-								customGraphsBlackList = customGraphsBlackList,
-								customFunctions = customFunctions,
-								crossRowFeatureSearch = crossRowFeatureSearch,
-								maxFeaturesCount = maxFeaturesCount,
-								autoColumnSubSets = autoColumnSubSets,
-								customColumnSubsets = customColumnSubsets,
-								maxFeatureDuration = maxFeatureDuration,
-								overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
-								useCachedFeatures = useCachedFeatures,
-								evaluationMetric = evaluationMetric,
-								scoreOnTestSet = scoreOnTestSet,
-								crossValidation = crossValidation,
-								allocatedMemoryMB = allocatedMemoryMB,
-								maxCollectionSize = maxCollectionSize,
-								produceFeatureClusteringReport = produceFeatureClusteringReport,
-								produceReports = produceReports
+								... #optional direct parameters
 	)
 	
-	session = do.call(learn.file,c(params))
+	session = do.call(learn.file,c(params, ...))
 	session$modelBuilt = TRUE
 	session
 }
@@ -433,29 +363,7 @@ featureSearch <- function(projectName = "temp",
 													fileEncoding = NA,
 													autoSave = TRUE,
 													runBlocking = TRUE,
-													
-													maxDepth = NA, 
-													functionsWhiteList = NA,
-													functionsBlackList = NA,
-													booleanNumericFeatures = NA,
-													numericEqualityFeatures = NA,
-													useGraph = NA,
-													useCustomGraphs = NA,
-													customGraphsWhiteList = NA,
-													customGraphsBlackList = NA,
-													customFunctions = NA,
-													crossRowFeatureSearch = NA,
-													maxFeaturesCount = NA,
-													autoColumnSubSets = NA,
-													customColumnSubsets = NA,
-													maxFeatureDuration = NA,
-													overrideMaxFeatureDurationForExternalData = NA,
-													useCachedFeatures = NA,
-													allocatedMemoryMB = NA,
-													maxCollectionSize = NA,
-													
-													produceFeatureClusteringReport = NA,
-													produceReports = NA
+													...
 													){
 	
 	params <-list(projectName = projectName,
@@ -466,34 +374,11 @@ featureSearch <- function(projectName = "temp",
 								contextDatasets = contextDatasets,
 								featureGenerationCtrl = featureGenerationCtrl,
 								reportingCtrl = reportingCtrl,
-								
-								maxDepth = maxDepth,
-								algorithmsWhiteList = list("ZeroR"),
-								functionsWhiteList = functionsWhiteList,
-								functionsBlackList = functionsBlackList,
-								booleanNumericFeatures = booleanNumericFeatures,
-								numericEqualityFeatures = numericEqualityFeatures,
-								useGraph = useGraph,
-								useCustomGraphs = useCustomGraphs,
-								customGraphsWhiteList = customGraphsWhiteList,
-								customGraphsBlackList = customGraphsBlackList,
-								customFunctions = customFunctions,
-								crossRowFeatureSearch = crossRowFeatureSearch,
-								maxFeaturesCount = maxFeaturesCount,
-								autoColumnSubSets = autoColumnSubSets,
-								customColumnSubsets = customColumnSubsets,
-								maxFeatureDuration = maxFeatureDuration,
-								overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
-								useCachedFeatures = useCachedFeatures,
-								allocatedMemoryMB = allocatedMemoryMB,
-								maxCollectionSize = maxCollectionSize,								
-								produceFeatureClusteringReport = produceFeatureClusteringReport,
-								produceReports = produceReports,
-								
 								fileEncoding = fileEncoding,
 								autoSave = autoSave,
-								runBlocking = runBlocking)
-	model = do.call(learn,c(params))
+								runBlocking = runBlocking
+								)
+	model = do.call(learn,c(params, algorithmsWhiteList = list("ZeroR"), ...))
 	model$modelBuilt = FALSE
 	model
 }
@@ -525,29 +410,8 @@ featureSearch.file <- function(projectName = "temp",
 															 fileEncoding = NA,
 															 autoSave = TRUE,
 															 runBlocking = TRUE,
-															 
-															 maxDepth = NA, 
-															 functionsWhiteList = NA,
-															 functionsBlackList = NA,
-															 booleanNumericFeatures = NA,
-															 numericEqualityFeatures = NA,
-															 useGraph = NA,
-															 useCustomGraphs = NA,
-															 customGraphsWhiteList = NA,
-															 customGraphsBlackList = NA,
-															 customFunctions = NA,
-															 crossRowFeatureSearch = NA,
-															 maxFeaturesCount = NA,
-															 autoColumnSubSets = NA,
-															 customColumnSubsets = NA,
-															 maxFeatureDuration = NA,
-															 overrideMaxFeatureDurationForExternalData = NA,
-															 useCachedFeatures = NA,
-															 allocatedMemoryMB = NA,
-															 maxCollectionSize = NA,
-															 
-															 produceFeatureClusteringReport = NA,
-															 produceReports = NA){
+															 ...
+															 ){
 	
 	params <-list(projectName = projectName,
 								trainDataFilename = trainDataFilename,
@@ -557,34 +421,10 @@ featureSearch.file <- function(projectName = "temp",
 								contextDatasets = contextDatasets,
 								featureGenerationCtrl = featureGenerationCtrl,
 								reportingCtrl = reportingCtrl,
-								
-								maxDepth = maxDepth,
-								algorithmsWhiteList = list("ZeroR"),
-								functionsWhiteList = functionsWhiteList,
-								functionsBlackList = functionsBlackList,
-								booleanNumericFeatures = booleanNumericFeatures,
-								numericEqualityFeatures = numericEqualityFeatures,
-								useGraph = useGraph,
-								useCustomGraphs = useCustomGraphs,
-								customGraphsWhiteList = customGraphsWhiteList,
-								customGraphsBlackList = customGraphsBlackList,
-								customFunctions = customFunctions,
-								crossRowFeatureSearch = crossRowFeatureSearch,
-								maxFeaturesCount = maxFeaturesCount,
-								autoColumnSubSets = autoColumnSubSets,
-								customColumnSubsets = customColumnSubsets,
-								useCachedFeatures = useCachedFeatures,
-								maxFeatureDuration = maxFeatureDuration,
-								overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
-								allocatedMemoryMB = allocatedMemoryMB,
-								maxCollectionSize = maxCollectionSize,
-								produceFeatureClusteringReport = produceFeatureClusteringReport,
-								produceReports = produceReports,
-								
 								fileEncoding = fileEncoding,
 								autoSave = autoSave,
 								runBlocking = runBlocking)
-	model = do.call(learn.file,c(params))
+	model = do.call(learn.file,c(params, algorithmsWhiteList = list("ZeroR"), ...))
 	model$modelBuilt = FALSE
 	model
 }

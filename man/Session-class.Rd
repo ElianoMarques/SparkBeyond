@@ -58,11 +58,11 @@ SB object that encapsulates a session
 
 \item{\code{showModelComparison()}}{Shows cross validation of various algorithms tested to create a model.}
 
-\item{\code{showReport(report_name = NA)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, train_features, train_unweighted_features, test_unweighted_features,field, function, InputSchema, modelComparison, roc_best, roc_CV}
-
 \item{\code{showROC()}}{Shows ROC of the model.}
 
 \item{\code{showROC_CV()}}{Shows ROC of cross validation of various algorithms tested to create a model.}
+
+\item{\code{showReport(report_name = NA)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, train_features, train_unweighted_features, test_unweighted_features,field, function, InputSchema, modelComparison, roc_best, roc_CV}
 
 \item{\code{status()}}{Checking the status of the session.}
 

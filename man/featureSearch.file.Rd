@@ -8,15 +8,7 @@ featureSearch.file(projectName = "temp", trainDataFilename, target,
   weightColumn = NA, weightByClass = FALSE, contextDatasets = NA,
   featureGenerationCtrl = featureGenerationControl(),
   reportingCtrl = reportingControl(), fileEncoding = NA, autoSave = TRUE,
-  runBlocking = TRUE, maxDepth = NA, functionsWhiteList = NA,
-  functionsBlackList = NA, booleanNumericFeatures = NA,
-  numericEqualityFeatures = NA, useGraph = NA, useCustomGraphs = NA,
-  customGraphsWhiteList = NA, customGraphsBlackList = NA,
-  customFunctions = NA, crossRowFeatureSearch = NA, maxFeaturesCount = NA,
-  autoColumnSubSets = NA, customColumnSubsets = NA,
-  maxFeatureDuration = NA, overrideMaxFeatureDurationForExternalData = NA,
-  useCachedFeatures = NA, allocatedMemoryMB = NA, maxCollectionSize = NA,
-  produceFeatureClusteringReport = NA, produceReports = NA)
+  runBlocking = TRUE, ...)
 }
 \arguments{
 \item{projectName}{Optional string of the session name. Setting a session name is highly recommened. "temp" by default.}

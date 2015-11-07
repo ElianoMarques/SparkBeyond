@@ -4,22 +4,22 @@
 \alias{featureGenerationControl}
 \title{featureGenerationContorl}
 \usage{
-featureGenerationControl(maxDepth = 2, enablePolywalk = FALSE,
+featureGenerationControl(maxDepth = 2, featureSearchMode = "DEFAULT",
   functionsWhiteList = NA, functionsBlackList = NA,
   booleanNumericFeatures = NA, numericEqualityFeatures = TRUE,
-  useGraph = FALSE, useCustomGraphs = FALSE, customGraphsWhiteList = NA,
-  customGraphsBlackList = NA, customFunctions = NA,
-  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
-  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
-  maxFeatureDuration = 100,
+  allowRangeFeatures = TRUE, useGraph = FALSE, useCustomGraphs = FALSE,
+  customGraphsWhiteList = NA, customGraphsBlackList = NA,
+  customFunctions = NA, crossRowFeatureSearch = FALSE,
+  maxFeaturesCount = list(300), autoColumnSubSets = list("CONCEPT"),
+  customColumnSubsets = NA, maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
   allocatedMemoryMB = 1000, maxCollectionSize = 80000,
-  useCachedFeatures = FALSE)
+  useCachedFeatures = TRUE)
 }
 \arguments{
 \item{maxDepth:}{Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
 
-\item{enablePolywalk.}{A switch to enable polywalk - a genetic algorithm heuristic to explore the feature search space.}
+\item{featureSearchMode:}{One of the following DEFAULT, ADVANCED, ADVANCED_WITH_PAIRS, DIG_DEEP}
 
 \item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
 
@@ -28,6 +28,8 @@ featureGenerationControl(maxDepth = 2, enablePolywalk = FALSE,
 \item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.}
 
 \item{numericEqualityFeatures:}{A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.}
+
+\item{allowRangeFeatures:}{A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.}
 
 \item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
 
@@ -55,7 +57,7 @@ featureGenerationControl(maxDepth = 2, enablePolywalk = FALSE,
 
 \item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.}
 
-\item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.}
+\item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). TRUE by default.}
 }
 \description{
 featureGenerationContorl
