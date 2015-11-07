@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 SparkBeyondLatestVersion.RData
+inst/extdata/examples-master_cache
+inst/extdata/examples-master_files

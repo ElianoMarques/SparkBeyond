@@ -11,7 +11,7 @@ output:
 %\VignetteDepends{xtable}
 -->
 
-```{r, echo=FALSE, eval = TRUE, message=FALSE, results='hide'}
+```{r example1_1, echo=FALSE, eval = TRUE, message=FALSE, results='hide'}
 library(SparkBeyond)
 setSBserverIOfolder("/tmp/")
 ```
@@ -25,12 +25,12 @@ We can get the titanic train data by calling `data = getData("titanic_train")`. 
 In the following example we ask the engine to create and return the top 25 features.  
 <br>
 Data sample:
-```{r titanic_sample_data, results='asis'}
+```{r example1_2, results='asis'}
 library(xtable)
 print(xtable(getData("titanic_train")[1:5,]), type='html', comment=F)
 ```
 <br>
-```{r titanic_survived_simple, eval=TRUE, message=FALSE, results='hide'}
+```{r example1_3, eval=TRUE, message=FALSE, results='hide'}
 data = getData("titanic_train")
 titanicSurvivedModel = learn(projectName = "titanic_survived",
                         trainData = data,
@@ -48,23 +48,23 @@ On the Titanic most children and women were rescued first, hence had higher surv
 The first feature that was generated, breaks down the `name` column into tokens and notes that the token "mr" is not included in the passenger name. This feature effectively identifies both the children and women populations.
 
 Here are the top 3 features (each contains a lift signal pointing to which class each feature suggests):
-```{r, eval=TRUE, results='asis'}
+```{r example1_4, eval=TRUE, results='asis'}
 print(xtable(titanicSurvivedModel$features()[1:3,c("idx", "feature", "Lift.0", "Lift.1")]), type='html', comment=F)
 ```
 <br>
 To view an html report with all the information on the features (on train or test) run:
-```{r, eval = FALSE, message=FALSE}
+```{r example1_5, eval = FALSE, message=FALSE}
 titanicSurvivedModel$showFeaturesTrain()
 titanicSurvivedModel$showFeaturesTest()
 ```
   
 To view the feature trace report review /reports/features/features_trace.txt:<br>
 For example, the first feature "tokenizeByPunctuation(name) does not contain mr" has a positive example trace under the "positive sample" column. The trace starts with the "name" subexpression (bottom) "Cumings, Mrs. John Bradley (Florence Briggs Thayer)", the next step of the trace is the subexpression "tokenizeByPunctuation(name)" which is directly on top of "name". It evaluates to "ArrayBuffer(cumings, mrs, john bradley, florence briggs thayer)" which does not contain "mr". The type and documentation of each subexpression function are listed in the last two columns.
-```{r, eval = TRUE, message=FALSE}
+```{r example1_6, eval = TRUE, message=FALSE}
 writeLines(gsub("-{2}","",readLines(paste0(titanicSurvivedModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))
 ```
 
-```{r, echo=FALSE, eval = FALSE, message=FALSE}
+```{r example1_7, echo=FALSE, eval = FALSE, message=FALSE}
 file.copy(paste0(titanicSurvivedModel$artifact_loc,"/reports/predictions/test/Lift_plot_survived_1.html"), getwd()) 
 ```
 <!-- 

@@ -19,7 +19,7 @@ Let's say that for example that for whatever reason we would prefer to not creat
 Please refer to the SparkBeyond function catalog by calling `functionCatalog()` to view the list of functions and associated domains
 In this example we are using the featureSearch capability only without actually building a model.
 <br>
-```{r titanic_feature_exclusion, eval=TRUE, message=FALSE, results='hide'}
+```{r example3_1, eval=TRUE, message=FALSE, results='hide'}
 data = getData("titanic_train")
 titanicAgeFeatures = featureSearch(projectName = "titanic_age_exclusions",
                         trainData = data,
@@ -33,12 +33,12 @@ titanicAgeFeatures = featureSearch(projectName = "titanic_age_exclusions",
 <br>
 Note that compared to the previous example the `master` feature does not exist.
 <br>
-```{r, eval=TRUE, results='asis'}
+```{r example3_2, eval=TRUE, results='asis'}
 library(xtable)
 print(xtable(titanicAgeFeatures$features()[1:10,c("idx", "feature")]), type='html', comment=F) 
 ```
 
-```{r, eval = TRUE, message=FALSE}
+```{r example3_3, eval = TRUE, message=FALSE}
 writeLines(readLines(paste0(titanicAgeFeatures$artifact_loc,"/reports/features/features_trace.txt"),n=9))
 ```
 

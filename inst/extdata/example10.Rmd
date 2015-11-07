@@ -7,7 +7,7 @@ output:
 
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Example 8}
+%\VignetteIndexEntry{Example 10}
 %\VignetteDepends{xtable}
 -->
 
@@ -21,11 +21,11 @@ Target = (f_1 * Math.log(1.0 + f_1) + f_2 + f_3 + f_4) / 5
 <br>
 Noise = values(f_5 -> f_7) noise random int in 1 to 100
 
-```{r, eval=TRUE, results='asis'}
+```{r example10_1, eval=TRUE, results='asis'}
 complexSum = getData("complexSum")
 print(xtable(head(complexSum,n=5)), type='html', comment=F)
 ```
-```{r complexSum_example, eval=TRUE, message=FALSE, results='hide'}
+```{r example10_2, eval=TRUE, message=FALSE, results='hide'}
 complexSumModel = learn(projectName = "complexSum",
         trainData = complexSum,
         target = "tgt",
@@ -39,11 +39,11 @@ complexSumModel = learn(projectName = "complexSum",
         autoSave = FALSE
     )
 ```
-```{r, eval=TRUE, echo=TRUE, cache=FALSE}
+```{r example10_3, eval=TRUE, echo=TRUE, cache=FALSE}
 complexSumModel$evaluate()$evaluation$rootMeanSquaredError
 ```
 
-```{r complexSumPoly_example, eval=TRUE, message=FALSE, results='hide'}
+```{r example10_4, eval=TRUE, message=FALSE, results='hide'}
 complexSumAdvancedModel = learn(
 					projectName = "complexSumAdvanced",
           trainData = complexSum,
@@ -60,10 +60,10 @@ complexSumAdvancedModel = learn(
 		)
 ```
 
-```{r, eval=TRUE, results='asis'}
+```{r example10_5, eval=TRUE, results='asis'}
 library(xtable)
 print(xtable(complexSumAdvancedModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
 ```
-```{r, eval=TRUE, echo=TRUE, cache=FALSE}
+```{r example10_6, eval=TRUE, echo=TRUE, cache=FALSE}
 complexSumAdvancedModel$evaluate()$evaluation$rootMeanSquaredError
 ```

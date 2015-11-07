@@ -885,12 +885,1681 @@ Show predict / create package etc example - should be in a different section
 -->
 <h1 id="spark-beyond-package-examples">Spark Beyond Package Examples</h1>
 <p><br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 1}
+%\VignetteDepends{xtable}
+-->
+<h1 id="example-1---simple-classification">Example 1 - simple classification</h1>
+Goal: Predict Titanic Passenger Survival <br> This example demonstrates how to perform a simple classification using the SparkBeyond platform. We will use data from the famous Kaggle competition to predict who will die on the Titanic. We can get the titanic train data by calling <code>data = getData(&quot;titanic_train&quot;)</code>. The column <code>survived</code> contains the information for whether a Titanic passenger survived. In the following example we ask the engine to create and return the top 25 features.<br /><br> Data sample:
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+print(xtable(getData("titanic_train")[1:5,]), type='html', comment=F)</code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+survived
+</th>
+<th>
+pclass
+</th>
+<th>
+name
+</th>
+<th>
+sex
+</th>
+<th>
+age
+</th>
+<th>
+sibsp
+</th>
+<th>
+parch
+</th>
+<th>
+ticket
+</th>
+<th>
+fare
+</th>
+<th>
+cabin
+</th>
+<th>
+embarked
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+3
+</td>
+<td>
+Braund, Mr. Owen Harris
+</td>
+<td>
+male
+</td>
+<td align="right">
+22.00
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+A/5 21171
+</td>
+<td align="right">
+7.25
+</td>
+<td>
+</td>
+<td>
+S
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+1
+</td>
+<td>
+Cumings, Mrs. John Bradley (Florence Briggs Thayer)
+</td>
+<td>
+female
+</td>
+<td align="right">
+38.00
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+PC 17599
+</td>
+<td align="right">
+71.28
+</td>
+<td>
+C85
+</td>
+<td>
+C
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+3
+</td>
+<td>
+Heikkinen, Miss. Laina
+</td>
+<td>
+female
+</td>
+<td align="right">
+26.00
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+0
+</td>
+<td>
+STON/O2. 3101282
+</td>
+<td align="right">
+7.92
+</td>
+<td>
+</td>
+<td>
+S
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+1
+</td>
+<td>
+Futrelle, Mrs. Jacques Heath (Lily May Peel)
+</td>
+<td>
+female
+</td>
+<td align="right">
+35.00
+</td>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+113803
+</td>
+<td align="right">
+53.10
+</td>
+<td>
+C123
+</td>
+<td>
+S
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+3
+</td>
+<td>
+Allen, Mr. William Henry
+</td>
+<td>
+male
+</td>
+<td align="right">
+35.00
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+0
+</td>
+<td>
+373450
+</td>
+<td align="right">
+8.05
+</td>
+<td>
+</td>
+<td>
+S
+</td>
+</tr>
+</table>
+</div>
+<br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">data = getData("titanic_train")
+titanicSurvivedModel = learn(projectName = "titanic_survived",
+                        trainData = data,
+                        target = "survived",
+                        algorithmsWhiteList = list("RRandomForestClassifier"),  
+                        maxFeaturesCount = 25,  # number of feature counts to check (if a list is provided
+                                                # the best will be selected using cross validation)
+                        scoreOnTestSet = TRUE,  # will create lift plots and prediction table 
+                        autoSave = FALSE        # in order to avoid automatically creating a local object 
+                                                # pointing to the created model
+                    )</code></pre>
+</div>
+<p><br> On the Titanic most children and women were rescued first, hence had higher survival rates. The first feature that was generated, breaks down the <code>name</code> column into tokens and notes that the token &quot;mr&quot; is not included in the passenger name. This feature effectively identifies both the children and women populations.</p>
+Here are the top 3 features (each contains a lift signal pointing to which class each feature suggests):
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(titanicSurvivedModel$features()[1:3,c("idx", "feature", "Lift.0", "Lift.1")]), type='html', comment=F)</code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+<th>
+Lift.0
+</th>
+<th>
+Lift.1
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+tokenizeByPunctuation(name) does not contain mr
+</td>
+<td align="right">
+0.49
+</td>
+<td align="right">
+1.84
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+pclass != 3
+</td>
+<td align="right">
+0.72
+</td>
+<td align="right">
+1.45
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+numberIn(ticket) in range (8854.5, 231932)
+</td>
+<td align="right">
+0.61
+</td>
+<td align="right">
+1.64
+</td>
+</tr>
+</table>
+</div>
+<br> To view an html report with all the information on the features (on train or test) run:
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">titanicSurvivedModel$showFeaturesTrain()
+titanicSurvivedModel$showFeaturesTest()</code></pre>
+</div>
+To view the feature trace report review /reports/features/features_trace.txt:<br> For example, the first feature &quot;tokenizeByPunctuation(name) does not contain mr&quot; has a positive example trace under the &quot;positive sample&quot; column. The trace starts with the &quot;name&quot; subexpression (bottom) &quot;Cumings, Mrs. John Bradley (Florence Briggs Thayer)&quot;, the next step of the trace is the subexpression &quot;tokenizeByPunctuation(name)&quot; which is directly on top of &quot;name&quot;. It evaluates to &quot;ArrayBuffer(cumings, mrs, john bradley, florence briggs thayer)&quot; which does not contain &quot;mr&quot;. The type and documentation of each subexpression function are listed in the last two columns.
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("-{2}","",readLines(paste0(titanicSurvivedModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## Human friendly: tokenizeByPunctuation(name) does not contain mr
+## Canonical: !core.Solving.TextFunctions.tokenizeByPunctuation(name).contains("mr")
+## +-+-++-++-+
+## | sub-expression              | positive sample                                                 | negative sample                      | type          | root function                                                                              | reference / explanation                                                                       |
+## +-+-++-++-+
+## | tokenizeByPunctuation(name) | ArrayBuffer(cumings, mrs, john bradley, florence briggs thayer) | ArrayBuffer(braund, mr, owen harris) | Seq[String]   | core.Solving.TextFunctions.tokenizeByPunctuation(s: core.nlp.SemanticWrapper): Seq[String] | Returns the list of words from the text, when splitting using standard punctuation characters |
+## |  name                       | Cumings, Mrs. John Bradley (Florence Briggs Thayer)             | Braund, Mr. Owen Harris              | core.nlp.Text | name                                                                                       | Input parameter 'name'                                                                        |
+## +-+-++-++-+
+</code></pre>
+</div>
+<!-- 
+need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/Resources/library/SparkBeyond/extdata/" or externally (amazon?) or generate equivalent figure
+<iframe width="400" height="400" src="./Lift_plot_survived_1.html" frameborder="0" seamless></iframe>
+-->
 <p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 2}
+%\VignetteDepends{xtable}
+-->
+<h1 id="example-2---simple-regression">Example 2 - simple regression</h1>
+Goal: Predict Titanic Passenger <br> This example demonstrates how to perform a simple regression using the SparkBeyond platform. We will use the same titanic data but now we will aim to predict the column <code>age</code>. <br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">data = getData("titanic_train")
+titanicAgeModel = learn(projectName = "titanic_age",
+                        trainData = data,
+                        target = "age",
+                        algorithmsWhiteList = list("RRandomForestRegressor"),  
+                        maxFeaturesCount = 25,
+                        scoreOnTestSet = TRUE,
+                        autoSave = FALSE
+                    )</code></pre>
+</div>
+<br> From this examples, we can see that having the tokens 'master' and 'miss' in the passenger name are strong indicators of the gender. Here are the top features: <br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+print(xtable(titanicAgeModel$features()[1:7,c("idx", "feature")]), type='html', comment=F)</code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+name contains master
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+pclass &lt; 3
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+wordFrequencies(name).valueOf(miss) orIfMissing 0.5773502691896258 &lt; 0.5386751345948129
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+parch in range (0, 3.5)
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+fare &lt; 9.54375
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td align="right">
+5
+</td>
+<td>
+embarked == Q
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td align="right">
+6
+</td>
+<td>
+stemmedWordsWithoutCommonTerms(name) does not contain mr
+</td>
+</tr>
+</table>
+</div>
+To view the feature trace report review /reports/features/features_trace.txt:<br> For example, the first feature &quot;name contains master&quot; has a positive example trace under the &quot;positive sample&quot; column. The trace starts with the &quot;name&quot; subexpression (bottom) &quot;Rice, Master. Eugene&quot;, the next step of the trace is the subexpression &quot;tokenizeByWordBoundary(name)&quot; which is directly on top of &quot;name&quot;. It evaluates to &quot;Vector(rice, master, eugene)&quot; which contains &quot;master&quot;. The type and documentation of each subexpression function are listed in the last two columns.
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("-{2}","",readLines(paste0(titanicAgeModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## Human friendly: name contains master
+## Canonical: core.Solving.TextFunctions.tokenizeByWordBoundary(name) contains "master"
+## +++++-+-+
+## | sub-expression               | positive sample              | negative sample                  | type           | root function                                                                                     | reference / explanation             |
+## +++++-+-+
+## | tokenizeByWordBoundary(name) | Vector(rice, master, eugene) | Vector(braund, mr, owen, harris) | Vector[String] | core.Solving.TextFunctions.tokenizeByWordBoundary(text: core.nlp.SemanticWrapper): Vector[String] | returns a list of the text\'s words |
+## |  name                        | Rice, Master. Eugene         | Braund, Mr. Owen Harris          | core.nlp.Text  | name                                                                                              | Input parameter 'name'              |
+## +++++-+-+
+</code></pre>
+</div>
 <p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 3}
+%\VignetteDepends{xtable}
+-->
+<h1 id="example-3---feature-exclusion">Example 3 - feature exclusion</h1>
+Goal: Predict Titanic Passenger Age <br> This example demonstrates how to exclude elements from the generated features. Let's say that for example that for whatever reason we would prefer to not create mathematical features (such as &quot;abs&quot;), trigonometry features, and also exclude features that contains the word &quot;master&quot;. We can set the <code>functionsBlackList</code> parameter to exclude these two terms. <br> Please refer to the SparkBeyond function catalog by calling <code>functionCatalog()</code> to view the list of functions and associated domains In this example we are using the featureSearch capability only without actually building a model. <br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">data = getData("titanic_train")
+titanicAgeFeatures = featureSearch(projectName = "titanic_age_exclusions",
+                        trainData = data,
+                        target = "age", 
+                        maxFeaturesCount = 10,
+                        functionsBlackList = list("abs", "master", "trigonometry"),  # blacklist trigonometric functions "abs" and "master"
+                        autoSave = FALSE
+                    )</code></pre>
+</div>
+<br> Note that compared to the previous example the <code>master</code> feature does not exist. <br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+print(xtable(titanicAgeFeatures$features()[1:10,c("idx", "feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+name contains master
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+pclass &lt; 3
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+wordFrequencies(name).valueOf(miss) orIfMissing 0.5773502691896258 &lt; 0.5386751345948129
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+parch in range (0, 3.5)
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+fare &lt; 9.54375
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td align="right">
+5
+</td>
+<td>
+embarked == Q
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td align="right">
+6
+</td>
+<td>
+stemmedWordsWithoutCommonTerms(name) does not contain mr
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td align="right">
+7
+</td>
+<td>
+sibsp in range (3.5, 6.5)
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td align="right">
+8
+</td>
+<td>
+numberOfWords(name) &lt; 4
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td align="right">
+9
+</td>
+<td>
+sentimentDistribution(name) == Map((0, 3))
+</td>
+</tr>
+</table>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(readLines(paste0(titanicAgeFeatures$artifact_loc,"/reports/features/features_trace.txt"),n=9))</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## Human friendly: name contains master
+## Canonical: core.Solving.TextFunctions.tokenizeByWordBoundary(name) contains "master"
+## +------------------------------+------------------------------+----------------------------------+----------------+---------------------------------------------------------------------------------------------------+-------------------------------------+
+## | sub-expression               | positive sample              | negative sample                  | type           | root function                                                                                     | reference / explanation             |
+## +------------------------------+------------------------------+----------------------------------+----------------+---------------------------------------------------------------------------------------------------+-------------------------------------+
+## | tokenizeByWordBoundary(name) | Vector(rice, master, eugene) | Vector(braund, mr, owen, harris) | Vector[String] | core.Solving.TextFunctions.tokenizeByWordBoundary(text: core.nlp.SemanticWrapper): Vector[String] | returns a list of the text\'s words |
+## |  name                        | Rice, Master. Eugene         | Braund, Mr. Owen Harris          | core.nlp.Text  | name                                                                                              | Input parameter 'name'              |
+## +------------------------------+------------------------------+----------------------------------+----------------+---------------------------------------------------------------------------------------------------+-------------------------------------+
+</code></pre>
+</div>
 <p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 4}
+%\VignetteDepends{xtable}
+-->
+<h1 id="example-4---cross-row-search">Example 4 - cross row search</h1>
+Goal: Identify changes in density of specific rows <br> In this example, we will generate 500 random points in Euclidean space, and we will set as target for each point, the inverse of the minimal distance from all other points. <br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">n = 500
+data = data.table(lat=runif(n), long = runif(n))
+data[,target:=sapply(1:n, function(i) 1/min({a = (data$lat[i]-data$lat)^2+(data$long[i]-data$long)^2; a[i] = Inf;a}))]
+densityModel = learn(projectName = "density_example",
+                        trainData = data,
+                        target = "target",
+                        algorithmsWhiteList = list("RRandomForestRegressor"),  
+                        crossRowFeatureSearch = TRUE,  # indicates that points from all rows should be
+                                                       # considered together during feature search
+                        maxFeaturesCount = 5,
+                        maxDepth = 3,                               # allowing a higher search space depth
+                        functionsBlackList = list("trigonometry"),  # blacklist trigonometric functions
+                        autoSave = FALSE
+                    )</code></pre>
+</div>
+<br> Note that in this example: <br> 1. While we provided the columns <code>lat</code> and <code>long</code> as two separate columns, a new feature named <code>latLong</code> was created that can operate in the 2D space. 2. The resulting best feature was able to capture our target by being able to generate features using the entire column information.
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+topFeatures = densityModel$features()[1:3,c("idx","feature")]
+print(xtable(topFeatures), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+inverse(distance of latLong from closest of latLong_column) &gt;= 0.6940667049710194
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+ceil(distance of latLong from closest of latLong_column) == 2.0
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+ceil(distance of latLong from closest of latLong_column) == 1.0
+</td>
+</tr>
+</table>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(readLines(paste0(densityModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## Human friendly: inverse(distance of latLong from closest of latLong_column) >= 0.6940667049710194
+## Canonical: (core.Solving.SpecialFunctions.inverse(core.common.zeroComplexity.ZeroComplexityFunctions.distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/zinman/localdata/artifacts/density_example/2/resources/latLong_column"), latLong))) >= 0.6940667049710194
+## +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------+----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+## | sub-expression                                                                                                                                                                                         | positive sample                            | negative sample                              | type                        | root function                                                                                                                                               | reference / explanation   |
+## +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------+----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+## | inverse(distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/zinman/localdata/artifacts/density_example/2/resources/latLong_column"), latLong)) | 0.7282626904504894                         | 0.3479900011460833                           | Double                      | core.Solving.SpecialFunctions.inverse(num: Double): Double                                                                                                  | 1 / num                   |
+## |  distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/zinman/localdata/artifacts/density_example/2/resources/latLong_column"), latLong)         | 1.3731308950914662                         | 2.8736457849552073                           | Double                      | core.common.zeroComplexity.ZeroComplexityFunctions.distanceFromClosest(points: Seq[core.datastructures.LatLong],point: core.datastructures.LatLong): Double |                           |
+## |   latLong                                                                                                                                                                                              | LatLong(0.39135928102769,0.52709619468078) | LatLong(0.856131664710119,0.828075018012896) | core.datastructures.LatLong | latLong                                                                                                                                                     | Input parameter 'latLong' |
+## +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------+----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+</code></pre>
+</div>
 <p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 5}
+%\VignetteDepends{xtable}
+-->
+<h1 id="example-5---sentiment-analysis">Example 5 - Sentiment analysis</h1>
+Goal: Identify sentiment in twitter tweets. <br> ### Tweets sentiment ###
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">tweets = getData("tweets_sentiment")
+SentimentModel = learn(projectName="tweets",
+              trainData=tweets,
+              target="sentiment",
+              algorithmsWhiteList = list("RRandomForestClassifier"),
+              maxFeaturesCount = list(50),
+              evaluationMetric = "AUC",
+              autoSave = FALSE)
+SentimentEval = SentimentModel$evaluate()</code></pre>
+</div>
+<p><br> In this example we load a sentiment dataset with a tweet column and a setiment target (-1 or 1). The top feature is a textSentimentScore which is automatically computed.</p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+print(xtable(SentimentModel$features()[1:10,c("idx","feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+textSentimentScore(tweet) &lt; -0.017857142857142856
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+sentimentDistribution(tweet).valueOf(&quot;1&quot;) orIfMissing 0 &gt;= 0.5
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+slidingSubsets(tweet).toSeq contains (best, the)
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+tweet contains great
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+numberIn(tweet) == -1.0
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td align="right">
+5
+</td>
+<td>
+stemmedWordsWithoutCommonTerms(tweet) contains goal
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td align="right">
+6
+</td>
+<td>
+numberIn(tweet) == 1.0
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td align="right">
+7
+</td>
+<td>
+tweet contains back
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td align="right">
+8
+</td>
+<td>
+wordFrequencies(tweet).valueOf(shit) orIfMissing 0 &gt;= 0.15714382244851252
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td align="right">
+9
+</td>
+<td>
+tweet contains fantastic
+</td>
+</tr>
+</table>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("\n","<br>",SentimentEval$evaluation$summary))</code></pre>
+<pre><code>                                         &lt;br&gt;Correctly Classified Instances     42   84.0%&lt;br&gt;Incorrectly Classified Instances   8    16.0%&lt;br&gt;Total Number of Instances          50        &lt;br&gt;                                             </code></pre>
+</div>
+<p><br> ### Tweets with a context database ###</p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">sentimentLexicon = getData("sentiment_lexicon")
+pathLexicon = writeToServer(sentimentLexicon)
+tweets = getData("tweets_sentiment")
+SentimentModelContext = learn(projectName="tweets",
+              trainData=tweets,
+              target="sentiment",
+              algorithmsWhiteList = list("RRandomForestClassifier"),
+              maxFeaturesCount = list(50),
+              evaluationMetric = "AUC",
+              autoSave = FALSE,
+              contextDatasets = list(pathLexicon))
+
+SentimentContextEval = SentimentModelContext$evaluate()</code></pre>
+</div>
+<p><br></p>
+<p>In order to improve performance we can include a custom context Dataset. The sentimentLexicon includes over 6000 single words with a either a positive or negative sentiment. The top features now are actually derived by looking up the values in the lexcion (data_column) and the classificaiton performance is boosted.</p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+print(xtable(SentimentModelContext$features()[1:10,c("idx","feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+textSentimentScore(tweet) &lt; -0.017857142857142856
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+sentimentDistribution(tweet).valueOf(&quot;1&quot;) orIfMissing 0 &gt;= 0.5
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+slidingSubsets(tweet).toSeq contains (best, the)
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+tweet contains great
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+numberIn(tweet) == -1.0
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td align="right">
+5
+</td>
+<td>
+stemmedWordsWithoutCommonTerms(tweet) contains goal
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td align="right">
+6
+</td>
+<td>
+numberIn(tweet) == 1.0
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td align="right">
+7
+</td>
+<td>
+tweet contains back
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td align="right">
+8
+</td>
+<td>
+wordFrequencies(tweet).valueOf(shit) orIfMissing 0 &gt;= 0.15714382244851252
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td align="right">
+9
+</td>
+<td>
+tweet contains fantastic
+</td>
+</tr>
+</table>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("\n","<br>",SentimentContextEval$evaluation$summary))</code></pre>
+<pre><code>                                         &lt;br&gt;Correctly Classified Instances     42   84.0%&lt;br&gt;Incorrectly Classified Instances   8    16.0%&lt;br&gt;Total Number of Instances          50        &lt;br&gt;                                             </code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(readLines(paste0(SentimentModelContext$artifact_loc,"/reports/features/features_trace.txt"),n=9))</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## Human friendly: textSentimentScore(tweet) < -0.017857142857142856
+## Canonical: (core.Solving.TextFunctions.textSentimentScore(tweet)) < -0.017857142857142856
+## +---------------------------+------------------------------------------------------+-----------------------------------------+---------------+---------------------------------------------------------------------------------------+---------------------------------------------------------------+
+## | sub-expression            | positive sample                                      | negative sample                         | type          | root function                                                                         | reference / explanation                                       |
+## +---------------------------+------------------------------------------------------+-----------------------------------------+---------------+---------------------------------------------------------------------------------------+---------------------------------------------------------------+
+## | textSentimentScore(tweet) | -0.125                                               | 0.0                                     | Double        | core.Solving.TextFunctions.textSentimentScore(text: core.nlp.SemanticWrapper): Double | The aggregate score that represents the sentiment of the text |
+## |  tweet                    | Defensive show against Sunderland best of the season | Performance proves is far from finished | core.nlp.Text | tweet                                                                                 | Input parameter 'tweet'                                       |
+## +---------------------------+------------------------------------------------------+-----------------------------------------+---------------+---------------------------------------------------------------------------------------+---------------------------------------------------------------+
+</code></pre>
+</div>
 <p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 6}
+%\VignetteDepends{xtable}
+-->
+<h1 id="example-6---features-combining-customgraphs-and-weather-api">Example 6 - Features combining customGraphs and weather API</h1>
+<p>Goal: Flights weather delay In this example we use data from Kaggle that contains information of flight delays caused due to weather conditions.</p>
+This example will show how airport codes (in fields <code>origin</code>, <code>dest</code>) are automatically identified as airport entities and are enriched with the corresponding latitude and longitude information of the airport. Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power. The first run may take more time as weather data will be downloaded and cached. <br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+flights = getData("flights_delay")
+airports = getData("airports")
+names(flights)</code></pre>
+[1] &quot;year&quot; &quot;month&quot; &quot;dayofMonth&quot;<br /> [4] &quot;dayOfWeek&quot; &quot;depTime&quot; &quot;cRSDepTime&quot;<br /> [7] &quot;arrTime&quot; &quot;cRSArrTime&quot; &quot;uniqueCarrier&quot;<br />[10] &quot;flightNum&quot; &quot;tailNum&quot; &quot;actualElapsedTime&quot; [13] &quot;cRSElapsedTime&quot; &quot;airTime&quot; &quot;origin&quot;<br />[16] &quot;dest&quot; &quot;distance&quot; &quot;taxiIn&quot;<br />[19] &quot;taxiOut&quot; &quot;cancelled&quot; &quot;cancellationCode&quot; [22] &quot;diverted&quot; &quot;weatherDelay&quot; &quot;lateAircraftDelay&quot; [25] &quot;date&quot;<br />
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(tail(airports,n=5)), type='html', comment=F) # show the airport database</code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+Name
+</th>
+<th>
+City
+</th>
+<th>
+Country
+</th>
+<th>
+IATA
+</th>
+<th>
+ICAO
+</th>
+<th>
+Latitude
+</th>
+<th>
+Longitude
+</th>
+<th>
+Altitude
+</th>
+<th>
+Timezone
+</th>
+<th>
+DST
+</th>
+<th>
+TZ.timezone
+</th>
+</tr>
+<tr>
+<td align="right">
+5876
+</td>
+<td>
+Mansons Landing Water Aerodrome
+</td>
+<td>
+Mansons Landing
+</td>
+<td>
+Canada
+</td>
+<td>
+YMU
+</td>
+<td>
+
+</td>
+<td align="right">
+50.07
+</td>
+<td align="right">
+-124.98
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Vancouver
+</td>
+</tr>
+<tr>
+<td align="right">
+5877
+</td>
+<td>
+Port McNeill Airport
+</td>
+<td>
+Port McNeill
+</td>
+<td>
+Canada
+</td>
+<td>
+YMP
+</td>
+<td>
+
+</td>
+<td align="right">
+50.58
+</td>
+<td align="right">
+-127.03
+</td>
+<td align="right">
+225
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Vancouver
+</td>
+</tr>
+<tr>
+<td align="right">
+5878
+</td>
+<td>
+Sullivan Bay Water Aerodrome
+</td>
+<td>
+Sullivan Bay
+</td>
+<td>
+Canada
+</td>
+<td>
+YTG
+</td>
+<td>
+
+</td>
+<td align="right">
+50.88
+</td>
+<td align="right">
+-126.83
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Vancouver
+</td>
+</tr>
+<tr>
+<td align="right">
+5879
+</td>
+<td>
+Deer Harbor Seaplane
+</td>
+<td>
+Deer Harbor
+</td>
+<td>
+United States
+</td>
+<td>
+DHB
+</td>
+<td>
+
+</td>
+<td align="right">
+48.62
+</td>
+<td align="right">
+-123.01
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Los_Angeles
+</td>
+</tr>
+<tr>
+<td align="right">
+5880
+</td>
+<td>
+San Diego Old Town Transit Center
+</td>
+<td>
+San Diego
+</td>
+<td>
+United States
+</td>
+<td>
+OLT
+</td>
+<td>
+
+</td>
+<td align="right">
+32.76
+</td>
+<td align="right">
+-117.20
+</td>
+<td align="right">
+0
+</td>
+<td align="right">
+-8.00
+</td>
+<td>
+A
+</td>
+<td>
+America/Los_Angeles
+</td>
+</tr>
+</table>
+</div>
+<p><br> The airport data will be loaded automatically as a customGraph but you could explicitly send it using contextDatasets (as in Example 5). Regardless of modality (customGraph or contextDatasets) the functionality is identical and the engine will automatically detect relevant columns in the airport data (or any other dataset) <br></p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">flightSampled = sampleDataAbsolute(flights,5000)
+flightsModel = learn(projectName = "flights_delay_example",
+                        trainData = flightSampled,
+                        target = "weatherDelay",
+                        useCustomGraphs = TRUE, 
+                        algorithmsWhiteList = list("RXGBoostRegressor"),
+                        functionsBlackList = list("trigonometry"),
+                        maxFeaturesCount = list(30),
+                        autoSave = FALSE,
+                        evaluationMetric = "RMSE"
+                    )
+flightsModelEval = flightsModel$evaluate()</code></pre>
+</div>
+<p><br> Note that in this example:</p>
+<ol style="list-style-type: decimal">
+<li><p>For example, in the <code>flightsModel</code> feature 7 <code>dataForLatLongDate(lookupGeo(dest, general_airports_csv), date) contains (VISIB, 5)</code>the dest field is recognized as an IATA code and is enriched with geolocation data from an airport custom graph, aditionally the coordinates and date field are used to automatically download weather data and enrich with visibility data. Simillarly feature 19 assesses wind gust data at origin airport locations.</p></li>
+<li><p>Running using the entire flights data can take a long time due to the Weather API downloading approporaite data for each location (but should achieve better results). <br></p></li>
+</ol>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(xtable)
+print(xtable(flightsModel$features()[1:20,c("idx","feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+log1p(arrTime) in range (3.569433499972762, 6.410996574838032)
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+taxiOut &gt;= 50
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+depTime &lt; 549
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+depTime not in range (548.5, 2244.5)
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+uniqueCarrier.min == A
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td align="right">
+5
+</td>
+<td>
+date == Sun Jul 13 03:00:00 IDT 2008
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td align="right">
+6
+</td>
+<td>
+uniqueCarrier == OO
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td align="right">
+7
+</td>
+<td>
+sigmoid(arrTime) in range (0.9999999994813985, 0.9999999999999999)
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td align="right">
+8
+</td>
+<td>
+date == Sat Mar 22 02:00:00 IST 2008
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td align="right">
+9
+</td>
+<td>
+date == Fri Feb 22 02:00:00 IST 2008
+</td>
+</tr>
+<tr>
+<td align="right">
+11
+</td>
+<td align="right">
+10
+</td>
+<td>
+distance in range (863.5, 871.5)
+</td>
+</tr>
+<tr>
+<td align="right">
+12
+</td>
+<td align="right">
+11
+</td>
+<td>
+airTime in range (144.5, 249.5)
+</td>
+</tr>
+<tr>
+<td align="right">
+13
+</td>
+<td align="right">
+12
+</td>
+<td>
+dayofMonth in range (8.5, 10.5)
+</td>
+</tr>
+<tr>
+<td align="right">
+14
+</td>
+<td align="right">
+13
+</td>
+<td>
+uniqueCarrier == XE
+</td>
+</tr>
+<tr>
+<td align="right">
+15
+</td>
+<td align="right">
+14
+</td>
+<td>
+date == Thu Jul 10 03:00:00 IDT 2008
+</td>
+</tr>
+<tr>
+<td align="right">
+16
+</td>
+<td align="right">
+15
+</td>
+<td>
+prefixes(tailNum) contains N74
+</td>
+</tr>
+<tr>
+<td align="right">
+17
+</td>
+<td align="right">
+16
+</td>
+<td>
+cRSArrTime &lt; 22
+</td>
+</tr>
+<tr>
+<td align="right">
+18
+</td>
+<td align="right">
+17
+</td>
+<td>
+smallSubsets(tailNum) contains List(4, 1)
+</td>
+</tr>
+<tr>
+<td align="right">
+19
+</td>
+<td align="right">
+18
+</td>
+<td>
+Histogram(uniqueCarrier) contains (V, 1)
+</td>
+</tr>
+<tr>
+<td align="right">
+20
+</td>
+<td align="right">
+19
+</td>
+<td>
+arithmeticNot(cRSElapsedTime) in range (-193.5, -188.5)
+</td>
+</tr>
+</table>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(gsub("\n","<br>",flightsModelEval$evaluation$summary))</code></pre>
+<pre><code>                                             &lt;br&gt;Correlation coefficient             0.971109     &lt;br&gt;R2                                  0.943053     &lt;br&gt;Mean absolute error                 9.933236     &lt;br&gt;Root mean squared error             17.574482    &lt;br&gt;Relative absolute error             20.48519378 %&lt;br&gt;Root relative squared error         24.61696612 %&lt;br&gt;Root relative prior squared error   71.39174767  &lt;br&gt;Actuals mean                        74.63377609  &lt;br&gt;Estimations mean                    72.95175912  &lt;br&gt;Actuals std                         71.24745501  &lt;br&gt;Estimations std                     65.07070017  &lt;br&gt;Total Number of Instances           1054         &lt;br&gt;                                                 </code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(readLines(paste0(flightsModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## Human friendly: log1p(arrTime) in range (3.569433499972762, 6.410996574838032)
+## Canonical: (scala.math.abs(scala.math.log1p(arrTime) - 4.990215037405397)) < 1.4207815374326351
+## +-----------------------------------------+----------------------+--------------------+--------+----------------------------------------+---------------------------------------------------------------+
+## | sub-expression                          | positive sample      | negative sample    | type   | root function                          | reference / explanation                                       |
+## +-----------------------------------------+----------------------+--------------------+--------+----------------------------------------+---------------------------------------------------------------+
+## | abs(log1p(arrTime) - 4.990215037405397) | 0.22804110260764077  | 1.732118499383915  | Double | scala.math.abs(x: Double): Double      | http://www.scala-lang.org/api/current/index.html#scala.math   |
+## |  log1p(arrTime) - 4.990215037405397     | -0.22804110260764077 | -1.732118499383915 | Double | scala.Double.$minus(x: Double): Double | http://www.scala-lang.org/api/current/index.html#scala.Double |
+## |   log1p(arrTime)                        | 4.762173934797756    | 3.258096538021482  | Double | scala.math.log1p(x: Double): Double    | http://www.scala-lang.org/api/current/index.html#scala.math   |
+## |    arrTime                              | 116                  | 25                 | Int    | arrTime                                | Input parameter 'arrTime'                                     |
+</code></pre>
+</div>
 <p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{Example 7}
+%\VignetteDepends{xtable}
+-->
+<h1 id="example-7---add-custom-functions">Example 7 - Add custom functions</h1>
+<p>Goal: Identify numbers that are multiples of 7 You can create your own functions, which will be used as building blocks during the feature search. All you need to do, is to specify the url/s of the source files containing the custom functions code (currently only Scala is supported). The file can be local (on the server) or on the web.</p>
+<br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">data = data.frame(number = 1:500, target = 1:500 %% 7 == 0)</code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">modModel = learn(projectName = "custom_function_example",
+                        trainData = data,
+                        target = "target",
+                        algorithmsWhiteList = list("RRandomForestClassifier"),  
+                        maxFeaturesCount = 5,                        
+                        customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala"),
+                        autoSave = FALSE
+                    )</code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">modModel$features()[1:1,c("idx","feature")]</code></pre>
+<p>idx feature 1 0 isMultipleOf7(number)</p>
+</div>
 <p><br> <br></p>
 <p><br> <br></p>
 <!--
@@ -1125,7 +2794,7 @@ true
 </button>
 <pre style=""><code class="source r">googleTrainTest = trainTestSplit(googleStock)</code></pre>
 </div>
-<br> Please note that we have introduced the featureGenerationCtrl, modelBuildingCtrl and reportingCtrl functions that aggregate all the arguments by domain (feature,model,reporting). You can still directly use old arguments for full backwards compatibility of your code but new features will be added through the Ctrl object.
+<br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -1238,7 +2907,7 @@ maxSlopeFirstHalf(close_sliding) &gt;= 15.479999999999961
 ## 
 </code></pre>
 </div>
-The model does poorly and fails to predict our happy state, now let's enable a deep feature search using polywalk.
+Now let's enable a deep feature search using an advanced feature search with pairs.
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -1308,7 +2977,7 @@ average(derivativeY(close_sliding).drop(criticalDay)) &lt; -0.04053124999999937
 <p><br> <br></p>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Example 8}
+%\VignetteIndexEntry{Example 10}
 %\VignetteDepends{xtable}
 -->
 <h1 id="example-10---deep-feature-search-complex-sum">Example 10 - Deep Feature Search Complex Sum</h1>
@@ -1539,7 +3208,7 @@ tgt
 <button class="output R toggle btn btn-xs btn-success">
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
-<pre style=""><code class="output r">## [1] 7.208078
+<pre style=""><code class="output r">## [1] 7.260662
 </code></pre>
 </div>
 <div class="row">
@@ -1643,7 +3312,7 @@ leftSlantedWeightedAverage(leftSlantedGeometricMean(f_0, f_1), average(f_3, f_4)
 <button class="output R toggle btn btn-xs btn-success">
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
-<pre style=""><code class="output r">## [1] 2.546681
+<pre style=""><code class="output r">## [1] 2.539253
 </code></pre>
 </div>
 <br> <br>
