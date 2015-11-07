@@ -27,27 +27,43 @@ Show predict / create package etc example - should be in a different section
 # Spark Beyond Package Examples #
 
 <br>
-```{r example1, child='example1.rmd', eval = TRUE, cache=TRUE}
+```{r example1, child='example1.rmd', eval = FALSE, cache=TRUE}
 ```
 <br>
-```{r example2, child='example2.rmd', eval = TRUE, cache=TRUE}
+<br>
+```{r example2, child='example2.rmd', eval = FALSE, cache=TRUE}
 ```
 <br>
-```{r example3, child='example3.rmd', eval = TRUE, cache=TRUE}
+<br>
+```{r example3, child='example3.rmd', eval = FALSE, cache=TRUE}
 ```
 <br>
-```{r example4, child='example4.rmd', eval = TRUE, cache=TRUE}
+<br>
+```{r example4, child='example4.rmd', eval = FALSE, cache=TRUE}
 ```
 <br>
-```{r example5, child='example5.rmd', eval = TRUE, cache=TRUE}
+<br>
+```{r example5, child='example5.rmd', eval = FALSE, cache=TRUE}
 ```
 <br>
-```{r example6, child='example6.rmd', eval = TRUE, cache=TRUE}
+<br>
+```{r example6, child='example6.rmd', eval = FALSE, cache=TRUE}
 ```
 <br>
-```{r example7, child='example7.rmd', eval = TRUE, cache=TRUE}
+<br>
+```{r example7, child='example7.rmd', eval = FALSE, cache=FALSE}
 ```
 <br>
-```{r example8, child='example8.rmd', eval = TRUE, cache=TRUE}
+<br>
+```{r example8, child='example8.rmd', eval = FALSE, cache=FALSE}
 ```
+<br>
+<br>
+```{r example9, child='example9.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+<br>
+```{r example10, child='example10.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
 <br>

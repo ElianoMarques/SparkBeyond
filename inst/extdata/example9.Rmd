@@ -22,57 +22,60 @@ print(xtable(head(googleStock,n=5)), type='html', comment=F)
 ```
 <br>
 The target variable reflects if the google closing price today was more than the closing price at a critical time point in the past.
-Let's split the data sequntially and first try a regular model at depth =2
+Let's split the data sequntially and first try a regular model at depth = 2
 ```{r, eval=TRUE, results='asis'}
-splitIndex = round(0.8*nrow(googleStock))
-googleTrain = googleStock[1:splitIndex,]
-googleTest = googleStock[(splitIndex+1):nrow(googleStock),]
+googleTrainTest = trainTestSplit(googleStock)
 ```
 <br>
 Please note that we have introduced the featureGenerationCtrl, modelBuildingCtrl and reportingCtrl functions that aggregate all the arguments by domain (feature,model,reporting). You can still directly use old arguments for full backwards compatibility of your code but new features will be added through the Ctrl object. 
 ```{r google_example, eval=TRUE, message=FALSE, results='hide'}
-googleModel = learn(projectName = "googleStock",
-                        trainData = googleTrain,
-                        testData = googleTest,
-                        target = "happy",
-											 	featureGenerationCtrl = featureGenerationControl(
-								 													maxFeaturesCount = 50,
-											 										maxFeatureDuration=5),
-										    #maxFeatureDuration=5,
-												#maxFeaturesCount = 50,   
-											  modelBuildingCtrl = modelBuildingControl(
-											  									algorithmsWhiteList = list("ZeroR","RRandomForestClassifier")),
-												#algorithmsWhiteList = list("ZeroR","RRandomForestClassifier")
-                        autoSave = FALSE
-                    )
+googleModel = learn(
+			projectName = "googleStock",
+      trainData = googleTrainTest[[1]],
+      testData = googleTrainTest[[2]],
+      target = "happy",
+			featureGenerationCtrl = featureGenerationControl(
+ 					maxFeaturesCount = 50,
+					maxFeatureDuration=5
+ 			),
+			modelBuildingCtrl = modelBuildingControl(
+					algorithmsWhiteList = list("RRandomForestClassifier")
+			),	
+      autoSave = FALSE
+)
 googleModelEval = googleModel$evaluate()
 ```
 
 ```{r, eval=TRUE, results='asis'}
 library(xtable)
 print(xtable(googleModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
-writeLines(googleModelEval$evaluation$summary)
+```
+```{r, eval=TRUE, echo=TRUE, cache=FALSE}
+e=googleModel$evaluate()$summary
 ```
 
 The model does poorly and fails to predict our happy state, now let's enable a deep feature search using polywalk.
 ```{r googlePoly_example, eval=TRUE, message=FALSE, results='hide'}
-googleModelPoly = learn(projectName = "googleStock",
-                        trainData = googleTrain,
-                        testData = googleTest,
-                        target = "happy",
-											 	featureGenerationCtrl = featureGenerationControl(
-											 										enablePolywalk = TRUE,
-								 													maxFeaturesCount = 50,
-											 										maxFeatureDuration=5),
-											  modelBuildingCtrl = modelBuildingControl(
-										  									algorithmsWhiteList = list("zeroR","RandomForeset")),
-                        autoSave = FALSE
-                    )
-googleModelPolyEval = googleModelPoly$evaluate()
+googleModelAdvanced = learn(projectName = "googleStockAdvanced",
+    trainData = googleTrainTest[[1]],
+    testData = googleTrainTest[[2]],
+    target = "happy",
+	 	featureGenerationCtrl = featureGenerationControl(
+	 				featureSearchMode = "ADVANCED_WITH_PAIRS",
+ 					maxFeaturesCount = 50,
+	 				maxFeatureDuration=5
+	 	),
+	  modelBuildingCtrl = modelBuildingControl(
+  				algorithmsWhiteList = list("RRandomForestClassifier")
+  	),
+    autoSave = FALSE
+)
 ```
 
 ```{r, eval=TRUE, results='asis'}
-print(xtable(googleModelPoly$features()[1:5,c("idx","feature")]), type='html', comment=F) 
-writeLines(googleModelPolyEval$evaluation$summary)
+print(xtable(googleModelAdvanced$features()[1:1,c("idx","feature")]), type='html', comment=F) 
+```
+```{r, eval=TRUE, echo=TRUE, cache=FALSE}
+e=googleModelAdvanced$evaluate()$summary
 ```
 

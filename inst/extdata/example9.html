@@ -861,38 +861,10 @@
   </style>
 </head>
 <body>
-<title>
-Examples
-</title>
 <div id="wrap">
 <div class="container">
 <div class="row row-offcanvas row-offcanvas-right">
 <div class="contents col-xs-12 col-md-10">
-<!--
-%\VignetteEngine{knitr}
-%\VignetteIndexEntry{All examples}
--->
-<!-- 
-  Comment:
-  ========
-  Set eval = FALSE (with spaces) in places that you would like not be to evaluated permanently (i.e., not be capture by the replace all) 
-  Use cache = TRUE to prevent recalculations => stored  per chunk identifier.
--->
-<!-- 
-Write text for all examples
-Show sampling, grouping examples - in a different section
-Show predict / create package etc example - should be in a different section
--->
-<h1 id="spark-beyond-package-examples">Spark Beyond Package Examples</h1>
-<p><br></p>
-<p><br> <br></p>
-<p><br> <br></p>
-<p><br> <br></p>
-<p><br> <br></p>
-<p><br> <br></p>
-<p><br> <br></p>
-<p><br> <br></p>
-<p><br> <br></p>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{Example 9}
@@ -1118,33 +1090,41 @@ true
 </tr>
 </table>
 </div>
-<br> The target variable reflects if the google closing price today was more than the closing price at a critical time point in the past. Let's split the data sequntially and first try a regular model at depth = 2
+<br> The target variable reflects if the google closing price today was more than the closing price at a critical time point in the past. Let's split the data sequntially and first try a regular model at depth =2
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">googleTrainTest = trainTestSplit(googleStock)</code></pre>
+<pre style=""><code class="source r">splitIndex = round(0.8*nrow(googleStock))
+googleTrain = googleStock[1:splitIndex,]
+googleTest = googleStock[(splitIndex+1):nrow(googleStock),]</code></pre>
 </div>
 <br> Please note that we have introduced the featureGenerationCtrl, modelBuildingCtrl and reportingCtrl functions that aggregate all the arguments by domain (feature,model,reporting). You can still directly use old arguments for full backwards compatibility of your code but new features will be added through the Ctrl object.
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">googleModel = learn(
-            projectName = "googleStock",
-      trainData = googleTrainTest[[1]],
-      testData = googleTrainTest[[2]],
-      target = "happy",
-            featureGenerationCtrl = featureGenerationControl(
-                    maxFeaturesCount = 50,
-                    maxFeatureDuration=5
-            ),
-            modelBuildingCtrl = modelBuildingControl(
-                    algorithmsWhiteList = list("RRandomForestClassifier")
-            ),  
-      autoSave = FALSE
-)
+<pre style=""><code class="source r">googleModel = learn(projectName = "googleStock",
+                        trainData = googleTrain,
+                        testData = googleTest,
+                        target = "happy",
+                                                featureGenerationCtrl = featureGenerationControl(
+                                                                                    maxFeaturesCount = 50,
+                                                                                    maxFeatureDuration=5),
+                                            #maxFeatureDuration=5,
+                                                #maxFeaturesCount = 50,   
+                                              modelBuildingCtrl = modelBuildingControl(
+                                                                                algorithmsWhiteList = list("ZeroR","RRandomForestClassifier")),
+                                                #algorithmsWhiteList = list("ZeroR","RRandomForestClassifier")
+                        autoSave = FALSE
+                    )
 googleModelEval = googleModel$evaluate()</code></pre>
+<button class="warning R toggle btn btn-xs btn-warning">
+<span class="glyphicon glyphicon-chevron-down"></span> R warning
+</button>
+<pre style=""><code class="warning r">## Warning in googleModel$evaluate(): Evaluation requires full model building
+## using learn
+</code></pre>
 </div>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -1171,7 +1151,7 @@ feature
 0
 </td>
 <td>
-dateToDouble(date) not in range (1.2633156E+12, 1.279728E+12)
+dateToDouble(date) &lt; 1.2633156E+12
 </td>
 </tr>
 <tr>
@@ -1182,7 +1162,7 @@ dateToDouble(date) not in range (1.2633156E+12, 1.279728E+12)
 1
 </td>
 <td>
-close &gt;= 550.6225
+close &lt; 550.6225
 </td>
 </tr>
 <tr>
@@ -1193,7 +1173,7 @@ close &gt;= 550.6225
 2
 </td>
 <td>
-close_sliding.max &gt;= 590.175
+close_sliding.max &gt;= 593.4
 </td>
 </tr>
 <tr>
@@ -1215,54 +1195,47 @@ derivativeY(close_sliding) contains 2.23
 4
 </td>
 <td>
-maxSlopeFirstHalf(close_sliding) &gt;= 15.479999999999961
+close_sliding contains 554.3
 </td>
 </tr>
 </table>
-</div>
-<div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">e=googleModel$evaluate()$summary</code></pre>
-<button class="output R toggle btn btn-xs btn-success">
-<span class="glyphicon glyphicon-chevron-down"></span> R output
-</button>
-<pre style=""><code class="output r">## === Detailed Accuracy By Class ===
-##                                                                                      
-## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
-##                                                                                      
-## true            0.821     0.071     0.958       0.821    0.885       0.962      0.923
-## false           0.929     0.179     0.722       0.929    0.813       0.962      0.923
-## Weighted Avg.   0.857     0.107     0.88        0.857    0.861       0.962      0.923
-## 
-</code></pre>
+<pre style=""><code class="source r">writeLines(googleModelEval$evaluation$summary)</code></pre>
+<p>== Summary ==</p>
+<p>Correctly Classified Instances 26 60.47% Incorrectly Classified Instances 17 39.53% Total Number of Instances 43</p>
 </div>
 The model does poorly and fails to predict our happy state, now let's enable a deep feature search using polywalk.
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">googleModelAdvanced = learn(projectName = "googleStockAdvanced",
-    trainData = googleTrainTest[[1]],
-    testData = googleTrainTest[[2]],
-    target = "happy",
-        featureGenerationCtrl = featureGenerationControl(
-                    featureSearchMode = "ADVANCED_WITH_PAIRS",
-                    maxFeaturesCount = 50,
-                    maxFeatureDuration=5
-        ),
-      modelBuildingCtrl = modelBuildingControl(
-                algorithmsWhiteList = list("RRandomForestClassifier")
-    ),
-    autoSave = FALSE
-)</code></pre>
+<pre style=""><code class="source r">googleModelPoly = learn(projectName = "googleStock",
+                        trainData = googleTrain,
+                        testData = googleTest,
+                        target = "happy",
+                                                featureGenerationCtrl = featureGenerationControl(
+                                                                                    enablePolywalk = TRUE,
+                                                                                    maxFeaturesCount = 50,
+                                                                                    maxFeatureDuration=5),
+                                              modelBuildingCtrl = modelBuildingControl(
+                                                                            algorithmsWhiteList = list("zeroR","RandomForeset")),
+                        autoSave = FALSE
+                    )
+googleModelPolyEval = googleModelPoly$evaluate()</code></pre>
+<button class="warning R toggle btn btn-xs btn-warning">
+<span class="glyphicon glyphicon-chevron-down"></span> R warning
+</button>
+<pre style=""><code class="warning r">## Warning in googleModelPoly$evaluate(): Evaluation requires full model
+## building using learn
+</code></pre>
 </div>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">print(xtable(googleModelAdvanced$features()[1:1,c("idx","feature")]), type='html', comment=F) </code></pre>
+<pre style=""><code class="source r">print(xtable(googleModelPoly$features()[1:5,c("idx","feature")]), type='html', comment=F) </code></pre>
 <table border="1">
 <tr>
 <th>
@@ -1282,311 +1255,7 @@ feature
 0
 </td>
 <td>
-average(derivativeY(close_sliding).drop(criticalDay)) &lt; -0.04053124999999937
-</td>
-</tr>
-</table>
-</div>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">e=googleModelAdvanced$evaluate()$summary</code></pre>
-<button class="output R toggle btn btn-xs btn-success">
-<span class="glyphicon glyphicon-chevron-down"></span> R output
-</button>
-<pre style=""><code class="output r">## === Detailed Accuracy By Class ===
-##                                                                                     
-## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini
-##                                                                                     
-## true            1         0         1           1        1           1          1   
-## false           1         0         1           1        1           1          1   
-## Weighted Avg.   1         0         1           1        1           1          1   
-## 
-</code></pre>
-</div>
-<p><br> <br></p>
-<!--
-%\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Example 8}
-%\VignetteDepends{xtable}
--->
-<h1 id="example-10---deep-feature-search-complex-sum">Example 10 - Deep Feature Search Complex Sum</h1>
-<p><br> Goal: Complex Sum <br></p>
-<p>Target = (f_1 * Math.log(1.0 + f_1) + f_2 + f_3 + f_4) / 5 <br> Noise = values(f_5 -&gt; f_7) noise random int in 1 to 100</p>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">complexSum = getData("complexSum")
-print(xtable(head(complexSum,n=5)), type='html', comment=F)</code></pre>
-<table border="1">
-<tr>
-<th>
-</th>
-<th>
-f_0
-</th>
-<th>
-f_1
-</th>
-<th>
-f_2
-</th>
-<th>
-f_3
-</th>
-<th>
-f_4
-</th>
-<th>
-f_5
-</th>
-<th>
-f_6
-</th>
-<th>
-f_7
-</th>
-<th>
-tgt
-</th>
-</tr>
-<tr>
-<td align="right">
-1
-</td>
-<td align="right">
-31
-</td>
-<td align="right">
-22
-</td>
-<td align="right">
-39
-</td>
-<td align="right">
-57
-</td>
-<td align="right">
-68
-</td>
-<td align="right">
-55
-</td>
-<td align="right">
-6
-</td>
-<td align="right">
-83
-</td>
-<td align="right">
-52.24
-</td>
-</tr>
-<tr>
-<td align="right">
-2
-</td>
-<td align="right">
-6
-</td>
-<td align="right">
-1
-</td>
-<td align="right">
-94
-</td>
-<td align="right">
-66
-</td>
-<td align="right">
-66
-</td>
-<td align="right">
-12
-</td>
-<td align="right">
-3
-</td>
-<td align="right">
-53
-</td>
-<td align="right">
-46.03
-</td>
-</tr>
-<tr>
-<td align="right">
-3
-</td>
-<td align="right">
-8
-</td>
-<td align="right">
-35
-</td>
-<td align="right">
-33
-</td>
-<td align="right">
-16
-</td>
-<td align="right">
-4
-</td>
-<td align="right">
-72
-</td>
-<td align="right">
-55
-</td>
-<td align="right">
-82
-</td>
-<td align="right">
-16.33
-</td>
-</tr>
-<tr>
-<td align="right">
-4
-</td>
-<td align="right">
-21
-</td>
-<td align="right">
-3
-</td>
-<td align="right">
-8
-</td>
-<td align="right">
-43
-</td>
-<td align="right">
-26
-</td>
-<td align="right">
-87
-</td>
-<td align="right">
-85
-</td>
-<td align="right">
-0
-</td>
-<td align="right">
-21.22
-</td>
-</tr>
-<tr>
-<td align="right">
-5
-</td>
-<td align="right">
-56
-</td>
-<td align="right">
-97
-</td>
-<td align="right">
-11
-</td>
-<td align="right">
-45
-</td>
-<td align="right">
-35
-</td>
-<td align="right">
-98
-</td>
-<td align="right">
-67
-</td>
-<td align="right">
-4
-</td>
-<td align="right">
-69.55
-</td>
-</tr>
-</table>
-</div>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">complexSumModel = learn(projectName = "complexSum",
-        trainData = complexSum,
-        target = "tgt",
-                featureGenerationCtrl = featureGenerationControl(
-                        maxFeaturesCount = 100,
-                        maxFeatureDuration= 5
-                ),
-                modelBuildingCtrl = modelBuildingControl(
-                        algorithmsWhiteList = list("RandomForestRegressor")
-                ),
-        autoSave = FALSE
-    )</code></pre>
-</div>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">complexSumModel$evaluate()$evaluation$rootMeanSquaredError</code></pre>
-<button class="output R toggle btn btn-xs btn-success">
-<span class="glyphicon glyphicon-chevron-down"></span> R output
-</button>
-<pre style=""><code class="output r">## [1] 7.208078
-</code></pre>
-</div>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">complexSumAdvancedModel = learn(
-                    projectName = "complexSumAdvanced",
-          trainData = complexSum,
-          target = "tgt",
-                    featureGenerationCtrl = featureGenerationControl(
-                                featureSearchMode = "DIG_DEEP",
-                                maxFeaturesCount = 100,
-                                maxFeatureDuration=5
-                    ),
-                                modelBuildingCtrl = modelBuildingControl(
-                                algorithmsWhiteList = list("RandomForestRegressor")
-                    ),
-          autoSave = FALSE
-        )</code></pre>
-</div>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">library(xtable)
-print(xtable(complexSumAdvancedModel$features()[1:5,c("idx","feature")]), type='html', comment=F) </code></pre>
-<table border="1">
-<tr>
-<th>
-</th>
-<th>
-idx
-</th>
-<th>
-feature
-</th>
-</tr>
-<tr>
-<td align="right">
-1
-</td>
-<td align="right">
-0
-</td>
-<td>
-rightSlantedWeightedAverage(average(f_3, f_4), pow(f_0, sigmoid(cbrt(f_1)))) &gt;= 46.6919635520674
+average(divDouble(close_sliding, low)) &gt;= 1.021494591773863
 </td>
 </tr>
 <tr>
@@ -1597,7 +1266,7 @@ rightSlantedWeightedAverage(average(f_3, f_4), pow(f_0, sigmoid(cbrt(f_1)))) &gt
 1
 </td>
 <td>
-pow(sin(log10(f_0)), rightSlantedWeightedAverage(f_3, f_1)) &lt; 0.12104896222206225
+modeDouble(close_sliding.map(x =&gt; atan2(low, x))) &lt; 0.7775884812805556
 </td>
 </tr>
 <tr>
@@ -1608,7 +1277,7 @@ pow(sin(log10(f_0)), rightSlantedWeightedAverage(f_3, f_1)) &lt; 0.1210489622220
 2
 </td>
 <td>
-sigmoid(leftSlantedWeightedAverage(leftSlantedGeometricMean(f_0, f_1), average(f_3, f_4))) != 1.0
+derivativeY(close_sliding).drop(criticalDay).min &lt; -17.890000000000015
 </td>
 </tr>
 <tr>
@@ -1619,7 +1288,7 @@ sigmoid(leftSlantedWeightedAverage(leftSlantedGeometricMean(f_0, f_1), average(f
 3
 </td>
 <td>
-leftSlantedGeometricMean(f_0, f_1) &gt;= 46.553181844068064
+softMax(divDouble(close_sliding, round(close))) &lt; 4.385849863929045
 </td>
 </tr>
 <tr>
@@ -1630,23 +1299,17 @@ leftSlantedGeometricMean(f_0, f_1) &gt;= 46.553181844068064
 4
 </td>
 <td>
-leftSlantedWeightedAverage(leftSlantedGeometricMean(f_0, f_1), average(f_3, f_4)) &lt; 43.848948600591235
+dateToDouble(date) &lt; 1.2633156E+12
 </td>
 </tr>
 </table>
-</div>
-<div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">complexSumAdvancedModel$evaluate()$evaluation$rootMeanSquaredError</code></pre>
-<button class="output R toggle btn btn-xs btn-success">
-<span class="glyphicon glyphicon-chevron-down"></span> R output
-</button>
-<pre style=""><code class="output r">## [1] 2.546681
-</code></pre>
+<pre style=""><code class="source r">writeLines(googleModelPolyEval$evaluation$summary)</code></pre>
+<p>== Summary ==</p>
+<p>Correctly Classified Instances 26 60.47% Incorrectly Classified Instances 17 39.53% Total Number of Instances 43</p>
 </div>
-<br> <br>
 </div>
 </div>
 <div class="navbar navbar-fixed-bottom navbar-inverse">
@@ -1684,7 +1347,7 @@ Languages
 Type
 </li>
 <li class="active">
-<a href="#" class="toggle-global output" type="output">output</a>
+<a href="#" class="toggle-global warning" type="warning">warning</a>
 </li>
 <li>
 <a href="#" type="all-output" class="toggle-global">All</a>

@@ -16,44 +16,54 @@ output:
 <br>
 Goal: Complex Sum
 <br>
+
+Target = (f_1 * Math.log(1.0 + f_1) + f_2 + f_3 + f_4) / 5
+<br>
+Noise = values(f_5 -> f_7) noise random int in 1 to 100
+
 ```{r, eval=TRUE, results='asis'}
 complexSum = getData("complexSum")
 print(xtable(head(complexSum,n=5)), type='html', comment=F)
 ```
 ```{r complexSum_example, eval=TRUE, message=FALSE, results='hide'}
-googleModel = learn(projectName = "complexSum",
-                        trainData = complexSum,
-                        target = "tgt",
-											 	featureGenerationCtrl = featureGenerationControl(
-								 													maxFeaturesCount = 100,
-											 										maxFeatureDuration=5),
-											  modelBuildingCtrl = modelBuildingControl(
-											  									algorithmsWhiteList = list("zeroR", "^BoundedRegression$")),
-                        autoSave = FALSE
-                    )
-googleModelEval = frequencyModel$evaluate()
+complexSumModel = learn(projectName = "complexSum",
+        trainData = complexSum,
+        target = "tgt",
+				featureGenerationCtrl = featureGenerationControl(
+						maxFeaturesCount = 100,
+						maxFeatureDuration= 5
+		 		),
+				modelBuildingCtrl = modelBuildingControl(
+						algorithmsWhiteList = list("RandomForestRegressor")
+				),
+        autoSave = FALSE
+    )
+```
+```{r, eval=TRUE, echo=TRUE, cache=FALSE}
+complexSumModel$evaluate()$evaluation$rootMeanSquaredError
 ```
 
-
 ```{r complexSumPoly_example, eval=TRUE, message=FALSE, results='hide'}
-complexSumModel = learn(projectName = "complexSum",
-                        trainData = complexSum,
-                        target = "tgt",
-											 	featureGenerationCtrl = featureGenerationControl(
-											 										enablePolywalk = TRUE,
-											 										digDeep = TRUE,
-								 													maxFeaturesCount = 100,
-											 										maxFeatureDuration=5),
-											  modelBuildingCtrl = modelBuildingControl(
-											  									algorithmsWhiteList = list("zeroR", "^BoundedRegression$")),
-                        autoSave = FALSE
-                    )
-complexSumModelEval = complexSumModel$evaluate()
+complexSumAdvancedModel = learn(
+					projectName = "complexSumAdvanced",
+          trainData = complexSum,
+          target = "tgt",
+					featureGenerationCtrl = featureGenerationControl(
+								featureSearchMode = "DIG_DEEP",
+								maxFeaturesCount = 100,
+								maxFeatureDuration=5
+					),
+								modelBuildingCtrl = modelBuildingControl(
+								algorithmsWhiteList = list("RandomForestRegressor")
+					),
+          autoSave = FALSE
+		)
 ```
 
 ```{r, eval=TRUE, results='asis'}
 library(xtable)
-print(xtable(complexSumModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
-writeLines(gsub("\n","<br>",complexSumModelEval$evaluation$summary))
+print(xtable(complexSumAdvancedModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
 ```
-
+```{r, eval=TRUE, echo=TRUE, cache=FALSE}
+complexSumAdvancedModel$evaluate()$evaluation$rootMeanSquaredError
+```
