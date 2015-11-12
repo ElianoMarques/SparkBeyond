@@ -1,0 +1,80 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{timeSeries_timeWindow}
+%\VignetteDepends{xtable}
+-->
+
+##Adding Time Window##
+
+<br>
+Goal: 
+<br>
+
+```{r timeSeries_timeWindow_X, eval=TRUE, message=FALSE, results='hide'}
+randDate <- function(N, st="2014/01/01", et="2014/12/31") {
+    st <- as.POSIXct(as.Date(st,tz = "EST"),tz = "EST")
+    et <- as.POSIXct(as.Date(et,tz = "EST"),tz = "EST")
+    dt <- as.numeric(difftime(et,st,unit="secs"))
+    ev <- sort(runif(N, 0, dt))
+    strftime(st+ev, format="%m/%d/%Y")
+}
+
+simulateData = function(n = 100, l = 10) {
+    data.table(ID = rep(1:n,l), value = rnorm(n*l), date = randDate(n*l))
+}
+
+
+set.seed(1)
+dataSize = 1000
+tsLength = 10
+data = simulateData(dataSize, tsLength)
+setTimeColumn(data, "date")
+grouped = groupBy(data, c("ID"))
+grouped[, status := sapply(value, function(x) if (mean(x) > 0.5) 1 else 0, simplify = TRUE)]
+
+model = learn(
+	projectName = "ts_test", 
+	trainData = grouped, 
+	target = "status", 
+	weightByClass = TRUE,
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),
+	modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
+	autoSave = FALSE
+)
+```
+
+```{r timeSeries_timeWindow_x, eval=TRUE, results='asis'}
+print(xtable(timeWindowModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
+```
+```{r timeSeries_timeWindow_x, eval=TRUE, echo=TRUE, cache=FALSE}
+timeWindowModelEval = frequencyModel$evaluate()
+```
+
+```{r timeSeries_timeWindow_X, eval=TRUE, message=FALSE, results='hide'}
+simulateData2 = function(n=500, l = 10){
+	data.table(x = 1:n, 
+		y = sapply(1:n, function(i) i%%10 * 0.5 + abs(rnorm(1))), 
+			target = ifelse(i%%n == 0, 1, 0) #alternatively regression - time to failure
+	)
+}
+data = simulateData2()
+context = addTimeWindow(data = data, dateCol = "x", window = 10, unit = "Number", relativeTime = TRUE) 
+#plot(data$x[1:50], data$y[1:50])
+
+model = learn(
+	projectName = "ts_test", 
+	trainData = data, 
+	target = "target", 
+	contextData
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),
+	modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
+	autoSave = FALSE
+)
+```

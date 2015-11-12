@@ -7,23 +7,23 @@ output:
 
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Example 8}
+%\VignetteIndexEntry{timeSeries_frequency}
 %\VignetteDepends{xtable}
 -->
 
+##Adding Time Window##
 
-# Example 8 -  Sliding Time Window #
 <br>
 Goal: Detect frequency changes in a time varying signal
 <br>
-```{r example8_1, eval=TRUE, results='asis'}
+```{r timeSeries_frequency_1, eval=TRUE, results='asis'}
 frequencyChangeDS = getData("frequencyChange")
 timeWindow = 30 # time window to examine
 print(xtable(head(frequencyChangeDS,n=5)), type='html', comment=F)
 ```
 <br>
 Let's take a look at time windows before failures and non-failure:
-```{r example8_2, eval=TRUE, results='asis'}
+```{r timeSeries_frequency_2, eval=TRUE, results='asis'}
 failures = which(frequencyChangeDS$failure==1)
 par(mfrow=c(4,1))
 plot(frequencyChangeDS[(failures[20]-timeWindow):failures[20],]$signal1,type="l",ylab=NA,main = "Failure")
@@ -33,7 +33,7 @@ plot(frequencyChangeDS[(failures[1]-timeWindow-1000):(failures[1]-1000),]$signal
 ```
 <br>
 The differences are clearest in the frequency domain:
-```{r example8_3, eval=TRUE, results='asis'}
+```{r timeSeries_frequency_3, eval=TRUE, results='asis'}
 par(mfrow=c(4,2))
 plot(frequencyChangeDS[(failures[20]-timeWindow):failures[20],]$signal1,type="l",ylab=NA,main = "Failure")
 plot(abs(fft(frequencyChangeDS[(failures[20]-timeWindow):failures[20],]$signal1))[2:(timeWindow/2)],ylab=NA,type="l",main = "Frequency domain")
@@ -50,39 +50,39 @@ plot(abs(fft(frequencyChangeDS[(failures[1]-timeWindow-1000):(failures[1]-1000),
 The failures are characteried by wider band signals and higher frequency ranges
 <br><br>
 In order to model this particular problem the features need to be represented as a windowed time series:
-```{r example8_4, eval=TRUE, results='asis'}
-frequencyChangeDSwindowed = addSlidingTimeWindow(frequencyChangeDS, "date", timeWindow, "day",dateFormat = "%a %b %d %H:%M:%S %z %Y",relativeTime=FALSE)
+```{r timeSeries_frequency_4, eval=TRUE, results='asis'}
+frequencyChangeDSwindowed = addTimeWindow(data = frequencyChangeDS, dateCol = "date", window = timeWindow, unit="Days",dateFormat = "%a %b %d %H:%M:%S %z %Y",relativeTime=FALSE)
 print(xtable(head(frequencyChangeDSwindowed,n=5)), type='html', comment=F)
 ```
 
 <br>
 Now that we have the sliding window column prepared we will split the data temporally to a testing and training set. We will retain only the target and time window information (including the date) in the training and testing data and access the actual signal (and any other columns) in a context dataset (date will serve as a key). The train and test data only hold logical information regarding the time windows which is constructed during matching with the context data set which holds the actual signal. This allows us to construct the windows in memory and we do not need to hold all the overlapping time windows in the training and testing data.
-```{r example8_5, eval=TRUE, results='asis'}
+```{r timeSeries_frequency_5, eval=TRUE, results='asis'}
 temporalSplit = failures[round(length(failures)*0.6)]
-trainData = frequencyChangeDSwindowed[1:temporalSplit,c("date","failure",paste0("last_",timeWindow, "_day"))] # keep only date, target and sliding window parameters
-testData = frequencyChangeDSwindowed[(temporalSplit+1):nrow(frequencyChangeDSwindowed),c("date","failure",paste0("last_",timeWindow, "_day"))] # keep only date, target and sliding window parameters
+trainData = frequencyChangeDSwindowed[1:temporalSplit,c("failure",paste0("last_",timeWindow, "_Days"))] # keep only date, target and sliding window parameters
+testData = frequencyChangeDSwindowed[(temporalSplit+1):nrow(frequencyChangeDSwindowed),c("failure",paste0("last_",timeWindow, "_Days"))] # keep only date, target and sliding window parameters
 contextData = frequencyChangeDSwindowed[,c("date","signal1")] # keep only the key (date in our case) and all other signals/columns
 ```
 
-```{r example8_6, eval=TRUE, message=FALSE, results='hide'}
+```{r timeSeries_frequency_6, eval=TRUE, message=FALSE, results='hide'}
 contextDataPth = writeToServer(contextData)
-frequencyModel = learn(projectName = "frequency_change_example",
-                        functionsBlackList = list("Tuple2","date"),
-                        trainData = trainData,
-                        testData = testData,
-                        target = "failure",
-                        algorithmsWhiteList = list("RRandomForestClassifier"),  
-                        maxFeaturesCount = 50,                        
-                        contextDatasets = list(contextDataPth),
-                        autoSave = FALSE,maxDepth = 3
-                    )
+frequencyModel = learn(
+		projectName = "frequency_change_example",
+    trainData = trainData,
+    testData = testData,
+    target = "failure",
+    contextDatasets = list(contextObject(data = contextDataPth, name = "signals")),
+		featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),                                  
+    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
+    autoSave = FALSE
+)
 ```
 
 The model finds the exact anomolies causing the failure: frequency content outside the range of the carrier signal as well as gradient and slope changes.
-```{r example8_7, eval=TRUE, results='asis'}
+```{r timeSeries_frequency_7, eval=TRUE, results='asis'}
 library(xtable)
 print(xtable(frequencyModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
 ```
-```{r example8_8, eval=TRUE, echo=TRUE, cache=FALSE}
+```{r timeSeries_frequency_8, eval=TRUE, echo=TRUE, cache=FALSE}
 frequencyModelEval = frequencyModel$evaluate()
 ```

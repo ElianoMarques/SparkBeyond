@@ -7,11 +7,14 @@ output:
 
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Example 6}
+%\VignetteIndexEntry{external_weather}
 %\VignetteDepends{xtable}
 -->
 
-# Example 6 - Features combining customGraphs and weather API #
+##External datasets and APIs##
+
+###Combining airports locations and weather API###
+
 Goal: Flights weather delay
 In this example we use data from Kaggle that contains information of flight delays caused due to weather conditions.
 
@@ -19,7 +22,7 @@ This example will show how airport codes (in fields `origin`, `dest`) are automa
 Moreover, when elements of type date and location are encountered during the feature search, external data including NOAA weather are examined for their distinctive power.
 The first run may take more time as weather data will be downloaded and cached. 
 <br>
-```{r example6_1, eval=TRUE, results='asis'}
+```{r external_weather_1, eval=TRUE, results='asis'}
 library(xtable)
 flights = getData("flights_delay")
 airports = getData("airports")
@@ -30,18 +33,20 @@ print(xtable(tail(airports,n=5)), type='html', comment=F) # show the airport dat
 The airport data will be loaded automatically as a customGraph but you could explicitly send it using contextDatasets (as in Example 5). Regardless of modality (customGraph or contextDatasets) the functionality is identical and the engine will automatically detect relevant columns in the airport data (or any other dataset)
 <br>
 
-```{r example6_2, eval=TRUE, message=FALSE, results='hide'}
+```{r external_weather_2, eval=TRUE, message=FALSE, results='hide'}
 flightSampled = sampleDataAbsolute(flights,5000)
-flightsModel = learn(projectName = "flights_delay_example",
-                        trainData = flightSampled,
-                        target = "weatherDelay",
-                        useCustomGraphs = TRUE, 
-                        algorithmsWhiteList = list("RXGBoostRegressor"),
-                        functionsBlackList = list("trigonometry"),
-                        maxFeaturesCount = list(30),
-                        autoSave = FALSE,
-                        evaluationMetric = "RMSE"
-                    )
+flightsModel = learn(
+		projectName = "flights_delay_example",
+    trainData = flightSampled,
+    target = "weatherDelay",
+    featureGenerationCtrl = featureGenerationControl(
+			useCustomGraphs = TRUE, 
+			maxFeaturesCount = list(30),
+			functionsBlackList = list("trigonometry")
+		),
+    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RXGBoostRegressor")),    
+    autoSave = FALSE
+)
 flightsModelEval = flightsModel$evaluate()
 ```
 <br>
@@ -52,13 +57,13 @@ Note that in this example:
 2. Running using the entire flights data can take a long time due to the Weather API downloading approporaite data for each location (but should achieve better results).
 <br>
 
-```{r example6_3, eval=TRUE, results='asis'}
+```{r external_weather_3, eval=TRUE, results='asis'}
 library(xtable)
 print(xtable(flightsModel$features()[1:20,c("idx","feature")]), type='html', comment=F) 
 writeLines(gsub("\n","<br>",flightsModelEval$evaluation$summary))
 ```
 
-```{r example6_4, eval = TRUE, message=FALSE}
+```{r external_weather_4, eval = TRUE, message=FALSE}
 writeLines(readLines(paste0(flightsModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))
 ```
 

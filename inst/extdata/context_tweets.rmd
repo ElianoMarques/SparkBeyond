@@ -1,0 +1,71 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{context_tweets}
+%\VignetteDepends{xtable}
+-->
+
+##Context - terms map - sentiment analysis##
+
+Goal: Identify sentiment in twitter tweets.
+<br>
+
+###Tweets sentiment ###
+
+```{r context_tweets_1, eval=TRUE, message=FALSE, results='hide'}
+tweets = getData("tweets_sentiment")
+SentimentModel = learn(
+		projectName="tweets",
+		trainData=tweets,
+		target="sentiment",
+		featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50)),    
+		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
+		autoSave = FALSE
+)
+SentimentEval = SentimentModel$evaluate()
+```
+<br>
+In this example we load a sentiment dataset with a tweet column and a setiment target (-1 or 1). The top feature is a textSentimentScore which is automatically computed.
+
+```{r context_tweets_2, eval=TRUE, results='asis'}
+print(xtable(SentimentModel$features()[1:10,c("idx","feature")]), type='html', comment=F)
+```
+```{r context_tweets_3, eval=TRUE, echo=TRUE, cache=FALSE}
+SentimentModelEval = SentimentModel$evaluate()
+```
+<br>
+
+###Tweets with a context dataset that creates a terms map###
+
+```{r context_tweets_4, eval=TRUE, message=FALSE, results='hide'}
+tweets = getData("tweets_sentiment")
+SentimentModelContext = learn(
+		projectName = "tweets",
+		trainData = tweets,
+		target = "sentiment",
+		contextDatasets = list(contextObject(data = getData("sentiment_lexicon"), name = "sentiment_lexicon")),
+		featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50)),    
+		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
+		autoSave = FALSE    
+)
+```
+<br>
+
+In order to improve performance we can include a custom context Dataset. The sentimentLexicon includes over 6000 single words with a either a positive or negative sentiment. The top features now are actually derived by looking up the values in the lexcion (data_column) and the classificaiton performance is boosted.
+
+```{r context_tweets_5, eval=TRUE, results='asis'}
+print(xtable(SentimentModelContext$features()[1:10,c("idx","feature")]), type='html', comment=F) 
+```
+
+```{r context_tweets_6, eval = FALSE, message=FALSE}
+writeLines(readLines(paste0(SentimentModelContext$artifact_loc,"/reports/features/features_trace.txt"),n=9))
+```
+```{r context_tweets_7, eval=TRUE, echo=TRUE, cache=FALSE}
+SentimentContextEval = SentimentModelContext$evaluate()
+```

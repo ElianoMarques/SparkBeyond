@@ -1,0 +1,66 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{advanced_complexSum}
+%\VignetteDepends{xtable}
+-->
+
+##Deep feature search with many interactions##
+
+<br>
+Goal: Complex Sum
+<br>
+
+Target = (f_1 * Math.log(1.0 + f_1) + f_2 + f_3 + f_4) / 5
+<br>
+Noise = values(f_5 -> f_7) noise random int in 1 to 100
+
+```{r advanced_complexSum_1, eval=TRUE, results='asis'}
+complexSum = getData("complexSum")
+print(xtable(head(complexSum,n=5)), type='html', comment=F)
+```
+
+```{r advanced_complexSum_2, eval=TRUE, message=FALSE, results='hide'}
+complexSumModel = learn(
+		projectName = "complexSum",
+    trainData = complexSum,
+    target = "tgt",
+		featureGenerationCtrl = featureGenerationControl(
+				maxFeaturesCount = 25,
+ 		),
+		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RandomForestRegressor")),
+    autoSave = FALSE
+)
+```
+
+```{r advanced_complexSum_3, eval=TRUE, echo=TRUE, cache=FALSE}
+complexSumModel$evaluate()$evaluation$rootMeanSquaredError
+```
+
+```{r advanced_complexSum_model_4, eval=TRUE, message=FALSE, results='hide'}
+complexSumAdvancedModel = learn(
+		projectName = "complexSumAdvanced",
+    trainData = complexSum,
+    target = "tgt",
+		featureGenerationCtrl = featureGenerationControl(
+					featureSearchMode = "DIG_DEEP",
+					maxFeaturesCount = 25
+		),
+		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RandomForestRegressor")),
+		autoSave=FALSE
+)
+```
+
+```{r advanced_complexSum_5, eval=TRUE, results='asis'}
+print(xtable(complexSumAdvancedModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
+```
+
+```{r advanced_complexSum_6, eval=TRUE, echo=TRUE, cache=FALSE}
+complexSumAdvancedModel$evaluate()$evaluation$rootMeanSquaredError
+```

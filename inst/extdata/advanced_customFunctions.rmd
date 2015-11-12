@@ -7,36 +7,39 @@ output:
 
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Example 7}
+%\VignetteIndexEntry{advanced_customFunctions}
 %\VignetteDepends{xtable}
 -->
 
+##Add custom functions##
 
-# Example 7 -  Add custom functions #
 Goal: Identify numbers that are multiples of 7 You can create your own functions, which will be used as building blocks during the feature search. All you need to do, is to specify the url/s of the source files containing the custom functions code (currently only Scala is supported). The file can be local (on the server) or on the web.
 
 <br>
-```{r example7_1, eval=TRUE, results='asis'}
+```{r advanced_customFunctions_1, eval=TRUE, results='asis'}
 data = data.frame(number = 1:500, target = 1:500 %% 7 == 0)
 ```
 
 
-```{r example7_2, eval=TRUE, message=FALSE, results='hide'}
+```{r advanced_customFunctions_2, eval=TRUE, message=FALSE, results='hide'}
 modModel = learn(projectName = "custom_function_example",
-                        trainData = data,
-                        target = "target",
-                        algorithmsWhiteList = list("RRandomForestClassifier"),  
-                        maxFeaturesCount = 5,                        
-                        customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala"),
-                        autoSave = FALSE
-                    )
+    trainData = data,
+    target = "target",
+    featureGenerationCtrl = featureGenerationControl(
+    	maxFeaturesCount = 5,                        
+    	# using a function from the web in the following url
+    	customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala")
+    ),
+    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
+    autoSave = FALSE
+)
 ```
 
-```{r example7_3, eval=TRUE, results='asis'}
+```{r advanced_customFunctions_3, eval=TRUE, results='asis'}
 modModel$features()[1:1,c("idx","feature")]
 ```
 
-```{r example7_4, echo=FALSE,eval = FALSE, message=FALSE}
+```{r advanced_customFunctions_4, echo=FALSE,eval = FALSE, message=FALSE}
 writeLines(readLines(paste0(modModel$artifact_loc,"/reports/features/features_trace.txt"),n=7))
 ```
 

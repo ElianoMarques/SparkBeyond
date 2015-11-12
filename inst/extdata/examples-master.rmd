@@ -16,6 +16,11 @@ output:
   ========
   Set eval = FALSE (with spaces) in places that you would like not be to evaluated permanently (i.e., not be capture by the replace all) 
   Use cache = TRUE to prevent recalculations => stored  per chunk identifier.
+  
+  To geneate examples:
+  library(knitrBootstrap)
+	library(rmarkdown)
+	render('./SparkBeyond/inst/extdata/examples-master.rmd', 'knitrBootstrap::bootstrap_document')
 --> 
 
 <!-- 
@@ -24,46 +29,99 @@ Show sampling, grouping examples - in a different section
 Show predict / create package etc example - should be in a different section
 -->
 
-# Spark Beyond Package Examples #
+#Spark Beyond Package Examples#
 
 <br>
-```{r example1, child='example1.rmd', eval = TRUE, cache=TRUE}
+
+#A. Basic modeling#
+```{r basic_classification, child='basic_classification.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
-```{r example2, child='example2.rmd', eval = TRUE, cache=TRUE}
+```{r basic_regression, child='basic_regression.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
-```{r example3, child='example3.rmd', eval = TRUE, cache=TRUE}
+
+#B. Basic feature generation controls#
+
+```{r featureGeneration_featureExclusions, child='featureGeneration_featureExclusions.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
-```{r example4, child='example4.rmd', eval = TRUE, cache=TRUE}
+
+#C. Using SparkBeyond knowledge#
+
+```{r external_weather, child='external_weather.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
-```{r example5, child='example5.rmd', eval = TRUE, cache=TRUE}
+
+#D. Model with complex data structures#
+
+##Coming soon.##
+
+<br>
+<br>
+
+#E. Add context to modeling#
+
+```{r context_tweets, child='context_tweets.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
-```{r example6, child='example6.rmd', eval = TRUE, cache=TRUE}
+
+
+#F. Time series analysis#
+
+```{r timeSeries_frequency, child='timeSeries_frequency.rmd', eval = TRUE, cache=TRUE}
+```
+
+<br>
+<br>
+
+#G. Advanced feature controls#
+
+<br>
+<br>
+```{r advanced_google, child='advanced_google.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
-```{r example7, child='example7.rmd', eval = TRUE, cache=TRUE}
+```{r advanced_complexSum, child='advanced_complexSum.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
-```{r example8, child='example8.rmd', eval = FALSE, cache=TRUE}
+```{r advanced_crossRow, child='advanced_crossRow.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
-```{r example9, child='example9.rmd', eval = TRUE, cache=TRUE}
+```{r advanced_customFunctions, child='advanced_customFunctions.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
-```{r example10, child='example10.rmd', eval = TRUE, cache=TRUE}
-```
+
+#H. Unsupervised learning#
+
 <br>
 <br>
+
+##Coming soon.##
+
+<br>
+<br>
+<br>
+<br>
+
+#I. More info#
+
+<br>
+<br>
+For more information please check:
+
+ * `tutorial()`   : [Getting started tutorial](https://s3.amazonaws.com/public-sparkbeyond/tutorial.html)
+ * `examples()`   : [These examples](https://s3.amazonaws.com/public-sparkbeyond/examples-master.html)
+ * `SBhelp()`       : [html help of this package](https://s3.amazonaws.com/public-sparkbeyond/SBadapterDocs/index.html)
+ * `faq()`        : [Frequently Asked Quetions](https://docs.google.com/document/d/1MfUduRR2jZiLaZPfc8Q68ijvWctjNKgg7smeqEoH9yk/pub) 
+ * `reportsList()`: [explantion of all the reports produced by the SparkBeyond engine](https://docs.google.com/document/d/16ogU45DHrW0x_BVLS5TiyPMblORUGSxaScR8i_lIDI0) 
+ * `resources()`  : [various SparkBeyond resources](https://docs.google.com/document/d/1wF7EkdyEB8409blpkianOyQxvi-OWasVEGegdLk-MOI/pub)

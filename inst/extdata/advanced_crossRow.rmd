@@ -7,42 +7,46 @@ output:
 
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Example 4}
+%\VignetteIndexEntry{advanced_crossRow}
 %\VignetteDepends{xtable}
 -->
-# Example 4 - cross row search #
+
+##Cross row search ##
+
 Goal: Identify changes in density of specific rows
 <br>
 In this example, we will generate 500 random points in Euclidean space, and we will set as target for each point, the inverse of the minimal distance from all other points. 
 <br>
-```{r example4_1, eval=TRUE, message=FALSE, results='hide'}
+```{r advanced_crossRow_1, eval=TRUE, message=FALSE, results='hide'}
 n = 500
 data = data.table(lat=runif(n), long = runif(n))
 data[,target:=sapply(1:n, function(i) 1/min({a = (data$lat[i]-data$lat)^2+(data$long[i]-data$long)^2; a[i] = Inf;a}))]
 densityModel = learn(projectName = "density_example",
-                        trainData = data,
-                        target = "target",
-                        algorithmsWhiteList = list("RRandomForestRegressor"),  
-                        crossRowFeatureSearch = TRUE,  # indicates that points from all rows should be
-                                                       # considered together during feature search
-                        maxFeaturesCount = 5,
-                        maxDepth = 3,                               # allowing a higher search space depth
-                        functionsBlackList = list("trigonometry"),  # blacklist trigonometric functions
-                        autoSave = FALSE
-                    )
+    trainData = data,
+    target = "target",
+ 		featureGenerationCtrl = featureGenerationControl(
+ 			# indicates that points from all rows should be considered together during feature search
+    	crossRowFeatureSearch = TRUE,  
+      maxFeaturesCount = 5,
+    	maxDepth = 3,                               # allowing a higher search space depth
+    	functionsBlackList = list("trigonometry")  # blacklist trigonometric functions
+    ),
+    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestRegressor")),
+    autoSave = FALSE
+)
 ```
 <br>
 Note that in this example:
 <br>
 1. While we provided the columns `lat` and `long` as two separate columns, a new feature named `latLong` was created that can operate in the 2D space.
 2. The resulting best feature was able to capture our target by being able to generate features using the entire column information.
-```{r example4_2, eval=TRUE, results='asis'}
+```{r advanced_crossRow_2, eval=TRUE, results='asis'}
 library(xtable)
 topFeatures = densityModel$features()[1:3,c("idx","feature")]
 print(xtable(topFeatures), type='html', comment=F) 
 ```
 
-```{r example4_3, eval = TRUE, message=FALSE}
+```{r advanced_crossRow_3, eval = TRUE, message=FALSE}
 writeLines(readLines(paste0(densityModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))
 ```
 

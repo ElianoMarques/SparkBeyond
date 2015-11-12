@@ -7,54 +7,52 @@ output:
 
 <!--
 %\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{Example 9}
+%\VignetteIndexEntry{advanced_google}
 %\VignetteDepends{xtable}
 -->
 
+##Deep feature search with pairs##
 
-# Example 9 -  Deep Feature Search Google Stock#
 <br>
 Goal: identify dependencies across variables and time series (Google Stock)
 <br>
-```{r example9_1, eval=TRUE, results='asis'}
+```{r advanced_google_1, eval=TRUE, results='asis'}
 googleStock = getData("googleStock")
 print(xtable(head(googleStock,n=5)), type='html', comment=F)
 ```
 <br>
 The target variable reflects if the google closing price today was more than the closing price at a critical time point in the past.
 Let's split the data sequntially and first try a regular model at depth = 2
-```{r example9_2, eval=TRUE, results='asis'}
+```{r advanced_google_2, eval=TRUE, results='asis'}
 googleTrainTest = trainTestSplit(googleStock)
 ```
 <br>
-```{r example9_3, eval=TRUE, message=FALSE, results='hide'}
+```{r advanced_google_3, eval=TRUE, message=FALSE, results='hide'}
 googleModel = learn(
-			projectName = "googleStock",
-      trainData = googleTrainTest[[1]],
-      testData = googleTrainTest[[2]],
-      target = "happy",
-			featureGenerationCtrl = featureGenerationControl(
- 					maxFeaturesCount = 50,
-					maxFeatureDuration=5
- 			),
-			modelBuildingCtrl = modelBuildingControl(
-					algorithmsWhiteList = list("RRandomForestClassifier")
-			),	
-      autoSave = FALSE
+		projectName = "googleStock",
+    trainData = googleTrainTest[[1]],
+    testData = googleTrainTest[[2]],
+    target = "happy",
+		featureGenerationCtrl = featureGenerationControl(
+ 				maxFeaturesCount = 50,
+				maxFeatureDuration=5
+ 		),
+		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),	
+    autoSave = FALSE
 )
 googleModelEval = googleModel$evaluate()
 ```
 
-```{r example9_4, eval=TRUE, results='asis'}
+```{r advanced_google_4, eval=TRUE, results='asis'}
 library(xtable)
 print(xtable(googleModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
 ```
-```{r example9_5, eval=TRUE, echo=TRUE, cache=FALSE}
+```{r advanced_google_5, eval=TRUE, echo=TRUE, cache=FALSE}
 e=googleModel$evaluate()$summary
 ```
 
 Now let's enable a deep feature search using an advanced feature search with pairs.
-```{r example9_6, eval=TRUE, message=FALSE, results='hide'}
+```{r advanced_google_6, eval=TRUE, message=FALSE, results='hide'}
 googleModelAdvanced = learn(projectName = "googleStockAdvanced",
     trainData = googleTrainTest[[1]],
     testData = googleTrainTest[[2]],
@@ -64,17 +62,15 @@ googleModelAdvanced = learn(projectName = "googleStockAdvanced",
  					maxFeaturesCount = 50,
 	 				maxFeatureDuration=5
 	 	),
-	  modelBuildingCtrl = modelBuildingControl(
-  				algorithmsWhiteList = list("RRandomForestClassifier")
-  	),
+	  modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
     autoSave = FALSE
 )
 ```
 
-```{r example9_7, eval=TRUE, results='asis'}
+```{r advanced_google_7, eval=TRUE, results='asis'}
 print(xtable(googleModelAdvanced$features()[1:1,c("idx","feature")]), type='html', comment=F) 
 ```
-```{r example9_8, eval=TRUE, echo=TRUE, cache=FALSE}
+```{r advanced_google_8, eval=TRUE, echo=TRUE, cache=FALSE}
 e=googleModelAdvanced$evaluate()$summary
 ```
 

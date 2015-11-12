@@ -112,6 +112,17 @@ reportingControl = function(
 	)
 }
 
+#' contextObject
+#' 
+contextObject = function(data, name = NULL, keyColumns = list(), timeColumn = NULL) { #TODO: help
+	#if data is data frame write it, otherwise it's a path - same for learn.file
+	obj = list(data = data, name=name, keyColumns = keyColumns, timeColumn=timeColumn)
+	class(obj) = "contextObject"
+	obj
+}
+
+
+
 #' learn.file
 #' 
 #' Runs SparkBeyond feature enrichment and learning process.
@@ -132,22 +143,23 @@ reportingControl = function(
 #' @return Session object that encapsulates the model.
 #' @examples
 #' #session = learn("titanic", titanic_file_path, target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
-learn.file <- function(projectName = "temp",
-				 trainDataFilename,
-				 target,
-				 testDataFilename = NA,
-				 trainTestSplitRatio = 0.8,
-				 weightColumn = NA,
-				 weightByClass = FALSE,
-				 contextDatasets = NA,
-				 featureGenerationCtrl = featureGenerationControl(),
-				 modelBuildingCtrl = modelBuildingControl(),
-				 reportingCtrl = reportingControl(),
-				 verbose = FALSE,
-				 fileEncoding = NA,
-				 autoSave = TRUE,
-				 runBlocking = TRUE,
-				 ...
+learn.file <- function(
+			 projectName = "temp",
+			 trainDataFilename,
+			 target,
+			 testDataFilename = NA,
+			 trainTestSplitRatio = 0.8,
+			 weightColumn = NA,
+			 weightByClass = FALSE,
+			 contextDatasets = NA,
+			 featureGenerationCtrl = featureGenerationControl(),
+			 modelBuildingCtrl = modelBuildingControl(),
+			 reportingCtrl = reportingControl(),
+			 verbose = FALSE,
+			 fileEncoding = NA,
+			 autoSave = TRUE,
+			 runBlocking = TRUE,
+			 ...
 ){
 	isLatestVersion()
 	isLatestRpackage()
@@ -166,6 +178,15 @@ learn.file <- function(projectName = "temp",
 	url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
 	print(paste("Calling:", url))
 	
+	if (!is.na(contextDatasets)){ #writing context data to server if necessary
+		if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
+		for (i in 1:length(contextDatasets)) {
+			contextDatasets[[i]]$data = writeToServer(contextDatasets[[i]]$data, 
+				prefix = paste0(projectName,"_context", ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),""))
+			)
+		}
+	}
+	
 	params <-list(projectName = projectName,
 								trainingFilePath = trainDataFilename,
 								target = target,
@@ -176,8 +197,8 @@ learn.file <- function(projectName = "temp",
 								contextDatasets = contextDatasets,
 								
 								featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,
-								hints = if(!is.null(extraParams$functionsWhiteList)) extraParams$functionsWhiteList else featureGenerationCtrl$functionsWhiteList, #changed naming
-								sessionBlackList = if(!is.null(extraParams$functionsBlackList)) extraParams$functionsBlackList else featureGenerationCtrl$functionsBlackList, #changed naming
+								functionsWhiteList = if(!is.null(extraParams$functionsWhiteList)) extraParams$functionsWhiteList else featureGenerationCtrl$functionsWhiteList, 
+								functionsBlackList = if(!is.null(extraParams$functionsBlackList)) extraParams$functionsBlackList else featureGenerationCtrl$functionsBlackList, 
 								booleanNumericFeatures = if(!is.null(extraParams$booleanNumericFeatures)) extraParams$booleanNumericFeatures else featureGenerationCtrl$booleanNumericFeatures,
 								numericEqualityFeatures = if(!is.null(extraParams$numericEqualityFeatures)) extraParams$numericEqualityFeatures else featureGenerationCtrl$numericEqualityFeatures,
 								allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGenerationCtrl$allowRangeFeatures,
@@ -188,10 +209,10 @@ learn.file <- function(projectName = "temp",
 								customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else featureGenerationCtrl$customGraphsBlackList,
 								customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else featureGenerationCtrl$customFunctions,
 								crossRowFeatureSearch = if(!is.null(extraParams$crossRowFeatureSearch)) extraParams$crossRowFeatureSearch else featureGenerationCtrl$crossRowFeatureSearch,
-								globalFeatureIterations = if(!is.null(extraParams$maxFeaturesCount)) extraParams$maxFeaturesCount else featureGenerationCtrl$maxFeaturesCount, #changed naming
+								maxFeaturesCount = if(!is.null(extraParams$maxFeaturesCount)) extraParams$maxFeaturesCount else featureGenerationCtrl$maxFeaturesCount, 
 								autoColumnSubSets = if(!is.null(extraParams$autoColumnSubSets)) extraParams$autoColumnSubSets else featureGenerationCtrl$autoColumnSubSets,
 								customColumnSubsets = if(!is.null(extraParams$customColumnSubsets)) extraParams$customColumnSubsets else featureGenerationCtrl$customColumnSubsets,
-								maxTimePerRowMillis = if(!is.null(extraParams$maxFeatureDuration)) extraParams$maxFeatureDuration else featureGenerationCtrl$maxFeatureDuration, #changed naming
+								maxFeatureDuration = if(!is.null(extraParams$maxFeatureDuration)) extraParams$maxFeatureDuration else featureGenerationCtrl$maxFeatureDuration, 
 								overrideMaxFeatureDurationForExternalData = if(!is.null(extraParams$overrideMaxFeatureDurationForExternalData)) extraParams$overrideMaxFeatureDurationForExternalData else featureGenerationCtrl$overrideMaxFeatureDurationForExternalData,
 								useCachedFeatures = if(!is.null(extraParams$useCachedFeatures)) extraParams$useCachedFeatures else featureGenerationCtrl$useCachedFeatures,
 								allocatedMemoryMB = if(!is.null(extraParams$allocatedMemoryMB)) extraParams$allocatedMemoryMB else featureGenerationCtrl$allocatedMemoryMB,
@@ -285,16 +306,6 @@ learn.file <- function(projectName = "temp",
 #' head(flightsModel$features)
 #' }
 
-# contextObject = function(a=3) { obj = list(a)
-# 																class(obj) = "contextObject"
-# 																obj
-# }
-# obj1 = contextObject()
-# obj1
-# is(obj1, "contextObject")
-
-# f2 = function(...) {l=list(...); ifelse("a" %in% names(l),l$a,NA)}
-
 learn <- function(projectName = "temp",
 									trainData,
 									target,
@@ -378,7 +389,7 @@ featureSearch <- function(projectName = "temp",
 								autoSave = autoSave,
 								runBlocking = runBlocking
 								)
-	model = do.call(learn,c(params, algorithmsWhiteList = list("ZeroR"), ...))
+	model = do.call(learn,c(params, algorithmsWhiteList = list("ZeroR"), ...)) #what about regression problem? use lm?
 	model$modelBuilt = FALSE
 	model
 }
@@ -435,18 +446,25 @@ featureSearch.file <- function(projectName = "temp",
 #' @param data Data frame or table to export to the server.
 #' @param filename: Optional. define a name to save the data to. NA by default.
 #' @return A filepath to the file on the server that was created.
-writeToServer = function(data, filename = NA, prefix = "data_in"){
-	final_filename = if (is.na(filename)) {
-			hash = digest(data)
-			final_filename = paste0(getSBserverIOfolder(), prefix, "_", hash, ".tsv") 
-			final_filename = gsub("/+", "/", final_filename)
-			if (!file.exists(final_filename)) writeToFile(data, final_filename) #due to hashing we rewrite file only if data has changed
-			final_filename		
-		} else {
-			final_filename = paste0(getSBserverIOfolder(), filename)
-			final_filename = gsub("/+", "/", final_filename)
-			writeToFile(data, final_filename)
-			final_filename
+writeToServer = function(data, filename = NA, prefix = "data_in"){ #TODO: if data is data.frame continue with current logic, otherwise check if it string and fits file location return it
+	final_filename = if ("data.frame" %in% class(data)){ # we got a data.frame object to be written to server
+		if (is.na(filename)) { # no specific name was provided - use digest to refrain from rewriting to server
+				hash = digest(data)
+				new_filename = paste0(getSBserverIOfolder(), prefix, "_", hash, ".tsv") 
+				new_filenamee = gsub("/+", "/", new_filename)
+				if (!file.exists(new_filename)) writeToFile(data, new_filename) #due to hashing we rewrite file only if data has changed
+				new_filename		
+			} else {			# specific name was provided - rewrite file to server
+				new_filename = paste0(getSBserverIOfolder(), filename)
+				new_filename = gsub("/+", "/", new_filename)
+				writeToFile(data, new_filename)
+				new_filename
+			}
+	} else { # a filename was provided as data - check if exists and return it
+		SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+		if (!grepl(SBdir, data)) data = paste0(getSBserverIOfolder(), data)
+		if (!file.exists(data)) stop(print(paste("Provided path:", data, "does not exist")))
+		data
 	}
 	return (final_filename)
 }
