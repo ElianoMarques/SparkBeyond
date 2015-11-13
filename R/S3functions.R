@@ -217,8 +217,8 @@ learn.file <- function(
 								useCachedFeatures = if(!is.null(extraParams$useCachedFeatures)) extraParams$useCachedFeatures else featureGenerationCtrl$useCachedFeatures,
 								allocatedMemoryMB = if(!is.null(extraParams$allocatedMemoryMB)) extraParams$allocatedMemoryMB else featureGenerationCtrl$allocatedMemoryMB,
 								maxCollectionSize = if(!is.null(extraParams$maxCollectionSize)) extraParams$maxCollectionSize else featureGenerationCtrl$maxCollectionSize,
+								maxDepth = if(!is.null(extraParams$maxDepth)) extraParams$maxDepth else featureGenerationCtrl$maxDepth,
 								
-								maxDepth = if(!is.null(extraParams$maxDepth)) extraParams$maxDepth else modelBuildingCtrl$maxDepth,
 								algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuildingCtrl$algorithmsWhiteList,
 								evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuildingCtrl$evaluationMetric,
 								crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuildingCtrl$crossValidation,
