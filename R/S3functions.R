@@ -114,6 +114,10 @@ reportingControl = function(
 
 #' contextObject
 #' 
+#' @param data: a data frame or a path to a file containing the context data
+#' @param name: an identifier for the context object to be created (optional).
+#' @param keyColumns: Specify the key columns to be used by the context object (optional).
+#' @param timeColumn: Specify the time column to be used by the context object (optional).
 contextObject = function(data, name = NULL, keyColumns = list(), timeColumn = NULL) { #TODO: help
 	#if data is data frame write it, otherwise it's a path - same for learn.file
 	obj = list(data = data, name=name, keyColumns = keyColumns, timeColumn=timeColumn)
@@ -446,7 +450,7 @@ featureSearch.file <- function(projectName = "temp",
 #' @param data Data frame or table to export to the server.
 #' @param filename: Optional. define a name to save the data to. NA by default.
 #' @return A filepath to the file on the server that was created.
-writeToServer = function(data, filename = NA, prefix = "data_in"){ #TODO: if data is data.frame continue with current logic, otherwise check if it string and fits file location return it
+writeToServer = function(data, filename = NA, prefix = "data_in"){ #TODO: deal with spaces in prefix
 	final_filename = if ("data.frame" %in% class(data)){ # we got a data.frame object to be written to server
 		if (is.na(filename)) { # no specific name was provided - use digest to refrain from rewriting to server
 				hash = digest(data)
