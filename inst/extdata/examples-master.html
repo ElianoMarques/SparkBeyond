@@ -2467,13 +2467,405 @@ entitiesHistogram(tweet, sentiment_lexicon) == Map((-1, 1))
 </code></pre>
 </div>
 <p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{context_geoSpatial}
+%\VignetteDepends{xtable}
+-->
+<h2 id="geo-spatial">Geo spatial</h2>
+<p>Using Geospatial KNN in order to infer from near by locations that have similar properties. <br> The input dataset contains locations in the world (based on a lat/long) and the language spoken at this location (for top 15 most spoken languages). <br> In this example we pass the input also as a context data. A GeoSpatial Index object will be created, keeping properties for each latitude and longitude that were provided. A set of KNN based functions can be triggered for the geoSpatial index object, that can collect and aggregate properties from near by locations. Note that the actual location is not used to prevent target leaks.</p>
+<!-- 
+langFull = data.table(getData("languages")) # get full data from "/Users/sagiedavidovich/Google Drive/data/datasets/public/lang-long-lat.csv"
+a = groupBy(langFull, "lang")
+b =colSizes(a)
+rownames(b) = a$lang
+c = b[order(b[,2],decreasing = TRUE),
+names = rownames(c[1:10,])      #FAILS with 10 - USState is identified as label type AND enrichment fails in Enricher:254
+langFiltered = langFull[lang %in% names]
+langData=sampleData(langFiltered, 0.05)
+-->
+<br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">langData =  getData("languages")
+languagesModel = learn(
+    projectName = "languages", 
+    trainData = langData, 
+    target = "lang", 
+    contextDatasets = list(contextObject(data=langData, name="languages")),
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),
+    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
+    autoSave = FALSE
+)</code></pre>
+</div>
+<br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">languagesModelEval = languagesModel$evaluate()</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## === Detailed Accuracy By Class ===
+##                                                                                       
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini  
+##                                                                                       
+## und             0         0.001     0           0        0           0.483      -0.034
+## in              0.777     0.032     0.663       0.777    0.715       0.941      0.882 
+## ar              0.875     0.007     0.764       0.875    0.816       0.95       0.9   
+## fr              0.636     0.006     0.761       0.636    0.693       0.869      0.739 
+## pt              0.91      0.022     0.822       0.91     0.864       0.971      0.942 
+## it              0.645     0.005     0.69        0.645    0.667       0.873      0.746 
+## tl              0.286     0.006     0.522       0.286    0.369       0.796      0.592 
+## nl              0         0.001     0           0        0           0.738      0.476 
+## de              0.5       0.001     0.75        0.5      0.6         0.827      0.654 
+## ru              0.954     0.005     0.873       0.954    0.912       0.989      0.979 
+## th              0.957     0.002     0.88        0.957    0.917       0.976      0.951 
+## tr              0.963     0.024     0.821       0.963    0.887       0.976      0.951 
+## en              0.792     0.103     0.807       0.792    0.799       0.89       0.78  
+## es              0.886     0.038     0.808       0.886    0.846       0.956      0.911 
+## ja              0.944     0.001     0.962       0.944    0.953       0.989      0.978 
+## Weighted Avg.   0.797     0.05      0.763       0.797    0.777       0.912      0.823 
+## 
+</code></pre>
+</div>
+<br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(languagesModel$features()[1:10,c("idx","feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+long &gt;= 19.795355999999998
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+squared(long) in range (58.94150370906482, 3109.645605280387)
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+lat &lt; 21.1515635
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+mostFrequentWeightedByDistance(latLong, languages_lang_by_location) == en
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+mostFrequentWeightedByDistance(latLong, languages_lang_by_location) == es
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td align="right">
+5
+</td>
+<td>
+mostFrequentWeightedByDistance(latLong, languages_lang_by_location) == pt
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td align="right">
+6
+</td>
+<td>
+mostFrequentWeightedByDistance(latLong, languages_lang_by_location) == tr
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td align="right">
+7
+</td>
+<td>
+cosh(lat) &lt; 43961173367876.95
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td align="right">
+8
+</td>
+<td>
+sigmoid(long) == 1.0
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td align="right">
+9
+</td>
+<td>
+cosh(long) &gt;= 2.835397518052458E+30
+</td>
+</tr>
+</table>
+</div>
+<p><br> <br></p>
 <h1 id="f.-time-series-analysis">F. Time series analysis</h1>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{timeSeries_timeWindow}
+%\VignetteDepends{xtable}
+-->
+<h2 id="adding-time-window">Adding Time Window</h2>
+<p>Constructing a window around each point to use the recent history for predictions. <br></p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">simulateData2 = function(n=1000, l = 10){
+    startDate = as.Date("2013-01-01")
+    data.table(
+        x = as.character(startDate+1:n), #
+        index = 1:n, 
+        temperature = sapply(1:n, function(i) i%%l * 0.1 + abs(rnorm(1))) 
+    )
+}
+data = simulateData2()
+data$target = sapply(1:n, function(i) ifelse(sum(data$temperature[(max(1, i-3):i)]) > 7, 1, 0)) #alternatively regression - time to failure
+#plot(as.Date(data$x[1:30], format="%m/%d/%Y"), data$temperature[1:30])
+sum(data$target)</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## [1] 86
+</code></pre>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">data = addTimeWindow(data = data, dateCol = "x",dateFormat = "%Y-%m-%d", window = 10, unit = "Days", includeUntil = TRUE, relativeTime = TRUE) 
+context = colsWhiteList(data, c("x","temperature"))
+#plot(data$index[1:30], data$y[1:30])</code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">timeWindowModel = learn(
+    projectName = "ts_test", 
+    trainData = colsWhiteList(data,c("last_10_Days","target")), 
+    target = "target", 
+    weightByClass = TRUE,
+    contextDatasets = list(contextObject(data=context, name="time_info")),
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25), featureSearchMode = "ADVANCED"),
+    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
+    autoSave = FALSE
+)</code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">timeWindowModelEval = timeWindowModel$evaluate()</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## === Detailed Accuracy By Class ===
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## 0               0.983     0.897     0.482       0.983    0.647       0.666      0.333
+## 1               0.103     0.017     0.876       0.103    0.185       0.666      0.333
+## Weighted Avg.   0.507     0.421     0.695       0.507    0.397       0.666      0.333
+## 
+</code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(timeWindowModel$features()[1:10,c("idx","feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+tsDiff5(window(last_10_Days, temp_history)) &lt; -0.9635422168758623
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+temp in range (0.24901689791924903, 0.7888373346680035)
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+exponentialMovingAverage(window(last_10_Days, temp_history)) &gt;= 1.5858420054452655
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+inverse(globalTrendSmoothed(window(last_10_Days, temp_history))) &lt; -1285910223.95281
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+bimodalDelta(window(last_10_Days, temp_history)) == -3.456E8
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td align="right">
+5
+</td>
+<td>
+round(temp) == 3
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td align="right">
+6
+</td>
+<td>
+inverse(lastRelativeSlope(window(last_10_Days, temp_history))) &lt; -2.8052050834806466E-9
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td align="right">
+7
+</td>
+<td>
+timeOfMaximum(window(last_10_Days, temp_history)) == Wed Jan 07 18:00:00 IST 1970
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td align="right">
+8
+</td>
+<td>
+temp &gt;= 1.49014449985697
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td align="right">
+9
+</td>
+<td>
+window(last_10_Days, temp_history).length == 28
+</td>
+</tr>
+</table>
+</div>
+<p><br> <br></p>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{timeSeries_frequency}
 %\VignetteDepends{xtable}
 -->
-<h2 id="adding-time-window">Adding Time Window</h2>
+<h2 id="adding-time-window---identify-frequency-change">Adding Time Window - identify frequency change</h2>
 <br> Goal: Detect frequency changes in a time varying signal <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">

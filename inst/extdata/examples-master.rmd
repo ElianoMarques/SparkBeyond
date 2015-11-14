@@ -70,13 +70,21 @@ Show predict / create package etc example - should be in a different section
 ```
 <br>
 <br>
+```{r context_geoSpatial, child='context_geoSpatial.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+<br>
 
 
 #F. Time series analysis#
 
+```{r timeSeries_timeWindow, child='timeSeries_timeWindow.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+<br>
+
 ```{r timeSeries_frequency, child='timeSeries_frequency.rmd', eval = TRUE, cache=TRUE}
 ```
-
 <br>
 <br>
 

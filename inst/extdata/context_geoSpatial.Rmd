@@ -1,0 +1,54 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{context_geoSpatial}
+%\VignetteDepends{xtable}
+-->
+
+##Geo spatial##
+
+Using Geospatial KNN in order to infer from near by locations that have similar properties. 
+<br>
+The input dataset contains locations in the world (based on a lat/long) and the language spoken at this location (for top 15 most spoken languages).
+<br>
+In this example we pass the input also as a context data. A GeoSpatial Index object will be created, keeping properties for each latitude and longitude that were provided. A set of KNN based functions can be triggered for the geoSpatial index object, that can collect and aggregate properties from near by locations. Note that the actual location is not used to prevent target leaks.
+
+
+<!-- 
+langFull = data.table(getData("languages")) # get full data from "/Users/sagiedavidovich/Google Drive/data/datasets/public/lang-long-lat.csv"
+a = groupBy(langFull, "lang")
+b =colSizes(a)
+rownames(b) = a$lang
+c = b[order(b[,2],decreasing = TRUE),
+names = rownames(c[1:10,])		#FAILS with 10 - USState is identified as label type AND enrichment fails in Enricher:254
+langFiltered = langFull[lang %in% names]
+langData=sampleData(langFiltered, 0.05)
+-->
+
+<br>
+```{r context_geoSpatial_2, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
+langData =  getData("languages")
+languagesModel = learn(
+	projectName = "languages", 
+	trainData = langData, 
+	target = "lang", 
+	contextDatasets = list(contextObject(data=langData, name="languages")),
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),
+	modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
+	autoSave = FALSE
+)
+```
+<br>
+```{r context_geoSpatial_3, eval=TRUE, echo=TRUE, cache=TRUE}
+languagesModelEval = languagesModel$evaluate()
+```
+<br>
+```{r context_geoSpatial_4, eval=TRUE, results='asis'}
+print(xtable(languagesModel$features()[1:10,c("idx","feature")]), type='html', comment=F) 
+```

@@ -11,7 +11,7 @@ output:
 %\VignetteDepends{xtable}
 -->
 
-##Adding Time Window##
+##Adding Time Window - identify frequency change##
 
 <br>
 Goal: Detect frequency changes in a time varying signal

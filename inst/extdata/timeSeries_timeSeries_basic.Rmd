@@ -1,0 +1,102 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{timeSeries_timeWindow}
+%\VignetteDepends{xtable}
+-->
+
+##Adding Time Window##
+
+<br>
+Goal: 
+<br>
+
+```{r timeSeries_timeWindow_1_1, eval=FALSE, message=FALSE, results='hide'}
+randDate <- function(N, st="2014/01/01", et="2014/12/31") {
+    st <- as.POSIXct(as.Date(st,tz = "EST"),tz = "EST")
+    et <- as.POSIXct(as.Date(et,tz = "EST"),tz = "EST")
+    dt <- as.numeric(difftime(et,st,unit="secs"))
+    ev <- sort(runif(N, 0, dt))
+    strftime(st+ev, format="%m/%d/%Y")
+}
+
+simulateData = function(n = 100, l = 10) {
+    data.table(ID = rep(1:n,l), value = rnorm(n*l), date = randDate(n*l))
+}
+
+
+set.seed(1)
+dataSize = 1000
+tsLength = 10
+data = simulateData(dataSize, tsLength)
+setTimeColumn(data, "date")
+grouped = groupBy(data, c("ID"))
+grouped[, status := sapply(value, function(x) if (mean(x) > 0.5) 1 else 0, simplify = TRUE)]
+
+model = learn(
+	projectName = "ts_test", 
+	trainData = grouped, 
+	target = "status", 
+	weightByClass = TRUE,
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),
+	modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
+	autoSave = FALSE
+)
+```
+
+```{r timeSeries_timeWindow_1_2, eval=FALSE, results='asis'}
+print(xtable(timeWindowModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
+```
+```{r timeSeries_timeWindow_1_3, eval=FALSE, echo=TRUE, cache=FALSE}
+timeWindowModelEval = frequencyModel$evaluate()
+```
+
+```{r timeSeries_timeWindow_2_1, eval=TRUE}
+randDate <- function(N, st="2014/01/01", et="2014/12/31") {
+    st <- as.POSIXct(as.Date(st,tz = "EST"),tz = "EST")
+    et <- as.POSIXct(as.Date(et,tz = "EST"),tz = "EST")
+    dt <- as.numeric(difftime(et,st,unit="secs"))
+    ev <- sort(runif(N, 0, dt))
+    strftime(st+ev, format="%m/%d/%Y")
+}
+
+simulateData2 = function(n=100, l = 10){
+	data.table(x = randDate(n), #
+		index =	1:n, 
+		y = sapply(1:n, function(i) i%%l * 0.5 + abs(rnorm(1))), 
+		target = sapply(1:n, function(i) ifelse(i%%l == 0, 1, 0)) #alternatively regression - time to failure
+	)
+}
+data = simulateData2()
+data = addTimeWindow(data = data, dateCol = "x", window = 10, unit = "Days", relativeTime = TRUE) 
+context = colsWhiteList(context, c("x","y"))
+#plot(data$index[1:30], data$y[1:30])
+plot(as.Date(data$x[1:30], format="%m/%d/%Y"), data$y[1:30])
+```
+
+```{r timeSeries_timeWindow_2_2, eval=TRUE, message=FALSE, results='hide'}
+timeWindowModel = learn(
+	projectName = "ts_test", 
+	trainData = colsWhiteList(data,c("last_10_Days","target")), 
+	target = "target", 
+	weightByClass = TRUE,
+	contextDatasets = list(contextObject(data=context, name="time_info")),
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),
+	modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
+	autoSave = FALSE
+)
+```
+
+```{r timeSeries_timeWindow_2_3, eval=TRUE, echo=TRUE, cache=TRUE}
+timeWindowModelEval = timeWindowModel$evaluate()
+```
+
+```{r timeSeries_timeWindow_2_4, eval=TRUE, results='asis'}
+print(xtable(timeWindowModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
+```
