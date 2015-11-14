@@ -117,7 +117,7 @@ reportingControl = function(
 #' @param data: a data frame or a path to a file containing the context data
 #' @param name: an identifier for the context object to be created (optional).
 #' @param keyColumns: Specify the key columns to be used by the context object (optional).
-#' @param timeColumn: Specify the time column to be used by the context object (optional).
+#' @param timeColumn: Specify the time column to be used by the context object (relevant in time series contexts) (optional).
 contextObject = function(data, name = NULL, keyColumns = list(), timeColumn = NULL) { #TODO: help
 	#if data is data frame write it, otherwise it's a path - same for learn.file
 	obj = list(data = data, name=name, keyColumns = keyColumns, timeColumn=timeColumn)
