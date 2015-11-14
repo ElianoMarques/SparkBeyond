@@ -6,6 +6,15 @@
 \usage{
 contextObject(data, name = NULL, keyColumns = list(), timeColumn = NULL)
 }
+\arguments{
+\item{data:}{a data frame or a path to a file containing the context data}
+
+\item{name:}{an identifier for the context object to be created (optional).}
+
+\item{keyColumns:}{Specify the key columns to be used by the context object (optional).}
+
+\item{timeColumn:}{Specify the time column to be used by the context object (optional).}
+}
 \description{
 contextObject
 }
