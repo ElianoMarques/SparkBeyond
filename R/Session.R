@@ -312,20 +312,19 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
-      createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE, debugMode = FALSE) { #
+      createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE, ...) { #
         "Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \\code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE)."
         if (is.na(modelBuilt) || !modelBuilt) warning("createPackage requires full model building using learn")
 
-        sampleDataFilename = if (is.null(sampleData)) NA else {
-          name = writeToServer(sampleData[1:20,], prefix="createPackage_sample") #projectName
-          SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
-          if (!grepl(SBdir, name)) name = paste0(getSBserverIOfolder(), name)
-          name
+        sampleDataFilename = if (is.null(sampleData)) NA else {		        	
+          writeToServer(if ("data.frame" %in% class(data)) sampleData[1:20,] else sampleData, prefix="createPackage_sample") #projectName
         }
+        extraParams = list(...)
+        
         params <-list(modelPath = artifact_loc,
                       createRestAPIpackage = createRestAPIpackage,
                       dataPath = sampleDataFilename,
-                      debugMode = debugMode,
+                      debugMode = if(!is.null(extraParams$debugMode)) extraParams$debugMode else FALSE
                       externalPrefixPath = getSBserverIOfolder())
 
         params = params[!is.na(params)]

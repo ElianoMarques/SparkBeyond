@@ -451,7 +451,7 @@ featureSearch.file <- function(projectName = "temp",
 #' @param filename: Optional. define a name to save the data to. NA by default.
 #' @return A filepath to the file on the server that was created.
 writeToServer = function(data, filename = NA, prefix = "data_in"){ #TODO: deal with spaces in prefix
-	final_filename = if ("data.frame" %in% class(data)){ # we got a data.frame object to be written to server
+	final_filename = if ("data.frame" %in% class(data)){ # we got a data.frame object to be written to server 
 		if (is.na(filename)) { # no specific name was provided - use digest to refrain from rewriting to server
 				hash = digest(data)
 				new_filename = paste0(getSBserverIOfolder(), prefix, "_", hash, ".tsv") 
