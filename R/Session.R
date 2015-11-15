@@ -324,7 +324,7 @@ Session = setRefClass("Session",
         params <-list(modelPath = artifact_loc,
                       createRestAPIpackage = createRestAPIpackage,
                       dataPath = sampleDataFilename,
-                      debugMode = if(!is.null(extraParams$debugMode)) extraParams$debugMode else FALSE
+                      debugMode = if(!is.null(extraParams$debugMode)) extraParams$debugMode else FALSE,
                       externalPrefixPath = getSBserverIOfolder())
 
         params = params[!is.na(params)]
