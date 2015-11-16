@@ -325,12 +325,6 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @param sample: optional maximal possible sample value (default to maxint)
 #' @return The new data
 addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, offset = 0) {
-  if (is.na(keyCol)){
-    newCol = paste0("last_", window, "_", unit)
-  }else{
-    newCol = paste0("last_keyed_", window, "_", unit)
-  }
-
   unitVal = switch(unit,
   			 "Number" = 1,
          "Seconds" = 1,
@@ -341,28 +335,38 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
          "Years" = 12*4*7*24*60*60,
          stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Months', 'Years', 'Number'")
   )
-  #TimeWindow(Thu Feb 12 20:54:13 EST 2015,Fri Feb 13 20:54:13 EST 2015,false,true,2147483647)
-  #KeyedTimeWindow(key=A, startDate=Thu Feb 12 12:16:20 IST 2015, endDate=Fri Feb 13 12:16:20 IST 2015, includeUntil=false, relativeTime=true)
   
-  #TODO: support non-dates,  support offset calculation
+  newCol = if (is.na(keyCol)){
+  	paste0("last_", window, "_", unit)
+  }else{
+  	paste0("last_keyed_", window, "_", unit)
+  }
+    
+  #TODO: support non-dates,  support offset calculation, Date POSix objects
 
   datePOSIXformatOut = "%m/%d/%Y %H:%M:%S %p %Z" #TODO: check if multiple output formats are possible
-  dateColData = colsWhiteList(data, dateCol)
+  dateColIndex = which(colnames(data)==dateCol)
+  dateColData = data[[dateColIndex]]
+  
+  dateType = sapply(data, class)[dateColIndex] #charachter, integer, numeric, date, POSIX
+  
+  generateWindow = function(dateVal, keyVal = NA) {
+  	dates = if (dateType == "character") {
+  		convertDateToString = function(dValue) as.character(as.POSIXct(dValue),format=datePOSIXformatOut)
+  	 	dt = convertDateToString(strptime(dateVal,dateFormat,tz="EST"))
+  		dt_from = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-window*unitVal)
+			c(dt_from, dt)
+		} else if (dateType == "integer" || dateType == "numeric"){
+			c(dateVal - window, dateVal)
+		} else if (dateType == "date") {}
+  	paste0(keyVal,",",dates[1],",",dates[2],",",includeUntil,",",relativeTime,",",unit,",",sample)
+  }
+  
   if (is.na(keyCol)){
-    data[,newCol] = sapply(dateColData,function (x) {
-                      dt = as.character(as.POSIXct(strptime(x,dateFormat,tz="EST")),format=datePOSIXformatOut)
-                      dt_from = as.character(as.POSIXct(strptime(x,dateFormat,tz="EST")-window*unitVal),format=datePOSIXformatOut)
-                      paste0("NA,",dt_from,",",dt,",",includeUntil,",",relativeTime,",",unit,",",sample)
-                      })
-    #data[,eval(as.symbol(newCol)):= sapply(eval(as.symbol(dateCol)),function (x) {dt = as.double(as.POSIXlt(strptime(x,datePOSIXformat,tz="EST"))); paste0("Window(",dt - window*unitVal,",",dt,",",includeUntil,",",relativeTime,",",sample,")")})]
-  } else{
-    generateKeyWindow = function(dateVal, keyVal) {
-      dt = as.character(as.POSIXct(strptime(dateVal,dateFormat,tz="EST")),format=datePOSIXformatOut)
-      dt_from = as.character(as.POSIXct(strptime(dateVal,dateFormat,tz="EST")-window*unitVal),format=datePOSIXformatOut)
-      paste0(keyVal,",",dt_from,",",dt,",",includeUntil,",",relativeTime,",",unit,",",sample)
-    }
+    data[,newCol] = sapply(dateColData, generateWindow)
+  } else{    
     keyColData = colsWhiteList(data, keyCol)
-    data[,newCol] = mapply(generateKeyWindow,dateColData,keyColData)
+    data[,newCol] = mapply(generateWindow,dateColData,keyColData)
   }
   data[]
 }
