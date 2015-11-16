@@ -13,7 +13,7 @@ contextObject(data, name = NULL, keyColumns = list(), timeColumn = NULL)
 
 \item{keyColumns:}{Specify the key columns to be used by the context object (optional).}
 
-\item{timeColumn:}{Specify the time column to be used by the context object (optional).}
+\item{timeColumn:}{Specify the time column to be used by the context object (relevant in time series contexts) (optional).}
 }
 \description{
 contextObject
