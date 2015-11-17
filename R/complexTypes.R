@@ -125,6 +125,20 @@ typeofCols = function(data) {
   sapply(data, typeof)
 }
 
+#' classofCols
+#'
+#' list the class of column for all columns in the input \code{data}
+#' @param data: data.table to examine.
+#' @return a vector of names for all \code{data} columns
+#' @examples
+#' grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
+#' classofCols(grouped$age)
+#' flattenCols(grouped, "age")
+#' classofCols(grouped)
+classofCols = function(data) {
+	sapply(data, class)
+}
+
 #' cols2Text
 #'
 #' Convert all \code{data} columns into a serializable text/primitive representation. Cells that contain lists will be converted to [ , , ] representation. All strings will quoted.
@@ -143,12 +157,20 @@ cols2Text = function(data) {
       s = gsub("\\n"," ",s) #\\\\n
       s
     }
+    
+    printNonCharElement = function(e){
+    	eType = class(e)
+    	if (length(eType) > 1) eType = eType[1]
+    	if (eType == "Date" || eType == "POSIXct") as.character(e)
+    	else e
+    }
+    
     createContent = function(x1) {
-      if (typeof(x1) == "character" || is.factor(x1)) {
+      if (length(class(x1)) == 1 && class(x1) == "character" || is.factor(x1)) {
         x2 = sapply(x1,  escapeFun) #deal with escaping
         paste0("\"", paste0(x2,collapse = "\",\""), "\"")
-      } else {
-        paste0(x1,collapse = ",")
+      } else {      	
+        paste0(printNonCharElement(x1),collapse = ",")
       }
     }
 
@@ -158,7 +180,8 @@ cols2Text = function(data) {
         paste0("[",content,"]")
       }
       sapply(x, writeList)
-    } else if (typeof(x) == "character" || is.factor(x)) paste0("\"",escapeFun(x),"\"") else x
+    } else if (length(class(x)) == 1 && class(x) == "character" || is.factor(x)) paste0("\"",escapeFun(x),"\"")     	
+    	else printNonCharElement(x)
   }
 
   sapply(data,col2Text)
@@ -348,17 +371,28 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   dateColIndex = which(colnames(data)==dateCol)
   dateColData = data[[dateColIndex]]
   
-  dateType = sapply(data, class)[dateColIndex] #charachter, integer, numeric, date, POSIX
+  dateType = sapply(data, class)[dateColIndex] #charachter, integer, numeric, date, POSIXct
+  if(length(class(dateType)) > 1) dateType = dateType[1] 
   
   generateWindow = function(dateVal, keyVal = NA) {
   	dates = if (dateType == "character") {
   		convertDateToString = function(dValue) as.character(as.POSIXct(dValue),format=datePOSIXformatOut)
   	 	dt = convertDateToString(strptime(dateVal,dateFormat,tz="EST"))
-  		dt_from = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-window*unitVal)
+  		dt_from = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-window*unitVal) #seconds based
 			c(dt_from, dt)
 		} else if (dateType == "integer" || dateType == "numeric"){
 			c(dateVal - window, dateVal)
-		} else if (dateType == "date") {}
+		} else if (dateType == "Date") {
+			dt = as.character(as.POSIXct(dateVal),format=datePOSIXformatOut)
+			dt_from = as.character(as.POSIXct(dateVal) - window*unitVal,format=datePOSIXformatOut)
+			c(dt_from, dt)			
+		} else if (dateType == "POSIXct"){
+			dt = as.character(dateVal)
+			dt_from = as.character(dateVal - window*unitVal)
+			c(dt_from, dt)
+		} else {
+			stop (paste("Date column", dateCol,"type should be one of 'character', 'integer', 'numeric', 'date', 'POSIXct'."))
+		}
   	paste0(keyVal,",",dates[1],",",dates[2],",",includeUntil,",",relativeTime,",",unit,",",sample)
   }
   
