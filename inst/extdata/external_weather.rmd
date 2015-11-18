@@ -47,7 +47,6 @@ flightsModel = learn(
     modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RXGBoostRegressor")),    
     autoSave = FALSE
 )
-flightsModelEval = flightsModel$evaluate()
 ```
 <br>
 Note that in this example:
@@ -57,13 +56,16 @@ Note that in this example:
 2. Running using the entire flights data can take a long time due to the Weather API downloading approporaite data for each location (but should achieve better results).
 <br>
 
-```{r external_weather_3, eval=TRUE, results='asis'}
-library(xtable)
-print(xtable(flightsModel$features()[1:20,c("idx","feature")]), type='html', comment=F) 
-writeLines(gsub("\n","<br>",flightsModelEval$evaluation$summary))
+```{r external_weather_3, eval=TRUE, cache=TRUE}
+print(flightsModel$evaluate()$evaluation$rootMeanSquaredError)
 ```
 
-```{r external_weather_4, eval = TRUE, message=FALSE}
+
+```{r external_weather_4, eval=TRUE, results='asis'}
+print(xtable(flightsModel$features()[1:20,c("idx","feature")]), type='html', comment=F) 
+```
+
+```{r external_weather_5, eval = TRUE, message=FALSE}
 writeLines(readLines(paste0(flightsModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))
 ```
 

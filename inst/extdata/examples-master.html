@@ -1842,15 +1842,14 @@ flightsModel = learn(
         projectName = "flights_delay_example",
     trainData = flightSampled,
     target = "weatherDelay",
-    featureGenerationCtrl = featureGenerationControl(
-            useCustomGraphs = TRUE, 
+    featureGenerationCtrl = featureGenerationControl(            
             maxFeaturesCount = list(30),
             functionsBlackList = list("trigonometry")
         ),
+        knowledgeCtrl = knowledgeControl(useCustomGraphs = TRUE),
     modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RXGBoostRegressor")),    
     autoSave = FALSE
-)
-flightsModelEval = flightsModel$evaluate()</code></pre>
+)</code></pre>
 </div>
 <p><br> Note that in this example:</p>
 <ol style="list-style-type: decimal">
@@ -1861,8 +1860,19 @@ flightsModelEval = flightsModel$evaluate()</code></pre>
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">library(xtable)
-print(xtable(flightsModel$features()[1:20,c("idx","feature")]), type='html', comment=F) </code></pre>
+<pre style=""><code class="source r">print(flightsModel$evaluate()$evaluation$rootMeanSquaredError)</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## 
+## [1] 64.62227
+</code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(flightsModel$features()[1:20,c("idx","feature")]), type='html', comment=F) </code></pre>
 <table border="1">
 <tr>
 <th>
@@ -1904,7 +1914,7 @@ taxiOut &gt;= 50
 2
 </td>
 <td>
-depTime &lt; 549
+Weather.contentForLatLongDate(lookupGeo(dest, table_airports_by_iata), date).valueOf(&quot;SLP2&quot;) orIfMissing 0 in range (12.5, 22.5)
 </td>
 </tr>
 <tr>
@@ -1915,7 +1925,7 @@ depTime &lt; 549
 3
 </td>
 <td>
-depTime not in range (548.5, 2244.5)
+Weather.contentForLatLongDate(lookupGeo(origin, table_airports_by_iata), date).valueOf(&quot;VISIB&quot;) orIfMissing 0 &gt;= 9.350000000000001
 </td>
 </tr>
 <tr>
@@ -1926,7 +1936,7 @@ depTime not in range (548.5, 2244.5)
 4
 </td>
 <td>
-uniqueCarrier.min == A
+depTime &lt; 549
 </td>
 </tr>
 <tr>
@@ -1937,7 +1947,7 @@ uniqueCarrier.min == A
 5
 </td>
 <td>
-date == Sun Jul 13 03:00:00 IDT 2008
+depTime not in range (548.5, 2244.5)
 </td>
 </tr>
 <tr>
@@ -1948,7 +1958,7 @@ date == Sun Jul 13 03:00:00 IDT 2008
 6
 </td>
 <td>
-uniqueCarrier == OO
+uniqueCarrier.min == A
 </td>
 </tr>
 <tr>
@@ -1959,7 +1969,7 @@ uniqueCarrier == OO
 7
 </td>
 <td>
-sigmoid(arrTime) in range (0.9999999994813985, 0.9999999999999999)
+Weather.contentForLatLongDate(lookupGeo(dest, table_airports_by_iata), date).valueOf(&quot;SLP&quot;) orIfMissing 0 &gt;= 1016.75
 </td>
 </tr>
 <tr>
@@ -1970,7 +1980,7 @@ sigmoid(arrTime) in range (0.9999999994813985, 0.9999999999999999)
 8
 </td>
 <td>
-date == Sat Mar 22 02:00:00 IST 2008
+Weather.contentForLatLongDate(lookupGeo(origin, table_airports_by_iata), date).valueOf(&quot; STP&quot;) orIfMissing 0 &lt; 978.75
 </td>
 </tr>
 <tr>
@@ -1981,7 +1991,7 @@ date == Sat Mar 22 02:00:00 IST 2008
 9
 </td>
 <td>
-date == Fri Feb 22 02:00:00 IST 2008
+date == Sun Jul 13 03:00:00 IDT 2008
 </td>
 </tr>
 <tr>
@@ -1992,7 +2002,7 @@ date == Fri Feb 22 02:00:00 IST 2008
 10
 </td>
 <td>
-distance in range (863.5, 871.5)
+Weather.contentForLatLongDate(lookupGeo(dest, table_airports_by_iata), date) does not contain (RAIN_EXISTS, 0)
 </td>
 </tr>
 <tr>
@@ -2003,7 +2013,7 @@ distance in range (863.5, 871.5)
 11
 </td>
 <td>
-airTime in range (144.5, 249.5)
+uniqueCarrier == OO
 </td>
 </tr>
 <tr>
@@ -2014,7 +2024,7 @@ airTime in range (144.5, 249.5)
 12
 </td>
 <td>
-dayofMonth in range (8.5, 10.5)
+Weather.contentForLatLongDate(lookupGeo(origin, table_airports_by_iata), date) contains (FOG_EXISTS, 1)
 </td>
 </tr>
 <tr>
@@ -2025,7 +2035,7 @@ dayofMonth in range (8.5, 10.5)
 13
 </td>
 <td>
-uniqueCarrier == XE
+lookupNumeric(origin, table_airports_by_iata).valueOf(latitude) orIfMissing 0 not in range (33.444, 41.91179150000001)
 </td>
 </tr>
 <tr>
@@ -2036,7 +2046,7 @@ uniqueCarrier == XE
 14
 </td>
 <td>
-date == Thu Jul 10 03:00:00 IDT 2008
+Weather.contentForLatLongDate(lookupGeo(dest, table_airports_by_iata), date) contains (DEWP, 62.6)
 </td>
 </tr>
 <tr>
@@ -2047,7 +2057,7 @@ date == Thu Jul 10 03:00:00 IDT 2008
 15
 </td>
 <td>
-prefixes(tailNum) contains N74
+sigmoid(arrTime) in range (0.9999999994813985, 0.9999999999999999)
 </td>
 </tr>
 <tr>
@@ -2058,7 +2068,7 @@ prefixes(tailNum) contains N74
 16
 </td>
 <td>
-cRSArrTime &lt; 22
+Weather.contentForLatLongDate(lookupGeo(dest, table_airports_by_iata), date).valueOf(&quot;VISIB&quot;) orIfMissing 0 &gt;= 9.55
 </td>
 </tr>
 <tr>
@@ -2069,7 +2079,7 @@ cRSArrTime &lt; 22
 17
 </td>
 <td>
-smallSubsets(tailNum) contains List(4, 1)
+date == Sat Mar 22 02:00:00 IST 2008
 </td>
 </tr>
 <tr>
@@ -2080,7 +2090,7 @@ smallSubsets(tailNum) contains List(4, 1)
 18
 </td>
 <td>
-Histogram(uniqueCarrier) contains (V, 1)
+Weather.contentForLatLongDate(lookupGeo(dest, table_airports_by_iata), date) does not contain (THUNDER_EXISTS, 0)
 </td>
 </tr>
 <tr>
@@ -2091,15 +2101,10 @@ Histogram(uniqueCarrier) contains (V, 1)
 19
 </td>
 <td>
-arithmeticNot(cRSElapsedTime) in range (-193.5, -188.5)
+date == Fri Feb 22 02:00:00 IST 2008
 </td>
 </tr>
 </table>
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">writeLines(gsub("\n","<br>",flightsModelEval$evaluation$summary))</code></pre>
-<pre><code>                                             &lt;br&gt;Correlation coefficient             0.971109     &lt;br&gt;R2                                  0.943053     &lt;br&gt;Mean absolute error                 9.933236     &lt;br&gt;Root mean squared error             17.574482    &lt;br&gt;Relative absolute error             20.48519378 %&lt;br&gt;Root relative squared error         24.61696612 %&lt;br&gt;Root relative prior squared error   71.39174767  &lt;br&gt;Actuals mean                        74.63377609  &lt;br&gt;Estimations mean                    72.95175912  &lt;br&gt;Actuals std                         71.24745501  &lt;br&gt;Estimations std                     65.07070017  &lt;br&gt;Total Number of Instances           1054         &lt;br&gt;                                                 </code></pre>
 </div>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -2677,37 +2682,37 @@ cosh(long) &gt;= 2.835397518052458E+30
 <pre style=""><code class="source r">simulateData2 = function(n=1000, l = 10){
     startDate = as.Date("2013-01-01")
     data.table(
-        x = as.character(startDate+1:n), #
         index = 1:n, 
+        timeDate = startDate+1:n,
+        timeString = as.character(startDate+1:n),       
+        timePOSIX = as.POSIXct(startDate+1:n),      
         temperature = sapply(1:n, function(i) i%%l * 0.1 + abs(rnorm(1))) 
     )
 }
 data = simulateData2()
-data$target = sapply(1:n, function(i) ifelse(sum(data$temperature[(max(1, i-3):i)]) > 7, 1, 0)) #alternatively regression - time to failure
-#plot(as.Date(data$x[1:30], format="%m/%d/%Y"), data$temperature[1:30])
+data$target = sapply(1:nrow(data), function(i) ifelse(sum(data$temperature[(max(1, i-3):i)]) > 7, 1, 0)) #alternatively regression - time to failure
 sum(data$target)</code></pre>
 <button class="output R toggle btn btn-xs btn-success">
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
-<pre style=""><code class="output r">## [1] 86
+<pre style=""><code class="output r">## [1] 106
 </code></pre>
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">data = addTimeWindow(data = data, dateCol = "x",dateFormat = "%Y-%m-%d", window = 10, unit = "Days", includeUntil = TRUE, relativeTime = TRUE) 
-context = colsWhiteList(data, c("x","temperature"))
-#plot(data$index[1:30], data$y[1:30])</code></pre>
 </div>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">timeWindowModel = learn(
+<pre style=""><code class="source r">timeColumn = "timeDate" #"index"
+timeUnit = "Days" #"Number"
+dataFinal = addTimeWindow(data = data, dateCol = timeColumn,dateFormat = "%Y-%m-%d", window = 10, unit = timeUnit, includeUntil = TRUE, relativeTime = TRUE) 
+head(dataFinal)
+
+timeWindowModel = learn(
     projectName = "ts_test", 
-    trainData = colsWhiteList(data,c("last_10_Days","target")), 
+    trainData = colsWhiteList(dataFinal,c(paste0("last_10_", timeUnit),"target")), #last_10_Days
     target = "target", 
     weightByClass = TRUE,
-    contextDatasets = list(contextObject(data=context, name="time_info")),
+    contextDatasets = list(contextObject(data=colsWhiteList(data, c(timeColumn,"temperature")), name="time_info", timeColumn = timeColumn)), 
     featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25), featureSearchMode = "ADVANCED"),
     modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
     autoSave = FALSE

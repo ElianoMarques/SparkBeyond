@@ -20,29 +20,30 @@ Constructing a window around each point to use the recent history for prediction
 simulateData2 = function(n=1000, l = 10){
 	startDate = as.Date("2013-01-01")
 	data.table(
-		x = as.character(startDate+1:n), #
 		index =	1:n, 
+		timeDate = startDate+1:n,
+		timeString = as.character(startDate+1:n), 		
+		timePOSIX = as.POSIXct(startDate+1:n),		
 		temperature = sapply(1:n, function(i) i%%l * 0.1 + abs(rnorm(1))) 
 	)
 }
 data = simulateData2()
-data$target = sapply(1:n, function(i) ifelse(sum(data$temperature[(max(1, i-3):i)]) > 7, 1, 0)) #alternatively regression - time to failure
-#plot(as.Date(data$x[1:30], format="%m/%d/%Y"), data$temperature[1:30])
+data$target = sapply(1:nrow(data), function(i) ifelse(sum(data$temperature[(max(1, i-3):i)]) > 7, 1, 0)) #alternatively regression - time to failure
 sum(data$target)
-
-data = addTimeWindow(data = data, dateCol = "x",dateFormat = "%Y-%m-%d", window = 10, unit = "Days", includeUntil = TRUE, relativeTime = TRUE) 
-context = colsWhiteList(data, c("x","temperature"))
-#plot(data$index[1:30], data$y[1:30])
-
 ```
 
 ```{r timeSeries_timeWindow_2_2, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
+timeColumn = "timeDate" #"index"
+timeUnit = "Days" #"Number"
+dataFinal = addTimeWindow(data = data, dateCol = timeColumn,dateFormat = "%Y-%m-%d", window = 10, unit = timeUnit, includeUntil = TRUE, relativeTime = TRUE) 
+head(dataFinal)
+
 timeWindowModel = learn(
 	projectName = "ts_test", 
-	trainData = colsWhiteList(data,c("last_10_Days","target")), 
+	trainData = colsWhiteList(dataFinal,c(paste0("last_10_", timeUnit),"target")), #last_10_Days
 	target = "target", 
 	weightByClass = TRUE,
-	contextDatasets = list(contextObject(data=context, name="time_info")),
+	contextDatasets = list(contextObject(data=colsWhiteList(data, c(timeColumn,"temperature")), name="time_info", timeColumn = timeColumn)), 
 	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25), featureSearchMode = "ADVANCED"),
 	modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
 	autoSave = FALSE
