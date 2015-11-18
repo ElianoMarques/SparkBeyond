@@ -7,9 +7,7 @@
 featureGenerationControl(maxDepth = 2, featureSearchMode = "DEFAULT",
   functionsWhiteList = NA, functionsBlackList = NA,
   booleanNumericFeatures = NA, numericEqualityFeatures = TRUE,
-  allowRangeFeatures = TRUE, useGraph = FALSE, useCustomGraphs = FALSE,
-  customGraphsWhiteList = NA, customGraphsBlackList = NA,
-  customFunctions = NA, crossRowFeatureSearch = FALSE,
+  allowRangeFeatures = TRUE, crossRowFeatureSearch = FALSE,
   maxFeaturesCount = list(300), autoColumnSubSets = list("CONCEPT"),
   customColumnSubsets = NA, maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
@@ -30,16 +28,6 @@ featureGenerationControl(maxDepth = 2, featureSearchMode = "DEFAULT",
 \item{numericEqualityFeatures:}{A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.}
 
 \item{allowRangeFeatures:}{A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.}
-
-\item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
-
-\item{useCustomGraphs:}{A boolean indicating whether custom graphs should be used. FALSE by default.}
-
-\item{customGraphsWhiteList:}{Optional. A list that filters which domains should be used. NA by default.}
-
-\item{customGraphsBlackList:}{Optional. A list that filters which custom graphs should be ignored. NA by default.}
-
-\item{customFunctions:}{Optional. A list of additional functions that should be incorporated to the feature search. NA by default.}
 
 \item{crossRowFeatureSearch.}{A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.}
 

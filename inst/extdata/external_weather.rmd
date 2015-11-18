@@ -39,11 +39,11 @@ flightsModel = learn(
 		projectName = "flights_delay_example",
     trainData = flightSampled,
     target = "weatherDelay",
-    featureGenerationCtrl = featureGenerationControl(
-			useCustomGraphs = TRUE, 
+    featureGenerationCtrl = featureGenerationControl(			 
 			maxFeaturesCount = list(30),
 			functionsBlackList = list("trigonometry")
 		),
+		knowledgeCtrl = knowledgeControl(useCustomGraphs = TRUE),
     modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RXGBoostRegressor")),    
     autoSave = FALSE
 )

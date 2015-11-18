@@ -7,6 +7,7 @@
 learn(projectName = "temp", trainData, target, testData = NA,
   trainTestSplitRatio = 0.8, weightColumn = NA, weightByClass = FALSE,
   contextDatasets = NA, featureGenerationCtrl = featureGenerationControl(),
+  knowledgeCtrl = knowledgeControl(),
   modelBuildingCtrl = modelBuildingControl(),
   reportingCtrl = reportingControl(), verbose = FALSE, fileEncoding = NA,
   autoSave = TRUE, runBlocking = TRUE, ...)
@@ -16,9 +17,9 @@ learn(projectName = "temp", trainData, target, testData = NA,
 
 \item{projectName:}{Optional string of the session name. Setting a session name is highly recommended. "temp" by default.}
 
-\item{trainData:}{A data frame to analyze.}
+\item{trainData:}{train data to analyze.}
 
-\item{testData:}{Optional. An independent test data frame to test the prediction on. NA by default.}
+\item{testData:}{Optional. test data to validate model results. NA by default.}
 
 \item{trainTestSplitRatio:}{Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.}
 
@@ -29,6 +30,8 @@ learn(projectName = "temp", trainData, target, testData = NA,
 \item{contextDatasets:}{Optional. A list of paths to context datasets to be added to the learning.}
 
 \item{featureGenerationControl:}{A \code{\link{featureGenerationControl}} object with specific feature generation parameters.}
+
+\item{knowledgeControl:}{A \code{\link{knowledgeControl}} object with specific external knowledge parameters.}
 
 \item{modelBuildingControl:}{A \code{\link{modelBuildingControl}} object with specific model building parameters.}
 
@@ -41,26 +44,12 @@ learn(projectName = "temp", trainData, target, testData = NA,
 \item{runBlocking:}{Block the R console while the session is running. FALSE by default.}
 }
 \value{
-\code{\link{Session}} object that encapsulates the model.
+Session object that encapsulates the model.
 }
 \description{
 Runs SparkBeyond feature enrichment and learning process.
 }
 \examples{
-\donttest{
-session = learn("titanic", getData("titanic_train"),
-   target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
-
-flights = getData("flights_delay")
-sampledFlights = sampleData(flights, 0.2)
-flightsModel = learn(projectName = "flights_delay_example",
-                    trainData = sampledFlights,
-                    target = "weatherDelay",
-                    algorithmsWhiteList = list("RRandomForestRegressor"),
-                    functionsBlackList = list("trigonometry"),
-                    maxFeaturesCount = list(20)
-               )
-head(flightsModel$features)
-}
+#session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE, autoSave=FALSE)
 }
 
