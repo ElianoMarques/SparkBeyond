@@ -194,7 +194,7 @@ learn <- function(
 	params <-list(projectName = projectName,
 								trainingFilePath = writeToServer(trainData, prefix = paste0(projectName,"_train")),
 								target = target,
-								testFilePath= if (class(testData) != "logical" && any(grep("data.frame", class(testData))))
+								testFilePath= if ((class(testData) != "logical" && any(grep("data.frame", class(testData)))) || class(testData)=="character")
 									writeToServer(testData, prefix = paste0(projectName,"_test")) else NA,
 								trainTestSplitRatio = trainTestSplitRatio,
 								weightColumn = weightColumn,
