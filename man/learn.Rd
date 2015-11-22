@@ -6,11 +6,12 @@
 \usage{
 learn(projectName = "temp", trainData, target, testData = NA,
   trainTestSplitRatio = 0.8, weightColumn = NA, weightByClass = FALSE,
-  contextDatasets = NA, featureGenerationCtrl = featureGenerationControl(),
+  contextDatasets = NA, preProcessingCtrl = preProcessingControl(),
+  featureGenerationCtrl = featureGenerationControl(),
   knowledgeCtrl = knowledgeControl(),
   modelBuildingCtrl = modelBuildingControl(),
-  reportingCtrl = reportingControl(), verbose = FALSE, fileEncoding = NA,
-  autoSave = TRUE, runBlocking = TRUE, ...)
+  reportingCtrl = reportingControl(), verbose = FALSE, autoSave = TRUE,
+  runBlocking = TRUE, ...)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -36,8 +37,6 @@ learn(projectName = "temp", trainData, target, testData = NA,
 \item{modelBuildingControl:}{A \code{\link{modelBuildingControl}} object with specific model building parameters.}
 
 \item{reportingControl:}{A \code{\link{reportingControl}} object with specific reporting parameters.}
-
-\item{fileEncoding:}{Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".}
 
 \item{autoSave:}{Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.}
 

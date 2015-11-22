@@ -11,7 +11,7 @@ featureGenerationControl(maxDepth = 2, featureSearchMode = "DEFAULT",
   maxFeaturesCount = list(300), autoColumnSubSets = list("CONCEPT"),
   customColumnSubsets = NA, maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
-  allocatedMemoryMB = 1000, maxCollectionSize = 80000,
+  allocatedMemoryMB = 1000, maxCollectionSize = NA,
   useCachedFeatures = TRUE)
 }
 \arguments{
@@ -43,7 +43,7 @@ featureGenerationControl(maxDepth = 2, featureSearchMode = "DEFAULT",
 
 \item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
 
-\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.}
+\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. NA by default corresponding to 200K.}
 
 \item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). TRUE by default.}
 }

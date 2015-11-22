@@ -4,12 +4,14 @@
 \alias{knowledgeControl}
 \title{knowledge Control}
 \usage{
-knowledgeControl(useGraph = FALSE, useCustomGraphs = FALSE,
-  customGraphsWhiteList = NA, customGraphsBlackList = NA,
-  customFunctions = NA)
+knowledgeControl(useGraph = FALSE, useOpenStreetMap = FALSE,
+  useCustomGraphs = FALSE, customGraphsWhiteList = NA,
+  customGraphsBlackList = NA, customFunctions = NA)
 }
 \arguments{
 \item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
+
+\item{useOpenStreetMap:}{Optional. A boolean indicating whether Open Street Map data should be included in feature search. FALSE by default.}
 
 \item{useCustomGraphs:}{A boolean indicating whether custom graphs should be used. FALSE by default.}
 
