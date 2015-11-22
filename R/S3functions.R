@@ -1,5 +1,19 @@
 # S3 functions (De facto constructors of Session)
 
+#' preProcessingContorl
+#' 
+#' @param emptyValuePolicy: Controls how empty values in the data are being handled NA by default will replace numeric value with median value, and strings with empty strings.
+#' @param fileEncoding: Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
+preProcessingControl = function(
+	emptyValuePolicy = NA,
+	fileEncoding = NA
+) {
+	list(
+		emptyValuePolicy = emptyValuePolicy,
+		fileEncoding = fileEncoding
+	)
+}
+
 #' featureGenerationContorl
 #' 
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
@@ -17,7 +31,7 @@
 #' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
 #' @param overrideMaxFeatureDurationForExternalData: A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.
 #' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
-#' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.
+#' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. NA by default corresponding to 200K.
 #' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). TRUE by default.
 featureGenerationControl = function(
 	maxDepth = 2,
@@ -35,7 +49,7 @@ featureGenerationControl = function(
 	maxFeatureDuration = 100,
 	overrideMaxFeatureDurationForExternalData = TRUE,
 	allocatedMemoryMB = 1000,
-	maxCollectionSize = 80000,
+	maxCollectionSize = NA,
 	useCachedFeatures = TRUE
 ) {
 	list(
@@ -62,20 +76,23 @@ featureGenerationControl = function(
 #' knowledge Control
 #' 
 #' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
+#' @param useOpenStreetMap: Optional. A boolean indicating whether Open Street Map data should be included in feature search. FALSE by default.
 #' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
 #' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
 #' @param customGraphsBlackList: Optional. A list that filters which custom graphs should be ignored. NA by default.
 #' @param customFunctions: Optional. A list of additional functions that should be incorporated to the feature search. NA by default.
 knowledgeControl = function(
 	useGraph = FALSE,
-	useCustomGraphs = FALSE,
+	useOpenStreetMap = FALSE,
+	useCustomGraphs = FALSE,	
 	customGraphsWhiteList = NA,
 	customGraphsBlackList = NA,
 	customFunctions = NA
 	) {
 		list(
 			useGraph = useGraph,
-			useCustomGraphs = useCustomGraphs,
+			useOpenStreetMap = useOpenStreetMap,
+			useCustomGraphs = useCustomGraphs,			
 			customGraphsWhiteList = customGraphsWhiteList,
 			customGraphsBlackList = customGraphsBlackList,
 			customFunctions = customFunctions
@@ -148,7 +165,6 @@ contextObject = function(data, name = NULL, keyColumns = list(), timeColumn = NU
 #' @param knowledgeControl: A \code{\link{knowledgeControl}} object with specific external knowledge parameters.
 #' @param modelBuildingControl: A \code{\link{modelBuildingControl}} object with specific model building parameters.
 #' @param reportingControl: A \code{\link{reportingControl}} object with specific reporting parameters.
-#' @param fileEncoding: Optional. NA by default. Options are: "ISO-8859-1", "UTF-8", "US-ASCII".
 #' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
@@ -163,12 +179,12 @@ learn <- function(
 			 weightColumn = NA,
 			 weightByClass = FALSE,
 			 contextDatasets = NA,
+			 preProcessingCtrl = preProcessingControl(),
 			 featureGenerationCtrl = featureGenerationControl(),
 			 knowledgeCtrl = knowledgeControl(),
 			 modelBuildingCtrl = modelBuildingControl(),
 			 reportingCtrl = reportingControl(),
 			 verbose = FALSE,
-			 fileEncoding = NA,
 			 autoSave = TRUE,
 			 runBlocking = TRUE,
 			 ...
@@ -179,7 +195,7 @@ learn <- function(
 	
 	if (!is.na(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")
 	
-	url <- paste(getSBserverHost(),":",getSBserverPort(),"/rapi/learn", sep="")
+	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/learn")
 	print(paste("Calling:", url))
 	
 	if (!is.na(contextDatasets)){ #writing context data to server if necessary
@@ -201,19 +217,17 @@ learn <- function(
 								weightByClass = weightByClass,
 								contextDatasets = contextDatasets,
 								
+								# preprocessing control
+								emptyValuePolicy = if(!is.null(extraParams$emptyValuePolicy)) extraParams$emptyValuePolicy else preProcessingCtrl$emptyValuePolicy,
+								fileEncoding = if(!is.null(extraParams$fileEncoding)) extraParams$fileEncoding else preProcessingCtrl$fileEncoding,
+								
+								#feature search parameters
 								featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,
 								functionsWhiteList = if(!is.null(extraParams$functionsWhiteList)) extraParams$functionsWhiteList else featureGenerationCtrl$functionsWhiteList, 
 								functionsBlackList = if(!is.null(extraParams$functionsBlackList)) extraParams$functionsBlackList else featureGenerationCtrl$functionsBlackList, 
 								booleanNumericFeatures = if(!is.null(extraParams$booleanNumericFeatures)) extraParams$booleanNumericFeatures else featureGenerationCtrl$booleanNumericFeatures,
 								numericEqualityFeatures = if(!is.null(extraParams$numericEqualityFeatures)) extraParams$numericEqualityFeatures else featureGenerationCtrl$numericEqualityFeatures,
-								allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGenerationCtrl$allowRangeFeatures,
-								
-								useGraph = if(!is.null(extraParams$useGraph)) extraParams$useGraph else knowledgeCtrl$useGraph,
-								useCustomGraphs = if(!is.null(extraParams$useCustomGraphs)) extraParams$useCustomGraphs else knowledgeCtrl$useCustomGraphs,
-								customGraphsWhiteList = if(!is.null(extraParams$customGraphsWhiteList)) extraParams$customGraphsWhiteList else knowledgeCtrl$customGraphsWhiteList,
-								customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else knowledgeCtrl$customGraphsBlackList,
-								customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else knowledgeCtrl$customFunctions,
-								
+								allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGenerationCtrl$allowRangeFeatures,																
 								crossRowFeatureSearch = if(!is.null(extraParams$crossRowFeatureSearch)) extraParams$crossRowFeatureSearch else featureGenerationCtrl$crossRowFeatureSearch,
 								maxFeaturesCount = if(!is.null(extraParams$maxFeaturesCount)) extraParams$maxFeaturesCount else featureGenerationCtrl$maxFeaturesCount, 
 								autoColumnSubSets = if(!is.null(extraParams$autoColumnSubSets)) extraParams$autoColumnSubSets else featureGenerationCtrl$autoColumnSubSets,
@@ -225,16 +239,25 @@ learn <- function(
 								maxCollectionSize = if(!is.null(extraParams$maxCollectionSize)) extraParams$maxCollectionSize else featureGenerationCtrl$maxCollectionSize,
 								maxDepth = if(!is.null(extraParams$maxDepth)) extraParams$maxDepth else featureGenerationCtrl$maxDepth,
 								
+								#knowledge parameters
+								useGraph = if(!is.null(extraParams$useGraph)) extraParams$useGraph else knowledgeCtrl$useGraph,
+								useOpenStreetMap = if(!is.null(extraParams$useOpenStreetMap)) extraParams$useOpenStreetMap else knowledgeCtrl$useOpenStreetMap,
+								useCustomGraphs = if(!is.null(extraParams$useCustomGraphs)) extraParams$useCustomGraphs else knowledgeCtrl$useCustomGraphs,								
+								customGraphsWhiteList = if(!is.null(extraParams$customGraphsWhiteList)) extraParams$customGraphsWhiteList else knowledgeCtrl$customGraphsWhiteList,
+								customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else knowledgeCtrl$customGraphsBlackList,
+								customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else knowledgeCtrl$customFunctions,
+								
+								# model building parameters
 								algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuildingCtrl$algorithmsWhiteList,
 								evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuildingCtrl$evaluationMetric,
 								crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuildingCtrl$crossValidation,
 								
+								#reporting parameters
 								produceFeatureClusteringReport = if(!is.null(extraParams$produceFeatureClusteringReport)) extraParams$produceFeatureClusteringReport else reportingCtrl$produceFeatureClusteringReport,
 								produceReports = if(!is.null(extraParams$produceReports)) extraParams$produceReports else reportingCtrl$produceReports,
 								scoreOnTestSet = if(!is.null(extraParams$scoreOnTestSet)) extraParams$scoreOnTestSet else reportingCtrl$scoreOnTestSet,
 								
-								externalPrefixPath = getSBserverIOfolder(),
-								fileEncoding = fileEncoding
+								externalPrefixPath = getSBserverIOfolder()
 	)
 	
 	verifyList = function(l) {if(is.vector(l) && !is.na(l)) as.list(l) else l}
@@ -364,4 +387,3 @@ writeToServer = function(data, filename = NA, prefix = "data_in"){ #TODO: deal w
 #   }
 # 	return(finalRes)
 # }
-
