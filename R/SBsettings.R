@@ -274,6 +274,16 @@ functionCatalog = function() {
   browseURL(system.file("extdata", "functionCatalog.html", package = "SparkBeyond"))
 }
 
+login = function(username, password) {
+	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/login")
+	httr::POST(url, encode = "form", body = list(email=username, password=password))
+}
+
+logout = function() {
+	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/logout")
+	httr::POST(url, encode = "form")
+}
+
 .onLoad <- function(libname = find.package("SparkBeyond"), pkgname = "SparkBeyond") {
   print(paste0("Automatically trying to load settings saved in :",getwd()))
   loadSettings()
