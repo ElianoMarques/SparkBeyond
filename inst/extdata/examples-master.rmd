@@ -38,7 +38,7 @@ Show predict / create package etc example - should be in a different section
 ```
 <br>
 <br>
-```{r basic_regression, child='basic_regression.rmd', eval = TRUE, cache=TRUE}
+```{r basic_regression, child='basic_regression.rmd', eval = FALSE, cache=TRUE}
 ```
 <br>
 <br>
@@ -53,6 +53,10 @@ Show predict / create package etc example - should be in a different section
 #C. Using SparkBeyond knowledge#
 
 ```{r external_weather, child='external_weather.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+<br>
+```{r external_openStreetMap, child='external_openStreetMap.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>

@@ -87,7 +87,7 @@ getData <- function(datasetName) {
 
   #auxiliary functions
   getExtData <- function(name) {
-    filename = system.file("extdata", name, package = "SparkBeyond")
+    filename = system.file("extdata/data", name, package = "SparkBeyond")
     sep = if (tools::file_ext(filename) == "tsv" || (tools::file_ext(filename) == "gz" && grepl("tsv", filename))) "\t" else ","
     data = read.table(filename, header = TRUE, sep = sep, stringsAsFactors=FALSE) #inspect file content
     #str(data) #inspect file content
@@ -107,6 +107,7 @@ getData <- function(datasetName) {
     city_geocodeddb =getExtData("City_geocodedDB.csv"),
     flights_delay = getExtData("flights_weatherDelay.tsv.gz"),
     languages = getExtData("languages.tsv"),
+    emergency_locations = getExtData("emergency_locations.tsv"),
     #flights_delay = getExtData("flights_weatherDelay.tsv.gz"), #the git upload in RStudio doesn't support tsv.gz
 #      flights_delay =       {
 #        destName = "flights_weatherDelay.tsv.gz"

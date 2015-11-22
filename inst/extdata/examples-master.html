@@ -1260,148 +1260,6 @@ need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/R
 <iframe width="400" height="400" src="./Lift_plot_survived_1.html" frameborder="0" seamless></iframe>
 -->
 <p><br> <br></p>
-<!--
-%\VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{basic_regression}
-%\VignetteDepends{xtable}
--->
-<h2 id="basic-regression">Basic regression</h2>
-Goal: Predict Titanic Passenger <br> This example demonstrates how to perform a simple regression using the SparkBeyond platform. We will use the same titanic data but now we will aim to predict the column <code>age</code>. <br>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">data = getData("titanic_train")
-titanicAgeModel = learn(
-        projectName = "titanic_age",
-    trainData = data,
-    target = "age",
-    # optional - limit the number of features - check documentation for featureGenerationControl         
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),  
-        # optional - specify algorithms to use - check modelBuildingControl
-        modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestRegressor")),
-        # optional - create lift plots and prediction results 
-    reportingCtrl = reportingControl(scoreOnTestSet = TRUE),  
-        # optional - avoid automatically creating a local object pointing to the created model 
-    autoSave = FALSE
-)</code></pre>
-</div>
-<br> From this examples, we can see that having the tokens 'master' and 'miss' in the passenger name are strong indicators of the gender. Here are the top features: <br>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">library(xtable)
-print(xtable(titanicAgeModel$features()[1:7,c("idx", "feature")]), type='html', comment=F)</code></pre>
-<table border="1">
-<tr>
-<th>
-</th>
-<th>
-idx
-</th>
-<th>
-feature
-</th>
-</tr>
-<tr>
-<td align="right">
-1
-</td>
-<td align="right">
-0
-</td>
-<td>
-name contains master
-</td>
-</tr>
-<tr>
-<td align="right">
-2
-</td>
-<td align="right">
-1
-</td>
-<td>
-pclass &lt; 3
-</td>
-</tr>
-<tr>
-<td align="right">
-3
-</td>
-<td align="right">
-2
-</td>
-<td>
-wordFrequencies(name).valueOf(miss) orIfMissing 0.5773502691896258 &lt; 0.5386751345948129
-</td>
-</tr>
-<tr>
-<td align="right">
-4
-</td>
-<td align="right">
-3
-</td>
-<td>
-parch in range (0, 3.5)
-</td>
-</tr>
-<tr>
-<td align="right">
-5
-</td>
-<td align="right">
-4
-</td>
-<td>
-fare &lt; 9.54375
-</td>
-</tr>
-<tr>
-<td align="right">
-6
-</td>
-<td align="right">
-5
-</td>
-<td>
-embarked == Q
-</td>
-</tr>
-<tr>
-<td align="right">
-7
-</td>
-<td align="right">
-6
-</td>
-<td>
-stemmedWordsWithoutCommonTerms(name) does not contain mr
-</td>
-</tr>
-</table>
-</div>
-To view the feature trace report review /reports/features/features_trace.txt:<br> For example, the first feature &quot;name contains master&quot; has a positive example trace under the &quot;positive sample&quot; column. The trace starts with the &quot;name&quot; subexpression (bottom) &quot;Rice, Master. Eugene&quot;, the next step of the trace is the subexpression &quot;tokenizeByWordBoundary(name)&quot; which is directly on top of &quot;name&quot;. It evaluates to &quot;Vector(rice, master, eugene)&quot; which contains &quot;master&quot;. The type and documentation of each subexpression function are listed in the last two columns.
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">writeLines(gsub("-{2}","",readLines(paste0(titanicAgeModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))</code></pre>
-<button class="output R toggle btn btn-xs btn-success">
-<span class="glyphicon glyphicon-chevron-down"></span> R output
-</button>
-<pre style=""><code class="output r">## Human friendly: name contains master
-## Canonical: core.Solving.TextFunctions.tokenizeByWordBoundary(name) contains "master"
-## +++++-+-+
-## | sub-expression               | positive sample              | negative sample                  | type           | root function                                                                                     | reference / explanation             |
-## +++++-+-+
-## | tokenizeByWordBoundary(name) | Vector(rice, master, eugene) | Vector(braund, mr, owen, harris) | Vector[String] | core.Solving.TextFunctions.tokenizeByWordBoundary(text: core.nlp.SemanticWrapper): Vector[String] | returns a list of the text\'s words |
-## |  name                        | Rice, Master. Eugene         | Braund, Mr. Owen Harris          | core.nlp.Text  | name                                                                                              | Input parameter 'name'              |
-## +++++-+-+
-</code></pre>
-</div>
 <p><br> <br></p>
 <h1 id="b.-basic-feature-generation-controls">B. Basic feature generation controls</h1>
 <!--
@@ -2124,6 +1982,211 @@ date == Fri Feb 22 02:00:00 IST 2008
 ## |   log1p(arrTime)                        | 4.762173934797756    | 3.258096538021482  | Double | scala.math.log1p(x: Double): Double    | http://www.scala-lang.org/api/current/index.html#scala.math   |
 ## |    arrTime                              | 116                  | 25                 | Int    | arrTime                                | Input parameter 'arrTime'                                     |
 </code></pre>
+</div>
+<p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{external_openStreetMap}
+%\VignetteDepends{xtable}
+-->
+<h2 id="open-street-map-data">Open Street Map data</h2>
+<p>The emergency locations dataset contains locations in the London, UK metro and associcates each location with a 'risk' score based on the distance within a 2-mile radius to the nearest fire station or hospital. If only fire station or hospital are in the radius of a point a penalty of 20.0 is added, and if no hospitals or fire stations are in the radius a penalty of 40.0 is added.</p>
+<br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">emergencyLocations = getData("emergency_locations")
+print(xtable(tail(emergencyLocations,n=5)), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+latitude
+</th>
+<th>
+longitude
+</th>
+<th>
+risk
+</th>
+</tr>
+<tr>
+<td align="right">
+496
+</td>
+<td align="right">
+51.50
+</td>
+<td align="right">
+0.05
+</td>
+<td align="right">
+2.64
+</td>
+</tr>
+<tr>
+<td align="right">
+497
+</td>
+<td align="right">
+51.39
+</td>
+<td align="right">
+-0.29
+</td>
+<td align="right">
+1.72
+</td>
+</tr>
+<tr>
+<td align="right">
+498
+</td>
+<td align="right">
+51.64
+</td>
+<td align="right">
+-0.06
+</td>
+<td align="right">
+21.85
+</td>
+</tr>
+<tr>
+<td align="right">
+499
+</td>
+<td align="right">
+51.58
+</td>
+<td align="right">
+0.04
+</td>
+<td align="right">
+21.18
+</td>
+</tr>
+<tr>
+<td align="right">
+500
+</td>
+<td align="right">
+51.53
+</td>
+<td align="right">
+0.11
+</td>
+<td align="right">
+3.37
+</td>
+</tr>
+</table>
+</div>
+<br> By setting useOpenStreetMap to TRUE, the area around each latLong will be downloaded and the points of interests available in that area will be used during the feature search. <br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">emergencyLocationsModel = learn(
+        projectName = "emergencyLocations_example",
+    trainData = emergencyLocations,
+    target = "risk",
+    featureGenerationCtrl = featureGenerationControl(            
+            maxFeaturesCount = list(5)
+        ),
+        knowledgeCtrl = knowledgeControl(useOpenStreetMap = TRUE),
+    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RXGBoostRegressor")),    
+    autoSave = FALSE
+)</code></pre>
+</div>
+<br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(emergencyLocationsModel$evaluate()$evaluation$rootMeanSquaredError)</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## 
+## [1] 0.1126233
+</code></pre>
+</div>
+<br> Indeed the top 3 features identify that the target is correlated with short distance to fire stations and hospitals.<br /><br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(emergencyLocationsModel$features()[1:5,c("idx","feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+idx
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0
+</td>
+<td>
+OSMmethods.attributesOfNearestObjects(latLong).valueOf((amenity, fire_station)) orIfMissing 1.9999070167541504 &lt; 1.4710450768470764
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+1
+</td>
+<td>
+OSMmethods.attributesOfNearestObjects(latLong).valueOf((amenity, hospital)) orIfMissing 0 &gt;= 0.08782432973384857
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+2
+</td>
+<td>
+OSMmethods.attributesOfNearestObjects(latLong).valueOf((amenity, fire_station)) orIfMissing 0 &gt;= 0.07668359577655792
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+3
+</td>
+<td>
+OSMmethods.allPairs1k(latLong).valueOf(&quot;(amenity, post_box)&quot;) orIfMissing 0 &gt;= 15.5
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+4
+</td>
+<td>
+OSMmethods.attributesOfNearestObjects(latLong).valueOf((name, HSBC)) orIfMissing 1.9999624490737915 &lt; 1.7175708413124084
+</td>
+</tr>
+</table>
 </div>
 <p><br> <br></p>
 <h1 id="d.-model-with-complex-data-structures">D. Model with complex data structures</h1>
