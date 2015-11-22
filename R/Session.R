@@ -39,6 +39,30 @@ Session = setRefClass("Session",
         curStatus = ""
         hasShownInputSchema = FALSE
         hasShownFeatures = FALSE
+        
+        readStreaming = function(prevLine = 0){
+        	stop = FALSE
+        	notificationFile = paste0(artifact_loc,"/UInotification.log")
+        	if (file.exists(notificationFile)){
+        		#print(paste("read streaming:",  prevLine))
+        		f = file(notificationFile, "r")
+        		on.exit(close(f))
+        		if (prevLine>0) readLines(f, n = prevLine)
+        		while(!stop) {
+        			next_line = readLines(f, n = 1)
+        			if(length(next_line) == 0) {
+        				stop = TRUE
+        				close(f)
+        			}else{
+        				print(next_line)
+        				prevLine = prevLine + 1
+        			}
+        		}
+        	}
+        	prevLine
+        }
+        curStreamingLine = readStreaming(curStreamingLine)
+        
         finalStatus = repeat {
           i = i+1
 #           if (i > 10 && !serverResponded) {
@@ -83,29 +107,7 @@ Session = setRefClass("Session",
             }
           }
 
-          readStreaming = function(prevLine = 0){
-            stop = FALSE
-            notificationFile = paste0(artifact_loc,"/UInotification.log")
-            if (file.exists(notificationFile)){
-              #print(paste("read streaming:",  prevLine))
-              f = file(notificationFile, "r")
-              if (prevLine>0) readLines(f, n = prevLine)
-              while(!stop) {
-                next_line = readLines(f, n = 1)
-                if(length(next_line) == 0) {
-                  stop = TRUE
-                  close(f)
-                }else{
-                  print(next_line)
-                  prevLine = prevLine + 1
-                }
-              }
-            }
-            prevLine
-          }
-
-          curStreamingLine = readStreaming(curStreamingLine)
-          print(paste(curStatus, "-" ,i))
+					print(paste(curStatus, "-" ,i))
           secs = min(i*(1.5), 20)
           Sys.sleep(secs)
         }
