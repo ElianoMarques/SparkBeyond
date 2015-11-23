@@ -193,7 +193,8 @@ learn <- function(
 	isLatestRpackage()
 	extraParams = list(...)
 	
-	if (!is.na(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")
+	if(is.null(trainData) && !is.null(extraParams$trainData)) trainData = extraParams$trainData
+	if (!is.na(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
 	
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/learn")
 	print(paste("Calling:", url))
@@ -308,14 +309,14 @@ learn.file = function(...) {
 	l = list(...)
 	trainData = if(!is.null(l$trainDataFilename)) l$trainDataFilename else stop("no training data was provided")
 	testData = if(!is.null(l$testDataFilename)) l$testDataFilename else NA
-	session = do.call(learn,c(trainData = trainData, testData=testData, ...))
+	session = do.call(learn,list(trainData = trainData, testData=testData, ...))
 	session$modelBuilt = TRUE
 	session
 }
 
 # Depreacted 
 featureSearch = function(...) { 
-	session = do.call(learn,c(algorithmsWhiteList = list("ZeroR"), ...))	# doesn't deal well with regression - add as parameter to learn
+	session = do.call(learn,list(algorithmsWhiteList = list("ZeroR"), ...))	
 	session$modelBuilt = FALSE
 	session
 }
@@ -324,7 +325,7 @@ featureSearch = function(...) {
 featureSearch.file = function(...) { 
 	l = list(...)
 	trainData = if(!is.null(l$trainDataFilename)) l$trainDataFilename else stop("no training data was provided")
-	session = do.call(learn,c(trainData = trainData, algorithmsWhiteList = list("ZeroR"), ...)) # doesn't deal well with regression - add as parameter to learn
+	session = do.call(learn,list(trainData = trainData, algorithmsWhiteList = list("ZeroR"), ...))
 	session$modelBuilt = FALSE
 	session
 }
