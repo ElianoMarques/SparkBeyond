@@ -25,7 +25,6 @@ The first run may take more time as weather data will be downloaded and cached.
 ```{r external_weather_1, eval=TRUE, results='asis'}
 library(xtable)
 flights = getData("flights_delay")
-airports = getData("airports")
 names(flights)
 print(xtable(tail(airports,n=5)), type='html', comment=F) # show the airport database
 ```

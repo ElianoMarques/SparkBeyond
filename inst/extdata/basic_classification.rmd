@@ -11,11 +11,6 @@ output:
 %\VignetteDepends{xtable}
 -->
 
-```{r basic_classification_1, echo=FALSE, eval = TRUE, message=FALSE, results='hide'}
-library(SparkBeyond)
-setSBserverIOfolder("/tmp/")
-```
-  
 ##Basic classification ##  
 
 Goal: Predict Titanic Passenger Survival

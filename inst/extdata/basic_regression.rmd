@@ -10,10 +10,6 @@ output:
 %\VignetteIndexEntry{basic_regression}
 %\VignetteDepends{xtable}
 -->
-
-```{r basic_2_1, echo=FALSE, eval = TRUE, message=FALSE, results='hide'}
-library(SparkBeyond)
-```
   
 ##Basic regression##
 
