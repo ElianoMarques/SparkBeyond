@@ -61,6 +61,28 @@ Session = setRefClass("Session",
         	}
         	prevLine
         }
+        readStreamingAPI = function(prevLine = 0){
+        	stop = FALSE
+        	#/rapi/notificationsLog/:project/:revision
+        	notificationFile = paste0(artifact_loc,"/UInotification.log")
+        	if (file.exists(notificationFile)){
+        		#print(paste("read streaming:",  prevLine))
+        		f = file(notificationFile, "r")
+        		on.exit(close(f))
+        		if (prevLine>0) readLines(f, n = prevLine)
+        		while(!stop) {
+        			next_line = readLines(f, n = 1)
+        			if(length(next_line) == 0) {
+        				stop = TRUE
+        				close(f)
+        			}else{
+        				print(next_line)
+        				prevLine = prevLine + 1
+        			}
+        		}
+        	}
+        	prevLine
+        }
         curStreamingLine = readStreaming(curStreamingLine)
         
         finalStatus = repeat {
