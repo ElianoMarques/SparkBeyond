@@ -108,6 +108,7 @@ getData <- function(datasetName) {
     flights_delay = getExtData("flights_weatherDelay.tsv.gz"),
     languages = getExtData("languages.tsv"),
     emergency_locations = getExtData("emergency_locations.tsv"),
+    museums = getExtData("museumsNextToParks.tsv"),
     #flights_delay = getExtData("flights_weatherDelay.tsv.gz"), #the git upload in RStudio doesn't support tsv.gz
 #      flights_delay =       {
 #        destName = "flights_weatherDelay.tsv.gz"
