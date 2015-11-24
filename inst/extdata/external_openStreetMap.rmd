@@ -11,7 +11,7 @@ output:
 %\VignetteDepends{xtable}
 -->
 
-##Open Street Map data##
+##Open Street Map data 1##
 
 The emergency locations dataset contains locations in the London, UK metro and associcates each location with a 'risk' score based on the distance within a 2-mile radius to the nearest fire station or hospital. If only fire station or hospital are in the radius of a point a penalty of 20.0 is added, and if no hospitals or fire stations are in the radius a penalty of 40.0 is added.
 
@@ -47,3 +47,43 @@ Indeed the top 3 features identify that the target is correlated with short dist
 print(xtable(emergencyLocationsModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
 ```
 
+<br>
+<br>
+<br>
+<br>
+
+##Open Street Map data 2##
+
+The museums dataset contains synthetic tweets mentioning names of museums in London. A boolean label is attached to each tweet marking whether there are parks within 0.4KM from the museum that was mentioned.  
+<br>
+```{r external_openStreetMap_2_1, eval=TRUE, results='asis'}
+museums = getData("museums") 
+print(xtable(tail(museums,n=5)), type='html', comment=F) 
+```
+<br>
+In this example, we will need to use both the knowledge graph in order to identify entities in the text, and open street map in order took for points of interest near each location.
+<br>
+```{r external_openStreetMap_2_2, eval=TRUE, message=FALSE, results='hide'}
+museumsModel = learn( 
+		projectName = "OSM_museums_example",
+    trainData = museums,
+    target = "label",
+    featureGenerationCtrl = featureGenerationControl(	booleanNumericFeatures = FALSE,		 
+			maxFeaturesCount = list(3),			
+			maxDepth = 3,
+		),
+		knowledgeCtrl = knowledgeControl(useGraph = TRUE, useOpenStreetMap = TRUE),
+    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),    
+    autoSave = FALSE
+)
+```
+<br>
+```{r external_openStreetMap_2_3, eval=TRUE, cache=TRUE}
+print(museumsModel$evaluate()$summary) 
+```
+<br>
+Indeed the top feature indicates that parks are in the vicinity of the input.      
+<br>
+```{r external_openStreetMap_2_4, eval=TRUE, results='asis'}
+print(xtable(museumsModel$features()[1:5,c("idx","feature")]), type='html', comment=F)  
+```
