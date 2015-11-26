@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>R: Run SparkBeyond feature enrichment and learning process.</title>
+<html><head><title>R: learn</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
 
@@ -11,11 +11,11 @@
 
 <table width="100%" summary="page for learn {SparkBeyond}"><tr><td>learn {SparkBeyond}</td><td align="right">R Documentation</td></tr></table>
 
-<h2>Run SparkBeyond feature enrichment and learning process.</h2>
+<h2>learn</h2>
 
 <h3>Description</h3>
 
-<p>Run SparkBeyond feature enrichment and learning process.
+<p>Runs SparkBeyond feature enrichment and learning process.
 </p>
 
 
@@ -23,22 +23,13 @@
 
 <pre>
 learn(projectName = "temp", trainData, target, testData = NA,
-  trainTestSplitRatio = 0.8, weightColumn = NA, maxDepth = 2,
-  contextDatasets = NA, algorithmsWhiteList = NA, functionsWhiteList = NA,
-  functionsBlackList = NA, booleanNumericFeatures = NA,
-  numericEqualityFeatures = TRUE, useGraph = FALSE,
-  useCustomGraphs = FALSE, customGraphsWhiteList = NA,
-  customGraphsBlackList = NA, customFunctions = NA,
-  crossRowFeatureSearch = FALSE, maxFeaturesCount = list(300),
-  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
-  maxFeatureDuration = 100,
-  overrideMaxFeatureDurationForExternalData = TRUE,
-  useCachedFeatures = FALSE, evaluationMetric = "AUC",
-  scoreOnTestSet = FALSE, crossValidation = 5, allocatedMemoryMB = 1000,
-  maxCollectionSize = 80000, weightByClass = FALSE,
-  produceFeatureClusteringReport = FALSE, produceReports = NA,
-  fileEncoding = NA, autoSave = TRUE, runBlocking = TRUE,
-  verbose = FALSE)
+  trainTestSplitRatio = 0.8, weightColumn = NA, weightByClass = FALSE,
+  contextDatasets = NA, preProcessingCtrl = preProcessingControl(),
+  featureGenerationCtrl = featureGenerationControl(),
+  knowledgeCtrl = knowledgeControl(),
+  modelBuildingCtrl = modelBuildingControl(),
+  reportingCtrl = reportingControl(), verbose = FALSE, autoSave = TRUE,
+  runBlocking = TRUE, ...)
 </pre>
 
 
@@ -55,11 +46,11 @@ learn(projectName = "temp", trainData, target, testData = NA,
 </td></tr>
 <tr valign="top"><td><code>trainData:</code></td>
 <td>
-<p>A data frame to analyze.</p>
+<p>train data to analyze.</p>
 </td></tr>
 <tr valign="top"><td><code>testData:</code></td>
 <td>
-<p>Optional. An independent test data frame to test the prediction on. NA by default.</p>
+<p>Optional. test data to validate model results. NA by default.</p>
 </td></tr>
 <tr valign="top"><td><code>trainTestSplitRatio:</code></td>
 <td>
@@ -69,117 +60,29 @@ learn(projectName = "temp", trainData, target, testData = NA,
 <td>
 <p>Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.</p>
 </td></tr>
-<tr valign="top"><td><code>maxDepth:</code></td>
+<tr valign="top"><td><code>weightByClass:</code></td>
 <td>
-<p>Optional. Integer &lt; 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.</p>
+<p>Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.</p>
 </td></tr>
 <tr valign="top"><td><code>contextDatasets:</code></td>
 <td>
 <p>Optional. A list of paths to context datasets to be added to the learning.</p>
 </td></tr>
-<tr valign="top"><td><code>algorithmsWhiteList:</code></td>
+<tr valign="top"><td><code>featureGenerationControl:</code></td>
 <td>
-<p>Optional. A list of strings that represents the set of algorithms to run. NA by default</p>
+<p>A <code><a href="../../SBadapter/html/featureGenerationControl.html">featureGenerationControl</a></code> object with specific feature generation parameters.</p>
 </td></tr>
-<tr valign="top"><td><code>functionsWhiteList:</code></td>
+<tr valign="top"><td><code>knowledgeControl:</code></td>
 <td>
-<p>Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.</p>
+<p>A <code><a href="knowledgeControl.html">knowledgeControl</a></code> object with specific external knowledge parameters.</p>
 </td></tr>
-<tr valign="top"><td><code>functionsBlackList:</code></td>
+<tr valign="top"><td><code>modelBuildingControl:</code></td>
 <td>
-<p>Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.</p>
+<p>A <code><a href="../../SBadapter/html/modelBuildingControl.html">modelBuildingControl</a></code> object with specific model building parameters.</p>
 </td></tr>
-<tr valign="top"><td><code>booleanNumericFeatures:</code></td>
+<tr valign="top"><td><code>reportingControl:</code></td>
 <td>
-<p>A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.</p>
-</td></tr>
-<tr valign="top"><td><code>numericEqualityFeatures:</code></td>
-<td>
-<p>A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.</p>
-</td></tr>
-<tr valign="top"><td><code>useGraph:</code></td>
-<td>
-<p>Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.</p>
-</td></tr>
-<tr valign="top"><td><code>useCustomGraphs:</code></td>
-<td>
-<p>A boolean indicating whether custom graphs should be used. FALSE by default.</p>
-</td></tr>
-<tr valign="top"><td><code>customGraphsWhiteList:</code></td>
-<td>
-<p>Optional. A list that filters which domains should be used. NA by default.</p>
-</td></tr>
-<tr valign="top"><td><code>customGraphsBlackList:</code></td>
-<td>
-<p>Optional. A list that filters which custom graphs should be ignored. NA by default.</p>
-</td></tr>
-<tr valign="top"><td><code>customFunctions:</code></td>
-<td>
-<p>Optional. A list of additional functions that should be incorporated to the feature search. NA by default.</p>
-</td></tr>
-<tr valign="top"><td><code>crossRowFeatureSearch.</code></td>
-<td>
-<p>A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.</p>
-</td></tr>
-<tr valign="top"><td><code>maxFeaturesCount:</code></td>
-<td>
-<p>Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.</p>
-</td></tr>
-<tr valign="top"><td><code>autoColumnSubSets:</code></td>
-<td>
-<p>Optional. A list of values contain any of the following: &quot;CONCEPT&quot;, &quot;NUMERIC_PAIRS&quot;, &quot;ALL_PAIRS&quot;. &quot;CONCEPT&quot; will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. &quot;NUMERIC_PAIRS&quot; will create all column subsets for numeric columns. &quot;ALL_PAIRS&quot; will create subsets of size 2 from all columns. &quot;CONCEPT&quot; by default.</p>
-</td></tr>
-<tr valign="top"><td><code>customColumnSubsets:</code></td>
-<td>
-<p>Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.</p>
-</td></tr>
-<tr valign="top"><td><code>maxFeatureDuration:</code></td>
-<td>
-<p>Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.</p>
-</td></tr>
-<tr valign="top"><td><code>overrideMaxFeatureDurationForExternalData:</code></td>
-<td>
-<p>A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.</p>
-</td></tr>
-<tr valign="top"><td><code>useCachedFeatures:</code></td>
-<td>
-<p>Optional. A boolean indicating whether to use cached features (from previous run). FALSE by default.</p>
-</td></tr>
-<tr valign="top"><td><code>evaluationMetric:</code></td>
-<td>
-<p>Optional. A string representing the evaluation metric. Should be either &quot;AUC&quot;, &quot;PREC&quot;, or &quot;RMSE&quot;. &quot;AUC&quot; by default.</p>
-</td></tr>
-<tr valign="top"><td><code>scoreOnTestSet:</code></td>
-<td>
-<p>Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.</p>
-</td></tr>
-<tr valign="top"><td><code>crossValidation:</code></td>
-<td>
-<p>Optional. Integer value representing how many cross validation splits should be used. 5 by default.</p>
-</td></tr>
-<tr valign="top"><td><code>allocatedMemoryMB:</code></td>
-<td>
-<p>Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.</p>
-</td></tr>
-<tr valign="top"><td><code>maxCollectionSize:</code></td>
-<td>
-<p>Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. 80K by default.</p>
-</td></tr>
-<tr valign="top"><td><code>weightByClass:</code></td>
-<td>
-<p>Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.</p>
-</td></tr>
-<tr valign="top"><td><code>produceFeatureClusteringReport:</code></td>
-<td>
-<p>An indicator to produce feature cluster visualization. FALSE by default.</p>
-</td></tr>
-<tr valign="top"><td><code>produceReports:</code></td>
-<td>
-<p>&quot;EVALUATED_FUNCTIONS&quot;.</p>
-</td></tr>
-<tr valign="top"><td><code>fileEncoding:</code></td>
-<td>
-<p>Optional. NA by default. Options are: &quot;ISO-8859-1&quot;, &quot;UTF-8&quot;, &quot;US-ASCII&quot;.</p>
+<p>A <code><a href="../../SBadapter/html/reportingControl.html">reportingControl</a></code> object with specific reporting parameters.</p>
 </td></tr>
 <tr valign="top"><td><code>autoSave:</code></td>
 <td>
@@ -200,54 +103,7 @@ learn(projectName = "temp", trainData, target, testData = NA,
 
 <h3>Examples</h3>
 
-<pre><code class="r">## No test: 
-session = learn(&quot;titanic&quot;, getData(&quot;titanic_train&quot;),
-   target = &quot;survived&quot;, algorithmsWhiteList = list(&quot;RRandomForest&quot;), runBlocking = TRUE)
-</code></pre>
-
-<pre><code>## [1] &quot;Notice: latest build version was not available - if this issue continues please notify SparkBeyond.&quot;
-## [1] &quot;Training on  ~/sparkBeyond/data_indf70796fe050.tsv&quot;
-## [1] &quot;Calling: http://127.0.0.1:9001/rapi/learn&quot;
-</code></pre>
-
-<pre><code>## Error in function (type, msg, asError = TRUE) : Failed to connect to 127.0.0.1 port 9001: Connection refused
-</code></pre>
-
-<pre><code class="r">flights = getData(&quot;flights_delay&quot;)
-</code></pre>
-
-<pre><code>## Warning in file(file, &quot;rt&quot;): file(&quot;&quot;) only supports open = &quot;w+&quot; and open =
-## &quot;w+b&quot;: using the former
-</code></pre>
-
-<pre><code>## Error in read.table(filename, header = TRUE, sep = sep, stringsAsFactors = FALSE): no lines available in input
-</code></pre>
-
-<pre><code class="r">sampledFlights = sampleData(flights, 0.2)
-</code></pre>
-
-<pre><code>## Error in nrow(data): object &#39;flights&#39; not found
-</code></pre>
-
-<pre><code class="r">flightsModel = learn(projectName = &quot;flights_delay_example&quot;,
-                    trainData = sampledFlights,
-                    target = &quot;weatherDelay&quot;,
-                    algorithmsWhiteList = list(&quot;RRandomForestRegressor&quot;),
-                    functionsBlackList = list(&quot;trigonometry&quot;),
-                    maxFeaturesCount = list(20)
-               )
-</code></pre>
-
-<pre><code>## Error in lapply(X = X, FUN = FUN, ...): object &#39;sampledFlights&#39; not found
-</code></pre>
-
-<pre><code class="r">head(flightsModel$features)
-</code></pre>
-
-<pre><code>## Error in head(flightsModel$features): object &#39;flightsModel&#39; not found
-</code></pre>
-
-<pre><code class="r">## End(No test)
+<pre><code class="r">#session = learn(&quot;titanic&quot;, getData(&quot;titanic_train&quot;), target = &quot;survived&quot;, algorithmsWhiteList = list(&quot;RRandomForest&quot;), runBlocking = TRUE, autoSave=FALSE)
 </code></pre>
 
 

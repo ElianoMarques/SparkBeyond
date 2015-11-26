@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: modelBuildingControl</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for modelBuildingControl {SparkBeyond}"><tr><td>modelBuildingControl {SparkBeyond}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>modelBuildingControl</h2>
+
+<h3>Description</h3>
+
+<p>modelBuildingControl
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+modelBuildingControl(algorithmsWhiteList = NA, evaluationMetric = NA,
+  crossValidation = 5)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>algorithmsWhiteList:</code></td>
+<td>
+<p>Optional. A list of strings that represents the set of algorithms to run. NA by default</p>
+</td></tr>
+<tr valign="top"><td><code>evaluationMetric:</code></td>
+<td>
+<p>Optional. A string representing the evaluation metric. Should be either &quot;AUC&quot;, &quot;PREC&quot;, or &quot;RMSE&quot;. NA by default automatically selects AUC for classification and RMSE for regression.</p>
+</td></tr>
+<tr valign="top"><td><code>crossValidation:</code></td>
+<td>
+<p>Optional. Integer value representing how many cross validation splits should be used. 5 by default.</p>
+</td></tr>
+</table>
+
+<hr><div align="center">[Package <em>SparkBeyond</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+</body></html>

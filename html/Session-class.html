@@ -36,7 +36,7 @@
 <dl>
 <dt><code>buildNumber()</code></dt><dd><p>Returns the build number in which the model was generated.</p>
 </dd>
-<dt><code>createPackage(sampleData = NULL, createRestAPIpackage = FALSE)</code></dt><dd><p>Create a sharable package for the model. <code>sampleData</code> can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. <code>createRestAPIpackage</code> is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE).</p>
+<dt><code>createPackage(sampleData = NULL, createRestAPIpackage = FALSE, ...)</code></dt><dd><p>Create a sharable package for the model. <code>sampleData</code> can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. <code>createRestAPIpackage</code> is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE).</p>
 </dd>
 <dt><code>enrich(data, featureCount = NA, writePredictionColumnsOnly = TRUE)</code></dt><dd><p>Returns a data frame containing the enrichedData. <code>data</code> is a dataframe to be enriched. Set <code>featureCount</code> in order to limit the number of returned features. Set <code>writePredictionColumnsOnly</code> to TRUE to return only prediction and probabily columns rather than the entire dataset.</p>
 </dd>
@@ -93,49 +93,285 @@
 session = learn(&quot;titanic&quot;, getData(&quot;titanic_train&quot;), target=&quot;survived&quot;,algorithmsWhiteList = list(&quot;xgboostClassifier&quot;),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
 </code></pre>
 
-<pre><code>## [1] &quot;Notice: latest build version was not available - if this issue continues please notify SparkBeyond.&quot;
-## [1] &quot;Training on  ~/sparkBeyond/data_indf7033e47e71.tsv&quot;
-## [1] &quot;Calling: http://127.0.0.1:9001/rapi/learn&quot;
-</code></pre>
-
-<pre><code>## Error in function (type, msg, asError = TRUE) : Failed to connect to 127.0.0.1 port 9001: Connection refused
+<pre><code>## [1] &quot;Notice: you are currently not using the latest engine version. Please consider running restartServer().&quot;
+## [1] &quot;SparkBeyond package is outdated. Please consider updatePackage()&quot;
+## [1] &quot;Calling: http://127.0.0.1:9000/rapi/learn&quot;
+## [1] &quot;Training on  /tmp/titanic_train_ab99a20f8ea70e75b52c4ae61c0c3321.tsv&quot;
+## [1] &quot;Artifact location was created at: /Users/zinman/localdata/artifacts/titanic/4&quot;
+## [1] &quot;auto saved Session object to a variable named &#39; backup_titanic_4 &#39;. To retrieve use: load(&#39;/Users/zinman/sparkBeyond/R/SparkBeyond/html/backup_titanic_4.RData&#39;).&quot;
+## [1] &quot;Detecting types - 1&quot;
+## Feature Search training-set: 710.0
+## Original histogram (FS):
+## +----------+-----------+
+## | Survived | Frequency |
+## +----------+-----------+
+## | 0        | 442       |
+## | 1        | 268       |
+## +----------+-----------+
+## Prior entropy: 0.9562317858093743
+## 
+## Input Schema
+## +-------+-----------+---------------+
+## | index | name      | type          |
+## +-------+-----------+---------------+
+## | 0     | *survived | Int           |
+## | 1     | pclass    | Int           |
+## | 2     | name      | core.nlp.Text |
+## | 3     | sex       | String        |
+## | 4     | age       | Double        |
+## | 5     | sibsp     | Int           |
+## | 6     | parch     | Int           |
+## | 7     | ticket    | core.nlp.Text |
+## | 8     | fare      | Double        |
+## | 9     | cabin     | String        |
+## | 10    | embarked  | String        |
+## +-------+-----------+---------------+
+## [1] &quot;Session in progress:  Creating features - 2&quot;
+## [1] &quot;Printing top 50 features out of 300&quot;
+##    idx
+## 1    0
+## 2    1
+## 3    2
+## 4    3
+## 5    4
+## 6    5
+## 7    6
+## 8    7
+## 9    8
+## 10   9
+## 11  10
+## 12  11
+## 13  12
+## 14  13
+## 15  14
+## 16  15
+## 17  16
+## 18  17
+## 19  18
+## 20  19
+## 21  20
+## 22  21
+## 23  22
+## 24  23
+## 25  24
+## 26  25
+## 27  26
+## 28  27
+## 29  28
+## 30  29
+## 31  30
+## 32  31
+## 33  32
+## 34  33
+## 35  34
+## 36  35
+## 37  36
+## 38  37
+## 39  38
+## 40  39
+## 41  40
+## 42  41
+## 43  42
+## 44  43
+## 45  44
+## 46  45
+## 47  46
+## 48  47
+## 49  48
+## 50  49
+##                                                                                                                 feature
+## 1                                                                                              name does not contain mr
+## 2                                                                                                           pclass != 3
+## 3                                                                            numberIn(ticket) in range (8854.5, 231932)
+## 4                                                                                            fare &gt;= 15.172899999999998
+## 5                                                                                numericSuffix(cabin) in range (3, 108)
+## 6                                                                                                           sex != male
+## 7                                                        cos(fare) in range (-0.4142747865977665, -0.18454433209625384)
+## 8                                                                                                         embarked == C
+## 9                                                                                                           pclass == 1
+## 10                                                                                                      name contains )
+## 11                                           upperCaseRatio(ticket) in range (0.05000000000000001, 0.13392857142857142)
+## 12                                                                                      cos(fare) &lt; -0.9989278625592983
+## 13                                                                                                    round(fare) == 19
+## 14                                                                                             numberOfWords(name) == 7
+## 15                                                           sin(fare) in range (0.998425635754864, 0.9995472778889662)
+## 16                                                           tan(age) in range (0.1652032253816651, 1.1682874182779286)
+## 17                                                                                             numberOfWords(name) &gt;= 6
+## 18                                                                              smallSubsets(cabin) contains List(2, E)
+## 19                                                                                                 sigmoid(fare) == 1.0
+## 20                                                                                                           sibsp &gt;= 5
+## 21                                             wordFrequencies(name).valueOf(john) orIfMissing 0 &gt;= 0.47360679774997894
+## 22                                                             wordFrequencies(name) contains (mrs, 0.3779644730092272)
+## 23                                                                                          prefixes(cabin) contains E1
+## 24                                                                                        upperCaseRatio(name) == 0.125
+## 25                                                                         normalizedNgrams(name) contains (mr, joseph)
+## 26                                                                                                    ticket contains o
+## 27                                                                                                   floor(fare) &lt; 10.5
+## 28                                                                           upperCaseRatio(name) &lt; 0.15301003344481606
+## 29                                                                                               numberIn(cabin) == 2.0
+## 30                                                                                                    ceil(fare) == 7.0
+## 31                                                                         normalizedNgrams(name) contains (miss, anna)
+## 32                                                                                         numberIn(ticket) &gt;= 319372.5
+## 33                                                                              smallSubsets(cabin) contains List(5, 2)
+## 34                                                                                      sin(age) &lt; -0.21049876125431888
+## 35                                                             stemmedWordsWithoutCommonTerms(name) does not contain mr
+## 36                                                                                     Histogram(cabin) contains (2, 1)
+## 37                                                                                                   ceil(fare) == 35.0
+## 38                                                                                                        embarked != S
+## 39                                                                                                          age == 47.0
+## 40                                                                                  normalizedNgrams(name) contains (j)
+## 41                                                                                    mostCommonValue(cabin) == Some(9)
+## 42                                                                              smallSubsets(cabin) contains List(1, D)
+## 43                                                                          sentimentDistribution(name) contains (0, 3)
+## 44                                                                                                  name contains david
+## 45                                                                                                   name contains kate
+## 46                                         wordFrequencies(name).valueOf(margaret) orIfMissing 0 &gt;= 0.47360679774997894
+## 47                                            wordFrequencies(name).valueOf(alfred) orIfMissing 0 &gt;= 0.4125890342545926
+## 48                                                                                       upperCaseRatio(name) == 0.1667
+## 49                                                              wordFrequencies(name) contains (mr, 0.5773502691896258)
+## 50 wordFrequencies(name).valueOf(john) orIfMissing 0.5773502691896258 in range (0.3657589318012504, 0.4277309429819105)
+##            RIG lin..score       support
+## 1  0.246524231  0.4428309 299 (42.11%) 
+## 2  0.076231905  0.4828444 315 (44.37%) 
+## 3  0.071115835  0.6485446 199 (28.03%) 
+## 4  0.068179011  0.4857528 333 (46.90%) 
+## 5  0.065055070  0.6512270 145 (20.42%) 
+## 6  0.242667723  0.4214526 251 (35.35%) 
+## 7  0.026757770  0.6091381  72 (10.14%) 
+## 8  0.023689570  0.5007106 139 (19.58%) 
+## 9  0.062929319  0.4867891 172 (24.23%) 
+## 10 0.010550407  0.5306137  14 (1.97%)  
+## 11 0.018753223  0.6129032  26 (3.66%)  
+## 12 0.012511649  0.5306704   6 (0.85%)  
+## 13 0.012511649  0.5306704   6 (0.85%)  
+## 14 0.032384616  0.5229437  29 (4.08%)  
+## 15 0.023655675  0.6114767  31 (4.37%)  
+## 16 0.010770463  0.6141236 104 (14.65%) 
+## 17 0.058777034  0.5127108  82 (11.55%) 
+## 18 0.012511649  0.5306704   6 (0.85%)  
+## 19 0.046715422  0.5171947 163 (22.96%) 
+## 20 0.011189840  0.5065561  11 (1.55%)  
+## 21 0.014925332  0.6140232  22 (3.10%)  
+## 22 0.034832967  0.5228582  21 (2.96%)  
+## 23 0.010413798  0.5313050   5 (0.70%)  
+## 24 0.013092465  0.5296784  18 (2.54%)  
+## 25 0.008115772  0.5325901   8 (1.13%)  
+## 26 0.009393665  0.5318326  16 (2.25%)  
+## 27 0.064727877  0.5118701 299 (42.11%) 
+## 28 0.044987230  0.5183965 337 (47.46%) 
+## 29 0.011035286  0.5849946   9 (1.27%)  
+## 30 0.010163270  0.5321201  10 (1.41%)  
+## 31 0.016722656  0.5293936   8 (1.13%)  
+## 32 0.027003283  0.5796781  99 (13.94%) 
+## 33 0.010413798  0.5313050   5 (0.70%)  
+## 34 0.011542697  0.5302979 248 (34.93%) 
+## 35 0.093387963  0.4997182 197 (27.75%) 
+## 36 0.019477192  0.5272582  38 (5.35%)  
+## 37 0.006075752  0.5330571   6 (0.85%)  
+## 38 0.026285346  0.4998902 208 (29.30%) 
+## 39 0.007094831  0.5074514   7 (0.99%)  
+## 40 0.007094831  0.5328240   7 (0.99%)  
+## 41 0.010413798  0.5313050   5 (0.70%)  
+## 42 0.010413798  0.5313050   5 (0.70%)  
+## 43 0.017400935  0.5283457 279 (39.30%) 
+## 44 0.006075752  0.5330571   6 (0.85%)  
+## 45 0.012511649  0.5306704   6 (0.85%)  
+## 46 0.012511649  0.6143173   6 (0.85%)  
+## 47 0.009138583  0.6162681   9 (1.27%)  
+## 48 0.015498520  0.5294405  72 (10.14%) 
+## 49 0.090437205  0.5055971 182 (25.63%) 
+## 50 0.012511649  0.7111491   6 (0.85%)  
+## [1] &quot;Session in progress:  Building model - 3&quot;
+## [1] &quot;Session in progress:  Building model - 4&quot;
+## [1] &quot;Session in progress:  Building model - 5&quot;
+## Score (AUC): 0.85539
+## Previous (revision 3) Score (AUC): 0.85116
+##                                                
+## Correctly Classified Instances     148   81.77%
+## Incorrectly Classified Instances   33    18.23%
+## Total Number of Instances          181         
+##                                                
+## === Detailed Accuracy By Class ===
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## 0               0.944     0.365     0.789       0.944    0.86        0.855      0.711
+## 1               0.635     0.056     0.887       0.635    0.74        0.855      0.711
+## Weighted Avg.   0.818     0.239     0.829       0.818    0.811       0.855      0.711
+##                                                                                      
+## Confusion Matrix:
+## +---------------------+-----+----+
+## | Actual \ Prediction | 0   | 1  |
+## +---------------------+-----+----+
+## | 0                   | 101 | 6  |
+## | 1                   | 27  | 47 |
+## +---------------------+-----+----+
+## [1] &quot;Done&quot;
 </code></pre>
 
 <pre><code class="r">#session = featureSearch(&quot;titanic&quot;, getData(&quot;titanic_train&quot;), target=&quot;survived&quot;)
 enriched = session$enrich(getData(&quot;titanic_train&quot;), featureCount = 10)
 </code></pre>
 
-<pre><code>## Error in eval(expr, envir, enclos): object &#39;session&#39; not found
+<pre><code>## [1] &quot;Notice: you are currently not using the latest engine version. Please consider running restartServer().&quot;
+## [1] &quot;Enriching  /tmp/enrich_ab99a20f8ea70e75b52c4ae61c0c3321.tsv&quot;
+## [1] &quot;Calling: http://127.0.0.1:9000/rapi/enrich&quot;
+## [1] &quot;Done.&quot;
 </code></pre>
 
 <pre><code class="r">colnames(enriched)
 </code></pre>
 
-<pre><code>## Error in is.data.frame(x): object &#39;enriched&#39; not found
+<pre><code>##  [1] &quot;X.name.contains.mr&quot;                                        
+##  [2] &quot;pclass....3&quot;                                               
+##  [3] &quot;abs.numberIn.ticket....120393.25....111538.75&quot;             
+##  [4] &quot;fare....15.172899999999998&quot;                                
+##  [5] &quot;abs.numericSuffix.cabin....55.5....52.5&quot;                   
+##  [6] &quot;sex....male&quot;                                               
+##  [7] &quot;abs.cos.fare.....0.2994095593470102....0.11486522725075635&quot;
+##  [8] &quot;embarked....C&quot;                                             
+##  [9] &quot;pclass....1&quot;                                               
+## [10] &quot;name.contains..&quot;
 </code></pre>
 
 <pre><code class="r">predicted = session$predict(getData(&quot;titanic_test&quot;))
 </code></pre>
 
-<pre><code>## Error in eval(expr, envir, enclos): object &#39;session&#39; not found
+<pre><code>## [1] &quot;Notice: you are currently not using the latest engine version. Please consider running restartServer().&quot;
+## [1] &quot;Predicting  /tmp/predict_0f89734c38a6ae1ded7bba3717abc94f.tsv&quot;
+## [1] &quot;Calling: http://127.0.0.1:9000/rapi/predict&quot;
+## [1] &quot;Predictions and plots are available at: /Users/zinman/localdata/artifacts/titanic/4/reports/predictions/test/&quot;
+## [1] &quot;Done.&quot;
 </code></pre>
 
 <pre><code class="r">colnames(predicted)
 </code></pre>
 
-<pre><code>## Error in is.data.frame(x): object &#39;predicted&#39; not found
+<pre><code>## [1] &quot;survived_predicted&quot; &quot;probability_0&quot;      &quot;probability_1&quot;
 </code></pre>
 
 <pre><code class="r">predicted[1:5,c(&quot;survived_predicted&quot;, &quot;probability_0&quot;, &quot;probability_1&quot;)]
 </code></pre>
 
-<pre><code>## Error in eval(expr, envir, enclos): object &#39;predicted&#39; not found
+<pre><code>##   survived_predicted probability_0 probability_1
+## 1                  0     0.9209693    0.07903069
+## 2                  1     0.3959064    0.60409361
+## 3                  0     0.8407071    0.15929288
+## 4                  0     0.6627080    0.33729205
+## 5                  1     0.3373680    0.66263205
 </code></pre>
 
 <pre><code class="r">eval = session$evaluate()
 </code></pre>
 
-<pre><code>## Error in eval(expr, envir, enclos): object &#39;session&#39; not found
+<pre><code>## === Detailed Accuracy By Class ===
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## 0               0.944     0.365     0.789       0.944    0.86        0.855      0.711
+## 1               0.635     0.056     0.887       0.635    0.74        0.855      0.711
+## Weighted Avg.   0.818     0.239     0.829       0.818    0.811       0.855      0.711
+## 
 </code></pre>
 
 <pre><code class="r">#session$showFeatures()

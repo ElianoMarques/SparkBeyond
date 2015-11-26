@@ -1,5 +1,5 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>R: typeofCols</title>
+<html><head><title>R: classofCols</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link rel="stylesheet" type="text/css" href="R.css">
 
@@ -9,20 +9,20 @@
 <script>hljs.initHighlightingOnLoad();</script>
 </head><body>
 
-<table width="100%" summary="page for typeofCols {SparkBeyond}"><tr><td>typeofCols {SparkBeyond}</td><td align="right">R Documentation</td></tr></table>
+<table width="100%" summary="page for classofCols {SparkBeyond}"><tr><td>classofCols {SparkBeyond}</td><td align="right">R Documentation</td></tr></table>
 
-<h2>typeofCols</h2>
+<h2>classofCols</h2>
 
 <h3>Description</h3>
 
-<p>list the type of column for all columns in the input <code>data</code>
+<p>list the class of column for all columns in the input <code>data</code>
 </p>
 
 
 <h3>Usage</h3>
 
 <pre>
-typeofCols(data)
+classofCols(data)
 </pre>
 
 
@@ -45,18 +45,18 @@ typeofCols(data)
 <h3>Examples</h3>
 
 <pre><code class="r">grouped = groupBy(getData(&quot;titanic_train&quot;), by =list(&quot;pclass&quot;,&quot;sex&quot;))
-typeofCols(grouped$age)
+classofCols(grouped$age)
 </code></pre>
 
-<pre><code>## [1] &quot;double&quot; &quot;double&quot; &quot;double&quot; &quot;double&quot; &quot;double&quot; &quot;double&quot;
+<pre><code>## [1] &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot; &quot;numeric&quot;
 </code></pre>
 
 <pre><code class="r">flattenCols(grouped, &quot;age&quot;)
-typeofCols(grouped)
+classofCols(grouped)
 </code></pre>
 
 <pre><code>##      pclass         sex    survived        name         age       sibsp 
-##   &quot;integer&quot; &quot;character&quot;      &quot;list&quot;      &quot;list&quot;    &quot;double&quot;      &quot;list&quot; 
+##   &quot;integer&quot; &quot;character&quot;      &quot;list&quot;      &quot;list&quot;   &quot;numeric&quot;      &quot;list&quot; 
 ##       parch      ticket        fare       cabin    embarked 
 ##      &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot;      &quot;list&quot;
 </code></pre>

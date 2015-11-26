@@ -30,7 +30,7 @@ join(x, y, by, all = FALSE, all.x = all, all.y = all, suffixes = c(".x",
 <h3>Arguments</h3>
 
 <table summary="R argblock">
-<tr valign="top"><td><code>x,</code></td>
+<tr valign="top"><td><code>x, </code></td>
 <td>
 <p>y: data tables. y is coerced to a data.table if it isn't one already.</p>
 </td></tr>
@@ -67,9 +67,11 @@ grouped2 = groupBy(data2, &quot;id&quot;)
 join(data1,grouped2,&quot;id&quot;)
 </code></pre>
 
-<pre><code>##    id text   num
-## 1:  1    a 1,2,3
-## 2:  2    b 4,5,6
+<pre><code>## Warning in merge.data.table(x, y, by, all, all.x, all.y, suffixes):
+## Supplied both `by` and `by.x/by.y`. `by` argument will be ignored.
+</code></pre>
+
+<pre><code>## Error in merge.data.table(x, y, by, all, all.x, all.y, suffixes): A non-empty vector of column names are required for `by.x` and `by.y`.
 </code></pre>
 
 

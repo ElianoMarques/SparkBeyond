@@ -1,0 +1,102 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><head><title>R: featureGenerationContorl</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<link rel="stylesheet" type="text/css" href="R.css">
+</head><body>
+
+<table width="100%" summary="page for featureGenerationControl {SparkBeyond}"><tr><td>featureGenerationControl {SparkBeyond}</td><td align="right">R Documentation</td></tr></table>
+
+<h2>featureGenerationContorl</h2>
+
+<h3>Description</h3>
+
+<p>featureGenerationContorl
+</p>
+
+
+<h3>Usage</h3>
+
+<pre>
+featureGenerationControl(maxDepth = 2, featureSearchMode = "DEFAULT",
+  functionsWhiteList = NA, functionsBlackList = NA,
+  booleanNumericFeatures = NA, numericEqualityFeatures = TRUE,
+  allowRangeFeatures = TRUE, crossRowFeatureSearch = FALSE,
+  maxFeaturesCount = list(300), autoColumnSubSets = list("CONCEPT"),
+  customColumnSubsets = NA, maxFeatureDuration = 100,
+  overrideMaxFeatureDurationForExternalData = TRUE,
+  allocatedMemoryMB = 1000, maxCollectionSize = NA,
+  useCachedFeatures = TRUE)
+</pre>
+
+
+<h3>Arguments</h3>
+
+<table summary="R argblock">
+<tr valign="top"><td><code>maxDepth:</code></td>
+<td>
+<p>Optional. Integer &lt; 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.</p>
+</td></tr>
+<tr valign="top"><td><code>featureSearchMode:</code></td>
+<td>
+<p>One of the following DEFAULT, ADVANCED, ADVANCED_WITH_PAIRS, DIG_DEEP</p>
+</td></tr>
+<tr valign="top"><td><code>functionsWhiteList:</code></td>
+<td>
+<p>Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>functionsBlackList:</code></td>
+<td>
+<p>Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>booleanNumericFeatures:</code></td>
+<td>
+<p>A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.</p>
+</td></tr>
+<tr valign="top"><td><code>numericEqualityFeatures:</code></td>
+<td>
+<p>A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>allowRangeFeatures:</code></td>
+<td>
+<p>A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>crossRowFeatureSearch.</code></td>
+<td>
+<p>A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>maxFeaturesCount:</code></td>
+<td>
+<p>Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.</p>
+</td></tr>
+<tr valign="top"><td><code>autoColumnSubSets:</code></td>
+<td>
+<p>Optional. A list of values contain any of the following: &quot;CONCEPT&quot;, &quot;NUMERIC_PAIRS&quot;, &quot;ALL_PAIRS&quot;. &quot;CONCEPT&quot; will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. &quot;NUMERIC_PAIRS&quot; will create all column subsets for numeric columns. &quot;ALL_PAIRS&quot; will create subsets of size 2 from all columns. &quot;CONCEPT&quot; by default.</p>
+</td></tr>
+<tr valign="top"><td><code>customColumnSubsets:</code></td>
+<td>
+<p>Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.</p>
+</td></tr>
+<tr valign="top"><td><code>maxFeatureDuration:</code></td>
+<td>
+<p>Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.</p>
+</td></tr>
+<tr valign="top"><td><code>overrideMaxFeatureDurationForExternalData:</code></td>
+<td>
+<p>A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.</p>
+</td></tr>
+<tr valign="top"><td><code>allocatedMemoryMB:</code></td>
+<td>
+<p>Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.</p>
+</td></tr>
+<tr valign="top"><td><code>maxCollectionSize:</code></td>
+<td>
+<p>Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. NA by default corresponding to 200K.</p>
+</td></tr>
+<tr valign="top"><td><code>useCachedFeatures:</code></td>
+<td>
+<p>Optional. A boolean indicating whether to use cached features (from previous run). TRUE by default.</p>
+</td></tr>
+</table>
+
+<hr><div align="center">[Package <em>SparkBeyond</em> version 0.1 <a href="00Index.html">Index</a>]</div>
+</body></html>
