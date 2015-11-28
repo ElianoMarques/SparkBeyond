@@ -40,65 +40,32 @@ Session = setRefClass("Session",
         hasShownInputSchema = FALSE
         hasShownFeatures = FALSE
         
-        readStreaming = function(prevLine = 0){
-        	stop = FALSE
-        	notificationFile = paste0(artifact_loc,"/UInotification.log")
-        	if (file.exists(notificationFile)){
-        		#print(paste("read streaming:",  prevLine))
-        		f = file(notificationFile, "r")
-        		on.exit(close(f))
-        		if (prevLine>0) readLines(f, n = prevLine)
-        		while(!stop) {
-        			next_line = readLines(f, n = 1)
-        			if(length(next_line) == 0) {
-        				stop = TRUE
-        				close(f)
-        			}else{
-        				print(next_line)
-        				prevLine = prevLine + 1
-        			}
-        		}
-        	}
-        	prevLine
-        }
         readStreamingAPI = function(prevLine = 0){
-        	stop = FALSE
-        	#/rapi/notificationsLog/:project/:revision
-        	notificationFile = paste0(artifact_loc,"/UInotification.log")
-        	if (file.exists(notificationFile)){
-        		#print(paste("read streaming:",  prevLine))
-        		f = file(notificationFile, "r")
-        		on.exit(close(f))
-        		if (prevLine>0) readLines(f, n = prevLine)
-        		while(!stop) {
-        			next_line = readLines(f, n = 1)
-        			if(length(next_line) == 0) {
-        				stop = TRUE
-        				close(f)
-        			}else{
-        				print(next_line)
-        				prevLine = prevLine + 1
-        			}
-        		}
-        	}
-        	prevLine
+        	#TODO: keep project name in Session
+        	tokens = strsplit(x = artifact_loc, split = "/")[[1]]
+					project = tokens[length(tokens)-1]
+					revision = tokens[length(tokens)]
+        	#/rapi/notificationsLog/:project/:revision?skipLines=x
+        	url = paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/notificationsLog/",project,"/",revision, "?skipLines=",prevLine)					
+        	res = httr::GET(url)
+					if (res$status == 200) {
+						txt = httr::content(res, as="text")
+						writeLines(txt)
+						length(strsplit(x = txt, split = "\n")[[1]]) # returning the number of lines read
+					} else 0
         }
-        curStreamingLine = readStreaming(curStreamingLine)
         
+				printFile = function(filename) {
+					file = paste0(artifact_loc,"/reports/",filename)
+					if (file.exists(file)) {
+						writeLines(readLines(file, warn = FALSE))
+						TRUE
+					}else FALSE
+				}
+					
         finalStatus = repeat {
           i = i+1
-#           if (i > 10 && !serverResponded) {
-#             res = "Server didn't respond for too long... terminating."
-#             print(res)
-#             #stop(res)
-#           }
-          printFile = function(filename) {
-            file = paste0(artifact_loc,"/reports/",filename)
-            if (file.exists(file)) {
-              writeLines(readLines(file, warn = FALSE))
-              TRUE
-            }else FALSE
-          }
+          curStreamingLine = readStreamingAPI(curStreamingLine)
 
           curStatus = status()
           if(curStatus == "Done") {serverResponded = TRUE
@@ -112,8 +79,6 @@ Session = setRefClass("Session",
             serverResponded = TRUE
             return (curStatus)
           }
-
-
 
           if (!hasShownInputSchema){
             hasShownInputSchema = printFile("preProcessing/inputSchema.txt")
