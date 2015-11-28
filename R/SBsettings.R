@@ -284,6 +284,28 @@ logout = function() {
 	httr::POST(url, encode = "form")
 }
 
+showProjectsLocks = function() {
+	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/api2/dblocks")
+	res = httr::GET(url)
+	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+}
+
+breakProjectLock = function(lockId) {
+	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/api2/dblocks/",lockId,"/break")
+	res = httr::POST(url)
+}
+
+showJobs = function(byProjectName = NA, byStatus = NA, returnAllColumns = FALSE) { #status can be one of "queued", "running", "failed", "canceled", "done"
+	query = if (!is.na(byProjectName) && is.na(byStatus)) paste0("?project=",byProjectName)
+		else if (is.na(byProjectName) && !is.na(byStatus)) paste0("?status=",byStatus)
+		else if (!is.na(byProjectName) && !is.na(byStatus)) paste0("?project=",byProjectName,"&status=",byStatus)
+		else ""
+	url <- paste0(getSBserverHost(),":",getSBserverPort(),paste0("/api2/jobs", query))
+	res = httr::GET(url)
+	jobs = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+	if (returnAllColumns) jobs else jobs[,c("id", "project", "status", "elapsed")]
+}
+
 .onLoad <- function(libname = find.package("SparkBeyond"), pkgname = "SparkBeyond") {
   print(paste0("Automatically trying to load settings saved in :",getwd()))
   loadSettings()
