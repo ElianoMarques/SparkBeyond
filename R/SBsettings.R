@@ -290,7 +290,7 @@ showProjectsLocks = function() {
 	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 }
 
-breakProjectLock = function(lockId) {
+breakProjectLock = function(lockId) { 
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/api2/dblocks/",lockId,"/break")
 	res = httr::POST(url)
 }
