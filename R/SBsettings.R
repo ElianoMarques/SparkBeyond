@@ -295,15 +295,29 @@ breakProjectLock = function(lockId) {
 	res = httr::POST(url)
 }
 
-showJobs = function(byProjectName = NA, byStatus = NA, returnAllColumns = FALSE) { #status can be one of "queued", "running", "failed", "canceled", "done"
-	query = if (!is.na(byProjectName) && is.na(byStatus)) paste0("?project=",byProjectName)
-		else if (is.na(byProjectName) && !is.na(byStatus)) paste0("?status=",byStatus)
-		else if (!is.na(byProjectName) && !is.na(byStatus)) paste0("?project=",byProjectName,"&status=",byStatus)
+showJobs = function(projectName = NA, status = NA, returnAllColumns = FALSE) { #status can be one of "queued", "running", "failed", "canceled", "done"
+	query = if (!is.na(projectName) && is.na(status)) paste0("?project=",projectName)
+		else if (is.na(projectName) && !is.na(status)) paste0("?status=",status)
+		else if (!is.na(projectName) && !is.na(status)) paste0("?project=",projectName,"&status=",status)
 		else ""
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),paste0("/api2/jobs", query))
 	res = httr::GET(url)
 	jobs = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-	if (returnAllColumns) jobs else jobs[,c("id", "project", "status", "elapsed")]
+	if (length(jobs) > 0) { 		
+		if (returnAllColumns) jobs else { 
+			showCols = c("id", "project", "status")
+			if ("elapsed" %in% colnames(jobs)) showCols = c(showCols, "elapsed")
+			jobs[,showCols]
+		}
+	} else {
+		NULL
+	}
+}
+
+showJobById = function(jobId) {
+	url <- paste0(getSBserverHost(),":",getSBserverPort(),paste0("/api2/jobs/", jobId))
+	res = httr::GET(url)
+	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 }
 
 .onLoad <- function(libname = find.package("SparkBeyond"), pkgname = "SparkBeyond") {
