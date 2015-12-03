@@ -7,12 +7,14 @@
 preProcessingControl = function(
 	emptyValuePolicy = NA,
 	fileEncoding = NA,
-	trainTestSplitRatio = 0.8
+	trainTestSplitRatio = 0.8,
+	temporalSplitColumn = NA
 ) {
 	list(
 		emptyValuePolicy = emptyValuePolicy,
 		fileEncoding = fileEncoding,
-		trainTestSplitRatio = trainTestSplitRatio
+		trainTestSplitRatio = trainTestSplitRatio,
+		temporalSplitColumn = temporalSplitColumn
 	)
 }
 
@@ -224,6 +226,7 @@ learn <- function(
 								# preprocessing control
 								emptyValuePolicy = if(!is.null(extraParams$emptyValuePolicy)) extraParams$emptyValuePolicy else preProcessingCtrl$emptyValuePolicy,
 								fileEncoding = if(!is.null(extraParams$fileEncoding)) extraParams$fileEncoding else preProcessingCtrl$fileEncoding,
+								temporalSplitColumn = preProcessingCtrl$temporalSplitColumn,
 								
 								#feature search parameters
 								featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,
