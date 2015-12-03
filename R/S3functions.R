@@ -6,11 +6,13 @@
 #' @param fileEncoding: Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
 preProcessingControl = function(
 	emptyValuePolicy = NA,
-	fileEncoding = NA
+	fileEncoding = NA,
+	trainTestSplitRatio = 0.8
 ) {
 	list(
 		emptyValuePolicy = emptyValuePolicy,
-		fileEncoding = fileEncoding
+		fileEncoding = fileEncoding,
+		trainTestSplitRatio = trainTestSplitRatio
 	)
 }
 
@@ -175,7 +177,6 @@ learn <- function(
 			 trainData,
 			 target,
 			 testData = NA,
-			 trainTestSplitRatio = 0.8,
 			 weightColumn = NA,
 			 weightByClass = FALSE,
 			 contextDatasets = NA,
@@ -194,6 +195,8 @@ learn <- function(
 	extraParams = list(...)
 	
 	if(is.null(trainData) && !is.null(extraParams$trainData)) trainData = extraParams$trainData
+	trainTestSplitRatio = if(!is.null(extraParams$trainTestSplitRatio)) extraParams$trainTestSplitRatio else preProcessingCtrl$trainTestSplitRatio
+	
 	if (!is.na(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
 	
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/learn")
