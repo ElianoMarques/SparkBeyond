@@ -192,6 +192,7 @@ learn <- function(
 	isLatestVersion()
 	isLatestRpackage()
 	extraParams = list(...)
+	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
 	
 	if(is.null(trainData) && !is.null(extraParams$trainData)) trainData = extraParams$trainData
 	if (!is.na(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
@@ -282,9 +283,9 @@ learn <- function(
 	
 	print(paste("Artifact location was created at:", res$artifactPath))
 	session = Session(artifact_loc = res$artifactPath, 
-							modelBuilt = is.null(params$algorithmsWhiteList) || 
-							!(length(params$algorithmsWhiteList) == 1 && 
-								tolower(params$algorithmsWhiteList[[1]]) == "zeror")
+							modelBuilt = !(length(params$algorithmsWhiteList) == 1 && 
+								tolower(params$algorithmsWhiteList[[1]]) == "zeror"),
+							jobId = if(is.null(res$jobId)) -1 else res$jobId
 					)
 	
 	if (autoSave){
@@ -297,7 +298,9 @@ learn <- function(
 			print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
 		})
 	}
-	if (runBlocking) session$waitForProcess()
+
+	if (runBlocking)session$waitForProcess()
+ 
 	session$modelBuilt = TRUE
 	return(session)
 }
@@ -330,6 +333,7 @@ featureSearch.file = function(...) {
 	session
 }
 
+# PUT("http://localhost:9000/api2/fileUpload/test/guy.tsv", body = "header1\theader2\n")
 
 #' writeToServer
 #' 
@@ -351,12 +355,12 @@ writeToServer = function(data, filename = NA, prefix = "data_in"){ #TODO: deal w
 				writeToFile(data, new_filename)
 				new_filename
 			}
-	} else { # a filename was provided as data - check if exists and return it
+	} else if (class(data) == "character") { # a filename was provided as data - check if exists and return it
 		SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
 		if (!grepl(SBdir, data)) data = paste0(getSBserverIOfolder(), data)
 		if (!file.exists(data)) stop(print(paste("Provided path:", data, "does not exist")))
 		data
-	}
+	} else stop("No valid data.frame or filename was provided")
 	return (final_filename)
 }
 
