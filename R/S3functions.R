@@ -130,12 +130,14 @@ modelBuildingControl = function(
 reportingControl = function(
 	produceFeatureClusteringReport = FALSE,
 	produceReports = NA,
-	scoreOnTestSet = FALSE
+	scoreOnTestSet = FALSE,
+	emailForNotification = NA
 ) {
 	list(
 		produceFeatureClusteringReport = produceFeatureClusteringReport,
 		produceReports = produceReports,
-		scoreOnTestSet = scoreOnTestSet
+		scoreOnTestSet = scoreOnTestSet,
+		emailForNotification = emailForNotification
 	)
 }
 
@@ -263,6 +265,7 @@ learn <- function(
 								produceFeatureClusteringReport = if(!is.null(extraParams$produceFeatureClusteringReport)) extraParams$produceFeatureClusteringReport else reportingCtrl$produceFeatureClusteringReport,
 								produceReports = if(!is.null(extraParams$produceReports)) extraParams$produceReports else reportingCtrl$produceReports,
 								scoreOnTestSet = if(!is.null(extraParams$scoreOnTestSet)) extraParams$scoreOnTestSet else reportingCtrl$scoreOnTestSet,
+								emailForNotification = reportingCtrl$emailForNotification,
 								
 								externalPrefixPath = getSBserverIOfolder()
 	)
