@@ -6,11 +6,15 @@
 #' @param fileEncoding: Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
 preProcessingControl = function(
 	emptyValuePolicy = NA,
-	fileEncoding = NA
+	fileEncoding = NA,
+	trainTestSplitRatio = 0.8,
+	temporalSplitColumn = NA
 ) {
 	list(
 		emptyValuePolicy = emptyValuePolicy,
-		fileEncoding = fileEncoding
+		fileEncoding = fileEncoding,
+		trainTestSplitRatio = trainTestSplitRatio,
+		temporalSplitColumn = temporalSplitColumn
 	)
 }
 
@@ -126,12 +130,14 @@ modelBuildingControl = function(
 reportingControl = function(
 	produceFeatureClusteringReport = FALSE,
 	produceReports = NA,
-	scoreOnTestSet = FALSE
+	scoreOnTestSet = FALSE,
+	emailForNotification = NA
 ) {
 	list(
 		produceFeatureClusteringReport = produceFeatureClusteringReport,
 		produceReports = produceReports,
-		scoreOnTestSet = scoreOnTestSet
+		scoreOnTestSet = scoreOnTestSet,
+		emailForNotification = emailForNotification
 	)
 }
 
@@ -175,7 +181,6 @@ learn <- function(
 			 trainData,
 			 target,
 			 testData = NA,
-			 trainTestSplitRatio = 0.8,
 			 weightColumn = NA,
 			 weightByClass = FALSE,
 			 contextDatasets = NA,
@@ -195,6 +200,8 @@ learn <- function(
 	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
 	
 	if(is.null(trainData) && !is.null(extraParams$trainData)) trainData = extraParams$trainData
+	trainTestSplitRatio = if(!is.null(extraParams$trainTestSplitRatio)) extraParams$trainTestSplitRatio else preProcessingCtrl$trainTestSplitRatio
+	
 	if (!is.na(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
 	
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/learn")
@@ -222,6 +229,7 @@ learn <- function(
 								# preprocessing control
 								emptyValuePolicy = if(!is.null(extraParams$emptyValuePolicy)) extraParams$emptyValuePolicy else preProcessingCtrl$emptyValuePolicy,
 								fileEncoding = if(!is.null(extraParams$fileEncoding)) extraParams$fileEncoding else preProcessingCtrl$fileEncoding,
+								temporalSplitColumn = preProcessingCtrl$temporalSplitColumn,
 								
 								#feature search parameters
 								featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,
@@ -258,6 +266,7 @@ learn <- function(
 								produceFeatureClusteringReport = if(!is.null(extraParams$produceFeatureClusteringReport)) extraParams$produceFeatureClusteringReport else reportingCtrl$produceFeatureClusteringReport,
 								produceReports = if(!is.null(extraParams$produceReports)) extraParams$produceReports else reportingCtrl$produceReports,
 								scoreOnTestSet = if(!is.null(extraParams$scoreOnTestSet)) extraParams$scoreOnTestSet else reportingCtrl$scoreOnTestSet,
+								emailForNotification = reportingCtrl$emailForNotification,
 								
 								externalPrefixPath = getSBserverIOfolder()
 	)
