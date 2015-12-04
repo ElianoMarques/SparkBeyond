@@ -1,14 +1,15 @@
 # S3 functions (De facto constructors of Session)
 
 #' preProcessingContorl
-#' 
+#' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
+#' @temporalSplitColumn: Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.  
 #' @param emptyValuePolicy: Controls how empty values in the data are being handled NA by default will replace numeric value with median value, and strings with empty strings.
 #' @param fileEncoding: Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
 preProcessingControl = function(
-	emptyValuePolicy = NA,
-	fileEncoding = NA,
 	trainTestSplitRatio = 0.8,
-	temporalSplitColumn = NA
+	temporalSplitColumn = NA,
+	emptyValuePolicy = NA,
+	fileEncoding = NA
 ) {
 	list(
 		emptyValuePolicy = emptyValuePolicy,
@@ -163,14 +164,14 @@ contextObject = function(data, name = NULL, keyColumns = list(), timeColumn = NU
 #' @param trainData: train data to analyze.
 #' @param target String of the column name of in the training file that contains the target of the prediction.
 #' @param testData: Optional. test data to validate model results. NA by default.
-#' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
-#' @param featureGenerationControl: A \code{\link{featureGenerationControl}} object with specific feature generation parameters.
-#' @param knowledgeControl: A \code{\link{knowledgeControl}} object with specific external knowledge parameters.
-#' @param modelBuildingControl: A \code{\link{modelBuildingControl}} object with specific model building parameters.
-#' @param reportingControl: A \code{\link{reportingControl}} object with specific reporting parameters.
+#' @param preProcessingCtrl: A \code{\link{preProcessingControl}} object with specific preprocessing parameters.
+#' @param featureGenerationCtrll: A \code{\link{featureGenerationControl}} object with specific feature generation parameters.
+#' @param knowledgeCtrll: A \code{\link{knowledgeControl}} object with specific external knowledge parameters.
+#' @param modelBuildingCtrll: A \code{\link{modelBuildingControl}} object with specific model building parameters.
+#' @param reportingCtrl: A \code{\link{reportingControl}} object with specific reporting parameters.
 #' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.

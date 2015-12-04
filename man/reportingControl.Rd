@@ -5,7 +5,7 @@
 \title{reportingContorl}
 \usage{
 reportingControl(produceFeatureClusteringReport = FALSE,
-  produceReports = NA, scoreOnTestSet = FALSE)
+  produceReports = NA, scoreOnTestSet = FALSE, emailForNotification = NA)
 }
 \arguments{
 \item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}

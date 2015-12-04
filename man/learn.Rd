@@ -5,8 +5,8 @@
 \title{learn}
 \usage{
 learn(projectName = "temp", trainData, target, testData = NA,
-  trainTestSplitRatio = 0.8, weightColumn = NA, weightByClass = FALSE,
-  contextDatasets = NA, preProcessingCtrl = preProcessingControl(),
+  weightColumn = NA, weightByClass = FALSE, contextDatasets = NA,
+  preProcessingCtrl = preProcessingControl(),
   featureGenerationCtrl = featureGenerationControl(),
   knowledgeCtrl = knowledgeControl(),
   modelBuildingCtrl = modelBuildingControl(),
@@ -22,21 +22,21 @@ learn(projectName = "temp", trainData, target, testData = NA,
 
 \item{testData:}{Optional. test data to validate model results. NA by default.}
 
-\item{trainTestSplitRatio:}{Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.}
-
 \item{weightColumn:}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}
 
 \item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
 
 \item{contextDatasets:}{Optional. A list of paths to context datasets to be added to the learning.}
 
-\item{featureGenerationControl:}{A \code{\link{featureGenerationControl}} object with specific feature generation parameters.}
+\item{preProcessingCtrl:}{A \code{\link{preProcessingControl}} object with specific preprocessing parameters.}
 
-\item{knowledgeControl:}{A \code{\link{knowledgeControl}} object with specific external knowledge parameters.}
+\item{featureGenerationCtrll:}{A \code{\link{featureGenerationControl}} object with specific feature generation parameters.}
 
-\item{modelBuildingControl:}{A \code{\link{modelBuildingControl}} object with specific model building parameters.}
+\item{knowledgeCtrll:}{A \code{\link{knowledgeControl}} object with specific external knowledge parameters.}
 
-\item{reportingControl:}{A \code{\link{reportingControl}} object with specific reporting parameters.}
+\item{modelBuildingCtrll:}{A \code{\link{modelBuildingControl}} object with specific model building parameters.}
+
+\item{reportingCtrl:}{A \code{\link{reportingControl}} object with specific reporting parameters.}
 
 \item{autoSave:}{Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.}
 
