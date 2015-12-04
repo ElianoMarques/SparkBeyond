@@ -22,13 +22,20 @@ library(methods) #to support RScript
 Session = setRefClass("Session",
     fields = list(
       artifact_loc = "character",
-      modelBuilt = "logical"       #TODO: replace to a function call
+      modelBuilt = "logical",       #TODO: replace to a function call
+      jobId = "numeric",
+      projectName = "character",
+      revision = "numeric"
     ),
     methods = list(
-      initialize = function(artifact_loc, modelBuilt = FALSE) {
+      initialize = function(artifact_loc, modelBuilt = FALSE, jobId = -1) {
         "initializes a session using a string provided as \\code{loc}."
-        artifact_loc<<- artifact_loc
+        artifact_loc <<- artifact_loc
         modelBuilt <<- modelBuilt
+        jobId <<- jobId
+        tokens = strsplit(x = artifact_loc, split = "/")[[1]]
+        projectName <<- tokens[length(tokens)-1]
+        revision <<- as.numeric(tokens[length(tokens)])
       },
 
       waitForProcess = function() { #TODO: number of mintues as parameter?
@@ -39,14 +46,15 @@ Session = setRefClass("Session",
         curStatus = ""
         hasShownInputSchema = FALSE
         hasShownFeatures = FALSE
-        
+        isRunning = FALSE
+        lastQueuePosition = -1
+        print("You are now running in a Blocking Mode")
+				print("In order to see the job queue, terminate the current command and run showJobs(status='queued')")
+                
         readStreamingAPI = function(prevLine = 0){
         	#TODO: keep project name in Session
-        	tokens = strsplit(x = artifact_loc, split = "/")[[1]]
-					project = tokens[length(tokens)-1]
-					revision = tokens[length(tokens)]
         	#/rapi/notificationsLog/:project/:revision?skipLines=x
-        	url = paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/notificationsLog/",project,"/",revision, "?skipLines=",prevLine)					
+        	url = paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/notificationsLog/",projectName,"/",revision, "?skipLines=",prevLine)					
         	res = httr::GET(url)
 					if (res$status == 200) {
 						txt = httr::content(res, as="text")
@@ -62,49 +70,94 @@ Session = setRefClass("Session",
 						TRUE
 					}else FALSE
 				}
+				
+				queuedStatus = function() {
+					queuedJobs = showJobs(status = "queued")
+					if (!is.null(queuedJobs) && !is.na(jobId) && length(which(queuedJobs$id == jobId)) > 0){
+						curQueuePosition = which(queuedJobs$id == jobId)
+    				if (curQueuePosition != lastQueuePosition){
+							print(paste("Learning job (", jobId ,") position in the queue is", curQueuePosition))
+    				}
+						curQueuePosition
+					}
+				}
+				
+				runningStatus = function() {
+					curStreamingLine = readStreamingAPI(curStreamingLine)
 					
-        finalStatus = repeat {
-          i = i+1
-          curStreamingLine = readStreamingAPI(curStreamingLine)
-
-          curStatus = status()
-          if(curStatus == "Done") {serverResponded = TRUE
-                                   printFile("model/evaluation.txt")
-                                   print ("Done")
-                                   return ("Done")}
-          else if (curStatus == "Detecting types") serverReponded = TRUE
-          else if (grepl("Session in progress: " , curStatus)) serverResponded = TRUE
-          else if (curStatus == "Unknown error") serverReponded = return (curStatus)
-          else {
-            serverResponded = TRUE
-            return (curStatus)
-          }
-
-          if (!hasShownInputSchema){
-            hasShownInputSchema = printFile("preProcessing/inputSchema.txt")
-          }
-          if (!hasShownFeatures){
-            f = tryCatch(features(), error = function(cond) NA)
-            if (length(f)>1 || !is.na(f)){
-              featuresCount = nrow(f)
-              cntToShow = min(featuresCount, 50)
-              print(paste("Printing top", cntToShow, "features out of", featuresCount))
-              print(f[1:cntToShow,c("idx","feature","RIG", "lin..score", "support")])
-              hasShownFeatures = TRUE
-            }
-          }
-
+					curStatus = status()
+					
+					internalHasShownInputSchema = hasShownInputSchema
+					if (!internalHasShownInputSchema){
+						internalHasShownInputSchema = printFile("preProcessing/inputSchema.txt")
+					}
+					internalHasShownFeatures = hasShownFeatures
+					if (!internalHasShownFeatures){
+						f = tryCatch(features(), error = function(cond) NA)
+						if (length(f)>1 || !is.na(f)){
+							featuresCount = nrow(f)
+							cntToShow = min(featuresCount, 50)
+							print(paste("Printing top", cntToShow, "features out of", featuresCount))
+							print(f[1:cntToShow,c("idx","feature","RIG", "lin..score", "support")])
+							internalHasShownFeatures = TRUE
+						}
+					}
+					
 					print(paste(curStatus, "-" ,i))
-          secs = min(i*(1.5), 20)
-          Sys.sleep(secs)
+					list(curStatus = curStatus, 
+							 hasShownInputSchema=internalHasShownInputSchema,
+							 hasShownFeatures=internalHasShownFeatures
+					) 
+				}
+					
+				jobFinished = FALSE
+				finalStatus = NA
+        while(!jobFinished) {
+          i = i+1
+          
+          if (!is.na(jobId)){ # new discover platform version
+          	newCurStatus = showJobById(jobId)$status
+          	switch(newCurStatus, 
+          				 queued = {
+          				 		lastQueuePosition = queuedStatus()
+          				 },
+          				 running = {
+          				 		retStatuses = runningStatus()
+          				 		hasShownInputSchema = retStatuses$hasShownInputSchema
+          				 		hasShownFeatures = retStatuses$hasShownFeatures
+          				 },
+          				 failed = {
+          				 		finalStatus = "Failed"
+          				 		jobFinished = TRUE
+          				 },
+          				 canceled = {
+          				 		print ("Learning session was cancelled")
+          				 		finalStatus = "Cancelled"
+          				 		jobFinished = TRUE
+          				 },
+          				 done = {
+          				 		runningStatus() # check to see if there are any last prints to do
+          				 		printFile("model/evaluation.txt")
+          				 		finalStatus = "Done"
+          				 		jobFinished = TRUE
+          				 }
+          	)
+          } else {  # old discovery platform version
+          	runningStatus()
+          }
+           
+          if (!jobFinished) {
+          	secs = min(i*(3), 10)
+          	Sys.sleep(secs)
+          }
         }
-        return (finalStatus)
+				finalStatus
       },
 
       status = function() {
         "Checking the status of the session."
 
-        if (!isServerAlive()) stop("Server is down. Check server for errors (e.g., out of memory).")
+        if (!isServerAlive()) stop(paste("Server", getSBserverHost(), "is unavailable."))
         checkIfError = function(status) {
           errorFile = paste0(artifact_loc,"/learningFailed.txt")
           if (file.exists(errorFile)){
@@ -118,21 +171,20 @@ Session = setRefClass("Session",
         }
 
         currentState = function(statusJson) {
-          curState = "Creating features"
-          if (curStatus$fastFeatures == TRUE) curState = "Building model"
-          if (curStatus$model == TRUE) curState = "Evaluating model"
-          if (curStatus$errors == TRUE) curState = "errors occurred"
+          curState = "Feature search"
+          if (curStatus$fastFeatures == TRUE) curState = "Model building"
+          if (curStatus$model == TRUE) curState = "Model evaluation"
+          if (curStatus$evaluation == TRUE) curState = "Model evaluation completed"
+          if (curStatus$errors == TRUE) curState = "Errors occurred"
           curState
         }
 
         statusFile = paste0(artifact_loc,"/json/status.json")
-        finalStatus = if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
-          serverResponded = TRUE
+        finalStatus = if (file.exists(statusFile)){
           curStatus = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
-          if (curStatus$evaluation == TRUE) return ("Done")
-          if (curStatus$alive == FALSE) return(checkIfError(FALSE))
-
-          return(paste("Session in progress: ",currentState()))   #TODO: further parse status and refine to feature search, evaluation
+          if (curStatus$evaluation == TRUE) return("Model evaluation completed")
+          else if (curStatus$alive == FALSE) return(checkIfError(FALSE))
+          return(paste(currentState())) 
         } else return(checkIfError(TRUE))
       },
 
@@ -147,8 +199,7 @@ Session = setRefClass("Session",
 
       statusException = function() {
         curStatus = status()
-        if (grepl("Session in progress: " , curStatus)) stop("Processing still didn't finish") #TODO: or more refined
-        if (curStatus != "Done") stop(paste("Session was not completed - ", curStatus))
+        if (curStatus != "Model evaluation completed") stop(paste("Session was not completed - ", curStatus))
       },
 
       enrich = function(data, featureCount = NA, writePredictionColumnsOnly = TRUE) {
@@ -388,11 +439,13 @@ Session = setRefClass("Session",
           else if (name %in% modelReports) "model"
           else "features"
         }
+        #http://localhost:9000/analytics/report/timeWindowNew2/6/preProcessing/inputSchema.html
         if (!report_name %in% c("roc_best", "roc_CV")){
-          htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
-          file.show(htmlSource)
+          #htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
+          htmlSource = paste0(getSBserverHost(), ":", getSBserverPort(), "/analytics/report/", projectName, "/", revision, "/", subFolder(report_name), "/", report_name, ".html")
+        	browseURL(htmlSource)
         }
-        else {
+        else { #TODO: change to serving mode
           modelLocation = paste0(artifact_loc,"/reports/model/")
           relFiles = names(which(sapply(list.files(modelLocation), function(f) grepl(report_name, f))))
           for(f in relFiles) file.show(paste0(modelLocation, f))
