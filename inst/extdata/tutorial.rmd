@@ -46,19 +46,28 @@ setSBserverIOfolder("/path/to/server's/shared/folder") # shared folder on the se
 <br>
 <br>
 
+#Project structure#
+
+Learning sessions are associated with a project name (specified as a parameter to the learn function, see below).
+<br>
+A serial revision number will be assigned to each learning session. Each revision contains the complete artifact for a rearning result, including reports, model code, model binaries, and required resources.
+The complete list of reports is available `reportsList()`: [explantion of all the reports produced by the SparkBeyond engine](https://docs.google.com/document/d/16ogU45DHrW0x_BVLS5TiyPMblORUGSxaScR8i_lIDI0)
+<br>
+<br>
+
 #Feature search + Model building #
 `learn` is used to discover features & build a model, it requires the following input:
 
-1.  `projectName`         - a name describring the analysis  
+1.  `projectName`         - a name describring the analysis.  
 2.  `trainData`           - a data frame
 3.  `target`              - the column name in the input data denoting the label to learn
 
 
-```{r, echo=TRUE, message=FALSE, results='hide'}
+```{r, echo=FALSE, message=FALSE, results='hide'}
 setSBserverIOfolder("/tmp/")
 ```
 
-```{r, eval=FALSE}
+```{r tutorial_basic_example, eval=TRUE, cache = TRUE}
 train = getData("titanic_train")
 model = learn(projectName = "titanic",
                         trainData = train,
@@ -66,7 +75,7 @@ model = learn(projectName = "titanic",
                         algorithmsWhiteList = list("RRandomForest"))
 ```
 
-The returned object `model` encapsulates a predictive-model on which we can perform various operations.
+The returned `Session` object named `model` encapsulates a predictive-model on which we can perform various operations.
 
 <!-- 
   Comment:
