@@ -200,6 +200,8 @@ learn <- function(
 	extraParams = list(...)
 	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
 	
+	projectName = gsub(" ", "_", projectName)
+	
 	if(is.null(trainData) && !is.null(extraParams$trainData)) trainData = extraParams$trainData
 	trainTestSplitRatio = if(!is.null(extraParams$trainTestSplitRatio)) extraParams$trainTestSplitRatio else preProcessingCtrl$trainTestSplitRatio
 	
