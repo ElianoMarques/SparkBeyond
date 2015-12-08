@@ -128,6 +128,7 @@ Session = setRefClass("Session",
           				 },
           				 failed = {
           				 		finalStatus = "Failed"
+          				 		writeLines(status())
           				 		jobFinished = TRUE
           				 },
           				 canceled = {
