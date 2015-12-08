@@ -209,6 +209,11 @@ learn <- function(
 	print(paste("Calling:", url))
 	
 	if (!is.na(contextDatasets)){ #writing context data to server if necessary
+		if (class(contextDatasets)!="list"){
+			warning("contextDatasets is not a list, inserting it in to a list")
+			if (class(contextDatasets)!="contextObject") error("contextDatasets are not of class contextObject")
+			contextDatasets=list(contextDatasets)
+		}
 		if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
 		for (i in 1:length(contextDatasets)) {
 			contextDatasets[[i]]$data = writeToServer(contextDatasets[[i]]$data, 

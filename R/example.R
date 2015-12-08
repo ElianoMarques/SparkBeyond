@@ -123,6 +123,8 @@ getData <- function(datasetName) {
     frequencychange = getExtData("frequencyChangeDS.csv"),
 		googlestock = getExtData("googDF.tsv"),
 		complexsum = getExtData("ComplexSum.tsv"),
+		wnvdata = getExtData("wnvData.csv"),
+		wnvweather = getExtData("wnvWeather.csv"),
     stop(paste0("The requested dataset '",datasetName,"' does not exists in the datasets list"))
   )
 }

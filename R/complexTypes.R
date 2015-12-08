@@ -364,7 +364,9 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   }else{
   	paste0("last_keyed_", window, "_", unit)
   }
-    
+  data = as.data.frame(data)
+  #TODO: support data.table as well
+  
   #TODO: support non-dates,  support offset calculation, Date POSix objects
 
   datePOSIXformatOut = "%m/%d/%Y %H:%M:%S %p %Z" #TODO: check if multiple output formats are possible
