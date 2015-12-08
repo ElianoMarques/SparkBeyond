@@ -379,18 +379,18 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   generateWindow = function(dateVal, keyVal = NA) {
   	dates = if (dateType == "character") {
   		convertDateToString = function(dValue) as.character(as.POSIXct(dValue),format=datePOSIXformatOut)
-  	 	dt = convertDateToString(strptime(dateVal,dateFormat,tz="EST"))
-  		dt_from = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-window*unitVal) #seconds based
+  	 	dt = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-offset*unitVal)
+  		dt_from = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-(window+offset)*unitVal) #seconds based
 			c(dt_from, dt)
 		} else if (dateType == "integer" || dateType == "numeric"){
 			c(dateVal - window, dateVal)
 		} else if (dateType == "Date") {
-			dt = as.character(as.POSIXct(dateVal),format=datePOSIXformatOut)
-			dt_from = as.character(as.POSIXct(dateVal) - window*unitVal,format=datePOSIXformatOut)
+			dt = as.character(as.POSIXct(dateVal) - offset*unitVal,format=datePOSIXformatOut)
+			dt_from = as.character(as.POSIXct(dateVal) - (window+offset)*unitVal,format=datePOSIXformatOut)
 			c(dt_from, dt)			
 		} else if (dateType == "POSIXct"){
-			dt = as.character(dateVal)
-			dt_from = as.character(dateVal - window*unitVal)
+			dt = as.character(dateVal - offset*unitVal)
+			dt_from = as.character(dateVal -(window+offset)*unitVal)
 			c(dt_from, dt)
 		} else {
 			stop (paste("Date column", dateCol,"type should be one of 'character', 'integer', 'numeric', 'date', 'POSIXct'."))
