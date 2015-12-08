@@ -128,7 +128,7 @@ Session = setRefClass("Session",
           				 },
           				 failed = {
           				 		finalStatus = "Failed"
-          				 		writeLines(status())
+          				 		writeLines(showJobById(jobId)$error)
           				 		jobFinished = TRUE
           				 },
           				 canceled = {
