@@ -126,27 +126,28 @@ loadSettings = function() {
 #' A function to restart server
 #' @return The response from the server.
 restartServer = function() {
-  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/die")
-  tryCatch({
-	  res = httr::GET(url, httr::content_type_json())
-	  i = 0
-	  finalStatus = repeat {
-	    i = i+1
-	    print(paste("Waiting for server to load -" ,i))
-	    secs = 8#min(i*2, 5)
-	    Sys.sleep(secs)
-	    if(isServerAlive()) {
-	    	tryCatch({
-		      version = serverVersion()
-		      print(paste("Build:", version$jenkinsBuild)) #alternatively use cat to print multiline
-		      print(paste("Time:", version$buildTime))
-	    	})
-	      return("Server is up.")
-	    }
-	    if (i > 15) return ("Server is failed to load automatically - please load manually.")
-	  }
-	  print(finalStatus)
-  }, error = function(e) print("Server is down - please load manually"))
+  stop("This function has been deprecated, as now jobs are handled by a queue")  #switch to be used for killing a job in the current queue - as a method on Session?
+# 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/die")
+#   tryCatch({
+# 	  res = httr::GET(url, httr::content_type_json())
+# 	  i = 0
+# 	  finalStatus = repeat {
+# 	    i = i+1
+# 	    print(paste("Waiting for server to load -" ,i))
+# 	    secs = 8#min(i*2, 5)
+# 	    Sys.sleep(secs)
+# 	    if(isServerAlive()) {
+# 	    	tryCatch({
+# 		      version = serverVersion()
+# 		      print(paste("Build:", version$jenkinsBuild)) #alternatively use cat to print multiline
+# 		      print(paste("Time:", version$buildTime))
+# 	    	})
+# 	      return("Server is up.")
+# 	    }
+# 	    if (i > 15) return ("Server is failed to load automatically - please load manually.")
+# 	  }
+# 	  print(finalStatus)
+#   }, error = function(e) print("Server is down - please load manually"))
 }
 
 #' A function to clear the cache of a specific project
