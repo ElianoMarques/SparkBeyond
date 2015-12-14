@@ -82,8 +82,8 @@ Session = setRefClass("Session",
 					}
 				}
 				
-				runningStatus = function() {
-					curStreamingLine = readStreamingAPI(curStreamingLine)
+				runningStatus = function(curStreamingLineParam) {
+					curStreamingLineAggregate = curStreamingLineParam + readStreamingAPI(curStreamingLineParam)
 					
 					curStatus = status()
 					
@@ -104,7 +104,8 @@ Session = setRefClass("Session",
 					}
 					
 					print(paste(curStatus, "-" ,i))
-					list(curStatus = curStatus, 
+					list(curStatus = curStatus,
+							 curStreamingLine = curStreamingLineAggregate,
 							 hasShownInputSchema=internalHasShownInputSchema,
 							 hasShownFeatures=internalHasShownFeatures
 					) 
@@ -122,7 +123,8 @@ Session = setRefClass("Session",
           				 		lastQueuePosition = queuedStatus()
           				 },
           				 running = {
-          				 		retStatuses = runningStatus()
+          				 		retStatuses = runningStatus(curStreamingLine)
+          				 		curStreamingLine = retStatuses$curStreamingLine
           				 		hasShownInputSchema = retStatuses$hasShownInputSchema
           				 		hasShownFeatures = retStatuses$hasShownFeatures
           				 },
@@ -137,7 +139,7 @@ Session = setRefClass("Session",
           				 		jobFinished = TRUE
           				 },
           				 done = {
-          				 		runningStatus() # check to see if there are any last prints to do
+          				 		runningStatus(curStreamingLine) # check to see if there are any last prints to do
           				 		printFile("model/evaluation.txt")
           				 		finalStatus = "Done"
           				 		jobFinished = TRUE
