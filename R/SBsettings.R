@@ -275,28 +275,46 @@ functionCatalog = function() {
   browseURL(system.file("extdata", "functionCatalog.html", package = "SparkBeyond"))
 }
 
+#' login
+
+#' Login to SparkBeyond
 login = function(username, password) {
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/login")
 	httr::POST(url, encode = "form", body = list(email=username, password=password))
 }
 
+#' Logout
 logout = function() {
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/logout")
 	httr::POST(url, encode = "form")
 }
 
+#' showProjectsLocks
+
+#' Shows all the active projects that acquired a lock to prevent multiple project run under the same name 
 showProjectsLocks = function() {
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/api2/dblocks")
 	res = httr::GET(url)
 	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 }
 
+#' removeProjectLock
+
+#' remove a lock by id (see \code{\link{showProjectsLocks}})
 removeProjectLock = function(lockId) { 
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/api2/dblocks/",lockId,"/break")
 	res = httr::POST(url)
 }
 
-showJobs = function(projectName = NA, status = NA, returnAllColumns = FALSE) { #status can be one of "queued", "running", "failed", "canceled", "done"
+#' showJobs
+
+#' shows the status for all jobs 
+#' A status of a job can be one of "queued", "running", "failed", "canceled", "done"
+#' @param projectName. Filter by project name.
+#' @param status. Filter by status. 
+#' @param showAllColumns. A switch for whether to show only the job ID, project name, status, and elapsed (if available). Alternatively show all columns
+#' @return a data frame with the jobs
+showJobs = function(projectName = NA, status = NA, showAllColumns = FALSE) { 
 	query = if (!is.na(projectName) && is.na(status)) paste0("?project=",projectName)
 		else if (is.na(projectName) && !is.na(status)) paste0("?status=",status)
 		else if (!is.na(projectName) && !is.na(status)) paste0("?project=",projectName,"&status=",status)
@@ -305,7 +323,7 @@ showJobs = function(projectName = NA, status = NA, returnAllColumns = FALSE) { #
 	res = httr::GET(url)
 	jobs = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 	if (length(jobs) > 0) { 		
-		if (returnAllColumns) jobs else { 
+		if (showAllColumns) jobs else { 
 			showCols = c("id", "project", "status")
 			if ("elapsed" %in% colnames(jobs)) showCols = c(showCols, "elapsed")
 			jobs[,showCols]
@@ -315,14 +333,31 @@ showJobs = function(projectName = NA, status = NA, returnAllColumns = FALSE) { #
 	}
 }
 
+#' showJobById
+
+#' get information for a specific job by job ID
+#' @param jobId. The id of the job as defined by \code{\link{showJobs}}
 showJobById = function(jobId) {
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),paste0("/api2/jobs/", jobId))
 	res = httr::GET(url)
 	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 }
 
+#' cancelJob
+
+#' cancels a queued job by a job ID
+#' @param jobId. The id of the job as defined by \code{\link{showJobs}}
+#' @return TRUE if succeeded. FALSE otherwise.
+cancelJob = function(jobId){
+	url <- paste0(getSBserverHost(),":",getSBserverPort(),paste0("/api2/jobs/", jobId,"/cancel"))
+	res = httr::POST(url)
+	ifelse(res$status == 200, TRUE,{
+		print(httr::content(res, as="text"))
+		FALSE
+	})
+}
+
 ####################################################### 
-# Server support - move to SBsettings
 
 doesFileExistOnServer = function(projectName, path){
 	res = httr::GET(paste0("http://localhost:9000/api2/download/exists/",projectName,"?path=",path))
