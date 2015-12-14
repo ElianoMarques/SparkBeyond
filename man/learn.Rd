@@ -4,8 +4,8 @@
 \alias{learn}
 \title{learn}
 \usage{
-learn(projectName = "temp", trainData, target, testData = NA,
-  weightColumn = NA, weightByClass = FALSE, contextDatasets = NA,
+learn(projectName, trainData, target, testData = NULL, weightColumn = NA,
+  weightByClass = FALSE, contextDatasets = NULL,
   preProcessingCtrl = preProcessingControl(),
   featureGenerationCtrl = featureGenerationControl(),
   knowledgeCtrl = knowledgeControl(),

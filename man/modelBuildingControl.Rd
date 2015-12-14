@@ -4,8 +4,8 @@
 \alias{modelBuildingControl}
 \title{modelBuildingControl}
 \usage{
-modelBuildingControl(algorithmsWhiteList = NA, evaluationMetric = NA,
-  crossValidation = 5)
+modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier",
+  "RRandomForestRegressor"), evaluationMetric = NA, crossValidation = 5)
 }
 \arguments{
 \item{algorithmsWhiteList:}{Optional. A list of strings that represents the set of algorithms to run. NA by default}
