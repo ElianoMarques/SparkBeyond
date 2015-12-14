@@ -320,6 +320,64 @@ showJobById = function(jobId) {
 	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 }
 
+####################################################### 
+# Server support - move to SBsettings
+
+doesFileExistOnServer = function(projectName, path){
+	res = httr::GET(paste0("http://localhost:9000/api2/download/exists/",projectName,"?path=",path))
+	res$status==200
+}
+
+uploadToServer = function(data, projectName, name) {
+	if (! "data.frame" %in% class(data)) stop("The provided data must be of type data.frame")
+	hash = digest(data)
+	filename = paste0(name, "_", hash, ".tsv")
+	attempts = 2
+	succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
+	if (!succeeded) {  #uploading only if doesn't exist
+		urlUpload = paste0("http://localhost:9000/api2/fileUpload/", projectName, "/",filename)
+		colHeaders = paste0(colnames(data), collapse = "\t")
+		body = paste0(colHeaders, "\n", 
+									paste0(apply(cols2Text(data),1,paste0, collapse = "\t"), collapse="\n"))
+		
+		while (!succeeded && attempts > 0 ) {
+			httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
+			attempts = attempts - 1
+			succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
+		}
+	}
+	ifelse (succeeded, paste0("/uploaded/",filename), NA)
+}
+
+#' writeToServer
+#' 
+#' A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.
+#' @param data Data frame or table to export to the server.
+#' @param filename: Optional. define a name to save the data to. NA by default.
+#' @return A filepath to the file on the server that was created.
+writeToServer = function(data, filename = NA, prefix = "data_in"){ #TODO: deal with spaces in prefix
+	final_filename = if ("data.frame" %in% class(data)){ # we got a data.frame object to be written to server 
+		if (is.na(filename)) { # no specific name was provided - use digest to refrain from rewriting to server
+			hash = digest(data)
+			new_filename = paste0(getSBserverIOfolder(), prefix, "_", hash, ".tsv") 
+			new_filenamee = gsub("/+", "/", new_filename)
+			if (!file.exists(new_filename)) writeToFile(data, new_filename) #due to hashing we rewrite file only if data has changed
+			new_filename		
+		} else {			# specific name was provided - rewrite file to server
+			new_filename = paste0(getSBserverIOfolder(), filename)
+			new_filename = gsub("/+", "/", new_filename)
+			writeToFile(data, new_filename)
+			new_filename
+		}
+	} else if (class(data) == "character") { # a filename was provided as data - check if exists and return it
+		SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+		if (!grepl(SBdir, data)) data = paste0(getSBserverIOfolder(), data)
+		if (!file.exists(data)) stop(print(paste("Provided path:", data, "does not exist")))
+		data
+	} else stop("No valid data.frame or filename was provided")
+	return (final_filename)
+}
+
 .onLoad <- function(libname = find.package("SparkBeyond"), pkgname = "SparkBeyond") {
   print(paste0("Automatically trying to load settings saved in :",getwd()))
   loadSettings()

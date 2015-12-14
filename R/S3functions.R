@@ -111,7 +111,7 @@ knowledgeControl = function(
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". NA by default automatically selects AUC for classification and RMSE for regression.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 modelBuildingControl = function(
-	algorithmsWhiteList = NA, #list available algorithms
+	algorithmsWhiteList = list("RRandomForestClassifier", "RRandomForestRegressor"), #TODO: list available algorithms as enums
 	evaluationMetric = NA,
 	crossValidation = 5
 ) {
@@ -178,13 +178,13 @@ contextObject = function(data, name = NULL, keyColumns = list(), timeColumn = NU
 #' @examples
 #' #session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE, autoSave=FALSE)
 learn <- function(
-			 projectName = "temp",
+			 projectName,
 			 trainData,
 			 target,
-			 testData = NA,
+			 testData = NULL,
 			 weightColumn = NA,
 			 weightByClass = FALSE,
-			 contextDatasets = NA,
+			 contextDatasets = NULL,
 			 preProcessingCtrl = preProcessingControl(),
 			 featureGenerationCtrl = featureGenerationControl(),
 			 knowledgeCtrl = knowledgeControl(),
@@ -198,6 +198,7 @@ learn <- function(
 	isLatestVersion()
 	isLatestRpackage()
 	extraParams = list(...)
+	# TODO: verify that there are no supurious parameters, e.g. (projectname instead of projectName)
 	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
 	
 	projectName = gsub(" ", "_", projectName)
@@ -205,78 +206,95 @@ learn <- function(
 	if(is.null(trainData) && !is.null(extraParams$trainData)) trainData = extraParams$trainData
 	trainTestSplitRatio = if(!is.null(extraParams$trainTestSplitRatio)) extraParams$trainTestSplitRatio else preProcessingCtrl$trainTestSplitRatio
 	
-	if (!is.na(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
+	if (!is.null(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
 	
 	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/learn")
 	print(paste("Calling:", url))
 	
-	if (!is.na(contextDatasets)){ #writing context data to server if necessary
+	if (!is.null(contextDatasets)){ #writing context data to server if necessary
 		if (class(contextDatasets)!="list"){
-			warning("contextDatasets is not a list, inserting it in to a list")
+			warning("contextDatasets should be a list")
 			if (class(contextDatasets)!="contextObject") error("contextDatasets are not of class contextObject")
 			contextDatasets=list(contextDatasets)
 		}
 		if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
 		for (i in 1:length(contextDatasets)) {
-			contextDatasets[[i]]$data = writeToServer(contextDatasets[[i]]$data, 
-				prefix = paste0(projectName,"_context", ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),""))
+			contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
+			contextDatasets[[i]]$data = 
+				ifelse(!remoteMode,
+					writeToServer(contextDatasets[[i]]$data, 
+						prefix = paste0(projectName,"_context", contextName),
+					),
+					uploadToServer(data = trainData, projectName = projectName, name = paste0("context", contextName))
 			)
 		}
 	}
 	
-	params <-list(projectName = projectName,
-								trainingFilePath = writeToServer(trainData, prefix = paste0(projectName,"_train")),
-								target = target,
-								testFilePath= if ((class(testData) != "logical" && any(grep("data.frame", class(testData)))) || class(testData)=="character")
-									writeToServer(testData, prefix = paste0(projectName,"_test")) else NA,
-								trainTestSplitRatio = trainTestSplitRatio,
-								weightColumn = weightColumn,
-								weightByClass = weightByClass,
-								contextDatasets = contextDatasets,
-								
-								# preprocessing control
-								emptyValuePolicy = if(!is.null(extraParams$emptyValuePolicy)) extraParams$emptyValuePolicy else preProcessingCtrl$emptyValuePolicy,
-								fileEncoding = if(!is.null(extraParams$fileEncoding)) extraParams$fileEncoding else preProcessingCtrl$fileEncoding,
-								temporalSplitColumn = preProcessingCtrl$temporalSplitColumn,
-								
-								#feature search parameters
-								featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,
-								functionsWhiteList = if(!is.null(extraParams$functionsWhiteList)) extraParams$functionsWhiteList else featureGenerationCtrl$functionsWhiteList, 
-								functionsBlackList = if(!is.null(extraParams$functionsBlackList)) extraParams$functionsBlackList else featureGenerationCtrl$functionsBlackList, 
-								booleanNumericFeatures = if(!is.null(extraParams$booleanNumericFeatures)) extraParams$booleanNumericFeatures else featureGenerationCtrl$booleanNumericFeatures,
-								numericEqualityFeatures = if(!is.null(extraParams$numericEqualityFeatures)) extraParams$numericEqualityFeatures else featureGenerationCtrl$numericEqualityFeatures,
-								allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGenerationCtrl$allowRangeFeatures,																
-								crossRowFeatureSearch = if(!is.null(extraParams$crossRowFeatureSearch)) extraParams$crossRowFeatureSearch else featureGenerationCtrl$crossRowFeatureSearch,
-								maxFeaturesCount = if(!is.null(extraParams$maxFeaturesCount)) extraParams$maxFeaturesCount else featureGenerationCtrl$maxFeaturesCount, 
-								autoColumnSubSets = if(!is.null(extraParams$autoColumnSubSets)) extraParams$autoColumnSubSets else featureGenerationCtrl$autoColumnSubSets,
-								customColumnSubsets = if(!is.null(extraParams$customColumnSubsets)) extraParams$customColumnSubsets else featureGenerationCtrl$customColumnSubsets,
-								maxFeatureDuration = if(!is.null(extraParams$maxFeatureDuration)) extraParams$maxFeatureDuration else featureGenerationCtrl$maxFeatureDuration, 
-								overrideMaxFeatureDurationForExternalData = if(!is.null(extraParams$overrideMaxFeatureDurationForExternalData)) extraParams$overrideMaxFeatureDurationForExternalData else featureGenerationCtrl$overrideMaxFeatureDurationForExternalData,
-								useCachedFeatures = if(!is.null(extraParams$useCachedFeatures)) extraParams$useCachedFeatures else featureGenerationCtrl$useCachedFeatures,
-								allocatedMemoryMB = if(!is.null(extraParams$allocatedMemoryMB)) extraParams$allocatedMemoryMB else featureGenerationCtrl$allocatedMemoryMB,
-								maxCollectionSize = if(!is.null(extraParams$maxCollectionSize)) extraParams$maxCollectionSize else featureGenerationCtrl$maxCollectionSize,
-								maxDepth = if(!is.null(extraParams$maxDepth)) extraParams$maxDepth else featureGenerationCtrl$maxDepth,
-								
-								#knowledge parameters
-								useGraph = if(!is.null(extraParams$useGraph)) extraParams$useGraph else knowledgeCtrl$useGraph,
-								useOpenStreetMap = if(!is.null(extraParams$useOpenStreetMap)) extraParams$useOpenStreetMap else knowledgeCtrl$useOpenStreetMap,
-								useCustomGraphs = if(!is.null(extraParams$useCustomGraphs)) extraParams$useCustomGraphs else knowledgeCtrl$useCustomGraphs,								
-								customGraphsWhiteList = if(!is.null(extraParams$customGraphsWhiteList)) extraParams$customGraphsWhiteList else knowledgeCtrl$customGraphsWhiteList,
-								customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else knowledgeCtrl$customGraphsBlackList,
-								customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else knowledgeCtrl$customFunctions,
-								
-								# model building parameters
-								algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuildingCtrl$algorithmsWhiteList,
-								evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuildingCtrl$evaluationMetric,
-								crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuildingCtrl$crossValidation,
-								
-								#reporting parameters
-								produceFeatureClusteringReport = if(!is.null(extraParams$produceFeatureClusteringReport)) extraParams$produceFeatureClusteringReport else reportingCtrl$produceFeatureClusteringReport,
-								produceReports = if(!is.null(extraParams$produceReports)) extraParams$produceReports else reportingCtrl$produceReports,
-								scoreOnTestSet = if(!is.null(extraParams$scoreOnTestSet)) extraParams$scoreOnTestSet else reportingCtrl$scoreOnTestSet,
-								emailForNotification = reportingCtrl$emailForNotification,
-								
-								externalPrefixPath = getSBserverIOfolder()
+	params <-list(
+		projectName = projectName,
+		trainingFilePath = 
+			ifelse (!remoteMode,
+					writeToServer(trainData, prefix = paste0(projectName,"_train")),
+					uploadToServer(data = trainData,projectName = projectName, name = "train")
+		),
+		target = target,
+		testFilePath = 
+			ifelse (!is.null(testData) && (any(grep("data.frame", class(testData))) || class(testData)=="character"),
+				ifelse( !remoteMode,
+						writeToServer(testData, prefix = paste0(projectName,"_test")),
+						uploadToServer(data = testData,projectName = projectName, name = "test")	
+				),
+				NA
+		),	
+				
+		trainTestSplitRatio = trainTestSplitRatio,
+		weightColumn = weightColumn,
+		weightByClass = weightByClass,
+		contextDatasets = contextDatasets,
+		
+		# preprocessing control
+		emptyValuePolicy = if(!is.null(extraParams$emptyValuePolicy)) extraParams$emptyValuePolicy else preProcessingCtrl$emptyValuePolicy,
+		fileEncoding = if(!is.null(extraParams$fileEncoding)) extraParams$fileEncoding else preProcessingCtrl$fileEncoding,
+		temporalSplitColumn = preProcessingCtrl$temporalSplitColumn,
+		
+		#feature search parameters
+		featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,
+		functionsWhiteList = if(!is.null(extraParams$functionsWhiteList)) extraParams$functionsWhiteList else featureGenerationCtrl$functionsWhiteList, 
+		functionsBlackList = if(!is.null(extraParams$functionsBlackList)) extraParams$functionsBlackList else featureGenerationCtrl$functionsBlackList, 
+		booleanNumericFeatures = if(!is.null(extraParams$booleanNumericFeatures)) extraParams$booleanNumericFeatures else featureGenerationCtrl$booleanNumericFeatures,
+		numericEqualityFeatures = if(!is.null(extraParams$numericEqualityFeatures)) extraParams$numericEqualityFeatures else featureGenerationCtrl$numericEqualityFeatures,
+		allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGenerationCtrl$allowRangeFeatures,																
+		crossRowFeatureSearch = if(!is.null(extraParams$crossRowFeatureSearch)) extraParams$crossRowFeatureSearch else featureGenerationCtrl$crossRowFeatureSearch,
+		maxFeaturesCount = if(!is.null(extraParams$maxFeaturesCount)) extraParams$maxFeaturesCount else featureGenerationCtrl$maxFeaturesCount, 
+		autoColumnSubSets = if(!is.null(extraParams$autoColumnSubSets)) extraParams$autoColumnSubSets else featureGenerationCtrl$autoColumnSubSets,
+		customColumnSubsets = if(!is.null(extraParams$customColumnSubsets)) extraParams$customColumnSubsets else featureGenerationCtrl$customColumnSubsets,
+		maxFeatureDuration = if(!is.null(extraParams$maxFeatureDuration)) extraParams$maxFeatureDuration else featureGenerationCtrl$maxFeatureDuration, 
+		overrideMaxFeatureDurationForExternalData = if(!is.null(extraParams$overrideMaxFeatureDurationForExternalData)) extraParams$overrideMaxFeatureDurationForExternalData else featureGenerationCtrl$overrideMaxFeatureDurationForExternalData,
+		useCachedFeatures = if(!is.null(extraParams$useCachedFeatures)) extraParams$useCachedFeatures else featureGenerationCtrl$useCachedFeatures,
+		allocatedMemoryMB = if(!is.null(extraParams$allocatedMemoryMB)) extraParams$allocatedMemoryMB else featureGenerationCtrl$allocatedMemoryMB,
+		maxCollectionSize = if(!is.null(extraParams$maxCollectionSize)) extraParams$maxCollectionSize else featureGenerationCtrl$maxCollectionSize,
+		maxDepth = if(!is.null(extraParams$maxDepth)) extraParams$maxDepth else featureGenerationCtrl$maxDepth,
+		
+		#knowledge parameters
+		useGraph = if(!is.null(extraParams$useGraph)) extraParams$useGraph else knowledgeCtrl$useGraph,
+		useOpenStreetMap = if(!is.null(extraParams$useOpenStreetMap)) extraParams$useOpenStreetMap else knowledgeCtrl$useOpenStreetMap,
+		useCustomGraphs = if(!is.null(extraParams$useCustomGraphs)) extraParams$useCustomGraphs else knowledgeCtrl$useCustomGraphs,								
+		customGraphsWhiteList = if(!is.null(extraParams$customGraphsWhiteList)) extraParams$customGraphsWhiteList else knowledgeCtrl$customGraphsWhiteList,
+		customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else knowledgeCtrl$customGraphsBlackList,
+		customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else knowledgeCtrl$customFunctions,
+		
+		# model building parameters
+		algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuildingCtrl$algorithmsWhiteList,
+		evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuildingCtrl$evaluationMetric,
+		crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuildingCtrl$crossValidation,
+		
+		#reporting parameters
+		produceFeatureClusteringReport = if(!is.null(extraParams$produceFeatureClusteringReport)) extraParams$produceFeatureClusteringReport else reportingCtrl$produceFeatureClusteringReport,
+		produceReports = if(!is.null(extraParams$produceReports)) extraParams$produceReports else reportingCtrl$produceReports,
+		scoreOnTestSet = if(!is.null(extraParams$scoreOnTestSet)) extraParams$scoreOnTestSet else reportingCtrl$scoreOnTestSet,
+		emailForNotification = reportingCtrl$emailForNotification,
+		
+		externalPrefixPath = ifelse(!remoteMode, getSBserverIOfolder(), NA)
 	)
 	
 	verifyList = function(l) {if(is.vector(l) && !is.na(l)) as.list(l) else l}
@@ -348,37 +366,6 @@ featureSearch.file = function(...) {
 	session = do.call(learn,list(trainData = trainData, algorithmsWhiteList = list("ZeroR"), ...))
 	session$modelBuilt = FALSE
 	session
-}
-
-# PUT("http://localhost:9000/api2/fileUpload/test/guy.tsv", body = "header1\theader2\n")
-
-#' writeToServer
-#' 
-#' A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.
-#' @param data Data frame or table to export to the server.
-#' @param filename: Optional. define a name to save the data to. NA by default.
-#' @return A filepath to the file on the server that was created.
-writeToServer = function(data, filename = NA, prefix = "data_in"){ #TODO: deal with spaces in prefix
-	final_filename = if ("data.frame" %in% class(data)){ # we got a data.frame object to be written to server 
-		if (is.na(filename)) { # no specific name was provided - use digest to refrain from rewriting to server
-				hash = digest(data)
-				new_filename = paste0(getSBserverIOfolder(), prefix, "_", hash, ".tsv") 
-				new_filenamee = gsub("/+", "/", new_filename)
-				if (!file.exists(new_filename)) writeToFile(data, new_filename) #due to hashing we rewrite file only if data has changed
-				new_filename		
-			} else {			# specific name was provided - rewrite file to server
-				new_filename = paste0(getSBserverIOfolder(), filename)
-				new_filename = gsub("/+", "/", new_filename)
-				writeToFile(data, new_filename)
-				new_filename
-			}
-	} else if (class(data) == "character") { # a filename was provided as data - check if exists and return it
-		SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
-		if (!grepl(SBdir, data)) data = paste0(getSBserverIOfolder(), data)
-		if (!file.exists(data)) stop(print(paste("Provided path:", data, "does not exist")))
-		data
-	} else stop("No valid data.frame or filename was provided")
-	return (final_filename)
 }
 
 
