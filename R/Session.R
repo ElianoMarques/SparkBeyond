@@ -28,18 +28,26 @@ Session = setRefClass("Session",
       revision = "numeric"
     ),
     methods = list(
-      initialize = function(artifact_loc, modelBuilt = FALSE, jobId = -1) {
-        "initializes a session using a string provided as \\code{loc}."
-        artifact_loc <<- artifact_loc
+      initialize = function(nameOfProject = NA, revisionNumber = NA, artifact_loc = NA, modelBuilt = TRUE, jobId = -1) {
+        "initializes a session using a projectName and revision number."
+        if (!is.na(nameOfProject) && !is.na(revisionNumber)){
+        	artifact_loc <<- paste0(nameOfProject,"/",revisionNumber)
+        	projectName <<- nameOfProject
+        	revision <<- revisionNumber
+        } else {
+	        artifact_loc <<- artifact_loc
+	        tokens = strsplit(x = artifact_loc, split = "/")[[1]]
+	        projectName <<- tokens[length(tokens)-1]
+	        revision <<- as.numeric(tokens[length(tokens)])
+        }
         modelBuilt <<- modelBuilt
         jobId <<- jobId
-        tokens = strsplit(x = artifact_loc, split = "/")[[1]]
-        projectName <<- tokens[length(tokens)-1]
-        revision <<- as.numeric(tokens[length(tokens)])
       },
 
-      waitForProcess = function() { #TODO: number of mintues as parameter?
+      waitForProcess = function(...) { #TODO: number of mintues as parameter?
         "Blocking the R console until session is finished."
+        extraParams = list(...)
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
         serverResponded = FALSE
         i = 0
         curStreamingLine = 0
@@ -52,23 +60,35 @@ Session = setRefClass("Session",
 				print("In order to see the job queue, terminate the current command and run showJobs(status='queued')")
                 
         readStreamingAPI = function(prevLine = 0){
-        	#TODO: keep project name in Session
         	#/rapi/notificationsLog/:project/:revision?skipLines=x
-        	url = paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/notificationsLog/",projectName,"/",revision, "?skipLines=",prevLine)					
+        	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=UInotification.log&skipLines=",prevLine)					
         	res = httr::GET(url)
 					if (res$status == 200) {
 						txt = httr::content(res, as="text")
-						writeLines(txt)
-						length(strsplit(x = txt, split = "\n")[[1]]) # returning the number of lines read
+						if (nchar(txt) > 0){
+							writeLines(txt)
+							length(strsplit(x = txt, split = "\n")[[1]]) # returning the number of lines read
+						} else 0
 					} else 0
         }
         
-				printFile = function(filename) {
-					file = paste0(artifact_loc,"/reports/",filename)
-					if (file.exists(file)) {
-						writeLines(readLines(file, warn = FALSE))
-						TRUE
-					}else FALSE
+				printFile = function(filename, ...) {
+					extraParams = list(...)
+					remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+					if (remoteMode){
+						url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/reports/", filename)
+						res = httr::GET(url)
+						if (res$status == 200){
+							writeLines(httr::content(res, as="text"))
+							TRUE
+						} else FALSE
+					} else {
+						file = paste0(artifact_loc,"/reports/",filename)
+						if (file.exists(file)) {
+							writeLines(readLines(file, warn = FALSE))
+							TRUE
+						}else FALSE
+					}					
 				}
 				
 				queuedStatus = function() {
@@ -85,16 +105,16 @@ Session = setRefClass("Session",
 				runningStatus = function(curStreamingLineParam) {
 					curStreamingLineAggregate = curStreamingLineParam + readStreamingAPI(curStreamingLineParam)
 					
-					curStatus = status()
+					curStatus = status(remoteMode = remoteMode)
 					
 					internalHasShownInputSchema = hasShownInputSchema
 					if (!internalHasShownInputSchema){
-						internalHasShownInputSchema = printFile("preProcessing/inputSchema.txt")
+						internalHasShownInputSchema = printFile("preProcessing/inputSchema.txt", remoteMode=remoteMode)
 					}
 					internalHasShownFeatures = hasShownFeatures
 					if (!internalHasShownFeatures){
-						f = tryCatch(features(), error = function(cond) NA)
-						if (length(f)>1 || !is.na(f)){
+						f = tryCatch(features(remoteMode=remoteMode), error = function(cond) NULL)
+						if (!is.null(f)){
 							featuresCount = nrow(f)
 							cntToShow = min(featuresCount, 50)
 							print(paste("Printing top", cntToShow, "features out of", featuresCount))
@@ -103,7 +123,8 @@ Session = setRefClass("Session",
 						}
 					}
 					
-					print(paste(curStatus, "-" ,i))
+			#		if (curStatus != "NOT_FOUND" && i %% 10 == 0)	print(paste("Current status:", curStatus))
+					
 					list(curStatus = curStatus,
 							 curStreamingLine = curStreamingLineAggregate,
 							 hasShownInputSchema=internalHasShownInputSchema,
@@ -140,7 +161,7 @@ Session = setRefClass("Session",
           				 },
           				 done = {
           				 		runningStatus(curStreamingLine) # check to see if there are any last prints to do
-          				 		printFile("model/evaluation.txt")
+          				 		printFile("model/evaluation.txt", remoteMode=remoteMode)
           				 		finalStatus = "Done"
           				 		jobFinished = TRUE
           				 }
@@ -157,94 +178,127 @@ Session = setRefClass("Session",
 				finalStatus
       },
 
-      status = function() {
+      status = function(...) {
         "Checking the status of the session."
-
+        extraParams = list(...)
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        
         if (!isServerAlive()) stop(paste("Server", getSBserverHost(), "is unavailable."))
-        checkIfError = function(status) {
-          errorFile = paste0(artifact_loc,"/learningFailed.txt")
-          if (file.exists(errorFile)){
-            errorLines = readLines(errorFile)
-            writeLines(errorLines)
-            paste(errorLines, collapse = '\n')
-          }else {
-            if (status == FALSE) "Unknown error"
-            else "Detecting types" #This may occur in the very begining of the run - status.json was not created and there is no error
-          }
+        
+        if (remoteMode){
+	        url = paste0(getSBserverDomain(),"/api2/state/",projectName,"/",revision)					
+	        res = httr::GET(url)
+	        if (res$status == 200) {
+	        	curStatus = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+	        	if (!is.null(curStatus$error)) showJobById(jobId = jobId)$status
+	        	else{
+	        		curState = "Preprocessing"
+	        		if (curStatus$featureSearch == TRUE) curState = "feature search"
+	        		if (curStatus$featureSelection == TRUE) curState = "feature selection"
+	        		if (curStatus$enrichment == TRUE) curState = "enrichment"
+	        		if (curStatus$modelBuild == TRUE) curState = "model build"
+	        		if (curStatus$dead == TRUE) curState = "error occurred"
+	        		curState
+	        	}
+	        } else "server is unavailable"	
+        } else {
+	        checkIfError = function(status) {
+	          errorFile = paste0(artifact_loc,"/learningFailed.txt")
+	          if (file.exists(errorFile)){
+	            errorLines = readLines(errorFile)
+	            writeLines(errorLines)
+	            paste(errorLines, collapse = '\n')
+	          }else {
+	            if (status == FALSE) "Unknown error"
+	            else "Detecting types" #This may occur in the very begining of the run - status.json was not created and there is no error
+	          }
+	        }
+	
+	        currentState = function(statusJson) {
+	          curState = "Feature search"
+	          if (curStatus$fastFeatures == TRUE) curState = "Model building"
+	          if (curStatus$model == TRUE) curState = "Model evaluation"
+	          if (curStatus$evaluation == TRUE) curState = "Model evaluation completed"
+	          if (curStatus$errors == TRUE) curState = "Errors occurred"
+	          curState
+	        }
+	
+	        statusFile = paste0(artifact_loc,"/json/status.json")
+	        finalStatus = if (file.exists(statusFile)){
+	          curStatus = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
+	          if (curStatus$evaluation == TRUE) return("Model evaluation completed")
+	          else if (curStatus$alive == FALSE) return(checkIfError(FALSE))
+	          currentState() 
+	        } else checkIfError(TRUE)
         }
-
-        currentState = function(statusJson) {
-          curState = "Feature search"
-          if (curStatus$fastFeatures == TRUE) curState = "Model building"
-          if (curStatus$model == TRUE) curState = "Model evaluation"
-          if (curStatus$evaluation == TRUE) curState = "Model evaluation completed"
-          if (curStatus$errors == TRUE) curState = "Errors occurred"
-          curState
-        }
-
-        statusFile = paste0(artifact_loc,"/json/status.json")
-        finalStatus = if (file.exists(statusFile)){
-          curStatus = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
-          if (curStatus$evaluation == TRUE) return("Model evaluation completed")
-          else if (curStatus$alive == FALSE) return(checkIfError(FALSE))
-          return(paste(currentState())) 
-        } else return(checkIfError(TRUE))
       },
-
-#       hasModelBuilt = function() {
-#         statusFile = paste0(artifact_loc,"/json/status.json")
-#         status = if (file.exists(statusFile)){ #currently assuming that application won't crush before file is created
-#           statusContent = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
-#           statusContent$model
-#         } else FALSE
-#         return (status)
-#       },
 
       statusException = function() {
-        curStatus = status()
-        if (curStatus != "Model evaluation completed") stop(paste("Session was not completed - ", curStatus))
+        #curStatus = status()
+        #if (curStatus != "Model evaluation completed") stop(paste("Session was not completed - ", curStatus))
+      	TRUE #TODO: relies on an accurate job id
       },
 
-      enrich = function(data, featureCount = NA, writePredictionColumnsOnly = TRUE) {
+			################################## enrich #####################
+      enrich = function(data, featureCount = NA, enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", ...) {
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
-        statusException()
-        datapath = writeToServer(data, prefix = "enrich") # projectName?
-        enrich.file(datapath, featureCount, writePredictionColumnsOnly)
-      },
-
-      enrich.file = function(file, featureCount = NA, writePredictionColumnsOnly = TRUE) {
-        "Returns a data frame containing the enrichedData. \\code{file} is a path to the file to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
-        statusException()
-        isLatestVersion()
-        outputPath = tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz") #TODO: complement with params
+        extraParams = list(...)
+        
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+                
+        dataPath = ifelse (remoteMode, 
+					{
+						uploadedPath = uploadToServer(data = data, projectName = projectName, name = "enrich")
+						if(is.na(uploadedPath)) stop("failed to upload file to enrich to server")
+						uploadedPath        
+					},
+					writeToServer(data, prefix = "enrich") #project name
+        )        
+ 
+        outputPath = ifelse(remoteMode,
+        								outputName,		#potentially get a name for the enriched output
+        								tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz"))
 
         params <-list(modelPath = artifact_loc,
-                      dataPath = file,
+                      dataPath = dataPath,
                       featureCount = featureCount,
-                      outputPath = outputPath,
-                      writePredictionColumnsOnly = writePredictionColumnsOnly,
-                      externalPrefixPath = getSBserverIOfolder())
-
+                      outputName = outputPath,
+                      enrichedColumnsOnly = enrichedColumnsOnly,
+        							columnsWhiteList = columnsWhiteList,
+                      externalPrefixPath = ifelse (remoteMode, NA, getSBserverIOfolder())
+        							#addBooleanNumericExtractors        							
+        )
         params = params[!is.na(params)]
 
         print (paste("Enriching ",params$dataPath))
-        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/enrich")
+        url <- paste0(getSBserverDomain(),"/rapi/enrich")
         print(paste("Calling:", url))
 
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
-          df = read.table(outputPath, header = TRUE, sep="\t")
-          for(i in 1:ncol(df)){
-            if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
-              df[,i] = as.logical(as.character(df[,i]))
-            } else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
-              df[,i] = as.logical(as.character(df[,i]))
-            }
-          }
-          df
+        finalRes = if (is.null(res$error) && !is.null(res$result)){
+        	if (remoteMode) {
+        		url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision,"/", res$result)
+        		res2 = httr::GET(url)
+        		if (res2$status == 200){
+        			localfile = paste0(outputName, ".tsv.gz")
+        			writeBin(httr::content(res2), localfile)
+        			print(paste0("Results written to: ", getwd(),"/", localfile))
+        			read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE)
+        		} else NA        		
+        	}else{
+	          df = read.table(outputPath, header = TRUE, sep="\t")
+	          for(i in 1:ncol(df)){
+	            if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
+	              df[,i] = as.logical(as.character(df[,i]))
+	            } else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
+	              df[,i] = as.logical(as.character(df[,i]))
+	            }
+	          }
+	          df
+        	}
         } else {
           message = paste("Enrichment failed: ", res$error)
           print(message)
@@ -254,50 +308,66 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
-      predict = function(data, writePredictionColumnsOnly = TRUE) { #
-        "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
+			################################## predict #####################
+      predict = function(data, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", ...) { 
+        "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. Set \\code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
+        if(!currentUser(FALSE)) stop("Please login")
+                
         statusException()
         if (is.na(modelBuilt) || !modelBuilt) warning("Prediction requires full model building using learn")
-        datapath = writeToServer(data, prefix = "predict") #project name
-        predict.file(datapath, writePredictionColumnsOnly)
-      },
-
-      predict.file = function(file, writePredictionColumnsOnly = TRUE) {
-        "Returns prediction on a created model. \\code{file} is the path of the file to be predicted. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
-        statusException()
-        isLatestVersion()
-        if (is.na(modelBuilt) || !modelBuilt) warning("Prediction requires full model building using learn")
-
-        SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
-        if (!grepl(SBdir, file)) file = paste0(getSBserverIOfolder(), file)
-        if (!file.exists(file)) stop(print(paste("Predict file:", file, "does not exist")))
+        
+        extraParams = list(...)        
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        
+        datapath = ifelse (remoteMode, 
+					{
+        		uploadedPath = uploadToServer(data = data, projectName = projectName, name = "predict")
+        		if(is.na(uploadedPath)) stop("failed to upload file to predict to server")
+        		uploadedPath        
+        	},
+        	writeToServer(data, prefix = "predict") #project name
+				)
 
         params <-list(modelPath = artifact_loc,
-                      dataPath = file,
-                      writePredictionColumnsOnly = writePredictionColumnsOnly,
-                      externalPrefixPath = getSBserverIOfolder())
+                      dataPath = datapath,
+                      writePredictionColumnsOnly = predictionColumnsOnly,
+        							columnsWhiteList = columnsWhiteList,
+                      externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())        							
+        )        							
+        params = params[!is.na(params)] 							
 
         print (paste("Predicting ",params$dataPath))
-        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/predict")
+        url <- paste0(getSBserverDomain(),"/rapi/predict")
         print(paste("Calling:", url))
 
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result)){
-          table = read.table(res$result, header = TRUE, sep="\t")
-          resultsLocation = paste0(artifact_loc, "/reports/predictions/test/")
-          print (paste("Predictions and plots are available at:", resultsLocation))
-          files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
-          if (length(files) > 0){
-            htmlFilesInd = which(files)
-            if (length(htmlFilesInd>0)) {
-              htmlFiles = names(htmlFilesInd)
-              for(f in htmlFiles) file.show(paste0(resultsLocation, f))
-            }
-          }
-          table
+        finalRes = if (is.null(res$error) && !is.null(res$result)){ 
+        	if (remoteMode) {
+        		url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/",res$result)
+        		res2 = httr::GET(url)
+        		if (res2$status == 200){
+        			localfile = paste0(outputName, ".tsv.gz")
+        			writeBin(httr::content(res2), localfile)
+        			print(paste0("Results written to: ", getwd(),"/", localfile))
+        			read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE)
+        		} else NA 
+        	}else {
+	          table = read.table(res$result, header = TRUE, sep="\t")
+	          resultsLocation = paste0(artifact_loc, "/reports/predictions/test/")
+	          print (paste("Predictions and plots are available at:", resultsLocation))
+	          files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
+	          if (length(files) > 0){
+	            htmlFilesInd = which(files)
+	            if (length(htmlFilesInd>0)) {
+	              htmlFiles = names(htmlFilesInd)
+	              for(f in htmlFiles) file.show(paste0(resultsLocation, f))
+	            }
+	          }
+	          table
+        	}
         } else {
           message = paste("Prediction failed: ", res$error)
           print(message)
@@ -307,24 +377,33 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
-      liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = NA, percentOfPopulationToPlot = 0.2) { #TODO: change documentation
+			################################## lift #####################			
+      liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift", ...) { #TODO: change documentation
         "Returns lift from a created model and generates three plots. \\code{predictionResult} is a dataframe to be analyzed, \\code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
+        extraParams = list(...)        
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        
         statusException()
         isLatestVersion()
-        if (is.na(modelBuilt) || !modelBuilt) warning("Lift requires full model building using learn")
+        if (is.na(modelBuilt) || !modelBuilt) warning("Lift requires full model building using learn") #TODO: verify classification problem
 
-        SBdir = substr(getSBserverIOfolder(), 1, nchar(getSBserverIOfolder())-1) #removing trailing slash
+        datapath = ifelse (remoteMode, {
+							uploadedPath = uploadToServer(data = predictionResult, projectName = projectName, name = "lift")
+							if(is.na(uploadedPath)) stop("failed to upload file to plots lifts to server")
+							uploadedPath        
+						},
+						writeToServer(data, prefix = "lift") 
+				)
+
         params <-list(modelPath = artifact_loc,
-                      predictionPath = writeToServer(predictionResult, prefix = "lift"), #projectName? 
+                      predictionPath = dataPath,
                       title = title,
                       percentOfPopulationToPlot= percentOfPopulationToPlot,
-                      externalPrefixPath = getSBserverIOfolder())
-
+        							externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())
+        )
         params = params[!is.na(params)]
 
-        print (paste("Calculating lift for ",params$predictionPath))
-
-        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/liftFromPredictionResults")
+        url <- paste0(getSBserverDomain(),"/rapi/liftFromPredictionResults")
         print(paste("Calling:", url))
 
         body = rjson::toJSON(params)
@@ -333,19 +412,17 @@ Session = setRefClass("Session",
 
         finalRes = if (is.null(res$error) && !is.null(res$result)){
           plotName = res$result
-          subFolder = if (is.na(title)) "test" else gsub("\\s+","_", title)
-          resultsLocation = paste0(artifact_loc, "/reports/predictions/", subFolder, "/")
-          print (paste("Plots are available at:", resultsLocation))
-          table = read.table(paste0(resultsLocation, "lift_table_",plotName, ".tsv.gz"), header = TRUE, sep="\t")
-          files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
-          if (length(files) > 0){
-            htmlFilesInd = which(files)
-            if (length(htmlFilesInd>0)) {
-              htmlFiles = names(htmlFilesInd)
-              for(f in htmlFiles) file.show(paste0(resultsLocation, f))
-            }
-          }
-          table
+          subFolder = gsub("\\s+","_", title)
+          resultsLocation = paste0("predictions/", subFolder, "/",)
+          
+          url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/","lift_table_",res$result, ".tsv.gz")
+          res2 = httr::GET(url)
+          if (res2$status == 200){
+          	localfile = paste0(outputName, ".tsv.gz")
+          	writeBin(httr::content(res2), localfile)
+          	print(paste0("Results written to: ", getwd(),"/", localfile))
+          	read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE)
+          } else NA 
         } else {
           message = paste("Lift failed: ", res$error)
           print(message)
@@ -355,6 +432,7 @@ Session = setRefClass("Session",
         return(finalRes)
       },
 
+			####################################### createPackage
       createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE, ...) { #
         "Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \\code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE)."
         if (is.na(modelBuilt) || !modelBuilt) warning("createPackage requires full model building using learn")
@@ -372,7 +450,7 @@ Session = setRefClass("Session",
 
         params = params[!is.na(params)]
 
-        url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/createPackage")
+        url <- paste0(getSBserverDomain(),"/rapi/createPackage")
         print(paste("Calling:", url))
 
         body = rjson::toJSON(params)
@@ -417,43 +495,30 @@ Session = setRefClass("Session",
         return (evaluation)
       },
 
-      features = function() {
+      features = function(...) {
         "Returns a dataset with top feature information"
-        #statusException() # TODO: check if features were generated already
-        featuresFile = paste0(artifact_loc,"/reports/features/train_features.tsv")
-        features = if (file.exists(featuresFile)){
-          suppressWarnings(read.table(featuresFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = ""))
-        } else {stop(paste("Features file does not exist in ", featuresFile))}
-        return (features)
+        extraParams = list(...)
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        
+        if (remoteMode) {
+        	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/reports/features/train_features.tsv")
+        	res = httr::GET(url)
+        	txt = httr::content(res, as="text")
+        	if (res$status == 200) read.table(textConnection(txt),sep="\t", header=TRUE, stringsAsFactors = FALSE)
+        	else NULL
+        } else {
+	        featuresFile = paste0(artifact_loc,"/reports/features/train_features.tsv")
+	        features = if (file.exists(featuresFile)){
+	          suppressWarnings(read.table(featuresFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = ""))
+	        } else NULL	        
+        }        
       },
 
       showReport = function(report_name = NA){ #confine to a specific list
-        "\\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, train_features, train_unweighted_features, test_unweighted_features,field, function, InputSchema, modelComparison, roc_best, roc_CV"
-        preProcessingReports = c("InputSchema")
-        featuresReports = c("extractor", "train_features", "train_unweighted_features", "test_unweighted_features","field", "function")
-        modelReports = c("confusionMatrix", "confusionMatrix_normalized", "modelComparison", "roc_best", "roc_CV")
-        validReports = c(preProcessingReports,featuresReports, modelReports)
-        if (is.na(report_name) || ! report_name %in% validReports ) stop("Report name is not valid")
-        if ((is.na(modelBuilt) || !modelBuilt) && report_name %in% modelReports) warning("This report requires full model building using learn")
-        #verify model created, check if classification, file exists
-        statusException() #TODO: can be more refined here per report
-        subFolder = function(name) {
-          if (name %in% preProcessingReports) "preProcessing"
-          else if (name %in% modelReports) "model"
-          else "features"
-        }
-        #http://localhost:9000/analytics/report/timeWindowNew2/6/preProcessing/inputSchema.html
-        if (!report_name %in% c("roc_best", "roc_CV")){
-          #htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
-          htmlSource = paste0(getSBserverHost(), ":", getSBserverPort(), "/analytics/report/", projectName, "/", revision, "/", subFolder(report_name), "/", report_name, ".html")
-        	browseURL(htmlSource)
-        }
-        else { #TODO: change to serving mode
-          modelLocation = paste0(artifact_loc,"/reports/model/")
-          relFiles = names(which(sapply(list.files(modelLocation), function(f) grepl(report_name, f))))
-          for(f in relFiles) file.show(paste0(modelLocation, f))
-        }
-
+        "\\code{report_name} name of report to show"        
+        #htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
+        htmlSource = paste0(getSBserverDomain(), "/analytics/report/", projectName, "/", revision, "/", report_name)
+      	browseURL(htmlSource)
       },
 
       showExtractors = function(){
@@ -462,48 +527,64 @@ Session = setRefClass("Session",
       },
       showFeaturesTrain = function(){
         "Shows features performance on train."
-        showReport("train_features")
+        showReport("features/train_features.html")
       },
       showFeaturesTest = function(){
         "Shows features performance on test."
-        showReport("test_unweighted_features")
+        showReport("features/test_unweighted_features.html")
       },
       showFields = function(){
         "Shows fields."
-        showReport("field")
+        showReport("features/field.html")
       },
       showFunctions = function(){
         "Shows functions."
-        showReport("function")
+        showReport("features/function.html")
       },
       showInputSchema = function(){
         "Shows the input schema."
-        showReport("InputSchema")
+        showReport("preProcessing/InputSchema.html")
       },
 
       #require model methods
       showConfusionMatrix = function(normalized = FALSE){ #verify that this was a classification problem
         "Shows a confusion matrix of a model."
-        showReport(if (normalized) "confusionMatrix_normalized" else "confusionMatrix")
+        showReport(if (normalized) "model/confusionMatrix_normalized.html" else "model/confusionMatrix.html")
       },
       showModelComparison = function(){
         "Shows cross validation of various algorithms tested to create a model."
-        showReport("modelComparison")
+        showReport("model/modelComparison.html")
       },
-      showROC = function(){
-        "Shows ROC of the model."
-        showReport("roc_best") #problematic to show in internal browser non local resources
-      },
-      showROC_CV = function(){
-        "Shows ROC of cross validation of various algorithms tested to create a model."
-        showReport("roc_CV")
-      },
+#       showROC = function(){
+#         "Shows ROC of the model."
+#         showReport("roc_best") #problematic to show in internal browser non local resources
+#       },
+#       showROC_CV = function(){
+#         "Shows ROC of cross validation of various algorithms tested to create a model."
+#         showReport("roc_CV")
+#       },
       showFeatureClusters = function(){
         "Shows the representative feature clusters pdf report."
-        pdfReport <- paste0(artifact_loc,"/reports/featureClusters/representativeFeatureIds.pdf")
-        if (file.exists(pdfReport)) viewer(pdfReport)
-        else {stop(paste("Feature clusters file does not exist in ", pdfReport, " (did you set the produceFeatureClusteringReport parameter in your learn call?)"))}
-      }
+				showReport("/features/featureClusters/allFeatures.pdf")
+      },
+			reports = function(){				
+				url = paste0(getSBserverDomain(),"/analytics/file/", projectName,"/",revision,"/reportsStructure.json")
+				res = httr::GET(url)
+				if (res$status == 200 && res$url == url){
+					reportList = unlist(jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE))
+					names(reportList) = NULL
+					reportListWithIndex = cbind(paste0("[",1:length(reportList),"]"), reportList)
+					reportListWithIndex = apply(reportListWithIndex,1,paste, collapse=" ")
+					writeLines(paste(unlist(reportListWithIndex), collapse="\n"))
+					n <- readline("enter a number of report to show or <enter> otherwise:")
+					n <- ifelse(grepl("\\D",n),-1,as.integer(n))
+					if(!is.na(n) && n >= 1 && n <= length(reportList)){
+						print(paste("showing",n))
+						showReport(reportList[n])
+					}										
+					reportList
+				}else NULL
+			}	
 
 # save and load are probably more confusing at this time hence commented out. Just use regular save and load.
 #       ,
