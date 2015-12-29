@@ -5,7 +5,7 @@
 \title{login
 Login to SparkBeyond}
 \usage{
-login(username, password)
+login(username, password, domain = NA)
 }
 \description{
 login

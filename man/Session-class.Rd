@@ -22,22 +22,22 @@ SB object that encapsulates a session
 
 \item{\code{createPackage(sampleData = NULL, createRestAPIpackage = FALSE, ...)}}{Create a sharable package for the model. \code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE).}
 
-\item{\code{enrich(data, featureCount = NA, writePredictionColumnsOnly = TRUE)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
-
-\item{\code{enrich.file(file, featureCount = NA, writePredictionColumnsOnly = TRUE)}}{Returns a data frame containing the enrichedData. \code{file} is a path to the file to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
+\item{\code{enrich(data, featureCount = NA, enrichedColumnsOnly = TRUE,
+  columnsWhiteList = NA, outputName = "enriched", ...)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
 \item{\code{evaluate()}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
-\item{\code{features()}}{Returns a dataset with top feature information}
+\item{\code{features(...)}}{Returns a dataset with top feature information}
 
-\item{\code{initialize(artifact_loc, modelBuilt = FALSE, jobId = -1)}}{initializes a session using a string provided as \code{loc}.}
+\item{\code{initialize(nameOfProject = NA, revisionNumber = NA, artifact_loc = NA,
+  modelBuilt = TRUE, jobId = -1)}}{initializes a session using a projectName and revision number.}
 
-\item{\code{liftFromPrediction(predictionResult, overrideDesiredClass = NA, title = NA,
-  percentOfPopulationToPlot = 0.2)}}{Returns lift from a created model and generates three plots. \code{predictionResult} is a dataframe to be analyzed, \code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \code{title} optional: a title for the plot. \code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis).}
+\item{\code{liftFromPrediction(predictionResult, overrideDesiredClass = NA,
+  title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift",
+  ...)}}{Returns lift from a created model and generates three plots. \code{predictionResult} is a dataframe to be analyzed, \code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \code{title} optional: a title for the plot. \code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis).}
 
-\item{\code{predict(data, writePredictionColumnsOnly = TRUE)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
-
-\item{\code{predict.file(file, writePredictionColumnsOnly = TRUE)}}{Returns prediction on a created model. \code{file} is the path of the file to be predicted. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
+\item{\code{predict(data, predictionColumnsOnly = TRUE, columnsWhiteList = NA,
+  outputName = "predicted", ...)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted. Set \code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
 \item{\code{showConfusionMatrix(normalized = FALSE)}}{Shows a confusion matrix of a model.}
 
@@ -57,15 +57,11 @@ SB object that encapsulates a session
 
 \item{\code{showModelComparison()}}{Shows cross validation of various algorithms tested to create a model.}
 
-\item{\code{showROC()}}{Shows ROC of the model.}
+\item{\code{showReport(report_name = NA)}}{\code{report_name} name of report to show}
 
-\item{\code{showROC_CV()}}{Shows ROC of cross validation of various algorithms tested to create a model.}
+\item{\code{status(...)}}{Checking the status of the session.}
 
-\item{\code{showReport(report_name = NA)}}{\code{report_name} should be one of the following: confusionMatrix, confusionMatrix_normalized, extractor, train_features, train_unweighted_features, test_unweighted_features,field, function, InputSchema, modelComparison, roc_best, roc_CV}
-
-\item{\code{status()}}{Checking the status of the session.}
-
-\item{\code{waitForProcess()}}{Blocking the R console until session is finished.}
+\item{\code{waitForProcess(...)}}{Blocking the R console until session is finished.}
 }}
 \examples{
 # Learning example
