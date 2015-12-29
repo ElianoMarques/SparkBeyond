@@ -6,7 +6,7 @@
 #' @param host new host URL.
 setSBserverHost = function(host = "http://127.0.0.1"){
   assign("SBhost", host, envir = globalenv())
-  print(paste("Setting server host to:", SBhost))
+  #print(paste("Setting server host to:", SBhost))
   return(SBhost)
 }
 
@@ -14,6 +14,15 @@ setSBserverHost = function(host = "http://127.0.0.1"){
 getSBserverHost = function() {
   host = if (exists("SBhost")) SBhost else setSBserverHost()
   return(host)
+}
+
+getSBserverDomain = function() {
+
+	port = getSBserverPort()
+	if (substr(getSBserverHost(), 1, 5) == "https" || grepl(":", getSBserverHost()) || nchar(port) == 0)
+		getSBserverHost()
+	else		
+		paste0(getSBserverHost(),":", port)
 }
 
 #' A function to print the SparkBeyond server host.
@@ -28,7 +37,7 @@ printSBserverHost = function() {
 #' @param port new port.
 setSBserverPort = function(port = "9000"){
   assign("SBport", port, envir = globalenv())
-  print(paste("Setting server port to:", SBport))
+  #print(paste("Setting server port to:", SBport))
   return(SBport)
 }
 
@@ -150,49 +159,12 @@ restartServer = function() {
 #   }, error = function(e) print("Server is down - please load manually"))
 }
 
-#' A function to clear the cache of a specific project
-#' @param projectName The project name to clear (e.g., "titanic").
-#' @return The response from the server.
-clearCache = function(projectName) {
-  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/cleanCache/",projectName)
-  res = httr::GET(url, httr::content_type_json())
-  #to verify: list.files(paste0(getSBserverIOfolder(),"/",getSBserverPort(),"/artifacts/",projectName))
-  if (res$status == 200) paste("Cleared:",projectName) else "Something went wrong"
-}
-
-
-#' A function to check whether the server is alive
-#' @return The response from the server.
-isServerAlive = function() {
-  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/heartbeat")
-  status = tryCatch({
-    res = httr::GET(url, httr::content_type_json())
-    TRUE
-    }, error = function(cond) FALSE
-  )
-  status
-}
-
-
-#' A function to get the server version information
-#' @return The server version information.
-serverVersion = function(){
-  url <- paste0(getSBserverHost(),":",getSBserverPort(),"/buildInfo")
-  status = tryCatch({
-    res = httr::GET(url, httr::content_type_json())
-    res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-    res
-  },
-  error = function(cond) NA
-  )
-  status
-}
 
 #' A function to verify if we are using the latest server version
 #' @return Boolean indicating TRUE if we are using the latest version otherwise FALSE.
 isLatestVersion = function(){
   tryCatch({
-     url <- paste0(getSBserverHost(),":",getSBserverPort(),"/isLastBuild")
+     url <- paste0(getSBserverDomain(),"/isLastBuild")
      latestBuild = tryCatch({
        res = httr::GET(url, httr::content_type_json())
        res <- httr::content(res, as="text")
@@ -278,22 +250,66 @@ functionCatalog = function() {
 #' login
 
 #' Login to SparkBeyond
-login = function(username, password) {
-	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/login")
-	httr::POST(url, encode = "form", body = list(email=username, password=password))
+login = function(username, password, domain = NA) {	
+	if (!is.na(domain)){
+		setSBserverHost(domain)
+		setSBserverPort("")
+	}
+	url <- paste0(getSBserverDomain(),"/login")
+	res = httr::POST(url, encode = "form", body = list(email=username, password=password))
+	loggedIn = if (res$status_code == 404) {		#there is a weird redirection causing this, but this actually OK
+		currentUser()
+	} else {
+		if (res$status_code == 400)	print ("Login failed. Please check your credentials.")
+		else  print ("Login failed.")
+		FALSE
+	}
+	loggedIn
 }
 
 #' Logout
 logout = function() {
-	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/logout")
-	httr::POST(url, encode = "form")
+	url <- paste0(getSBserverDomain(), "/logout")
+	res = httr::GET(url, encode = "form")
+	ifelse(res$status_code == 200, 
+	 {
+	 	print ("You have been logged out")
+	 	TRUE
+	 }, 
+	 FALSE
+	)	
+}
+
+#' currentUser
+#' 
+#' Current user information
+currentUser = function(showInfo = TRUE) {
+	url <- paste0(getSBserverDomain(), "/currentUser")
+	res = httr::GET(url, encode = "form")
+	loggedIn = if (res$status_code == 200){
+		ret = tryCatch({
+			userInfo = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+			if (!is.null(userInfo$user$fullName)) {
+				if (showInfo) print (paste("Hello", userInfo$user$fullName, "!  ", paste0("(",userInfo$user$email ,")")))							
+				TRUE
+			} else	FALSE			
+		}, 
+		error = function(e) FALSE
+		)		
+		ret				
+	} else FALSE
+		
+	if(!loggedIn)	print("You are currently not logged in - please use the login() function first.")
+		
+	loggedIn
 }
 
 #' showProjectsLocks
 
 #' Shows all the active projects that acquired a lock to prevent multiple project run under the same name 
 showProjectsLocks = function() {
-	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/api2/dblocks")
+	if(!currentUser(FALSE)) stop("Please login")
+	url <- paste0(getSBserverDomain(),"/api2/dblocks")
 	res = httr::GET(url)
 	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 }
@@ -302,7 +318,8 @@ showProjectsLocks = function() {
 
 #' remove a lock by id (see \code{\link{showProjectsLocks}})
 removeProjectLock = function(lockId) { 
-	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/api2/dblocks/",lockId,"/break")
+	if(!currentUser(FALSE)) stop("Please login")
+	url <- paste0(getSBserverDomain(),"/api2/dblocks/",lockId,"/break")
 	res = httr::POST(url)
 }
 
@@ -315,22 +332,27 @@ removeProjectLock = function(lockId) {
 #' @param showAllColumns. A switch for whether to show only the job ID, project name, status, and elapsed (if available). Alternatively show all columns
 #' @return a data frame with the jobs
 showJobs = function(projectName = NA, status = NA, showAllColumns = FALSE) { 
-	query = if (!is.na(projectName) && is.na(status)) paste0("?project=",projectName)
+	if(!currentUser(FALSE)) stop("Please login")
+	query = {if (!is.na(projectName) && is.na(status)) paste0("?project=",projectName)
 		else if (is.na(projectName) && !is.na(status)) paste0("?status=",status)
 		else if (!is.na(projectName) && !is.na(status)) paste0("?project=",projectName,"&status=",status)
-		else ""
-	url <- paste0(getSBserverHost(),":",getSBserverPort(),paste0("/api2/jobs", query))
+		else ""}
+	url <- paste0(getSBserverDomain(),paste0("/api2/jobs", query))
 	res = httr::GET(url)
 	jobs = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-	if (length(jobs) > 0) { 		
+	finalJobs = if (length(jobs) > 0) { 		
 		if (showAllColumns) jobs else { 
-			showCols = c("id", "project", "status")
+			showCols = c("id", "project")
+			if ("revision" %in% colnames(jobs)) showCols = c(showCols, "revision")
+			if ("status" %in% colnames(jobs)) showCols = c(showCols, "status")
 			if ("elapsed" %in% colnames(jobs)) showCols = c(showCols, "elapsed")
 			jobs[,showCols]
 		}
 	} else {
 		NULL
 	}
+	if ("revision" %in% colnames(finalJobs)) finalJobs$revision = as.numeric(finalJobs$revision)
+	finalJobs
 }
 
 #' showJobById
@@ -338,7 +360,8 @@ showJobs = function(projectName = NA, status = NA, showAllColumns = FALSE) {
 #' get information for a specific job by job ID
 #' @param jobId. The id of the job as defined by \code{\link{showJobs}}
 showJobById = function(jobId) {
-	url <- paste0(getSBserverHost(),":",getSBserverPort(),paste0("/api2/jobs/", jobId))
+	if(!currentUser(FALSE)) stop("Please login")
+	url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId))
 	res = httr::GET(url)
 	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 }
@@ -349,7 +372,8 @@ showJobById = function(jobId) {
 #' @param jobId. The id of the job as defined by \code{\link{showJobs}}
 #' @return TRUE if succeeded. FALSE otherwise.
 cancelJob = function(jobId){
-	url <- paste0(getSBserverHost(),":",getSBserverPort(),paste0("/api2/jobs/", jobId,"/cancel"))
+	if(!currentUser(FALSE)) stop("Please login")
+	url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId,"/cancel"))
 	res = httr::POST(url)
 	ifelse(res$status == 200, TRUE,{
 		print(httr::content(res, as="text"))
@@ -357,21 +381,68 @@ cancelJob = function(jobId){
 	})
 }
 
+#' A function to clear the cache of a specific project
+#' @param projectName The project name to clear (e.g., "titanic").
+#' @return The response from the server.
+clearCache = function(projectName) {
+	if(!currentUser(FALSE)) stop("Please login")
+	url <- paste0(getSBserverDomain(),"/rapi/cleanCache/",projectName)
+	res = httr::GET(url, httr::content_type_json())
+	#to verify: list.files(paste0(getSBserverIOfolder(),"/",getSBserverPort(),"/artifacts/",projectName))
+	if (res$status == 200) paste("Cleared:",projectName) else "Something went wrong"
+}
+
+
+#' A function to check whether the server is alive
+#' @return The response from the server.
+isServerAlive = function() {
+	url <- paste0(getSBserverDomain(),"/rapi/heartbeat")
+	status = tryCatch({
+		res = httr::GET(url, httr::content_type_json())
+		TRUE
+	}, error = function(cond) FALSE
+	)
+	status
+}
+
+
+#' A function to get the server version information
+#' @return The server version information.
+serverVersion = function(){
+	url <- paste0(getSBserverDomain(),"/buildInfo")
+	status = tryCatch({
+		res = httr::GET(url, httr::content_type_json())
+		res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+		res
+	},
+	error = function(cond) NA
+	)
+	status
+}
+
 ####################################################### 
 
 doesFileExistOnServer = function(projectName, path){
-	res = httr::GET(paste0("http://localhost:9000/api2/download/exists/",projectName,"?path=",path))
-	res$status==200
+	if(!currentUser(FALSE)) stop("Please login")
+	domain = getSBserverDomain()
+	url = paste0(domain, "/api2/download/exists/",projectName,"?path=",path)
+	res = httr::GET(url)
+	if (res$status==200 && res$url == domain){ #not logged in the first time
+		res = httr::GET(url)	#a the second time
+		if (res$status==200 && res$url == domain) stop("This operation requires authentication, please log in first")
+	} 
+	res$status==200 && url == res$url
 }
 
 uploadToServer = function(data, projectName, name) {
+	if(!currentUser(FALSE)) stop("Please login")
 	if (! "data.frame" %in% class(data)) stop("The provided data must be of type data.frame")
 	hash = digest(data)
 	filename = paste0(name, "_", hash, ".tsv")
 	attempts = 2
 	succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
 	if (!succeeded) {  #uploading only if doesn't exist
-		urlUpload = paste0("http://localhost:9000/api2/fileUpload/", projectName, "/",filename)
+		urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
 		colHeaders = paste0(colnames(data), collapse = "\t")
 		body = paste0(colHeaders, "\n", 
 									paste0(apply(cols2Text(data),1,paste0, collapse = "\t"), collapse="\n"))
@@ -383,6 +454,26 @@ uploadToServer = function(data, projectName, name) {
 		}
 	}
 	ifelse (succeeded, paste0("/uploaded/",filename), NA)
+}
+
+projectRevisions = function(projectName) {
+	if(!currentUser(FALSE)) stop("Please login")	
+	url = paste0(getSBserverDomain(), "/analytics/revisions/",projectName)
+	res = httr::GET(url)
+	ret = if (res$status_code == 200) {
+		tryCatch({
+			txt =httr::content(res, as="text")
+			if (nchar(txt) > 0 & txt != "[]") {
+				projectInfo = jsonlite::fromJSON(txt=txt,simplifyDataFrame=TRUE)
+				if(!is.null(projectInfo)) {
+					projectInfo$name = as.numeric(projectInfo$name) 
+				projectInfo
+				}else NULL
+			} else NULL
+		})
+	} else NULL
+	if (is.null(ret)) print ("Project not found")
+	ret
 }
 
 #' writeToServer
