@@ -200,6 +200,7 @@ learn <- function(
 	extraParams = list(...)
 	# TODO: verify that there are no supurious parameters, e.g. (projectname instead of projectName)
 	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+	if(remoteMode & !currentUser(FALSE)) stop("Please login")
 	
 	projectName = gsub(" ", "_", projectName)
 	
@@ -208,7 +209,7 @@ learn <- function(
 	
 	if (!is.null(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
 	
-	url <- paste0(getSBserverHost(),":",getSBserverPort(),"/rapi/learn")
+	url <- paste0(getSBserverDomain(),"/rapi/learn")
 	print(paste("Calling:", url))
 	
 	if (!is.null(contextDatasets)){ #writing context data to server if necessary
@@ -235,7 +236,11 @@ learn <- function(
 		trainingFilePath = 
 			ifelse (!remoteMode,
 					writeToServer(trainData, prefix = paste0(projectName,"_train")),
-					uploadToServer(data = trainData,projectName = projectName, name = "train")
+					{
+						uploadedPath = uploadToServer(data = trainData,projectName = projectName, name = "train")
+						if(is.na(uploadedPath)) stop("failed to upload training file to server")
+						uploadedPath
+					}
 		),
 		target = target,
 		testFilePath = 
@@ -334,7 +339,7 @@ learn <- function(
 		})
 	}
 
-	if (runBlocking)session$waitForProcess()
+	if (runBlocking)session$waitForProcess(remoteMode=remoteMode)
  
 	session$modelBuilt = TRUE
 	return(session)
