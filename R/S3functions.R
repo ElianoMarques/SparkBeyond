@@ -122,6 +122,14 @@ modelBuildingControl = function(
 	)
 }
 
+algorithmsList = function(
+		isClassification = NA,
+		randomForest = TRUE,
+		xgBoost = TRUE	
+	){
+	
+}
+
 #' reportingContorl
 #' 
 
@@ -148,14 +156,12 @@ reportingControl = function(
 #' @param name: an identifier for the context object to be created (optional).
 #' @param keyColumns: Specify the key columns to be used by the context object (optional).
 #' @param timeColumn: Specify the time column to be used by the context object (relevant in time series contexts) (optional).
-contextObject = function(data, name = NULL, keyColumns = list(), timeColumn = NULL) { #TODO: help
+contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL ) { #TODO: help
 	#if data is data frame write it, otherwise it's a path - same for learn.file
-	obj = list(data = data, name=name, keyColumns = keyColumns, timeColumn=timeColumn)
+	obj = list(data = data, contextTypes = contextTypes, name=name, keyColumns = keyColumns, timeColumn=timeColumn, graphSourceNodeColumn=graphSourceNodeColumn, graphTargetNodeColumn=graphTargetNodeColumn)
 	class(obj) = "contextObject"
 	obj
 }
-
-
 
 #' learn
 #' 
@@ -200,7 +206,7 @@ learn <- function(
 	extraParams = list(...)
 	# TODO: verify that there are no supurious parameters, e.g. (projectname instead of projectName)
 	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
-	if(remoteMode & !currentUser(FALSE)) stop("Please login")
+#	if(remoteMode && !currentUser(FALSE)) stop("Please login")
 	
 	projectName = gsub(" ", "_", projectName)
 	
