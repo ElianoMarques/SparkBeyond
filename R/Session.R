@@ -33,15 +33,19 @@ Session = setRefClass("Session",
         if (!is.na(nameOfProject) && !is.na(revisionNumber)){
         	artifact_loc <<- paste0(nameOfProject,"/",revisionNumber)
         	projectName <<- nameOfProject
-        	revision <<- revisionNumber
+        	revision <<- as.numeric(revisionNumber)
+        	jobs = showJobs(projectName = projectName) #currently not using revision for backward compatibility 
+        	if ("revision" %in% colnames(jobs)) {
+        		jobId <<- as.numeric(jobs[jobs$revision == revision,]$id)
+        	}
         } else {
 	        artifact_loc <<- artifact_loc
 	        tokens = strsplit(x = artifact_loc, split = "/")[[1]]
 	        projectName <<- tokens[length(tokens)-1]
 	        revision <<- as.numeric(tokens[length(tokens)])
+	        jobId <<- jobId
         }
         modelBuilt <<- modelBuilt
-        jobId <<- jobId
       },
 
       waitForProcess = function(...) { #TODO: number of mintues as parameter?
@@ -246,7 +250,7 @@ Session = setRefClass("Session",
         
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
                 
-        dataPath = ifelse (remoteMode, 
+        datapath = ifelse (remoteMode, 
 					{
 						uploadedPath = uploadToServer(data = data, projectName = projectName, name = "enrich")
 						if(is.na(uploadedPath)) stop("failed to upload file to enrich to server")
@@ -260,7 +264,7 @@ Session = setRefClass("Session",
         								tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz"))
 
         params <-list(modelPath = artifact_loc,
-                      dataPath = dataPath,
+                      dataPath = datapath,
                       featureCount = featureCount,
                       outputName = outputPath,
                       enrichedColumnsOnly = enrichedColumnsOnly,
@@ -311,7 +315,7 @@ Session = setRefClass("Session",
 			################################## predict #####################
       predict = function(data, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", ...) { 
         "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. Set \\code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
-        if(!currentUser(FALSE)) stop("Please login")
+        #if(!currentUser(FALSE)) stop("Please login")
                 
         statusException()
         if (is.na(modelBuilt) || !modelBuilt) warning("Prediction requires full model building using learn")
@@ -383,8 +387,6 @@ Session = setRefClass("Session",
         extraParams = list(...)        
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
         
-        statusException()
-        isLatestVersion()
         if (is.na(modelBuilt) || !modelBuilt) warning("Lift requires full model building using learn") #TODO: verify classification problem
 
         datapath = ifelse (remoteMode, {
@@ -396,7 +398,7 @@ Session = setRefClass("Session",
 				)
 
         params <-list(modelPath = artifact_loc,
-                      predictionPath = dataPath,
+                      predictionPath = datapath,
                       title = title,
                       percentOfPopulationToPlot= percentOfPopulationToPlot,
         							externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())
@@ -413,9 +415,12 @@ Session = setRefClass("Session",
         finalRes = if (is.null(res$error) && !is.null(res$result)){
           plotName = res$result
           subFolder = gsub("\\s+","_", title)
-          resultsLocation = paste0("predictions/", subFolder, "/",)
+          resultsLocation = paste0("predictions/", subFolder, "/")
+          showReport(paste0(resultsLocation, "CumulativeGain_counts_", plotName)) #cummGain_counts
+          showReport(paste0(resultsLocation, "CumulativeGain_percent_", plotName)) #cummGain_percent
+          showReport(paste0(resultsLocation, "Lift_plot_", plotName)) #lift plot
           
-          url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/","lift_table_",res$result, ".tsv.gz")
+          url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/reports/", resultsLocation, "lift_table_",plotName, ".tsv.gz")
           res2 = httr::GET(url)
           if (res2$status == 200){
           	localfile = paste0(outputName, ".tsv.gz")
