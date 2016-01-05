@@ -308,7 +308,7 @@ currentUser = function(showInfo = TRUE) {
 
 #' Shows all the active projects that acquired a lock to prevent multiple project run under the same name 
 showProjectsLocks = function() {
-	if(!currentUser(FALSE)) stop("Please login")
+	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),"/api2/dblocks")
 	res = httr::GET(url)
 	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
@@ -318,7 +318,7 @@ showProjectsLocks = function() {
 
 #' remove a lock by id (see \code{\link{showProjectsLocks}})
 removeProjectLock = function(lockId) { 
-	if(!currentUser(FALSE)) stop("Please login")
+	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),"/api2/dblocks/",lockId,"/break")
 	res = httr::POST(url)
 }
@@ -326,13 +326,14 @@ removeProjectLock = function(lockId) {
 #' showJobs
 
 #' shows the status for all jobs 
+#' 
 #' A status of a job can be one of "queued", "running", "failed", "canceled", "done"
 #' @param projectName. Filter by project name.
 #' @param status. Filter by status. 
 #' @param showAllColumns. A switch for whether to show only the job ID, project name, status, and elapsed (if available). Alternatively show all columns
 #' @return a data frame with the jobs
-showJobs = function(projectName = NA, status = NA, showAllColumns = FALSE) { 
-	if(!currentUser(FALSE)) stop("Please login")
+showJobs = function(projectName = NA, revision = NA, status = NA, showAllColumns = FALSE) { 
+	#if(!currentUser(FALSE)) stop("Please login")
 	query = {if (!is.na(projectName) && is.na(status)) paste0("?project=",projectName)
 		else if (is.na(projectName) && !is.na(status)) paste0("?status=",status)
 		else if (!is.na(projectName) && !is.na(status)) paste0("?project=",projectName,"&status=",status)
@@ -351,7 +352,10 @@ showJobs = function(projectName = NA, status = NA, showAllColumns = FALSE) {
 	} else {
 		NULL
 	}
-	if ("revision" %in% colnames(finalJobs)) finalJobs$revision = as.numeric(finalJobs$revision)
+	if ("revision" %in% colnames(finalJobs)) {
+		finalJobs$revision = as.numeric(finalJobs$revision)
+		if (!is.na(revision)) finalJobs = finalJobs[finalJobs$revision == revision,]
+	}
 	finalJobs
 }
 
@@ -360,7 +364,7 @@ showJobs = function(projectName = NA, status = NA, showAllColumns = FALSE) {
 #' get information for a specific job by job ID
 #' @param jobId. The id of the job as defined by \code{\link{showJobs}}
 showJobById = function(jobId) {
-	if(!currentUser(FALSE)) stop("Please login")
+	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId))
 	res = httr::GET(url)
 	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
@@ -372,7 +376,7 @@ showJobById = function(jobId) {
 #' @param jobId. The id of the job as defined by \code{\link{showJobs}}
 #' @return TRUE if succeeded. FALSE otherwise.
 cancelJob = function(jobId){
-	if(!currentUser(FALSE)) stop("Please login")
+	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId,"/cancel"))
 	res = httr::POST(url)
 	ifelse(res$status == 200, TRUE,{
@@ -385,7 +389,7 @@ cancelJob = function(jobId){
 #' @param projectName The project name to clear (e.g., "titanic").
 #' @return The response from the server.
 clearCache = function(projectName) {
-	if(!currentUser(FALSE)) stop("Please login")
+	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),"/rapi/cleanCache/",projectName)
 	res = httr::GET(url, httr::content_type_json())
 	#to verify: list.files(paste0(getSBserverIOfolder(),"/",getSBserverPort(),"/artifacts/",projectName))
@@ -423,7 +427,7 @@ serverVersion = function(){
 ####################################################### 
 
 doesFileExistOnServer = function(projectName, path){
-	if(!currentUser(FALSE)) stop("Please login")
+	#if(!currentUser(FALSE)) stop("Please login")
 	domain = getSBserverDomain()
 	url = paste0(domain, "/api2/download/exists/",projectName,"?path=",path)
 	res = httr::GET(url)
@@ -435,7 +439,7 @@ doesFileExistOnServer = function(projectName, path){
 }
 
 uploadToServer = function(data, projectName, name) {
-	if(!currentUser(FALSE)) stop("Please login")
+	#if(!currentUser(FALSE)) stop("Please login")
 	if (! "data.frame" %in% class(data)) stop("The provided data must be of type data.frame")
 	hash = digest(data)
 	filename = paste0(name, "_", hash, ".tsv")
@@ -457,7 +461,7 @@ uploadToServer = function(data, projectName, name) {
 }
 
 projectRevisions = function(projectName) {
-	if(!currentUser(FALSE)) stop("Please login")	
+	#if(!currentUser(FALSE)) stop("Please login")	
 	url = paste0(getSBserverDomain(), "/analytics/revisions/",projectName)
 	res = httr::GET(url)
 	ret = if (res$status_code == 200) {
