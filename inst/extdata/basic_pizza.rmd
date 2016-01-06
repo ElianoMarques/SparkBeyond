@@ -48,10 +48,9 @@ pizzaModel = learn(
 		projectName = "pizza",
     trainData = data,
     target = "requester_received_pizza",                        
-		# optional - limit the number of features - check documentation for featureGenerationControl		 
+		preProcessingCtrl = preProcessingControl(fileEscaping = FALSE),
     featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = 300),
-		knowledgeCtrl = knowledgeControl(useGraph = TRUE),
-		# optional - specify algorithms to use - check modelBuildingControl
+		#knowledgeCtrl = knowledgeControl(useGraph = TRUE),
 		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
 		# optional - avoid automatically creating a local object pointing to the created model 
     autoSave = FALSE     
