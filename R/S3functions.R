@@ -107,11 +107,11 @@ knowledgeControl = function(
 
 #' modelBuildingControl
 #' 
-#' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. NA by default
+#' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. Uses \code{\link{algorithmsList}}
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". NA by default automatically selects AUC for classification and RMSE for regression.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 modelBuildingControl = function(
-	algorithmsWhiteList = list("RRandomForestClassifier", "RRandomForestRegressor"), #TODO: list available algorithms as enums
+	algorithmsWhiteList = algorithmsList(), 
 	evaluationMetric = NA,
 	crossValidation = 5
 ) {
@@ -122,12 +122,53 @@ modelBuildingControl = function(
 	)
 }
 
+#' algorithmsList
+#' 
+#' @param isClassification A boolean indicator for whether to use only classification algorithms or only regression algorithms. If is NA the relevant algorithms are selected based on the target type and cardinality using the learning process. 
+#' @param randomForest random forest algorithm from the randomForest package.
+#' @param xgBoost eXtreme gradient boosted machine algorithm from the xgBoost package.  (currently does not support multiclass)
+#' @param GBM gradient boosten machine algorithm from the xgBoost package.  
+#' @param rpart decision tree algorithm from the rpart package.  
+#' @param lassoGlmnet logistic regression / linear regression algorithm with alpha = 0 from the glmnet package.  
+#' @param ridgeGlmnet logistic regression / linear regression algorithm with alpha = 1 from the glmnet package.  
+#' @param linearRegression linear regression algorithm. lm from the base package.  
+#' @param linearEnsemble A linear ensemble of a collection of GBM and rpart algorithms.
+#' @param stackingEnsemble A stacking ensemble of GBM as meta-model that ensmebles a collection of GBM and rpart algorithms.
 algorithmsList = function(
 		isClassification = NA,
 		randomForest = TRUE,
-		xgBoost = TRUE	
+		xgBoost = FALSE,
+		GBM = FALSE,
+		rpart = FALSE,
+		lassoGlmnet = FALSE,
+		ridgeGlmnet = FALSE,
+		linearRegression = FALSE,
+		linearEnsemble = FALSE,
+		stackingEnsemble = FALSE
 	){
-	
+		algsList = vector()
+		if (randomForest) algsList = c(algsList, "RRandomForest")
+		if (xgBoost) algsList = c(algsList, "RXGBoost")
+		if (GBM) algsList = c(algsList, "RCaretGBM")
+		if (rpart) algsList = c(algsList, "RRpartDecisionTree")
+		if (lassoGlmnet && is.na(isClassification)) algsList = c(algsList, "RLassoL")
+		if (ridgeGlmnet && is.na(isClassification)) algsList = c(algsList, "RRidgeL")
+		if (linearEnsemble) algsList = c(algsList, "RLinearEnsembleGBM_with_Rpart")
+		if (stackingEnsemble) algsList = c(algsList, "RStackingEnsembleGBM_of_GBM_with_Rpart")
+		
+		if (!is.na(isClassification) && isClassification == TRUE) algsList = paste0(algsList, "Classifier")
+		if (!is.na(isClassification) && isClassification == FALSE) algsList = paste0(algsList, "Regressor")
+		
+		if (linearRegression) algsList = c(algsList, "RLinearRegressionLMRegressor")
+		
+		if (!is.na(isClassification)){
+			if (lassoGlmnet && isClassification == TRUE) algsList = c(algsList, "RLassoLogisticRegressionGlmnetClassifier")
+			if (ridgeGlmnet && isClassification == TRUE) algsList = c(algsList, "RRidgeLogisticRegressionGlmnetClassifier")
+			if (lassoGlmnet && isClassification == FALSE) algsList = c(algsList, "RLassoLinearRegressionGlmnetClassifier")
+			if (ridgeGlmnet && isClassification == FALSE) algsList = c(algsList, "RRidgeLinearRegressionGlmnetClassifier")
+		}	
+		
+		algsList
 }
 
 #' reportingContorl
