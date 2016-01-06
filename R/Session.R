@@ -244,7 +244,7 @@ Session = setRefClass("Session",
       },
 
 			################################## enrich #####################
-      enrich = function(data, featureCount = NA, enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", ...) {
+      enrich = function(data, featureCount = NA, enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, ...) {
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         extraParams = list(...)
         
@@ -252,11 +252,11 @@ Session = setRefClass("Session",
                 
         datapath = ifelse (remoteMode, 
 					{
-						uploadedPath = uploadToServer(data = data, projectName = projectName, name = "enrich")
+						uploadedPath = uploadToServer(data = data, projectName = projectName, name = "enrich", useEscaping = fileEscaping)
 						if(is.na(uploadedPath)) stop("failed to upload file to enrich to server")
 						uploadedPath        
 					},
-					writeToServer(data, prefix = "enrich") #project name
+					writeToServer(data, prefix = "enrich", useEscaping = fileEscaping) #project name
         )        
  
         outputPath = ifelse(remoteMode,
@@ -321,7 +321,7 @@ Session = setRefClass("Session",
       },
 
 			################################## predict #####################
-      predict = function(data, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", ...) { 
+      predict = function(data, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE, ...) { 
         "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. Set \\code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         #if(!currentUser(FALSE)) stop("Please login")
                 
@@ -333,11 +333,11 @@ Session = setRefClass("Session",
         
         datapath = ifelse (remoteMode, 
 					{
-        		uploadedPath = uploadToServer(data = data, projectName = projectName, name = "predict")
+        		uploadedPath = uploadToServer(data = data, projectName = projectName, name = "predict", useEscaping = fileEscaping)
         		if(is.na(uploadedPath)) stop("failed to upload file to predict to server")
         		uploadedPath        
         	},
-        	writeToServer(data, prefix = "predict") #project name
+        	writeToServer(data, prefix = "predict", useEscaping = fileEscaping) #project name
 				)
 
         params <-list(modelPath = artifact_loc,
@@ -390,7 +390,7 @@ Session = setRefClass("Session",
       },
 
 			################################## lift #####################			
-      liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift", ...) { #TODO: change documentation
+      liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift", fileEscaping = TRUE, ...) { #TODO: change documentation
         "Returns lift from a created model and generates three plots. \\code{predictionResult} is a dataframe to be analyzed, \\code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
         extraParams = list(...)        
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
@@ -398,11 +398,11 @@ Session = setRefClass("Session",
         if (is.na(modelBuilt) || !modelBuilt) warning("Lift requires full model building using learn") #TODO: verify classification problem
 
         datapath = ifelse (remoteMode, {
-							uploadedPath = uploadToServer(data = predictionResult, projectName = projectName, name = "lift")
+							uploadedPath = uploadToServer(data = predictionResult, projectName = projectName, name = "lift", useEscaping = fileEscaping)
 							if(is.na(uploadedPath)) stop("failed to upload file to plots lifts to server")
 							uploadedPath        
 						},
-						writeToServer(data, prefix = "lift") 
+						writeToServer(data, prefix = "lift", useEscaping = fileEscaping) 
 				)
 
         params <-list(modelPath = artifact_loc,
@@ -446,12 +446,12 @@ Session = setRefClass("Session",
       },
 
 			####################################### createPackage
-      createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE, ...) { #
+      createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE, fileEscaping = TRUE, ...) { #
         "Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \\code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE)."
         if (is.na(modelBuilt) || !modelBuilt) warning("createPackage requires full model building using learn")
 
         sampleDataFilename = if (is.null(sampleData)) NA else {		        	
-          writeToServer(if ("data.frame" %in% class(data)) sampleData[1:20,] else sampleData, prefix="createPackage_sample") #projectName
+          writeToServer(if ("data.frame" %in% class(data)) sampleData[1:20,] else sampleData, prefix="createPackage_sample", useEscaping = fileEscaping) #projectName
         }
         extraParams = list(...)
         

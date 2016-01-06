@@ -4,12 +4,14 @@
 \alias{writeToServer}
 \title{writeToServer}
 \usage{
-writeToServer(data, filename = NA, prefix = "data_in")
+writeToServer(data, filename = NA, prefix = "data_in", useEscaping = TRUE)
 }
 \arguments{
 \item{data}{Data frame or table to export to the server.}
 
-\item{filename:}{Optional. define a name to save the data to. NA by default.}
+\item{filename}{Optional. define a name to save the data to. NA by default.}
+
+\item{useEscaping}{A binary indicator noting whether a forward slash in the data needs to be escaped}
 }
 \value{
 A filepath to the file on the server that was created.

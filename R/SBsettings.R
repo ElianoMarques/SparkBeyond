@@ -438,7 +438,13 @@ doesFileExistOnServer = function(projectName, path){
 	res$status==200 && url == res$url
 }
 
-uploadToServer = function(data, projectName, name) {
+#' uploadToServer
+#' 
+#' @param data dataFrame to be written to the server
+#' @param projectName the name of the project to save the data under
+#' @param name the prefix of the file name in which the data will be saved
+#' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
+uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 	#if(!currentUser(FALSE)) stop("Please login")
 	if (! "data.frame" %in% class(data)) stop("The provided data must be of type data.frame")
 	hash = digest(data)
@@ -449,7 +455,7 @@ uploadToServer = function(data, projectName, name) {
 		urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
 		colHeaders = paste0(colnames(data), collapse = "\t")
 		body = paste0(colHeaders, "\n", 
-									paste0(apply(cols2Text(data),1,paste0, collapse = "\t"), collapse="\n"))
+									paste0(apply(cols2Text(data, useEscaping),1,paste0, collapse = "\t"), collapse="\n"))
 		
 		while (!succeeded && attempts > 0 ) {
 			httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
@@ -484,20 +490,21 @@ projectRevisions = function(projectName) {
 #' 
 #' A function to write a dateframe to the server. Useful for passing a dataframe to the server for feature search / learning purposes.
 #' @param data Data frame or table to export to the server.
-#' @param filename: Optional. define a name to save the data to. NA by default.
+#' @param filename Optional. define a name to save the data to. NA by default.
+#' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
 #' @return A filepath to the file on the server that was created.
-writeToServer = function(data, filename = NA, prefix = "data_in"){ #TODO: deal with spaces in prefix
+writeToServer = function(data, filename = NA, prefix = "data_in", useEscaping = TRUE){ #TODO: deal with spaces in prefix
 	final_filename = if ("data.frame" %in% class(data)){ # we got a data.frame object to be written to server 
 		if (is.na(filename)) { # no specific name was provided - use digest to refrain from rewriting to server
 			hash = digest(data)
 			new_filename = paste0(getSBserverIOfolder(), prefix, "_", hash, ".tsv") 
 			new_filenamee = gsub("/+", "/", new_filename)
-			if (!file.exists(new_filename)) writeToFile(data, new_filename) #due to hashing we rewrite file only if data has changed
+			if (!file.exists(new_filename)) writeToFile(data, new_filename, useEscaping) #due to hashing we rewrite file only if data has changed
 			new_filename		
 		} else {			# specific name was provided - rewrite file to server
 			new_filename = paste0(getSBserverIOfolder(), filename)
 			new_filename = gsub("/+", "/", new_filename)
-			writeToFile(data, new_filename)
+			writeToFile(data, new_filename, useEscaping)
 			new_filename
 		}
 	} else if (class(data) == "character") { # a filename was provided as data - check if exists and return it

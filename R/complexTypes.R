@@ -142,19 +142,19 @@ classofCols = function(data) {
 #' cols2Text
 #'
 #' Convert all \code{data} columns into a serializable text/primitive representation. Cells that contain lists will be converted to [ , , ] representation. All strings will quoted.
-#' @param data: dataframe / data.table to convert to primitive represenation.
+#' @param data dataframe / data.table to convert to primitive represenation.
+#' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
 #' @return a vector containing all input information in text/primitive representation
 #' @examples
 #' grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
 #' textGrouped = cols2Text(grouped)
 #' typeofCols(textGrouped)
 #' textGrouped[1,]
-cols2Text = function(data) {
+cols2Text = function(data, useEscaping = TRUE) {
   col2Text = function(x) {
     escapeFun = function(s) {
       s = gsub('"','""',s)
-      s = gsub("\\t","\\\\t",s)
-      s = gsub("\\n"," ",s) #\\\\n
+      if (useEscaping) s = gsub("\\","\\\\",s) 
       s
     }
     
@@ -190,12 +190,13 @@ cols2Text = function(data) {
 #' writeToFile
 #'
 #' Convert all \code{data} columns into a serializable text/primitive representation and write them to a tab separated file.
-#' @param data: dataframe / data data.table to write.
+#' @param data dataframe / data data.table to write.
+#' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
 #' @examples
 #' grouped = groupBy(getData("titanic_train"), by =list("pclass","sex"))
 #' writeToFile(grouped, "titanic_grouped.tsv")
-writeToFile = function(data, outputFile) { #sugar for writing grouped data
-  toWrite = cols2Text(data)
+writeToFile = function(data, outputFile, useEscaping = TRUE) { #sugar for writing grouped data
+  toWrite = cols2Text(data, useEscaping)
   write.table(toWrite, file=outputFile, sep="\t", row.names=FALSE, quote=FALSE)
 }
 

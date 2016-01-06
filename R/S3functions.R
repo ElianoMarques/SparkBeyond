@@ -5,11 +5,13 @@
 #' @temporalSplitColumn: Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.  
 #' @param emptyValuePolicy: Controls how empty values in the data are being handled NA by default will replace numeric value with median value, and strings with empty strings.
 #' @param fileEncoding: Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
+#' @param fileEscaping: Define how escaping (e.g., \n) should be handled when files are parsed.
 preProcessingControl = function(
 	trainTestSplitRatio = 0.8,
 	temporalSplitColumn = NA,
 	emptyValuePolicy = NA,
-	fileEncoding = NA
+	fileEncoding = NA,
+	fileEscaping = TRUE
 ) {
 	list(
 		emptyValuePolicy = emptyValuePolicy,
@@ -198,7 +200,6 @@ reportingControl = function(
 #' @param keyColumns: Specify the key columns to be used by the context object (optional).
 #' @param timeColumn: Specify the time column to be used by the context object (relevant in time series contexts) (optional).
 contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL ) { #TODO: help
-	#if data is data frame write it, otherwise it's a path - same for learn.file
 	obj = list(data = data, contextTypes = contextTypes, name=name, keyColumns = keyColumns, timeColumn=timeColumn, graphSourceNodeColumn=graphSourceNodeColumn, graphTargetNodeColumn=graphTargetNodeColumn)
 	class(obj) = "contextObject"
 	obj
@@ -272,8 +273,10 @@ learn <- function(
 				ifelse(!remoteMode,
 					writeToServer(contextDatasets[[i]]$data, 
 						prefix = paste0(projectName,"_context", contextName),
+						useEscaping = preProcessingCtrl$fileEscaping
 					),
-					uploadToServer(data = trainData, projectName = projectName, name = paste0("context", contextName))
+					uploadToServer(data = trainData, projectName = projectName, name = paste0("context", contextName)
+												 , useEscaping = preProcessingCtrl$fileEscaping)
 			)
 		}
 	}
@@ -282,9 +285,10 @@ learn <- function(
 		projectName = projectName,
 		trainingFilePath = 
 			ifelse (!remoteMode,
-					writeToServer(trainData, prefix = paste0(projectName,"_train")),
+					writeToServer(trainData, prefix = paste0(projectName,"_train"), useEscaping = preProcessingCtrl$fileEscaping),
 					{
-						uploadedPath = uploadToServer(data = trainData,projectName = projectName, name = "train")
+						uploadedPath = uploadToServer(data = trainData,projectName = projectName, name = "train"
+																					, useEscaping = preProcessingCtrl$fileEscaping)
 						if(is.na(uploadedPath)) stop("failed to upload training file to server")
 						uploadedPath
 					}
@@ -293,8 +297,8 @@ learn <- function(
 		testFilePath = 
 			ifelse (!is.null(testData) && (any(grep("data.frame", class(testData))) || class(testData)=="character"),
 				ifelse( !remoteMode,
-						writeToServer(testData, prefix = paste0(projectName,"_test")),
-						uploadToServer(data = testData,projectName = projectName, name = "test")	
+						writeToServer(testData, prefix = paste0(projectName,"_test"), useEscaping = preProcessingCtrl$fileEscaping),
+						uploadToServer(data = testData,projectName = projectName, name = "test", useEscaping = preProcessingCtrl$fileEscaping)	
 				),
 				NA
 		),	

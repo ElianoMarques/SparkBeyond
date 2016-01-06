@@ -4,10 +4,12 @@
 \alias{writeToFile}
 \title{writeToFile}
 \usage{
-writeToFile(data, outputFile)
+writeToFile(data, outputFile, useEscaping = TRUE)
 }
 \arguments{
-\item{data:}{dataframe / data data.table to write.}
+\item{data}{dataframe / data data.table to write.}
+
+\item{useEscaping}{A binary indicator noting whether a forward slash in the data needs to be escaped}
 }
 \description{
 Convert all \code{data} columns into a serializable text/primitive representation and write them to a tab separated file.

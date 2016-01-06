@@ -4,10 +4,12 @@
 \alias{cols2Text}
 \title{cols2Text}
 \usage{
-cols2Text(data)
+cols2Text(data, useEscaping = TRUE)
 }
 \arguments{
-\item{data:}{dataframe / data.table to convert to primitive represenation.}
+\item{data}{dataframe / data.table to convert to primitive represenation.}
+
+\item{useEscaping}{A binary indicator noting whether a forward slash in the data needs to be escaped}
 }
 \value{
 a vector containing all input information in text/primitive representation
