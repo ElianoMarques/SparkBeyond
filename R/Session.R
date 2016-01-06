@@ -269,6 +269,7 @@ Session = setRefClass("Session",
                       outputName = outputPath,
                       enrichedColumnsOnly = enrichedColumnsOnly,
         							columnsWhiteList = columnsWhiteList,
+        							fileEscaping = fileEscaping,
                       externalPrefixPath = ifelse (remoteMode, NA, getSBserverIOfolder())
         							#addBooleanNumericExtractors        							
         )
@@ -344,6 +345,7 @@ Session = setRefClass("Session",
                       dataPath = datapath,
                       writePredictionColumnsOnly = predictionColumnsOnly,
         							columnsWhiteList = columnsWhiteList,
+        							fileEscaping = fileEscaping,
                       externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())        							
         )        							
         params = params[!is.na(params)] 							
@@ -409,6 +411,7 @@ Session = setRefClass("Session",
                       predictionPath = datapath,
                       title = title,
                       percentOfPopulationToPlot= percentOfPopulationToPlot,
+        							fileEscaping = fileEscaping,
         							externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())
         )
         params = params[!is.na(params)]
@@ -459,6 +462,7 @@ Session = setRefClass("Session",
                       createRestAPIpackage = createRestAPIpackage,
                       dataPath = sampleDataFilename,
                       debugMode = if(!is.null(extraParams$debugMode)) extraParams$debugMode else FALSE,
+        							fileEscaping = fileEscaping,
                       externalPrefixPath = getSBserverIOfolder())
 
         params = params[!is.na(params)]
