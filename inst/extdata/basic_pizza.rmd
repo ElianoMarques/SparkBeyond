@@ -1,0 +1,67 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{basic_pizza}
+%\VignetteDepends{xtable}
+-->
+
+##Basic classification ##  
+
+###Overview###
+
+Goal: 
+<br>
+
+
+<br>
+<br>
+
+###Training set###
+
+```{r basic_pizza_1, results='asis'}
+data = read.csv("http://s3.amazonaws.com/public-sparkbeyond/pizza_full_clean.csv", stringsAsFactors = FALSE)
+data = excludeCols(data, c("giver_username_if_known", 
+													 "requester_days_since_first_post_on_raop_at_request",
+													 "requester_days_since_first_post_on_raop_at_retrieval",
+													 "requester_number_of_posts_on_raop_at_request",
+													 "requester_number_of_posts_on_raop_at_retrieval",
+													 "requester_number_of_comments_in_raop_at_request",
+													 "requester_number_of_comments_in_raop_at_retrieval",
+													 "requester_user_flair"))
+print(xtable(data[1:5,]), type='html', comment=F)
+```
+<br>
+<br>
+
+###Learning###
+
+<br>
+
+```{r basic_pizza_2, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
+pizzaModel = learn(
+		projectName = "pizza",
+    trainData = data,
+    target = "requester_received_pizza",                        
+		# optional - limit the number of features - check documentation for featureGenerationControl		 
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = 300),
+		knowledgeCtrl = knowledgeControl(useGraph = TRUE),
+		# optional - specify algorithms to use - check modelBuildingControl
+		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
+		# optional - avoid automatically creating a local object pointing to the created model 
+    autoSave = FALSE     
+)
+```
+<br>
+```{r basic_pizza_3, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(pizzaModel$features()[1:3,c("idx", "RIG", "feature", "Lift.false", "Lift.true")]), type='html', comment=F) 
+```
+<br>
+```{r basic_pizza_4, eval=TRUE, echo=TRUE, cache=FALSE}
+e=pizzaModel$evaluate()$summary  
+```
