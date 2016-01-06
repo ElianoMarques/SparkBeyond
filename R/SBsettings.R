@@ -328,9 +328,10 @@ removeProjectLock = function(lockId) {
 #' shows the status for all jobs 
 #' 
 #' A status of a job can be one of "queued", "running", "failed", "canceled", "done"
-#' @param projectName. Filter by project name.
-#' @param status. Filter by status. 
-#' @param showAllColumns. A switch for whether to show only the job ID, project name, status, and elapsed (if available). Alternatively show all columns
+#' @param projectName Filter by project name.
+#' @param revision Option to filter the returned list by revision number
+#' @param status Filter by status. 
+#' @param showAllColumns A switch for whether to show only the job ID, project name, status, and elapsed (if available). Alternatively show all columns
 #' @return a data frame with the jobs
 showJobs = function(projectName = NA, revision = NA, status = NA, showAllColumns = FALSE) { 
 	#if(!currentUser(FALSE)) stop("Please login")

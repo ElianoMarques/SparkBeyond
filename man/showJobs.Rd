@@ -3,24 +3,24 @@
 \name{showJobs}
 \alias{showJobs}
 \title{showJobs
-shows the status for all jobs 
-A status of a job can be one of "queued", "running", "failed", "canceled", "done"}
+shows the status for all jobs}
 \usage{
-showJobs(projectName = NA, status = NA, showAllColumns = FALSE)
+showJobs(projectName = NA, revision = NA, status = NA,
+  showAllColumns = FALSE)
 }
 \arguments{
-\item{projectName.}{Filter by project name.}
+\item{projectName}{Filter by project name.}
 
-\item{status.}{Filter by status.}
+\item{revision}{Option to filter the returned list by revision number}
 
-\item{showAllColumns.}{A switch for whether to show only the job ID, project name, status, and elapsed (if available). Alternatively show all columns}
+\item{status}{Filter by status.}
+
+\item{showAllColumns}{A switch for whether to show only the job ID, project name, status, and elapsed (if available). Alternatively show all columns}
 }
 \value{
 a data frame with the jobs
 }
 \description{
-showJobs
-shows the status for all jobs 
 A status of a job can be one of "queued", "running", "failed", "canceled", "done"
 }
 
