@@ -4,11 +4,11 @@
 \alias{modelBuildingControl}
 \title{modelBuildingControl}
 \usage{
-modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier",
-  "RRandomForestRegressor"), evaluationMetric = NA, crossValidation = 5)
+modelBuildingControl(algorithmsWhiteList = algorithmsList(),
+  evaluationMetric = NA, crossValidation = 5)
 }
 \arguments{
-\item{algorithmsWhiteList:}{Optional. A list of strings that represents the set of algorithms to run. NA by default}
+\item{algorithmsWhiteList:}{Optional. A list of strings that represents the set of algorithms to run. Uses \code{\link{algorithmsList}}}
 
 \item{evaluationMetric:}{Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". NA by default automatically selects AUC for classification and RMSE for regression.}
 
