@@ -155,7 +155,7 @@ cols2Text = function(data, useEscaping = TRUE) {
     escapeFun = function(s) {
       s = gsub('"','""',s)
       #if (useEscaping) s = gsub("\\","\\\\",s) 
-      if (TRUE) s = gsub("\\","\\\\",s) 
+      if (TRUE) s = gsub("\\t","\\\\t",s) 
       s
     }
     
