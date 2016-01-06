@@ -2,7 +2,7 @@
 % Please edit documentation in R/S3functions.R
 \name{featureGenerationControl}
 \alias{featureGenerationControl}
-\title{featureGenerationContorl}
+\title{featureGenerationControl}
 \usage{
 featureGenerationControl(maxDepth = 2, featureSearchMode = "DEFAULT",
   functionsWhiteList = NA, functionsBlackList = NA,
@@ -48,6 +48,6 @@ featureGenerationControl(maxDepth = 2, featureSearchMode = "DEFAULT",
 \item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). TRUE by default.}
 }
 \description{
-featureGenerationContorl
+featureGenerationControl
 }
 

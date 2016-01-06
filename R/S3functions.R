@@ -19,7 +19,7 @@ preProcessingControl = function(
 	)
 }
 
-#' featureGenerationContorl
+#' featureGenerationControl
 #' 
 #' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
 #' @param featureSearchMode: One of the following DEFAULT, ADVANCED, ADVANCED_WITH_PAIRS, DIG_DEEP
