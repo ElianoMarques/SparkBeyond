@@ -19,7 +19,7 @@ getSBserverHost = function() {
 getSBserverDomain = function() {
 
 	port = getSBserverPort()
-	if (substr(getSBserverHost(), 1, 5) == "https" || grepl(":", getSBserverHost()) || nchar(port) == 0)
+	if (substr(getSBserverHost(), 1, 5) == "https" || grepl(":", substr(getSBserverHost(), 6, nchar(getSBserverHost()))) || nchar(port) == 0)
 		getSBserverHost()
 	else		
 		paste0(getSBserverHost(),":", port)
