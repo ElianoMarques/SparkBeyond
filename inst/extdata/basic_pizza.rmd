@@ -25,7 +25,7 @@ Goal:
 ###Training set###
 
 ```{r basic_pizza_1, results='asis'}
-data = read.csv("http://s3.amazonaws.com/public-sparkbeyond/pizza_full_clean.csv", stringsAsFactors = FALSE)
+data = read.csv("http://s3.amazonaws.com/public-sparkbeyond/pizza_full.csv", stringsAsFactors = FALSE)
 data = excludeCols(data, c("giver_username_if_known", 
 													 "requester_days_since_first_post_on_raop_at_request",
 													 "requester_days_since_first_post_on_raop_at_retrieval",

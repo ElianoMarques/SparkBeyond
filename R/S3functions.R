@@ -312,7 +312,8 @@ learn <- function(
 		# preprocessing control
 		emptyValuePolicy = if(!is.null(extraParams$emptyValuePolicy)) extraParams$emptyValuePolicy else preProcessingCtrl$emptyValuePolicy,
 		fileEncoding = if(!is.null(extraParams$fileEncoding)) extraParams$fileEncoding else preProcessingCtrl$fileEncoding,
-		temporalSplitColumn = preProcessingCtrl$temporalSplitColumn,
+		fileEscaping = if(!is.null(extraParams$fileEscaping)) extraParams$fileEscaping else preProcessingCtrl$fileEscaping,
+		temporalSplitColumn = if(!is.null(extraParams$temporalSplitColumn)) extraParams$temporalSplitColumn else preProcessingCtrl$temporalSplitColumn,
 		
 		#feature search parameters
 		featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,
