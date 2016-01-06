@@ -17,7 +17,8 @@ preProcessingControl = function(
 		emptyValuePolicy = emptyValuePolicy,
 		fileEncoding = fileEncoding,
 		trainTestSplitRatio = trainTestSplitRatio,
-		temporalSplitColumn = temporalSplitColumn
+		temporalSplitColumn = temporalSplitColumn.
+		fileEscaping = fileEscaping
 	)
 }
 
