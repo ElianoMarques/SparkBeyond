@@ -175,17 +175,20 @@ cols2Text = function(data, useEscaping = TRUE) {
       }
     }
 
-    if (is.list(x)){
+    retString = if (is.list(x)){
       writeList = function (xi){
         content = createContent(xi)
         paste0("[",content,"]")
       }
       sapply(x, writeList)
-    } else if (length(class(x)) == 1 && class(x) == "character" || is.factor(x)) paste0("\"",escapeFun(x),"\"")     	
-    	else printNonCharElement(x)
+    } else if (length(class(x)) == 1 && class(x) == "character" || is.factor(x)) {
+    	paste0("\"",escapeFun(x),"\"")     	
+    }else printNonCharElement(x)
+    retString
   }
 
-  sapply(data,col2Text)
+  mergedString = sapply(data,col2Text,simplify = FALSE)
+	as.data.frame(mergedString)
 }
 
 #' writeToFile
