@@ -542,6 +542,10 @@ Session = setRefClass("Session",
         "Shows extractors."
         showReport("extractor")
       },
+			showContextObjects = function(){
+				"Shows context objects report."
+				showReport("features/contextObjects.html")
+			},
       showFeaturesTrain = function(){
         "Shows features performance on train."
         showReport("features/train_features.html")
@@ -550,6 +554,10 @@ Session = setRefClass("Session",
         "Shows features performance on test."
         showReport("features/test_unweighted_features.html")
       },
+			showFeatureStability = function(){
+				"Shows features stability report."
+				showReport("features/featureStability.html")
+			},
       showFields = function(){
         "Shows fields."
         showReport("features/field.html")
@@ -584,7 +592,8 @@ Session = setRefClass("Session",
         "Shows the representative feature clusters pdf report."
 				showReport("/features/featureClusters/allFeatures.pdf")
       },
-			reports = function(){				
+			reports = function(){	
+				"Shows all reports applicable for the current analysis."
 				url = paste0(getSBserverDomain(),"/analytics/file/", projectName,"/",revision,"/reportsStructure.json")
 				res = httr::GET(url)
 				if (res$status == 200 && res$url == url){
