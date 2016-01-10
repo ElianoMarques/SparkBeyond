@@ -5,7 +5,7 @@
 #' @temporalSplitColumn: Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.  
 #' @param emptyValuePolicy: Controls how empty values in the data are being handled NA by default will replace numeric value with median value, and strings with empty strings.
 #' @param fileEncoding: Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
-#' @param fileEscaping: Define how escaping (e.g., \n) should be handled when files are parsed.
+#' @param fileEscaping: Define how escaping (e.g., \\n) should be handled when files are parsed.
 preProcessingControl = function(
 	trainTestSplitRatio = 0.8,
 	temporalSplitColumn = NA,
@@ -276,7 +276,7 @@ learn <- function(
 						prefix = paste0(projectName,"_context", contextName),
 						useEscaping = preProcessingCtrl$fileEscaping
 					),
-					uploadToServer(data = trainData, projectName = projectName, name = paste0("context", contextName)
+					uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
 												 , useEscaping = preProcessingCtrl$fileEscaping)
 			)
 		}
