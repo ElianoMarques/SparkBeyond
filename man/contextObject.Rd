@@ -4,7 +4,9 @@
 \alias{contextObject}
 \title{contextObject}
 \usage{
-contextObject(data, name = NULL, keyColumns = list(), timeColumn = NULL)
+contextObject(data, contextTypes = NULL, name = NULL, keyColumns = list(),
+  timeColumn = NULL, graphSourceNodeColumn = NULL,
+  graphTargetNodeColumn = NULL)
 }
 \arguments{
 \item{data:}{a data frame or a path to a file containing the context data}

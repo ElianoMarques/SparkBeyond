@@ -41,11 +41,17 @@ SB object that encapsulates a session
 \item{\code{predict(data, predictionColumnsOnly = TRUE, columnsWhiteList = NA,
   outputName = "predicted", fileEscaping = TRUE, ...)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted. Set \code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
+\item{\code{reports()}}{Shows all reports applicable for the current analysis.}
+
 \item{\code{showConfusionMatrix(normalized = FALSE)}}{Shows a confusion matrix of a model.}
+
+\item{\code{showContextObjects()}}{Shows context objects report.}
 
 \item{\code{showExtractors()}}{Shows extractors.}
 
 \item{\code{showFeatureClusters()}}{Shows the representative feature clusters pdf report.}
+
+\item{\code{showFeatureStability()}}{Shows features stability report.}
 
 \item{\code{showFeaturesTest()}}{Shows features performance on test.}
 

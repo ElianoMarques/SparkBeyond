@@ -14,7 +14,7 @@ preProcessingControl(trainTestSplitRatio = 0.8, temporalSplitColumn = NA,
 
 \item{fileEncoding:}{Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.}
 
-\item{fileEscaping:}{Define how escaping (e.g., \n) should be handled when files are parsed.}
+\item{fileEscaping:}{Define how escaping (e.g., \\n) should be handled when files are parsed.}
 }
 \description{
 preProcessingContorl
