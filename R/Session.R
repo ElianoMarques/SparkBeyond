@@ -498,18 +498,34 @@ Session = setRefClass("Session",
         } else NA
       },
 
-      evaluate = function() {
+      evaluate = function(...) {
         "Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
-        statusException()
-        if (is.na(modelBuilt) || !modelBuilt) warning("Evaluation requires full model building using learn")
-        evaluationFile = paste0(artifact_loc,"/json/evaluation.json")
-        evaluation = if (file.exists(evaluationFile)){
-          lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
-          eval = jsonlite::fromJSON(gsub("NaN", 0.0, lines),flatten = TRUE)
-          writeLines(eval$evaluation$classDetails)
-          eval
-        } else {stop(paste("Evaluation file does not exist in ", evaluationFile))}
-        return (evaluation)
+        #statusException()
+        #if (is.na(modelBuilt) || !modelBuilt) warning("Evaluation requires full model building using learn")
+        extraParams = list(...)        
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        
+       	finalEvaluation = if (remoteMode){
+        		url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/json/evaluation.json")
+        		res = httr::GET(url)
+        		if (res$status == 200){
+        			jsonlite::fromJSON(txt=httr::content(res, as="text"))
+        		} else NULL        	
+        }else{
+	        evaluationFile = paste0(artifact_loc,"/json/evaluation.json")
+	        evaluation = if (file.exists(evaluationFile)){
+	          lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
+	          jsonlite::fromJSON(gsub("NaN", 0.0, lines),flatten = TRUE)
+	        } else {stop(paste("Evaluation file does not exist in ", evaluationFile))}
+        }
+        
+        if (finalEvaluation$isRegression) {
+        	writeLines(finalEvaluation$evaluation$summary)
+        } else {
+        	writeLines(finalEvaluation$evaluation$classDetails)
+        }
+        
+        finalEvaluation
       },
 
       features = function(...) {
