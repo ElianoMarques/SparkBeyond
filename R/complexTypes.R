@@ -225,20 +225,22 @@ writeToFile = function(data, outputFile, useEscaping = TRUE) { #sugar for writin
 #' colnames(data)
 #' excluded = excludeCols(data, list("sex", "age"))
 #' colnames(excluded)
-excludeCols = function(data, cols) {
+excludeCols = function(data, cols, verbose = TRUE) {
   effectiveCols = intersect(cols,names(data))
   if (length(effectiveCols) > 0) {
-    print (paste(paste(effectiveCols, collapse=", "), "were removed"))
+    if (verbose) print (paste(paste(effectiveCols, collapse=", "), "were removed"))
     if ("data.table" %in% class(data)){
       data[, (effectiveCols) := NULL] #note: parenthesis around cols are important
-      print("Note: the input object is of type data.table hence NA is returned and the input object will be modified,")
-      NA
+      if (verbose) print("Note: the input object is of type data.table hence NULL is returned and the input object will be modified,")
+      NULL
     } else {
-      print("Note: the input object is of type data.frame hence, a new data.frame with the excluded columns will be returned.")
+    	if (verbose) print("Note: the input object is of type data.frame hence, a new data.frame with the excluded columns will be returned.")
       data[ , -which(names(data) %in% cols)]
     }
+  } else {
+  	if (verbose) print("No columns were removed")
+  	if ("data.table" %in% class(data)) NULL else data
   }
-  else print("No columns were removed")
 }
 
 #' colsWhiteList
