@@ -484,7 +484,7 @@ projectRevisions = function(projectName) {
 		})
 	} else NULL
 	if (is.null(ret)) print ("Project not found")
-	excludeCols(ret, c("jsonClass"))
+	excludeCols(ret, c("jsonClass"), verbose = FALSE)
 }
 
 #' writeToServer
