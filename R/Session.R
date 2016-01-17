@@ -537,7 +537,7 @@ Session = setRefClass("Session",
         	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/reports/features/train_features.tsv")
         	res = httr::GET(url)
         	txt = httr::content(res, as="text")
-        	if (res$status == 200) read.table(textConnection(txt),sep="\t", header=TRUE, stringsAsFactors = FALSE)
+        	if (res$status == 200) suppressWarnings(read.table(textConnection(txt),sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = ""))
         	else NULL
         } else {
 	        featuresFile = paste0(artifact_loc,"/reports/features/train_features.tsv")
