@@ -341,7 +341,14 @@ showJobs = function(projectName = NA, revision = NA, status = NA, showAllColumns
 		else ""}
 	url <- paste0(getSBserverDomain(),paste0("/api2/jobs", query))
 	res = httr::GET(url)
-	jobs = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+	txt=httr::content(res, as="text")
+	if (substr(txt,1,13) == "\n\n\n\n<!DOCTYPE") {  #Giving a second chance
+		url <- paste0(getSBserverDomain(),paste0("/api2/jobs", query))
+		res = httr::GET(url)
+		txt=httr::content(res, as="text")
+	}
+	jobs = jsonlite::fromJSON(txt = txt, simplifyDataFrame=TRUE) 
+
 	finalJobs = if (length(jobs) > 0) { 		
 		if (showAllColumns) jobs else { 
 			showCols = c("id", "project")
