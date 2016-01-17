@@ -354,7 +354,7 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @param offset: optional offset to target. 0 by default.
 #' @param sample: optional maximal possible sample value (default to maxint)
 #' @return The new data
-addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, offset = 0) {
+addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, offset = 0, ...) {
   unitVal = switch(unit,
   			 "Number" = 1,
          "Seconds" = 1,
@@ -375,6 +375,15 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   #TODO: support data.table as well
   
   #TODO: support non-dates,  support offset calculation, Date POSix objects
+  
+  extraParams = list(...)
+  remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+  
+  prefix = if(!remoteMode) "" else {
+  	if (is.na(keyCol)) "TW:" else{
+  		if (is.numeric(data[,keyCol])) "DKTW:" else "SKTW:"
+  	}
+  }
 
   datePOSIXformatOut = "%m/%d/%Y %H:%M:%S %p %Z" #TODO: check if multiple output formats are possible
   dateColIndex = which(colnames(data)==dateCol)
@@ -402,7 +411,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
 		} else {
 			stop (paste("Date column", dateCol,"type should be one of 'character', 'integer', 'numeric', 'date', 'POSIXct'."))
 		}
-  	paste0(keyVal,",",dates[1],",",dates[2],",",includeUntil,",",relativeTime,",",unit,",",sample)
+  	paste0(prefix, keyVal,",",dates[1],",",dates[2],",",includeUntil,",",relativeTime,",",unit,",",sample)
   }
   
   if (is.na(keyCol)){
