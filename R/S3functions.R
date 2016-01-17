@@ -92,6 +92,7 @@ featureGenerationControl = function(
 knowledgeControl = function(
 	useGraph = FALSE,
 	useOpenStreetMap = FALSE,
+	useWeather = FALSE,
 	useCustomGraphs = FALSE,	
 	customGraphsWhiteList = NA,
 	customGraphsBlackList = NA,
@@ -99,6 +100,7 @@ knowledgeControl = function(
 	) {
 		list(
 			useGraph = useGraph,
+			useWeather = useWeather,
 			useOpenStreetMap = useOpenStreetMap,
 			useCustomGraphs = useCustomGraphs,			
 			customGraphsWhiteList = customGraphsWhiteList,
@@ -336,6 +338,7 @@ learn <- function(
 		#knowledge parameters
 		useGraph = if(!is.null(extraParams$useGraph)) extraParams$useGraph else knowledgeCtrl$useGraph,
 		useOpenStreetMap = if(!is.null(extraParams$useOpenStreetMap)) extraParams$useOpenStreetMap else knowledgeCtrl$useOpenStreetMap,
+		useWeather = if(!is.null(extraParams$useWeather)) extraParams$useWeather else knowledgeCtrl$useWeather,
 		useCustomGraphs = if(!is.null(extraParams$useCustomGraphs)) extraParams$useCustomGraphs else knowledgeCtrl$useCustomGraphs,								
 		customGraphsWhiteList = if(!is.null(extraParams$customGraphsWhiteList)) extraParams$customGraphsWhiteList else knowledgeCtrl$customGraphsWhiteList,
 		customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else knowledgeCtrl$customGraphsBlackList,
