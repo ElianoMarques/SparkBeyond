@@ -51,7 +51,7 @@ Session = setRefClass("Session",
       waitForProcess = function(...) { #TODO: number of mintues as parameter?
         "Blocking the R console until session is finished."
         extraParams = list(...)
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
         serverResponded = FALSE
         i = 0
         curStreamingLine = 0
@@ -78,7 +78,7 @@ Session = setRefClass("Session",
         
 				printFile = function(filename, ...) {
 					extraParams = list(...)
-					remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+					remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
 					if (remoteMode){
 						url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/reports/", filename)
 						res = httr::GET(url)
@@ -185,7 +185,7 @@ Session = setRefClass("Session",
       status = function(...) {
         "Checking the status of the session."
         extraParams = list(...)
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
         
         if (!isServerAlive()) stop(paste("Server", getSBserverHost(), "is unavailable."))
         
@@ -248,7 +248,7 @@ Session = setRefClass("Session",
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         extraParams = list(...)
         
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
                 
         datapath = ifelse (remoteMode, 
 					{
@@ -330,7 +330,7 @@ Session = setRefClass("Session",
         if (is.na(modelBuilt) || !modelBuilt) warning("Prediction requires full model building using learn")
         
         extraParams = list(...)        
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
         
         datapath = ifelse (remoteMode, 
 					{
@@ -395,7 +395,7 @@ Session = setRefClass("Session",
       liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift", fileEscaping = TRUE, ...) { #TODO: change documentation
         "Returns lift from a created model and generates three plots. \\code{predictionResult} is a dataframe to be analyzed, \\code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
         extraParams = list(...)        
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
         
         if (is.na(modelBuilt) || !modelBuilt) warning("Lift requires full model building using learn") #TODO: verify classification problem
 
@@ -503,7 +503,7 @@ Session = setRefClass("Session",
         #statusException()
         #if (is.na(modelBuilt) || !modelBuilt) warning("Evaluation requires full model building using learn")
         extraParams = list(...)        
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
         
        	finalEvaluation = if (remoteMode){
         		url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/json/evaluation.json")
@@ -531,7 +531,7 @@ Session = setRefClass("Session",
       features = function(...) {
         "Returns a dataset with top feature information"
         extraParams = list(...)
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
         
         if (remoteMode) {
         	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/reports/features/train_features.tsv")

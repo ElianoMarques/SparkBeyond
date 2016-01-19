@@ -377,7 +377,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   #TODO: support non-dates,  support offset calculation, Date POSix objects
   
   extraParams = list(...)
-  remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else FALSE
+  remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
   
   prefix = if(!remoteMode) "" else {
   	if (is.na(keyCol)) "TW:" else{
