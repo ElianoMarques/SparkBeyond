@@ -290,7 +290,7 @@ currentUser = function(showInfo = TRUE) {
 		ret = tryCatch({
 			userInfo = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 			if (!is.null(userInfo$user$fullName)) {
-				if (showInfo) print (paste("Hello", userInfo$user$fullName, "!  ", paste0("(",userInfo$user$email ,")")))							
+				if (showInfo) print (paste("Hello", userInfo$user$fullName, "!  ", paste0("(",userInfo$user$email ,")"), " on ", getSBserverDomain()))							
 				TRUE
 			} else	FALSE			
 		}, 
@@ -454,24 +454,27 @@ doesFileExistOnServer = function(projectName, path){
 #' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
 uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 	#if(!currentUser(FALSE)) stop("Please login")
-	if (! "data.frame" %in% class(data)) stop("The provided data must be of type data.frame")
-	hash = digest(data)
-	filename = paste0(name, "_", hash, ".tsv")
-	attempts = 2
-	succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
-	if (!succeeded) {  #uploading only if doesn't exist
-		urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
-		colHeaders = paste0(colnames(data), collapse = "\t")
-		body = paste0(colHeaders, "\n", 
-									paste0(apply(cols2Text(data, useEscaping),1,paste0, collapse = "\t"), collapse="\n"))
-		
-		while (!succeeded && attempts > 0 ) {
-			httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
-			attempts = attempts - 1
-			succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
+	if (class(data) == "character") data
+	else {
+		if (! "data.frame" %in% class(data)) stop("The provided data should of type data.frame or character")
+		hash = digest(data)
+		filename = paste0(name, "_", hash, ".tsv")
+		attempts = 2
+		succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
+		if (!succeeded) {  #uploading only if doesn't exist
+			urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
+			colHeaders = paste0(colnames(data), collapse = "\t")
+			body = paste0(colHeaders, "\n", 
+										paste0(apply(cols2Text(data, useEscaping),1,paste0, collapse = "\t"), collapse="\n"))
+			
+			while (!succeeded && attempts > 0 ) {
+				httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
+				attempts = attempts - 1
+				succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
+			}
 		}
+		ifelse (succeeded, paste0("/uploaded/",filename), NA)
 	}
-	ifelse (succeeded, paste0("/uploaded/",filename), NA)
 }
 
 projectRevisions = function(projectName) {
