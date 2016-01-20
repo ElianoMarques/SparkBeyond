@@ -189,22 +189,22 @@ Session = setRefClass("Session",
         
         if (!isServerAlive()) stop(paste("Server", getSBserverHost(), "is unavailable."))
         
-        if (remoteMode){
-	        url = paste0(getSBserverDomain(),"/api2/state/",projectName,"/",revision)					
-	        res = httr::GET(url)
-	        if (res$status == 200) {
-	        	curStatus = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-	        	if (!is.null(curStatus$error)) showJobById(jobId = jobId)$status
-	        	else{
-	        		curState = "Preprocessing"
-	        		if (curStatus$featureSearch == TRUE) curState = "feature search"
-	        		if (curStatus$featureSelection == TRUE) curState = "feature selection"
-	        		if (curStatus$enrichment == TRUE) curState = "enrichment"
-	        		if (curStatus$modelBuild == TRUE) curState = "model build"
-	        		if (curStatus$dead == TRUE) curState = "error occurred"
-	        		curState
-	        	}
-	        } else "server is unavailable"	
+        if (remoteMode){""
+# 	        url = paste0(getSBserverDomain(),"/api2/state/",projectName,"/",revision)					
+# 	        res = httr::GET(url)
+# 	        if (res$status == 200) {
+# 	        	curStatus = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+# 	        	if (!is.null(curStatus$error)) showJobById(jobId = jobId)$status
+# 	        	else{
+# 	        		curState = "Preprocessing"
+# 	        		if (curStatus$featureSearch == TRUE) curState = "feature search"
+# 	        		if (curStatus$featureSelection == TRUE) curState = "feature selection"
+# 	        		if (curStatus$enrichment == TRUE) curState = "enrichment"
+# 	        		if (curStatus$modelBuild == TRUE) curState = "model build"
+# 	        		if (curStatus$dead == TRUE) curState = "error occurred"
+# 	        		curState
+# 	        	}
+# 	        } else "server is unavailable"	
         } else {
 	        checkIfError = function(status) {
 	          errorFile = paste0(artifact_loc,"/learningFailed.txt")
