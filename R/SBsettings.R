@@ -264,8 +264,8 @@ login = function(username, password, domain = NA) {
 	url <- paste0(getSBserverDomain(),"/login")
 	res = httr::POST(url, encode = "form", body = list(email=username, password=password))
 	loggedIn = if (res$status_code == 404) {		#there is a weird redirection causing this, but this actually OK
-		currentUser()
 		setSBserverIOfolder(NULL)
+		currentUser()
 	} else {
 		if (res$status_code == 400)	print ("Login failed. Please check your credentials.")
 		else  print ("Login failed.")
