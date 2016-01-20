@@ -5,7 +5,8 @@
 \title{reportingContorl}
 \usage{
 reportingControl(produceFeatureClusteringReport = FALSE,
-  produceReports = NA, scoreOnTestSet = FALSE, emailForNotification = NA)
+  produceReports = NA, scoreOnTestSet = FALSE, emailForNotification = NA,
+  showWebView = FALSE)
 }
 \arguments{
 \item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
@@ -13,6 +14,10 @@ reportingControl(produceFeatureClusteringReport = FALSE,
 \item{produceReports:}{"EVALUATED_FUNCTIONS".}
 
 \item{scoreOnTestSet:}{Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.}
+
+\item{emailNotification:}{An optional email to notify when the learning is finished.}
+
+\item{showWebView:}{control for whether to show a dynamic web view of the analysis in a browser.}
 }
 \description{
 reportingContorl

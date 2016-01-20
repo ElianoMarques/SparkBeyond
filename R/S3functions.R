@@ -182,17 +182,21 @@ algorithmsList = function(
 #' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
 #' @param produceReports: "EVALUATED_FUNCTIONS".
 #' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
+#' @param emailNotification: An optional email to notify when the learning is finished.
+#' @param showWebView: control for whether to show a dynamic web view of the analysis in a browser.
 reportingControl = function(
 	produceFeatureClusteringReport = FALSE,
 	produceReports = NA,
 	scoreOnTestSet = FALSE,
-	emailForNotification = NA
+	emailForNotification = NA,
+	showWebView = FALSE
 ) {
 	list(
 		produceFeatureClusteringReport = produceFeatureClusteringReport,
 		produceReports = produceReports,
 		scoreOnTestSet = scoreOnTestSet,
-		emailForNotification = emailForNotification
+		emailForNotification = emailForNotification,
+		showWebView = showWebView
 	)
 }
 
@@ -393,7 +397,7 @@ learn <- function(
 			print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
 		})
 	}
-
+	if (reportingCtrl$showWebView == TRUE && remoteMode == TRUE) session$webView() 
 	if (runBlocking)session$waitForProcess(remoteMode=remoteMode)
  
 	session$modelBuilt = TRUE

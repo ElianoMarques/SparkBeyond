@@ -626,7 +626,12 @@ Session = setRefClass("Session",
 					}										
 					reportList
 				}else NULL
-			}	
+			},
+			webView = function (){
+				"Show a dynamic web view of the analysis."
+				htmlSource = paste0(getSBserverDomain(), "/#/visualPipeline/", projectName, "?revision=", revision, "&forceByRevision=true")
+				browseURL(htmlSource)
+			}
 
 # save and load are probably more confusing at this time hence commented out. Just use regular save and load.
 #       ,
