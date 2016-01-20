@@ -58,31 +58,36 @@ printSBserverPort = function() {
 #' A function to set the SparkBeyond server I/O folder.
 #' @param port new port.
 setSBserverIOfolder = function(folder){
-  finalFolder = tryCatch ({
-    if (is.null(folder) || nchar(folder) <= 2) stop("Empty folder name was provided to setSBserverIOfolder")
-    prefix = if (substr(folder, 1, 2) == "\\\\") {
-      curPrefix = substr(folder, 1, 2)
-      folder = substr(folder, 3, nchar(folder))
-      curPrefix
-    } else ""
-    folder = paste0(prefix,gsub("\\\\","/",folder))
-    if (substr(folder, nchar(folder), nchar(folder)) != "/") folder = paste0(folder, "/")
-    #if (substr(folder, nchar(folder)-1, nchar(folder)) != "//") folder = paste0(folder, "/")
-    if (is.null(folder) || folder == "") {stop("folder location is empty")}
-    if (!file.exists(folder)) {
-      print (paste("Folder ",  folder, " does not exists - attempting to create"))
-      dir.create(folder)
-
-      #if (!file.exists(folder)) {stop(paste("failed to create folder", folder))} #fails if ends with "/"
-    }
-    assign("IOfolder", folder, envir = globalenv())
-    print(paste("Setting server IO folder to:", IOfolder))
-    return(IOfolder)
-  }, error = function(e) {
-    print(paste("Failed to set SBserverIOfolder. Details:",e))
-    return("")
-  })
-  finalFolder
+	if (is.null(folder)){
+		assign("IOfolder", folder, envir = globalenv())
+		NULL
+	}else{
+	  finalFolder = tryCatch ({
+	    if (is.null(folder) || nchar(folder) <= 2) stop("Empty folder name was provided to setSBserverIOfolder")
+	    prefix = if (substr(folder, 1, 2) == "\\\\") {
+	      curPrefix = substr(folder, 1, 2)
+	      folder = substr(folder, 3, nchar(folder))
+	      curPrefix
+	    } else ""
+	    folder = paste0(prefix,gsub("\\\\","/",folder))
+	    if (substr(folder, nchar(folder), nchar(folder)) != "/") folder = paste0(folder, "/")
+	    #if (substr(folder, nchar(folder)-1, nchar(folder)) != "//") folder = paste0(folder, "/")
+	    if (is.null(folder) || folder == "") {stop("folder location is empty")}
+	    if (!file.exists(folder)) {
+	      print (paste("Folder ",  folder, " does not exists - attempting to create"))
+	      dir.create(folder)
+	
+	      #if (!file.exists(folder)) {stop(paste("failed to create folder", folder))} #fails if ends with "/"
+	    }
+	    assign("IOfolder", folder, envir = globalenv())
+	    print(paste("Setting server IO folder to:", IOfolder))
+	    return(IOfolder)
+	  }, error = function(e) {
+	    print(paste("Failed to set SBserverIOfolder. Details:",e))
+	    return("")
+	  })
+	  finalFolder
+	}
 }
 
 #' A function to get the SparkBeyond server IO folder.
@@ -160,36 +165,37 @@ restartServer = function() {
 }
 
 
-#' A function to verify if we are using the latest server version
-#' @return Boolean indicating TRUE if we are using the latest version otherwise FALSE.
+#Deprecated
 isLatestVersion = function(){
-  tryCatch({
-     url <- paste0(getSBserverDomain(),"/isLastBuild")
-     latestBuild = tryCatch({
-       res = httr::GET(url, httr::content_type_json())
-       res <- httr::content(res, as="text")
-      res
-    },
-    error = function(cond) NA
-    )
-    trim <- function (x) gsub("^\\s+|\\s+$", "", x)
-    res = if (is.null(latestBuild) || is.na(latestBuild) || length(latestBuild) == 0){
-              print ("Notice: latest build version was not available - if this issue continues please notify SparkBeyond.")
-              FALSE
-    } else {
-      jenkinsBuild = serverVersion()$jenkinsBuild
-      if (is.null(jenkinsBuild) || is.na(jenkinsBuild) || length(jenkinsBuild) == 0){
-        print ("Notice: Jenkins build information was not available - if this issue continues please notify SparkBeyond.")
-        FALSE
-      } else { if (trim(latestBuild) == trim(jenkinsBuild)) TRUE else {
-        print ("Notice: you are currently not using the latest engine version. Please consider running restartServer().")
-        FALSE
-      }
-    }
-    }
-    res
-  },error = function(e) TRUE #if there is no internet connection than we skip the check
-  )
+	print ("This function has been deprecated, as now jobs are handled by a queue")
+	TRUE
+#   tryCatch({
+#      url <- paste0(getSBserverDomain(),"/isLastBuild")
+#      latestBuild = tryCatch({
+#        res = httr::GET(url, httr::content_type_json())
+#        res <- httr::content(res, as="text")
+#       res
+#     },
+#     error = function(cond) NA
+#     )
+#     trim <- function (x) gsub("^\\s+|\\s+$", "", x)
+#     res = if (is.null(latestBuild) || is.na(latestBuild) || length(latestBuild) == 0){
+#               print ("Notice: latest build version was not available - if this issue continues please notify SparkBeyond.")
+#               FALSE
+#     } else {
+#       jenkinsBuild = serverVersion()$jenkinsBuild
+#       if (is.null(jenkinsBuild) || is.na(jenkinsBuild) || length(jenkinsBuild) == 0){
+#         print ("Notice: Jenkins build information was not available - if this issue continues please notify SparkBeyond.")
+#         FALSE
+#       } else { if (trim(latestBuild) == trim(jenkinsBuild)) TRUE else {
+#         print ("Notice: you are currently not using the latest engine version. Please consider running restartServer().")
+#         FALSE
+#       }
+#     }
+#     }
+#     res
+#   },error = function(e) TRUE #if there is no internet connection than we skip the check
+#   )
 }
 
 
@@ -259,6 +265,7 @@ login = function(username, password, domain = NA) {
 	res = httr::POST(url, encode = "form", body = list(email=username, password=password))
 	loggedIn = if (res$status_code == 404) {		#there is a weird redirection causing this, but this actually OK
 		currentUser()
+		setSBserverIOfolder(NULL)
 	} else {
 		if (res$status_code == 400)	print ("Login failed. Please check your credentials.")
 		else  print ("Login failed.")

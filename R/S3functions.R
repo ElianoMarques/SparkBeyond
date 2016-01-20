@@ -246,7 +246,6 @@ learn <- function(
 			 runBlocking = TRUE,
 			 ...
 ){
-	isLatestVersion()
 	isLatestRpackage()
 	extraParams = list(...)
 	# TODO: verify that there are no supurious parameters, e.g. (projectname instead of projectName)
