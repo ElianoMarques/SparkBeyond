@@ -30,7 +30,7 @@ Session = setRefClass("Session",
     methods = list(
       initialize = function(nameOfProject = NA, revisionNumber = NA, artifact_loc = NA, modelBuilt = TRUE, jobId = -1) {
         "initializes a session using a projectName and revision number."
-        if (!is.na(nameOfProject) && !is.na(revisionNumber)){
+        if (!is.na(nameOfProject) && !is.na(revisionNumber)) {
         	artifact_loc <<- paste0(nameOfProject,"/",revisionNumber)
         	projectName <<- nameOfProject
         	revision <<- as.numeric(revisionNumber)
@@ -63,13 +63,13 @@ Session = setRefClass("Session",
         print("You are now running in a Blocking Mode")
 				print("In order to see the job queue, terminate the current command and run showJobs(status='queued')")
                 
-        readStreamingAPI = function(prevLine = 0){
+        readStreamingAPI = function(prevLine = 0) {
         	#/rapi/notificationsLog/:project/:revision?skipLines=x
         	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=UInotification.log&skipLines=",prevLine)					
         	res = httr::GET(url)
 					if (res$status == 200) {
 						txt = httr::content(res, as="text")
-						if (nchar(txt) > 0){
+						if (nchar(txt) > 0) {
 							writeLines(txt)
 							length(strsplit(x = txt, split = "\n")[[1]]) # returning the number of lines read
 						} else 0
@@ -82,7 +82,7 @@ Session = setRefClass("Session",
 					if (remoteMode){
 						url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/reports/", filename)
 						res = httr::GET(url)
-						if (res$status == 200){
+						if (res$status == 200) {
 							writeLines(httr::content(res, as="text"))
 							TRUE
 						} else FALSE
@@ -91,15 +91,15 @@ Session = setRefClass("Session",
 						if (file.exists(file)) {
 							writeLines(readLines(file, warn = FALSE))
 							TRUE
-						}else FALSE
+						} else FALSE
 					}					
 				}
 				
 				queuedStatus = function() {
 					queuedJobs = showJobs(status = "queued")
-					if (!is.null(queuedJobs) && !is.na(jobId) && length(which(queuedJobs$id == jobId)) > 0){
+					if (!is.null(queuedJobs) && !is.na(jobId) && length(which(queuedJobs$id == jobId)) > 0) {
 						curQueuePosition = which(queuedJobs$id == jobId)
-    				if (curQueuePosition != lastQueuePosition){
+    				if (curQueuePosition != lastQueuePosition) {
 							print(paste("Learning job (", jobId ,") position in the queue is", curQueuePosition))
     				}
 						curQueuePosition
@@ -112,13 +112,13 @@ Session = setRefClass("Session",
 					curStatus = status(remoteMode = remoteMode)
 					
 					internalHasShownInputSchema = hasShownInputSchema
-					if (!internalHasShownInputSchema){
+					if (!internalHasShownInputSchema) {
 						internalHasShownInputSchema = printFile("preProcessing/inputSchema.txt", remoteMode=remoteMode)
 					}
 					internalHasShownFeatures = hasShownFeatures
-					if (!internalHasShownFeatures){
+					if (!internalHasShownFeatures) {
 						f = tryCatch(features(remoteMode=remoteMode), error = function(cond) NULL)
-						if (!is.null(f)){
+						if (!is.null(f)) {
 							featuresCount = nrow(f)
 							cntToShow = min(featuresCount, 50)
 							print(paste("Printing top", cntToShow, "features out of", featuresCount))
@@ -139,9 +139,9 @@ Session = setRefClass("Session",
 				jobFinished = FALSE
 				finalStatus = NA
         while(!jobFinished) {
-          i = i+1
+          i = i + 1
           
-          if (!is.na(jobId)){ # new discover platform version
+          if (!is.na(jobId)) { # new discover platform version
           	newCurStatus = showJobById(jobId)$status
           	switch(newCurStatus, 
           				 queued = {
@@ -189,7 +189,7 @@ Session = setRefClass("Session",
         
         if (!isServerAlive()) stop(paste("Server", getSBserverHost(), "is unavailable."))
         
-        if (remoteMode){
+        if (remoteMode) {
 	        url = paste0(getSBserverDomain(),"/api2/state/",projectName,"/",revision)					
 	        res = httr::GET(url)
 	        if (res$status == 200) {
@@ -212,7 +212,7 @@ Session = setRefClass("Session",
 	            errorLines = readLines(errorFile)
 	            writeLines(errorLines)
 	            paste(errorLines, collapse = '\n')
-	          }else {
+	          } else {
 	            if (status == FALSE) "Unknown error"
 	            else "Detecting types" #This may occur in the very begining of the run - status.json was not created and there is no error
 	          }
@@ -228,7 +228,7 @@ Session = setRefClass("Session",
 	        }
 	
 	        statusFile = paste0(artifact_loc,"/json/status.json")
-	        finalStatus = if (file.exists(statusFile)){
+	        finalStatus = if (file.exists(statusFile)) {
 	          curStatus = jsonlite::fromJSON(paste(readLines(statusFile, warn=FALSE), collapse=""))
 	          if (curStatus$evaluation == TRUE) return("Model evaluation completed")
 	          else if (curStatus$alive == FALSE) return(checkIfError(FALSE))
@@ -283,16 +283,16 @@ Session = setRefClass("Session",
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result)){
+        finalRes = if (is.null(res$error) && !is.null(res$result)) {
         	if (remoteMode) {
         		url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision,"/", res$result)
         		res2 = httr::GET(url)
-        		if (res2$status == 200){
+        		if (res2$status == 200) {
         			localfile = paste0(outputName, ".tsv.gz")
         			writeBin(httr::content(res2), localfile)
         			print(paste0("Results written to: ", getwd(),"/", localfile))
         			df = read.table(localfile, sep="\t", header=TRUE)
-        			for(i in 1:ncol(df)){
+        			for(i in 1:ncol(df)) {
         				if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
         					df[,i] = as.logical(as.character(df[,i]))
         				} else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
@@ -301,9 +301,9 @@ Session = setRefClass("Session",
         			}
         			df
         		} else NA        		
-        	}else{
+        	} else {
 	          df = read.table(outputPath, header = TRUE, sep="\t")
-	          for(i in 1:ncol(df)){
+	          for(i in 1:ncol(df)) {
 	            if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
 	              df[,i] = as.logical(as.character(df[,i]))
 	            } else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
@@ -356,24 +356,24 @@ Session = setRefClass("Session",
 
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
-        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"), simplifyDataFrame=TRUE)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result)){ 
+        finalRes = if (is.null(res$error) && !is.null(res$result)) { 
         	if (remoteMode) {
         		url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/",res$result)
         		res2 = httr::GET(url)
-        		if (res2$status == 200){
+        		if (res2$status == 200) {
         			localfile = paste0(outputName, ".tsv.gz")
         			writeBin(httr::content(res2), localfile)
         			print(paste0("Results written to: ", getwd(),"/", localfile))
         			read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE)
         		} else NA 
-        	}else {
+        	} else {
 	          table = read.table(res$result, header = TRUE, sep="\t")
 	          resultsLocation = paste0(artifact_loc, "/reports/predictions/test/")
 	          print (paste("Predictions and plots are available at:", resultsLocation))
 	          files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
-	          if (length(files) > 0){
+	          if (length(files) > 0) {
 	            htmlFilesInd = which(files)
 	            if (length(htmlFilesInd>0)) {
 	              htmlFiles = names(htmlFilesInd)
@@ -423,7 +423,7 @@ Session = setRefClass("Session",
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result)){
+        finalRes = if (is.null(res$error) && !is.null(res$result)) {
           plotName = res$result
           subFolder = gsub("\\s+","_", title)
           resultsLocation = paste0("predictions/", subFolder, "/")
@@ -433,7 +433,7 @@ Session = setRefClass("Session",
           
           url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/reports/", resultsLocation, "lift_table_",plotName, ".tsv.gz")
           res2 = httr::GET(url)
-          if (res2$status == 200){
+          if (res2$status == 200) {
           	localfile = paste0(outputName, ".tsv.gz")
           	writeBin(httr::content(res2), localfile)
           	print(paste0("Results written to: ", getwd(),"/", localfile))
@@ -474,12 +474,12 @@ Session = setRefClass("Session",
        # print(body)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK"){
+        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK") {
           print ("Package created successfully")
           TRUE
-        } else{
+        } else {
           errorFile = paste0(artifact_loc,"/package-errors.txt")
-          if (file.exists(errorFile)){
+          if (file.exists(errorFile)) {
             errorLines = readLines(errorFile)
             writeLines(errorLines)
           }
@@ -492,7 +492,7 @@ Session = setRefClass("Session",
       buildNumber = function() {
         "Returns the build number in which the model was generated."
         filename = paste0(artifact_loc,"/jenkinsBuild.txt")
-        if (file.exists(filename)){
+        if (file.exists(filename)) {
           lines = paste(readLines(filename, warn=FALSE), collapse="")
           lines
         } else NA
@@ -505,17 +505,17 @@ Session = setRefClass("Session",
         extraParams = list(...)        
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
         
-       	finalEvaluation = if (remoteMode){
+       	finalEvaluation = if (remoteMode) {
         		url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/json/evaluation.json")
         		res = httr::GET(url)
-        		if (res$status == 200){
+        		if (res$status == 200) {
         			jsonlite::fromJSON(txt=httr::content(res, as="text"))
         		} else NULL        	
-        }else{
+        } else {
 	        evaluationFile = paste0(artifact_loc,"/json/evaluation.json")
-	        evaluation = if (file.exists(evaluationFile)){
+	        evaluation = if (file.exists(evaluationFile)) {
 	          lines = paste(readLines(evaluationFile, warn=FALSE), collapse="")
-	          jsonlite::fromJSON(gsub("NaN", 0.0, lines),flatten = TRUE)
+	          jsonlite::fromJSON(gsub("NaN", 0.0, lines), flatten=TRUE)
 	        } else {stop(paste("Evaluation file does not exist in ", evaluationFile))}
         }
         
@@ -554,45 +554,45 @@ Session = setRefClass("Session",
       	browseURL(htmlSource)
       },
 
-      showExtractors = function(){
+      showExtractors = function() {
         "Shows extractors."
         showReport("extractor")
       },
-			showContextObjects = function(){
+			showContextObjects = function() {
 				"Shows context objects report."
 				showReport("features/contextObjects.html")
 			},
-      showFeaturesTrain = function(){
+      showFeaturesTrain = function() {
         "Shows features performance on train."
         showReport("features/train_features.html")
       },
-      showFeaturesTest = function(){
+      showFeaturesTest = function() {
         "Shows features performance on test."
         showReport("features/test_unweighted_features.html")
       },
-			showFeatureStability = function(){
+			showFeatureStability = function() {
 				"Shows features stability report."
 				showReport("features/featureStability.html")
 			},
-      showFields = function(){
+      showFields = function() {
         "Shows fields."
         showReport("features/field.html")
       },
-      showFunctions = function(){
+      showFunctions = function() {
         "Shows functions."
         showReport("features/function.html")
       },
-      showInputSchema = function(){
+      showInputSchema = function() {
         "Shows the input schema."
         showReport("preProcessing/InputSchema.html")
       },
 
       #require model methods
-      showConfusionMatrix = function(normalized = FALSE){ #verify that this was a classification problem
+      showConfusionMatrix = function(normalized = FALSE) { #verify that this was a classification problem
         "Shows a confusion matrix of a model."
         showReport(if (normalized) "model/confusionMatrix_normalized.html" else "model/confusionMatrix.html")
       },
-      showModelComparison = function(){
+      showModelComparison = function() {
         "Shows cross validation of various algorithms tested to create a model."
         showReport("model/modelComparison.html")
       },
@@ -604,15 +604,15 @@ Session = setRefClass("Session",
 #         "Shows ROC of cross validation of various algorithms tested to create a model."
 #         showReport("roc_CV")
 #       },
-      showFeatureClusters = function(){
+      showFeatureClusters = function() {
         "Shows the representative feature clusters pdf report."
 				showReport("/features/featureClusters/allFeatures.pdf")
       },
-			reports = function(){	
+			reports = function() {	
 				"Shows all reports applicable for the current analysis."
 				url = paste0(getSBserverDomain(),"/analytics/file/", projectName,"/",revision,"/reportsStructure.json")
 				res = httr::GET(url)
-				if (res$status == 200 && res$url == url){
+				if (res$status == 200 && res$url == url) {
 					reportList = unlist(jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE))
 					names(reportList) = NULL
 					reportListWithIndex = cbind(paste0("[",1:length(reportList),"]"), reportList)
@@ -620,7 +620,7 @@ Session = setRefClass("Session",
 					writeLines(paste(unlist(reportListWithIndex), collapse="\n"))
 					n <- readline("enter a number of report to show or <enter> otherwise:")
 					n <- ifelse(grepl("\\D",n),-1,as.integer(n))
-					if(!is.na(n) && n >= 1 && n <= length(reportList)){
+					if(!is.na(n) && n >= 1 && n <= length(reportList)) {
 						print(paste("showing",n))
 						showReport(reportList[n])
 					}										

@@ -22,8 +22,8 @@ testZip = function () {
 }
 
 # stam haara shel R
-stam = function(){
-  cornellRaw=read.csv("~/Downloads/Cornell results 2015.csv")
+stam = function() {
+  cornellRaw = read.csv("~/Downloads/Cornell results 2015.csv")
   cornellRaw = cornellRaw[1:168,]
   rownames(cornellRaw) = cornellRaw[,1]
   cornell = cornellRaw[,9:ncol(cornellRaw)]

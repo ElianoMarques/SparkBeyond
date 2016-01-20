@@ -74,7 +74,7 @@ sampleDataByClass = function(data, columnName, labels = NA, desiredDistribution 
 #' @param data dataframe to be splitted
 #' @param seed - Optional. A single numeric value representing the seed for the random sampling. It is guaranteed that for the same data and the same seed, the same sampling will be generated.
 #' @return a list of two elements with train dataframe as first element, and test dataframe as second element
-trainTestSplit = function(data, ratio = 0.8, seed = 1){
+trainTestSplit = function(data, ratio = 0.8, seed = 1) {
   set.seed(seed)
   dataSize = nrow(data)
   sampleSize = ceiling(ratio * dataSize)

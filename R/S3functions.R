@@ -262,10 +262,10 @@ learn <- function(
 	url <- paste0(getSBserverDomain(),"/rapi/learn")
 	print(paste("Calling:", url))
 	
-	if (!is.null(contextDatasets)){ #writing context data to server if necessary
-		if (class(contextDatasets)!="list"){
+	if (!is.null(contextDatasets)) { #writing context data to server if necessary
+		if (class(contextDatasets) != "list") {
 			warning("contextDatasets should be a list")
-			if (class(contextDatasets)!="contextObject") error("contextDatasets are not of class contextObject")
+			if (class(contextDatasets) != "contextObject") error("contextDatasets are not of class contextObject")
 			contextDatasets=list(contextDatasets)
 		}
 		if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
@@ -298,7 +298,7 @@ learn <- function(
 		target = target,
 		testFilePath = 
 			ifelse (!is.null(testData) && (any(grep("data.frame", class(testData))) || class(testData)=="character"),
-				ifelse( !remoteMode,
+				ifelse(!remoteMode,
 						writeToServer(testData, prefix = paste0(projectName,"_test"), useEscaping = preProcessingCtrl$fileEscaping),
 						uploadToServer(data = testData,projectName = projectName, name = "test", useEscaping = preProcessingCtrl$fileEscaping)	
 				),
@@ -383,13 +383,13 @@ learn <- function(
 							jobId = if(is.null(res$jobId)) -1 else res$jobId
 					)
 	
-	if (autoSave){
+	if (autoSave) {
 		tryCatch({
 			tokens = strsplit(session$artifact_loc, "/")[[1]]
 			varName = paste("backup", tokens[length(tokens)-1], tokens[length(tokens)], sep="_")
 			saveFilename = paste0(getwd(),.Platform$file.sep,varName,".RData")
 			assign(varName, session)
-			base::save(list=varName, file = saveFilename) #auto-saving the model
+			base::save(list=varName, file=saveFilename) #auto-saving the model
 			print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
 		})
 	}
