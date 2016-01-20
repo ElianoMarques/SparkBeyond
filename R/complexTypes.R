@@ -4,7 +4,7 @@
 #' @param data: dataframe or data.table to be grouped
 #' @param by: a list of column names to distinct by
 #' @return a new data.table object with the distinct data
-distinctBy = function(data, by){
+distinctBy = function(data, by) {
   grouped = groupBy(data, by)
   flattenCols(grouped, names(grouped))  #flatten all columns
   grouped
@@ -27,14 +27,14 @@ distinctBy = function(data, by){
 #' rownames(grouped2)
 #' colSizes(grouped2)
 #' head(grouped2)
-groupBy = function(data, by, flatten = TRUE){
+groupBy = function(data, by, flatten = TRUE) {
   text = paste0("list(",paste(by, collapse = ","),")")
   data = as.data.table(data)
   grouped = data[,lapply(.SD,list), by=eval(parse(text=text))]
   #set row names
   #rownames(grouped) = apply(grouped[,eval(parse(text=text))], 1, paste0,collapse = "_") #data.table does not use rownames()
   #flatten when single value
-  if (flatten){
+  if (flatten) {
     rowsCount = nrow(grouped)
     #toFlatten = setdiff(names(which(rowsCount == apply(colSizes(grouped), 2, sum))), by)
     toFlatten = setdiff(names(which(rowsCount == apply(colSizesUnique(grouped), 2, sum) )), by)
@@ -159,7 +159,7 @@ cols2Text = function(data, useEscaping = TRUE) {
       s
     }
     
-    printNonCharElement = function(e){
+    printNonCharElement = function(e) {
     	eType = class(e)
     	if (length(eType) > 1) eType = eType[1]
     	if (eType == "Date" || eType == "POSIXct") as.character(e)
@@ -175,8 +175,8 @@ cols2Text = function(data, useEscaping = TRUE) {
       }
     }
 
-    retString = if (is.list(x)){
-      writeList = function (xi){
+    retString = if (is.list(x)) {
+      writeList = function (xi) {
         content = createContent(xi)
         paste0("[",content,"]")
       }
@@ -235,7 +235,7 @@ excludeCols = function(data, cols, verbose = TRUE) {
       NULL
     } else {
     	if (verbose) print("Note: the input object is of type data.frame hence, a new data.frame with the excluded columns will be returned.")
-      data[ , -which(names(data) %in% cols)]
+      data[ ,-which(names(data) %in% cols)]
     }
   } else {
   	if (verbose) print("No columns were removed")
@@ -249,10 +249,10 @@ excludeCols = function(data, cols, verbose = TRUE) {
 #' @param data: dataframe / data data.table to modify.
 #' @param cols: a list of column names to get.
 #' @return a dataframe / data.table with the requested columns will be returned.
-colsWhiteList = function(data, cols){
-  if ("data.table" %in% class(data)){
+colsWhiteList = function(data, cols) {
+  if ("data.table" %in% class(data)) {
     data[,cols, with=FALSE]
-  }else{
+  } else {
     data[,cols]
   }
 }
@@ -303,7 +303,7 @@ setTimeColumn = function(data, timeCol) { #assumption is can be called only if t
 #' nrow(limitTimeSeries(tsData, "date", fromDate ="07/01/2014"))
 #' nrow(limitTimeSeries(tsData, "date", untilDate ="11/01/2014"))
 #' nrow(limitTimeSeries(tsData, "date", fromDate="07/01/2014", untilDate ="11/01/2014"))
-limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilDate = NA, datesFormat = "%m/%d/%Y"){
+limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilDate = NA, datesFormat = "%m/%d/%Y") {
   fromDateFormatted = strptime(fromDate, datesFormat)
   untilDateFormatted = strptime(untilDate, datesFormat)
 
@@ -325,7 +325,7 @@ limitTimeSeries = function(data, dateCol = "SB_times_col", fromDate = NA, untilD
 #' @param datesFormat: the format of the from/until dates. "\%m/\%d/\%Y" by default.
 #' @param units: the time span unit to use when creating the reference. Based on \code{\link[base]{difftime}} definitions. "days" by default.
 #' @return NA will be returned and the input file will be modified.
-offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m/%d/%Y", units = "days"){
+offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m/%d/%Y", units = "days") {
   ref = strptime(refDate, datesFormat)
 
   offsetDateInternal = function(colDate) {
@@ -366,7 +366,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
          stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Months', 'Years', 'Number'")
   )
   
-  newCol = if (is.na(keyCol)){
+  newCol = if (is.na(keyCol)) {
   	paste0("last_", window, "_", unit)
   }else{
   	paste0("last_keyed_", window, "_", unit)
@@ -380,7 +380,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
   
   prefix = if(!remoteMode) "" else {
-  	if (is.na(keyCol)) "TW:" else{
+  	if (is.na(keyCol)) "TW:" else {
   		if (is.numeric(data[,keyCol])) "DKTW:" else "SKTW:"
   	}
   }
@@ -398,13 +398,13 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   	 	dt = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-offset*unitVal)
   		dt_from = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-(window+offset)*unitVal) #seconds based
 			c(dt_from, dt)
-		} else if (dateType == "integer" || dateType == "numeric"){
+		} else if (dateType == "integer" || dateType == "numeric") {
 			c(dateVal - window, dateVal)
 		} else if (dateType == "Date") {
 			dt = as.character(as.POSIXct(dateVal) - offset*unitVal,format=datePOSIXformatOut)
 			dt_from = as.character(as.POSIXct(dateVal) - (window+offset)*unitVal,format=datePOSIXformatOut)
 			c(dt_from, dt)			
-		} else if (dateType == "POSIXct"){
+		} else if (dateType == "POSIXct") {
 			dt = as.character(dateVal - offset*unitVal)
 			dt_from = as.character(dateVal -(window+offset)*unitVal)
 			c(dt_from, dt)
@@ -414,9 +414,9 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   	paste0(prefix, keyVal,",",dates[1],",",dates[2],",",includeUntil,",",relativeTime,",",unit,",",sample)
   }
   
-  if (is.na(keyCol)){
+  if (is.na(keyCol)) {
     data[,newCol] = sapply(dateColData, generateWindow)
-  } else{    
+  } else {    
     keyColData = colsWhiteList(data, keyCol)
     data[,newCol] = mapply(generateWindow,dateColData,keyColData)
   }

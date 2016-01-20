@@ -4,7 +4,7 @@
 \alias{excludeCols}
 \title{excludeCols}
 \usage{
-excludeCols(data, cols)
+excludeCols(data, cols, verbose = TRUE)
 }
 \arguments{
 \item{data:}{dataframe / data data.table to modify.}

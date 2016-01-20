@@ -4,7 +4,7 @@
 # ===========
 #' A function to set the SparkBeyond server host.
 #' @param host new host URL.
-setSBserverHost = function(host = "http://127.0.0.1"){
+setSBserverHost = function(host = "http://127.0.0.1") {
   assign("SBhost", host, envir = globalenv())
   #print(paste("Setting server host to:", SBhost))
   return(SBhost)
@@ -35,7 +35,7 @@ printSBserverHost = function() {
 # ===========
 #' A function to set the SparkBeyond server port.
 #' @param port new port.
-setSBserverPort = function(port = "9000"){
+setSBserverPort = function(port = "9000") {
   assign("SBport", port, envir = globalenv())
   #print(paste("Setting server port to:", SBport))
   return(SBport)
@@ -57,11 +57,11 @@ printSBserverPort = function() {
 # ======================
 #' A function to set the SparkBeyond server I/O folder.
 #' @param port new port.
-setSBserverIOfolder = function(folder){
-	if (is.null(folder)){
+setSBserverIOfolder = function(folder) {
+	if (is.null(folder)) {
 		assign("IOfolder", folder, envir = globalenv())
 		NULL
-	}else{
+	} else {
 	  finalFolder = tryCatch ({
 	    if (is.null(folder) || nchar(folder) <= 2) stop("Empty folder name was provided to setSBserverIOfolder")
 	    prefix = if (substr(folder, 1, 2) == "\\\\") {
@@ -106,7 +106,7 @@ printSBserverIOfolder = function() {
 }
 
 #' Print all current settings.
-printSettings = function(){
+printSettings = function() {
   printSBserverIOfolder()
   printSBserverHost()
   printSBserverPort()
@@ -124,7 +124,7 @@ saveSettings = function() {
 
 #' Load settings from the current folder.
 loadSettings = function() {
-  if (file.exists("settings.RData")){
+  if (file.exists("settings.RData")) {
     load("settings.RData")
     setSBserverIOfolder(SB_IOfolder)
     setSBserverHost(SB_HOST)
@@ -166,7 +166,7 @@ restartServer = function() {
 
 
 #Deprecated
-isLatestVersion = function(){
+isLatestVersion = function() {
 	print ("This function has been deprecated, as now jobs are handled by a queue")
 	TRUE
 #   tryCatch({
@@ -293,7 +293,7 @@ logout = function() {
 currentUser = function(showInfo = TRUE) {
 	url <- paste0(getSBserverDomain(), "/currentUser")
 	res = httr::GET(url, encode = "form")
-	loggedIn = if (res$status_code == 200){
+	loggedIn = if (res$status_code == 200) {
 		ret = tryCatch({
 			userInfo = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 			if (!is.null(userInfo$user$fullName)) {
@@ -348,11 +348,11 @@ showJobs = function(projectName = NA, revision = NA, status = NA, showAllColumns
 		else ""}
 	url <- paste0(getSBserverDomain(),paste0("/api2/jobs", query))
 	res = httr::GET(url)
-	txt=httr::content(res, as="text")
+	txt = httr::content(res, as="text")
 	if (substr(txt,1,13) == "\n\n\n\n<!DOCTYPE") {  #Giving a second chance
 		url <- paste0(getSBserverDomain(),paste0("/api2/jobs", query))
 		res = httr::GET(url)
-		txt=httr::content(res, as="text")
+		txt = httr::content(res, as="text")
 	}
 	jobs = jsonlite::fromJSON(txt = txt, simplifyDataFrame=TRUE) 
 
@@ -390,7 +390,7 @@ showJobById = function(jobId) {
 #' cancels a queued job by a job ID
 #' @param jobId. The id of the job as defined by \code{\link{showJobs}}
 #' @return TRUE if succeeded. FALSE otherwise.
-cancelJob = function(jobId){
+cancelJob = function(jobId) {
 	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId,"/cancel"))
 	res = httr::POST(url)
@@ -427,7 +427,7 @@ isServerAlive = function() {
 
 #' A function to get the server version information
 #' @return The server version information.
-serverVersion = function(){
+serverVersion = function() {
 	url <- paste0(getSBserverDomain(),"/buildInfo")
 	status = tryCatch({
 		res = httr::GET(url, httr::content_type_json())
@@ -441,12 +441,12 @@ serverVersion = function(){
 
 ####################################################### 
 
-doesFileExistOnServer = function(projectName, path){
+doesFileExistOnServer = function(projectName, path) {
 	#if(!currentUser(FALSE)) stop("Please login")
 	domain = getSBserverDomain()
 	url = paste0(domain, "/api2/download/exists/",projectName,"?path=",path)
 	res = httr::GET(url)
-	if (res$status==200 && res$url == domain){ #not logged in the first time
+	if (res$status==200 && res$url == domain) { #not logged in the first time
 		res = httr::GET(url)	#a the second time
 		if (res$status==200 && res$url == domain) stop("This operation requires authentication, please log in first")
 	} 
@@ -511,8 +511,8 @@ projectRevisions = function(projectName) {
 #' @param filename Optional. define a name to save the data to. NA by default.
 #' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
 #' @return A filepath to the file on the server that was created.
-writeToServer = function(data, filename = NA, prefix = "data_in", useEscaping = TRUE){ #TODO: deal with spaces in prefix
-	final_filename = if ("data.frame" %in% class(data)){ # we got a data.frame object to be written to server 
+writeToServer = function(data, filename = NA, prefix = "data_in", useEscaping = TRUE) { #TODO: deal with spaces in prefix
+	final_filename = if ("data.frame" %in% class(data)) { # we got a data.frame object to be written to server 
 		if (is.na(filename)) { # no specific name was provided - use digest to refrain from rewriting to server
 			hash = digest(data)
 			new_filename = paste0(getSBserverIOfolder(), prefix, "_", hash, ".tsv") 

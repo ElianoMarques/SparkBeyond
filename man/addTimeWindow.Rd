@@ -6,7 +6,7 @@
 \usage{
 addTimeWindow(data, dateCol, keyCol = NA, window, unit = "Days",
   dateFormat = "\%m/\%d/\%Y", includeUntil = FALSE, relativeTime = TRUE,
-  sample = 2147483647, offset = 0)
+  sample = 2147483647, offset = 0, ...)
 }
 \arguments{
 \item{data:}{data.table to be modified.}

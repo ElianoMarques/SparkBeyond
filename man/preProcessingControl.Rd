@@ -10,6 +10,8 @@ preProcessingControl(trainTestSplitRatio = 0.8, temporalSplitColumn = NA,
 \arguments{
 \item{trainTestSplitRatio:}{Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.}
 
+\item{temporalSplitColumn:}{Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.}
+
 \item{emptyValuePolicy:}{Controls how empty values in the data are being handled NA by default will replace numeric value with median value, and strings with empty strings.}
 
 \item{fileEncoding:}{Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.}

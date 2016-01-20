@@ -5,7 +5,7 @@
 \title{knowledge Control}
 \usage{
 knowledgeControl(useGraph = FALSE, useOpenStreetMap = FALSE,
-  useCustomGraphs = FALSE, customGraphsWhiteList = NA,
+  useWeather = FALSE, useCustomGraphs = FALSE, customGraphsWhiteList = NA,
   customGraphsBlackList = NA, customFunctions = NA)
 }
 \arguments{

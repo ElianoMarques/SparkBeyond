@@ -27,7 +27,7 @@ SB object that encapsulates a session
   columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE,
   ...)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
-\item{\code{evaluate()}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
+\item{\code{evaluate(...)}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
 \item{\code{features(...)}}{Returns a dataset with top feature information}
 

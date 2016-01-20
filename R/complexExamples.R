@@ -9,11 +9,11 @@ complexExamples = function() {
   grouped = groupBy(data2, c("pclass"))
   writeToFile(grouped, "/tmp/time_series.tsv", c("pclass"))
 
-  b=zipAllCols(data,"age",c("pclass"))
+  b = zipAllCols(data,"age",c("pclass"))
   writeToFile(b, "/tmp/time_series_full.tsv", c("pclass"))
 
-  a= grouped[,.(pclass,zipped)]
-  b=cols2Text(a, c("pclass"))
-
+  a = grouped[,.(pclass,zipped)]
+  b = cols2Text(a, c("pclass"))
+ 
   #date to number
 }
