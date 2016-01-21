@@ -461,7 +461,7 @@ doesFileExistOnServer = function(projectName, path) {
 #' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
 uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 	#if(!currentUser(FALSE)) stop("Please login")
-	if (class(data) == "character") data
+	if (length(class(data)) == 1 && class(data) == "character") data
 	else {
 		if (! "data.frame" %in% class(data)) stop("The provided data should of type data.frame or character")
 		hash = digest(data)
