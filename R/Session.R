@@ -322,8 +322,8 @@ Session = setRefClass("Session",
       },
 
 			################################## predict #####################
-      predict = function(data, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE, ...) { 
-        "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. Set \\code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
+      predict = function(data, contextDatasets = NULL, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE, ...) { 
+        "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \\code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         #if(!currentUser(FALSE)) stop("Please login")
                 
         statusException()
@@ -340,12 +340,27 @@ Session = setRefClass("Session",
         	},
         	writeToServer(data, prefix = "predict", useEscaping = fileEscaping) #project name
 				)
+        
+        if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
+        for (i in 1:length(contextDatasets)) {
+        	contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
+        	contextDatasets[[i]]$data = 
+        		ifelse(!remoteMode,
+        					 writeToServer(contextDatasets[[i]]$data, 
+        					 							prefix = paste0(projectName,"_context", contextName),
+        					 							useEscaping = preProcessingCtrl$fileEscaping
+        					 ),
+        					 uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
+        					 							 , useEscaping = preProcessingCtrl$fileEscaping)
+        		)
+        }
 
         params <-list(modelPath = artifact_loc,
                       dataPath = datapath,
                       writePredictionColumnsOnly = predictionColumnsOnly,
         							columnsWhiteList = columnsWhiteList,
         							fileEscaping = fileEscaping,
+        							predictContexts = contextDatasets,
                       externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())        							
         )        							
         params = params[!is.na(params)] 							
@@ -629,7 +644,10 @@ Session = setRefClass("Session",
 			},
 			webView = function (){
 				"Show a dynamic web view of the analysis."
-				htmlSource = paste0(getSBserverDomain(), "/#/visualPipeline/", projectName, "?revision=", revision, "&forceByRevision=true")
+				url <- paste0(getSBserverDomain(),paste0("/getToken")) 
+				res = httr::GET(url)
+				token = httr::content(res, as="text")
+				htmlSource = paste0(getSBserverDomain(), "/?token=", token,"#/visualPipeline/", projectName, "?revision=", revision, "&forceByRevision=true")
 				browseURL(htmlSource)
 			}
 
