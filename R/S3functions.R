@@ -200,6 +200,35 @@ reportingControl = function(
 	)
 }
 
+#' contextTypesList
+#' 
+#' @param geoSpatial. This context allows looking for geo spatial features. All rows are indexed based on their latitude and longitude information, and then all the objects in the  
+contextTypesList = function(
+		geoSpatial = FALSE,
+		#geoSpatialWithPartition = FALSE,
+		#geoTiff = FALSE,
+		graph = FALSE,
+		invertedIndex = FALSE,
+		lookupTables = FALSE,
+		membershipSet = FALSE, 
+		shapeFile = FALSE,
+		termsMap = FALSE,
+		timeSeries = FALSE,
+		timeSeriesMap = FALSE
+	){
+		contextList = vector()
+		if (geoSpatial) contextList = c(contextList, "GeoSpatial")
+		if (graph) contextList = c(contextList, "Graph")
+		if (invertedIndex) contextList = c(contextList, "InvertedIndex")
+		if (lookupTables) contextList = c(contextList, "LookupTables")
+		if (membershipSet) contextList = c(contextList, "MembershipSet")
+		if (shapeFile) contextList = c(contextList, "ShapeFile")
+		if (termsMap) contextList = c(contextList, "TermsMap")
+		if (timeSeries) contextList = c(contextList, "TimeSeries")
+		if (timeSeriesMap) contextList = c(contextList, "TimeSeriesMap")
+		as.list(contextList)
+}
+
 #' contextObject
 #' 
 #' @param data: a data frame or a path to a file containing the context data
@@ -232,6 +261,15 @@ contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list
 #' @return Session object that encapsulates the model.
 #' @examples
 #' #session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE, autoSave=FALSE)
+
+# supportThreshold
+# localTopFeatureCount
+# regressionDiscretizerBinsOverride
+# automaticSelectionOfNumberOfFeatures
+# regressionMode
+# empty value policy
+# linesForTypeDetection
+
 learn <- function(
 			 projectName,
 			 trainData,
