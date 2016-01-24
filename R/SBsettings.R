@@ -392,11 +392,17 @@ showJobById = function(jobId) {
 #' @return TRUE if succeeded. FALSE otherwise.
 cancelJob = function(jobId) {
 	#if(!currentUser(FALSE)) stop("Please login")
-	url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId,"/cancel"))
-	res = httr::POST(url)
-	ifelse(res$status == 200, TRUE,{
-		print(httr::content(res, as="text"))
-		FALSE
+	#url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId,"/cancel"))
+	#res = httr::POST(url)
+	url <- paste0(getSBserverDomain(),paste0("/api2/terminateJob/", jobId)) 
+	res = httr::DELETE(url)
+	ifelse(res$status == 200, {
+			print(paste("Job", jobId, "was canceled"))
+			TRUE
+		},{
+			print(paste("Unable to cancel job", jobId, ". (Does this jobId exist in showJobs()?)"))
+			#print(httr::content(res, as="text"))
+			FALSE
 	})
 }
 
