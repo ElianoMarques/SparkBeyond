@@ -565,7 +565,10 @@ Session = setRefClass("Session",
       showReport = function(report_name = NA){ #confine to a specific list
         "\\code{report_name} name of report to show"        
         #htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
-        htmlSource = paste0(getSBserverDomain(), "/analytics/report/", projectName, "/", revision, "/", report_name)
+      	url <- paste0(getSBserverDomain(),paste0("/getToken")) 
+      	res = httr::GET(url)
+      	token = httr::content(res, as="text")
+        htmlSource = paste0(getSBserverDomain(), "/analytics/report/", projectName, "/", revision, "/", report_name,"?token=", token)
       	browseURL(htmlSource)
       },
 
