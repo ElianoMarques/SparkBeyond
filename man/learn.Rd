@@ -10,8 +10,7 @@ learn(projectName, trainData, target, testData = NULL, weightColumn = NA,
   featureGenerationCtrl = featureGenerationControl(),
   knowledgeCtrl = knowledgeControl(),
   modelBuildingCtrl = modelBuildingControl(),
-  reportingCtrl = reportingControl(), verbose = FALSE, autoSave = TRUE,
-  runBlocking = TRUE, ...)
+  reportingCtrl = reportingControl(), runBlocking = TRUE, ...)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -38,8 +37,6 @@ learn(projectName, trainData, target, testData = NULL, weightColumn = NA,
 
 \item{reportingCtrl:}{A \code{\link{reportingControl}} object with specific reporting parameters.}
 
-\item{autoSave:}{Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.}
-
 \item{runBlocking:}{Block the R console while the session is running. FALSE by default.}
 }
 \value{
@@ -49,6 +46,6 @@ Session object that encapsulates the model.
 Runs SparkBeyond feature enrichment and learning process.
 }
 \examples{
-#session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE, autoSave=FALSE)
+#session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
 }
 

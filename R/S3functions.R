@@ -256,11 +256,10 @@ contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list
 #' @param knowledgeCtrll: A \code{\link{knowledgeControl}} object with specific external knowledge parameters.
 #' @param modelBuildingCtrll: A \code{\link{modelBuildingControl}} object with specific model building parameters.
 #' @param reportingCtrl: A \code{\link{reportingControl}} object with specific reporting parameters.
-#' @param autoSave: Optional. Automatically saves the generated session object to a file for future use. Good in cases where the connection between R and the server was interrupted or you would like to review previous models results. TRUE by default.
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
-#' #session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE, autoSave=FALSE)
+#' #session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
 
 # supportThreshold
 # localTopFeatureCount
@@ -283,8 +282,6 @@ learn <- function(
 			 knowledgeCtrl = knowledgeControl(),
 			 modelBuildingCtrl = modelBuildingControl(),
 			 reportingCtrl = reportingControl(),
-			 verbose = FALSE,
-			 autoSave = TRUE,
 			 runBlocking = TRUE,
 			 ...
 ){
@@ -292,7 +289,7 @@ learn <- function(
 	extraParams = list(...)
 	# TODO: verify that there are no supurious parameters, e.g. (projectname instead of projectName)
 	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
-#	if(remoteMode && !currentUser(FALSE)) stop("Please login")
+	if(remoteMode && !currentUser(FALSE)) stop("Please login before calling the learn function. Thank you.")
 	
 	projectName = gsub(" ", "_", projectName)
 	
@@ -409,7 +406,7 @@ learn <- function(
 	print (paste("Training on ",params$trainingFilePath))
 	
 	body = rjson::toJSON(params)
-	if (verbose) print(body)
+	#if (verbose) print(body)
 	res = httr::POST(url, body = body, httr::content_type_json())
 	res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 	if (!is.null(res$error)) {
@@ -425,16 +422,16 @@ learn <- function(
 							jobId = if(is.null(res$jobId)) -1 else res$jobId
 					)
 	
-	if (autoSave) {
-		tryCatch({
-			tokens = strsplit(session$artifact_loc, "/")[[1]]
-			varName = paste("backup", tokens[length(tokens)-1], tokens[length(tokens)], sep="_")
-			saveFilename = paste0(getwd(),.Platform$file.sep,varName,".RData")
-			assign(varName, session)
-			base::save(list=varName, file=saveFilename) #auto-saving the model
-			print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
-		})
-	}
+# 	if (autoSave) {
+# 		tryCatch({
+# 			tokens = strsplit(session$artifact_loc, "/")[[1]]
+# 			varName = paste("backup", tokens[length(tokens)-1], tokens[length(tokens)], sep="_")
+# 			saveFilename = paste0(getwd(),.Platform$file.sep,varName,".RData")
+# 			assign(varName, session)
+# 			base::save(list=varName, file=saveFilename) #auto-saving the model
+# 			print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
+# 		})
+# 	}
 	if (reportingCtrl$showWebView == TRUE && remoteMode == TRUE) session$webView() 
 	if (runBlocking)session$waitForProcess(remoteMode=remoteMode)
  
