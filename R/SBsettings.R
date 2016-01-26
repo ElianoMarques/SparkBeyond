@@ -291,24 +291,26 @@ logout = function() {
 #' 
 #' Current user information
 currentUser = function(showInfo = TRUE) {
-	url <- paste0(getSBserverDomain(), "/currentUser")
-	res = httr::GET(url, encode = "form")
-	loggedIn = if (res$status_code == 200) {
-		ret = tryCatch({
-			userInfo = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-			if (!is.null(userInfo$user$fullName)) {
-				if (showInfo) print (paste("Hello", userInfo$user$fullName, "!  ", paste0("(",userInfo$user$email ,")"), " on ", getSBserverDomain()))							
-				TRUE
-			} else	FALSE			
-		}, 
-		error = function(e) FALSE
-		)		
-		ret				
-	} else FALSE
-		
-	if(!loggedIn)	print("You are currently not logged in - please use the login() function first.")
-		
-	loggedIn
+	if(!is.null(getSBserverIOfolder())) TRUE else {
+		url <- paste0(getSBserverDomain(), "/currentUser")
+		res = httr::GET(url, encode = "form")
+		loggedIn = if (res$status_code == 200) {
+			ret = tryCatch({
+				userInfo = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+				if (!is.null(userInfo$user$fullName)) {
+					if (showInfo) print (paste("Hello", userInfo$user$fullName, "!  ", paste0("(",userInfo$user$email ,")"), " on ", getSBserverDomain()))							
+					TRUE
+				} else	FALSE			
+			}, 
+			error = function(e) FALSE
+			)		
+			ret				
+		} else FALSE
+			
+		if(showInfo && !loggedIn)	print("You are currently not logged in - please use the login() function first.")
+			
+		loggedIn
+	}
 }
 
 #' showProjectsLocks
@@ -341,7 +343,7 @@ removeProjectLock = function(lockId) {
 #' @param showAllColumns A switch for whether to show only the job ID, project name, status, and elapsed (if available). Alternatively show all columns
 #' @return a data frame with the jobs
 showJobs = function(projectName = NA, revision = NA, status = NA, showAllColumns = FALSE) { 
-	#if(!currentUser(FALSE)) stop("Please login")
+	if(!currentUser(FALSE)) stop("Please login")
 	query = {if (!is.na(projectName) && is.na(status)) paste0("?project=",projectName)
 		else if (is.na(projectName) && !is.na(status)) paste0("?status=",status)
 		else if (!is.na(projectName) && !is.na(status)) paste0("?project=",projectName,"&status=",status)
