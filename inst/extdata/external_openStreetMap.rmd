@@ -13,8 +13,11 @@ output:
 
 ##Open Street Map data 1##
 
+####Overview####
+
 The emergency locations dataset contains locations in the London, UK metro and associcates each location with a 'risk' score based on the distance within a 2-mile radius to the nearest fire station or hospital. If only fire station or hospital are in the radius of a point a penalty of 20.0 is added, and if no hospitals or fire stations are in the radius a penalty of 40.0 is added.
 
+####Training data####
 <br>
 ```{r external_openStreetMap_1, eval=TRUE, results='asis'}
 emergencyLocations = getData("emergency_locations")
@@ -23,6 +26,9 @@ print(xtable(tail(emergencyLocations,n=5)), type='html', comment=F)
 <br>
 By setting useOpenStreetMap to TRUE, the area around each latLong will be downloaded and the points of interests available in that area will be used during the feature search.
 <br>
+
+####Pipeline####
+
 ```{r external_openStreetMap_2, eval=TRUE, message=FALSE, results='hide'}
 emergencyLocationsModel = learn(
 		projectName = "emergencyLocations_example",
@@ -31,20 +37,25 @@ emergencyLocationsModel = learn(
     featureGenerationCtrl = featureGenerationControl(			 
 			maxFeaturesCount = list(5)
 		),
-		knowledgeCtrl = knowledgeControl(useOpenStreetMap = TRUE),
-    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RXGBoostRegressor")),    
-    autoSave = FALSE
+		knowledgeCtrl = knowledgeControl(useOpenStreetMap = TRUE)
 )
 ```
 <br>
-```{r external_openStreetMap_3, eval=TRUE, cache=TRUE}
-print(emergencyLocationsModel$evaluate()$evaluation$rootMeanSquaredError)
-```
-<br>
+
+####Top features####
+
 Indeed the top 3 features identify that the target is correlated with short distance to fire stations and hospitals.      
 <br>
+
 ```{r external_openStreetMap_4, eval=TRUE, results='asis'}
 print(xtable(emergencyLocationsModel$features()[1:5,c("idx","feature")]), type='html', comment=F) 
+```
+
+####Evaluation####
+
+<br>
+```{r external_openStreetMap_3, eval=TRUE, cache=TRUE}
+print(emergencyLocationsModel$evaluate()$evaluation$rootMeanSquaredError)
 ```
 
 <br>
@@ -54,15 +65,24 @@ print(xtable(emergencyLocationsModel$features()[1:5,c("idx","feature")]), type='
 
 ##Open Street Map data 2##
 
+####Overview####
+
 The museums dataset contains synthetic tweets mentioning names of museums in London. A boolean label is attached to each tweet marking whether there are parks within 0.4KM from the museum that was mentioned.  
 <br>
+
+####Training data####
+
 ```{r external_openStreetMap_2_1, eval=TRUE, results='asis'}
 museums = getData("museums") 
 print(xtable(tail(museums,n=5)), type='html', comment=F) 
 ```
 <br>
+
+####Pipeline####
+
 In this example, we will need to use both the knowledge graph in order to identify entities in the text, and open street map in order took for points of interest near each location.
 <br>
+
 ```{r external_openStreetMap_2_2, eval=TRUE, message=FALSE, results='hide'}
 museumsModel = learn( 
 		projectName = "OSM_museums_example",
@@ -70,20 +90,24 @@ museumsModel = learn(
     target = "label",
     featureGenerationCtrl = featureGenerationControl(	booleanNumericFeatures = FALSE,		 
 			maxFeaturesCount = list(3),			
-			maxDepth = 3,
+			maxDepth = 3
 		),
-		knowledgeCtrl = knowledgeControl(useGraph = TRUE, useOpenStreetMap = TRUE),
-    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),    
-    autoSave = FALSE
+		knowledgeCtrl = knowledgeControl(useGraph = TRUE, useOpenStreetMap = TRUE)
 )
 ```
-<br>
-```{r external_openStreetMap_2_3, eval=TRUE, cache=TRUE}
-print(museumsModel$evaluate()$summary) 
-```
+
+####Top features####
+
 <br>
 Indeed the top feature indicates that parks are in the vicinity of the input.      
 <br>
 ```{r external_openStreetMap_2_4, eval=TRUE, results='asis'}
 print(xtable(museumsModel$features()[1:5,c("idx","feature")]), type='html', comment=F)  
 ```
+
+####Evaluation####
+
+```{r external_openStreetMap_2_3, eval=TRUE, cache=TRUE}
+print(museumsModel$evaluate()$summary) 
+```
+<br>

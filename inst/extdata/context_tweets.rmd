@@ -11,61 +11,137 @@ output:
 %\VignetteDepends{xtable}
 -->
 
-##Context - terms map - sentiment analysis##
+##Text analysis - tweets sentiment##
 
-Goal: Identify sentiment in twitter tweets.
+###Internal text functions###
+
+####Overview####
+
+Goal: Identify sentiment in twitter tweets. The sentiment dataset contains a column with a tweet and a setiment target (-1 or 1).
 <br>
 
-###Tweets sentiment ###
+####Training data####
+```{r context_tweets_0, eval=TRUE, results='asis'}
+tweets = getData("tweets_sentiment")
+print(xtable(head(tweets,n=5)), type='html', comment=F)
+```
+
+####Pipeline####
 
 ```{r context_tweets_1, eval=TRUE, message=FALSE, results='hide'}
-tweets = getData("tweets_sentiment")
 SentimentModel = learn(
-		projectName="tweets",
-		trainData=tweets,
-		target="sentiment",
-		featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50)),    
-		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
-		autoSave = FALSE
+	projectName="tweets",
+	trainData=tweets,
+	target="sentiment",
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
 )
-SentimentEval = SentimentModel$evaluate()
 ```
 <br>
-In this example we load a sentiment dataset with a tweet column and a setiment target (-1 or 1). The top feature is a textSentimentScore which is automatically computed.
+
+####Top features####
+
+The top feature is a textSentimentScore which is automatically computed.
 
 ```{r context_tweets_2, eval=TRUE, results='asis'}
-print(xtable(SentimentModel$features()[1:10,c("idx","feature")]), type='html', comment=F)
+print(xtable(SentimentModel$features()[1:5,c("idx","feature")]), type='html', comment=F)
 ```
+
+####Evaluation####
+
 ```{r context_tweets_3, eval=TRUE, echo=TRUE, cache=FALSE}
 SentimentModelEval = SentimentModel$evaluate()
 ```
 <br>
 
-###Tweets with a context dataset that creates a terms map###
+###Terms Map context###
+
+<br>
+
+####Overview####
+
+In order to improve performance we can include a custom context Dataset. The sentimentLexicon includes over 6000 single words with a either a positive or negative sentiment. The top features now are actually derived by looking up the values in the lexcion (data_column) and the classificaiton performance is boosted.
+
+####Context data####
+
+```{r context_tweets_4_0, eval=TRUE, results='asis'}
+lexicon = getData("sentiment_lexicon")
+print(xtable(head(lexicon, n=5)), type='html', comment=F)
+```
+
+####Pipeline####
+
+<br>
+Based on the column types in the context data, various context objects can be created. See contextTypesList for complete information on all possible context object types. It is also possible to define the requested context types to be generated explicitly in contextObject. Specifically, in this case we will define a Terms Map context. 
+<br>
+<br>
 
 ```{r context_tweets_4, eval=TRUE, message=FALSE, results='hide'}
-tweets = getData("tweets_sentiment")
 SentimentModelContext = learn(
-		projectName = "tweets",
-		trainData = tweets,
-		target = "sentiment",
-		contextDatasets = list(contextObject(data = getData("sentiment_lexicon"), name = "sentiment_lexicon")),
-		featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50)),    
-		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
-		autoSave = FALSE    
+	projectName = "tweets",
+	trainData = tweets,
+	target = "sentiment",
+	contextDatasets = list(contextObject(data = getData("sentiment_lexicon"), name = "sentiment_lexicon",
+		contextTypes = contextTypesList(termsMap = TRUE))), #defining the context type explicity
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+)
+```
+
+####Top features####
+
+```{r context_tweets_5, eval=TRUE, results='asis'}
+print(xtable(SentimentModelContext$features()[1:5,c("idx","feature")]), type='html', comment=F) 
+```
+
+####Evaluation####
+```{r context_tweets_7, eval=TRUE, echo=TRUE, cache=FALSE}
+SentimentContextEval = SentimentModelContext$evaluate()
+```
+
+<br>
+<br>
+
+###Inverted Index context###
+
+####Overview####
+<br>
+In this example we will see how to add an Inverted Index context. Specifically, this will allow us to use similar textual instances to augment the feature search, in a KNN-fashion. In this example, during the training, only the context information of the train data will be made available for feature search purposes. However, during prediction, the context information of both the train data and the test data can be made available.
+<br>
+<br>
+
+####Pipeline####
+
+We will first split the data into train and test data using the trainTestSplit function.
+
+```{r context_tweets_8, eval=TRUE, message=FALSE, results='hide'}
+trainTestData=trainTestSplit(tweets,0.5)
+SentimentModelContext2 = learn(
+	projectName="tweets_semtiment3",
+	trainData=trainTestData$train,
+	testData =trainTestData$test,
+	target="sentiment",
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50)), 
+	contextDatasets = list(contextObject(data = trainTestData$train, name = "tweets_context", 
+				contextTypes = contextTypesList(invertedIndex = TRUE))), #defining the context type explicitly
+	autoSave = FALSE
 )
 ```
 <br>
 
-In order to improve performance we can include a custom context Dataset. The sentimentLexicon includes over 6000 single words with a either a positive or negative sentiment. The top features now are actually derived by looking up the values in the lexcion (data_column) and the classificaiton performance is boosted.
+####Top features####
 
-```{r context_tweets_5, eval=TRUE, results='asis'}
-print(xtable(SentimentModelContext$features()[1:10,c("idx","feature")]), type='html', comment=F) 
+```{r context_tweets_9, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(SentimentModelContext2$features()[1:5,c("idx","feature")]), type='html', comment=F) 
 ```
 
-```{r context_tweets_6, eval = FALSE, message=FALSE}
-writeLines(readLines(paste0(SentimentModelContext$artifact_loc,"/reports/features/features_trace.txt"),n=9))
+####Evaluation####
+
+During prediction we can match the context objects to the ones used in the train by using the same name.
+<br>
+
+```{r context_tweets_10, eval=TRUE, echo=FALSE, , results='hide', cache=TRUE, message=FALSE}
+	pred = SentimentModelContext2$predict(data = trainTestData$test, 
+				contextDatasets = list(contextObject(data = tweets, name = "tweets_context")))
 ```
-```{r context_tweets_7, eval=TRUE, echo=TRUE, cache=FALSE}
-SentimentContextEval = SentimentModelContext$evaluate()
+```{r context_tweets_11, eval=TRUE, echo=TRUE, cache=TRUE, message=FALSE}
+	length(which(pred$sentiment==pred$sentiment_predicted))/nrow(pred) * 100
 ```

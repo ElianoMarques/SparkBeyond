@@ -11,41 +11,109 @@ output:
 %\VignetteDepends{xtable}
 -->
 
-##Feature exclusions##
+##Feature Generation Control##
+ 
+<br>
+
+###Function exclusions###
+
+
+####Overview####
 
 Goal: Predict Titanic Passenger Age
 <br>
-This example demonstrates how to exclude elements from the generated features. 
-Let's say that for example that for whatever reason we would prefer to not create mathematical features (such as "abs"), trigonometry features, and also exclude features that contains the word "master". We can set the `functionsBlackList` parameter to exclude these two terms. 
+This example demonstrates two important capabilities:
+<br>
+1. controlling the number of features in the output
+<br>
+2. excluding elements from the generated features.
+<br>
+<br>
+For example in order to reduce overfit, we would like generate only 25 features. (Or alternatively, create either 25 features or 50 features and use the model the performs better on cross validation of the training set.) This can be set in the `maxFeaturesCount` of `featureGenerationCtrl`.
+<br>
+<br>
+In addition, we would prefer to not create mathematical features (such as "ceil"), trigonometry features, and also exclude features that contains the word "master". These can be set via the `functionsBlackList` parameter to exclude these terms. 
 <br>
 Please refer to the SparkBeyond function catalog by calling `functionCatalog()` to view the list of functions and associated domains
-In this example we are using the featureSearch capability only without actually building a model.
+Lastly, you can notice that in this example we are using the `featureSearch` capability instead of the regular `learn` without actually building a model.
 <br>
+<br>
+
+####Pipeline####
+
 ```{r featureGeneration_featureExclusions_1, eval=TRUE, message=FALSE, results='hide'}
 data = getData("titanic_train")
 titanicAgeFeatures = featureSearch(
-		projectName = "titanic_age_exclusions",
-    trainData = data,
-    target = "age", 
-		featureGenerationCtrl = featureGenerationControl(					 
-    	maxFeaturesCount = 10,
-    	# blacklist trigonometric functions, "abs" function, and features containing "master"
-    	functionsBlackList = list("trigonometry", "abs", "master"),  
-    ),
-		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestRegressor")),
-    autoSave = FALSE
+	projectName = "titanic_age_exclusions",
+	trainData = data,
+	target = "age", 
+					 
+	featureGenerationCtrl = featureGenerationControl(
+		#limit the number of features to 25
+		maxFeaturesCount = 25, #list(25,50)
+		# blacklist trigonometric functions, "abs" function, and features containing "master"
+		functionsBlackList = list("trigonometry", "ceil", "master")  
+	)
 )
-
 ```
 <br>
-Note that compared to the previous example the `master` feature does not exist.
+<br>
+
+####Top features####
+
+Note that compared to the regular regression example, the `master` feature does not exist (as well as 'ceil' and trignometry).
 <br>
 ```{r featureGeneration_featureExclusions_2, eval=TRUE, results='asis'}
-library(xtable)
-print(xtable(titanicAgeFeatures$features()[1:10,c("idx", "feature")]), type='html', comment=F) 
+print(xtable(titanicAgeFeatures$features()[1:20,c("idx", "feature")]), type='html', comment=F) 
 ```
 
-```{r featureGeneration_featureExclusions_3, eval = TRUE, message=FALSE}
+<!--
+feature generation control
+
+model building control
+	# optional - specify algorithms to use - check modelBuildingControl
+	modelBuildingCtrl = modelBuildingControl(
+	algorithmsWhiteList = algorithmsList(isClassification = TRUE, randomForest = TRUE)),
+
+
+reporting control
+		# optional - create lift plots and prediction results 
+    email notification
+    
+    web view
+    
+    reportingCtrl = reportingControl(scoreOnTestSet = TRUE), 
+    
+    feature clusteres
+    +
+    titanicSurvivedModelLocal$showFeatureClusters()
+
+predict
+
+enrich
+			
+revisions	
+		revs = projectRevisions(projectName)
+		titanicSurvivedModelLocal = Session(projectName, revs$name[1])
+-->
+
+<!--
+feature trace
+To view the feature trace report review /reports/features/features_trace.txt:<br>
+For example, the first feature "name contains master" has a positive example trace under the "positive sample" column. The trace starts with the "name" subexpression (bottom) "Rice, Master. Eugene", the next step of the trace is the subexpression "tokenizeByWordBoundary(name)" which is directly on top of "name". It evaluates to "Vector(rice, master, eugene)" which contains "master". The type and documentation of each subexpression function are listed in the last two columns.
+{r basic_regression_4, eval = TRUE, message=FALSE}
+writeLines(gsub("-{2}","",readLines(paste0(titanicAgeModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))
+
+{r featureGeneration_featureExclusions_3, eval = TRUE, message=FALSE}
 writeLines(readLines(paste0(titanicAgeFeatures$artifact_loc,"/reports/features/features_trace.txt"),n=9))
-```
+
+
+To view the feature trace report review /reports/features/features_trace.txt:<br>
+For example, the first feature "tokenizeByPunctuation(name) does not contain mr" has a positive example trace under the "positive sample" column. The trace starts with the "name" subexpression (bottom) "Cumings, Mrs. John Bradley (Florence Briggs Thayer)", the next step of the trace is the subexpression "tokenizeByPunctuation(name)" which is directly on top of "name". It evaluates to "ArrayBuffer(cumings, mrs, john bradley, florence briggs thayer)" which does not contain "mr". The type and documentation of each subexpression function are listed in the last two columns.
+{r basic_classification_6, eval = TRUE, message=FALSE}
+writeLines(gsub("-{2}","",readLines(paste0(titanicSurvivedModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))
+
+
+-->
+
 

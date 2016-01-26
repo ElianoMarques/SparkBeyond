@@ -12,39 +12,48 @@ output:
 -->
   
 ##Basic regression##
+<br>
+<br>
+
+####Overview####
 
 Goal: Predict Titanic Passenger
 <br>
 This example demonstrates how to perform a simple regression using the SparkBeyond platform.
 We will use the same titanic data but now we will aim to predict the column `age`.
 <br>
-```{r basic_regression_2, eval=TRUE, message=FALSE, results='hide'}
-data = getData("titanic_train")
-titanicAgeModel = learn(
-		projectName = "titanic_age",
-    trainData = data,
-    target = "age",
-    # optional - limit the number of features - check documentation for featureGenerationControl		 
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),  
-		# optional - specify algorithms to use - check modelBuildingControl
-		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestRegressor")),
-		# optional - create lift plots and prediction results 
-    reportingCtrl = reportingControl(scoreOnTestSet = TRUE),  
-		# optional - avoid automatically creating a local object pointing to the created model 
-    autoSave = FALSE
-)
 
+####Training data####
+
+Here are all the columns available:
+```{r basic_classification_1, results='asis'}
+data = getData("titanic_train")
+#View(data) # in order to view the data in an RStudio tab
+print(xtable(data[1:5,]), type='html', comment=F)
 ```
 <br>
-From this examples, we can see that having the tokens 'master' and 'miss' in the passenger name are strong indicators of the gender. 
-Here are the top features:
+<br>
+
+####Pipeline####
+
+The problem was automatically identified as a regression problem because the target is continuous.
+<br>
+```{r basic_regression_2, eval=TRUE, message=FALSE, results='hide'}
+titanicAgeModel = learn(
+	projectName = "titanic_age",
+	trainData = data,
+	target = "age"
+)
+```
+<br>
+<br>
+
+####Top features####
+
+From this example, we can see that having the tokens 'master' and 'miss' in the passenger name are strong indicators of the gender. 
 <br>
 ```{r basic_regression_3, eval=TRUE, results='asis'}
 library(xtable)
-print(xtable(titanicAgeModel$features()[1:7,c("idx", "feature")]), type='html', comment=F)
+print(xtable(titanicAgeModel$features()[1:20,c("idx", "feature")]), type='html', comment=F)
 ```
-To view the feature trace report review /reports/features/features_trace.txt:<br>
-For example, the first feature "name contains master" has a positive example trace under the "positive sample" column. The trace starts with the "name" subexpression (bottom) "Rice, Master. Eugene", the next step of the trace is the subexpression "tokenizeByWordBoundary(name)" which is directly on top of "name". It evaluates to "Vector(rice, master, eugene)" which contains "master". The type and documentation of each subexpression function are listed in the last two columns.
-```{r basic_regression_4, eval = TRUE, message=FALSE}
-writeLines(gsub("-{2}","",readLines(paste0(titanicAgeModel$artifact_loc,"/reports/features/features_trace.txt"),n=9)))
-```
+

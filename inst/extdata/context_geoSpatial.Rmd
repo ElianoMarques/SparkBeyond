@@ -11,17 +11,18 @@ output:
 %\VignetteDepends{xtable}
 -->
 
-##Geo spatial##
+##Geo spatial context##
+
+####Overview####
 
 Using Geospatial KNN in order to infer from near by locations that have similar properties. 
 <br>
-The input dataset contains locations in the world (based on a lat/long) and the language spoken at this location (for top 15 most spoken languages).
 <br>
-In this example we pass the input also as a context data. A GeoSpatial Index object will be created, keeping properties for each latitude and longitude that were provided. A set of KNN based functions can be triggered for the geoSpatial index object, that can collect and aggregate properties from near by locations. Note that the actual location is not used to prevent target leaks.
+In this example we pass the input also as a context data. A GeoSpatial Index object will be created, keeping properties for each coordinate that were provided. A set of KNN based functions can be triggered for the geoSpatial index object, that can collect and aggregate properties from near by locations. Note that the actual location is not used to prevent target leaks.
 
 
 <!-- 
-langFull = data.table(getData("languages")) # get full data from "/Users/sagiedavidovich/Google Drive/data/datasets/public/lang-long-lat.csv"
+langFull = data.table(getData("languages")) # get full data from "Google Drive/data/datasets/public/lang-long-lat.csv"
 a = groupBy(langFull, "lang")
 b =colSizes(a)
 rownames(b) = a$lang
@@ -31,24 +32,40 @@ langFiltered = langFull[lang %in% names]
 langData=sampleData(langFiltered, 0.05)
 -->
 
-<br>
-```{r context_geoSpatial_2, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
+####Training data####
+
+The input dataset contains locations in the world (based on a lat/long) and the language spoken at this location (for top 15 most spoken languages).
+
+```{r context_geoSpatial_1, results='asis', cache=TRUE}
 langData =  getData("languages")
+print(xtable(langData[1:5,]), type='html', comment=F)
+```
+<br>
+<br>
+
+####Pipeline####
+
+```{r context_geoSpatial_2, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
 languagesModel = learn(
 	projectName = "languages", 
 	trainData = langData, 
 	target = "lang", 
-	contextDatasets = list(contextObject(data=langData, name="languages")),
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),
-	modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
-	autoSave = FALSE
+	contextDatasets = list(contextObject(data=langData, name="languages",
+		contextTypes = contextTypesList(geoSpatial = TRUE))),
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))
 )
 ```
+
+####Top features####
+
+<br>
+```{r context_geoSpatial_4, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(languagesModel$features()[1:10,c("idx","feature","Lift.en","Lift.es")]), type='html', comment=F) 
+```
+
+####Evaluation####
+
 <br>
 ```{r context_geoSpatial_3, eval=TRUE, echo=TRUE, cache=TRUE}
 languagesModelEval = languagesModel$evaluate()
-```
-<br>
-```{r context_geoSpatial_4, eval=TRUE, results='asis'}
-print(xtable(languagesModel$features()[1:10,c("idx","feature")]), type='html', comment=F) 
 ```

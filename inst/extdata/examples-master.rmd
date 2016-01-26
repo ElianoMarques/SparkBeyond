@@ -14,7 +14,7 @@ output:
 <!-- 
   Comment:
   ========
-  Set eval = FALSE (with spaces) in places that you would like not be to evaluated permanently (i.e., not be capture by the replace all) 
+  Set eval = TRUE (with spaces) in places that you would like not be to evaluated permanently (i.e., not be capture by the replace all) 
   Use cache = TRUE to prevent recalculations => stored  per chunk identifier.
   
   To geneate examples:
@@ -31,6 +31,7 @@ Show predict / create package etc example - should be in a different section
 
 #Spark Beyond Package Examples#
 
+<img src="http://s3.amazonaws.com/public-sparkbeyond/images/overview" width="800" height="650">
 <br>
 
 #A. Basic modeling#
@@ -43,16 +44,27 @@ Show predict / create package etc example - should be in a different section
 <br>
 <br>
 
-#B. Basic feature generation controls#
+#B. Basic controls#
 
 ```{r featureGeneration_featureExclusions, child='featureGeneration_featureExclusions.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
 
-#C. Using SparkBeyond knowledge#
+```{r basic_pizza, child='basic_pizza.rmd', eval=FALSE, cache=TRUE}
+```
+<br>
+<br>
 
-```{r external_weather, child='external_weather.rmd', eval = TRUE, cache=TRUE}
+#C. Text analysis#
+
+```{r context_tweets, child='context_tweets.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+<br>
+
+#D. GeoSpatial analysis#
+```{r context_geoSpatial, child='context_geoSpatial.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
@@ -61,26 +73,7 @@ Show predict / create package etc example - should be in a different section
 <br>
 <br>
 
-#D. Model with complex data structures#
-
-##Coming soon.##
-
-<br>
-<br>
-
-#E. Add context to modeling#
-
-```{r context_tweets, child='context_tweets.rmd', eval = TRUE, cache=TRUE}
-```
-<br>
-<br>
-```{r context_geoSpatial, child='context_geoSpatial.rmd', eval = TRUE, cache=TRUE}
-```
-<br>
-<br>
-
-
-#F. Time series analysis#
+#E. Time series analysis#
 
 ```{r timeSeries_timeWindow, child='timeSeries_timeWindow.rmd', eval = TRUE, cache=TRUE}
 ```
@@ -88,6 +81,13 @@ Show predict / create package etc example - should be in a different section
 <br>
 
 ```{r timeSeries_frequency, child='timeSeries_frequency.rmd', eval = TRUE, cache=TRUE}
+```
+<br>
+<br>
+
+#F. Additional World knowledge resources#
+
+```{r external_weather, child='external_weather.rmd', eval=TRUE, cache=TRUE}
 ```
 <br>
 <br>

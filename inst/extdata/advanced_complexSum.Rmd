@@ -28,14 +28,12 @@ print(xtable(head(complexSum,n=5)), type='html', comment=F)
 
 ```{r advanced_complexSum_2, eval=TRUE, message=FALSE, results='hide'}
 complexSumModel = learn(
-		projectName = "complexSum",
-    trainData = complexSum,
-    target = "tgt",
-		featureGenerationCtrl = featureGenerationControl(
-				maxFeaturesCount = 25,
- 		),
-		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RandomForestRegressor")),
-    autoSave = FALSE
+	projectName = "complexSum",
+	trainData = complexSum,
+	target = "tgt",
+	featureGenerationCtrl = featureGenerationControl(
+			maxFeaturesCount = 25
+	 )
 )
 ```
 
@@ -45,15 +43,13 @@ complexSumModel$evaluate()$evaluation$rootMeanSquaredError
 
 ```{r advanced_complexSum_model_4, eval=TRUE, message=FALSE, results='hide'}
 complexSumAdvancedModel = learn(
-		projectName = "complexSumAdvanced",
-    trainData = complexSum,
-    target = "tgt",
-		featureGenerationCtrl = featureGenerationControl(
-					featureSearchMode = "DIG_DEEP",
-					maxFeaturesCount = 25
-		),
-		modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RandomForestRegressor")),
-		autoSave=FALSE
+	projectName = "complexSumAdvanced",
+	trainData = complexSum,
+	target = "tgt",
+	featureGenerationCtrl = featureGenerationControl(
+				featureSearchMode = "DIG_DEEP",
+				maxFeaturesCount = 25
+	)
 )
 ```
 
