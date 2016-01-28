@@ -262,7 +262,7 @@ login = function(username, password, domain = NA) {
 		setSBserverPort("")
 	}
 	url <- paste0(getSBserverDomain(),"/login")
-	res = httr::POST(url, encode = "form", body = list(email=username, password=password))
+	res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
 	loggedIn = if (res$status_code == 404 || res$status_code == 200) {		#there is a weird redirection causing this, but this actually OK
 		setSBserverIOfolder(NULL)
 		currentUser()
