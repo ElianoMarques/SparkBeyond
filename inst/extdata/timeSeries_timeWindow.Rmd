@@ -11,49 +11,60 @@ output:
 %\VignetteDepends{xtable}
 -->
 
-##Adding Time Window##
+##Time Window##
+
+<br>
+
+####Overview####
 
 Constructing a window around each point to use the recent history for predictions.
 <br>
 
+####Training data####
 ```{r timeSeries_timeWindow_2_1, eval=TRUE}
 simulateData2 = function(n=1000, l = 10){
 	startDate = as.Date("2013-01-01")
 	data.table(
-		index =	1:n, 
 		timeDate = startDate+1:n,
-		timeString = as.character(startDate+1:n), 		
-		timePOSIX = as.POSIXct(startDate+1:n),		
 		temperature = sapply(1:n, function(i) i%%l * 0.1 + abs(rnorm(1))) 
 	)
 }
 data = simulateData2()
-data$target = sapply(1:nrow(data), function(i) ifelse(sum(data$temperature[(max(1, i-3):i)]) > 7, 1, 0)) #alternatively regression - time to failure
+data$target = sapply(1:nrow(data), function(i) ifelse(sum(data$temperature[(max(1, i-3):i)]) > 7, 1, 0)) 
 sum(data$target)
 ```
 
+<br>
+
+####Pipeline####
+
 ```{r timeSeries_timeWindow_2_2, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
-timeColumn = "timeDate" #"index"
-timeUnit = "Days" #"Number"
-dataFinal = addTimeWindow(data = data, dateCol = timeColumn,dateFormat = "%Y-%m-%d", window = 10, unit = timeUnit, includeUntil = TRUE, relativeTime = TRUE) 
-head(dataFinal)
+# adding a column defining the time window in which features can be searched for.   
+dataFinal = addTimeWindow(data = data, dateCol = "timeDate",dateFormat = "%Y-%m-%d", window = 10, unit = "Days", includeUntil = TRUE, relativeTime = TRUE) 
 
 timeWindowModel = learn(
 	projectName = "ts_test", 
-	trainData = colsWhiteList(dataFinal,c(paste0("last_10_", timeUnit),"target")), #last_10_Days
+	trainData = colsWhiteList(dataFinal,c("last_10_Days","target")), # keeping only the time window and the label
 	target = "target", 
-	weightByClass = TRUE,
-	contextDatasets = list(contextObject(data=colsWhiteList(data, c(timeColumn,"temperature")), name="time_info", timeColumn = timeColumn)), 
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25), featureSearchMode = "ADVANCED"),
-	modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
-	autoSave = FALSE
+	contextDatasets = list(contextObject(data=colsWhiteList(data, c("timeDate","temperature")), 
+		name="time_info", timeColumn = timeColumn, contextTypes = contextTypesList(timeSeries = TRUE))), 
+	problemDefintion = problemDefinitionControl(weightByClass = TRUE),
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))
 )
 ```
 
-```{r timeSeries_timeWindow_2_3, eval=TRUE, echo=TRUE, cache=TRUE}
-timeWindowModelEval = timeWindowModel$evaluate()
+<br>
+
+####Top features####
+
+```{r timeSeries_timeWindow_2_3, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(timeWindowModel$features()[1:10,c("feature","RIG")]), type='html', comment=F) 
 ```
 
-```{r timeSeries_timeWindow_2_4, eval=TRUE, results='asis'}
-print(xtable(timeWindowModel$features()[1:10,c("idx","feature")]), type='html', comment=F) 
+<br>
+
+####Evaluation####
+
+```{r timeSeries_timeWindow_2_4, eval=TRUE, echo=TRUE, cache=TRUE}
+timeWindowModelEval = timeWindowModel$evaluate()
 ```
