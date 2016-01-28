@@ -9,11 +9,11 @@ getData(datasetName)
 \arguments{
 \item{String}{of the name of the dataset. Options are:
 \itemize{
-\item 1. titanic_train
-\item 2. titanic_test
-\item 3. tweets_sentiment
-\item 4. tweets_sentimentkaggle
-\item 5. sentiment_lexicon
+\item titanic_train
+\item titanic_test
+\item tweets_sentiment
+\item tweets_sentimentkaggle
+\item sentiment_lexicon
 }}
 }
 \value{

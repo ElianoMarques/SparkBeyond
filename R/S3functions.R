@@ -220,13 +220,13 @@ reportingControl = function(
 #' 
 #' @param geoSpatial. This context allows looking for geo spatial features. All rows are indexed based on their coordinate information, allowing properties from the surrounding environment to be searched for in a KNN-fashion. A coordinate column is required for this context object to be created.
 #' @param graph. This context allows looking for features on a graph or a network. This context requires defining the edges in the graph by setting the source column and target column in the contextObject.
-#' @param invertedIndex. 
-#' @param lookupTables.
-#' @param membershipSet.
-#' @param shapeFile.
-#' @param termsMap.
-#' @param timeSeries.
-#' @param timeSeriesMap.
+#' @param invertedIndex. This context creates an inverted index out of text column provided in a context. The properties of each text can be search for in a KNN-fashion. A text column is required for this context object.
+#' @param lookupTables. This context creates a lookup table for each key column using all other columns as properties that can be associated with the key. The key column should be unique and can be defined in the keyColumns parameter.
+#' @param membershipSet. This context creates a bag of elements and supports the "contain" operation for the set. 
+#' @param shapeFile. This context allows providing shape files. The structure of the input should be the location of the shapeFile, one per row.
+#' @param termsMap. This context associates a string / text column with some numeric value that can be looked at for every term. 
+#' @param timeSeries. This context creates a single time series per column for all the rows provided. The context is sorted by the time/data column. It is necessary that at least one time window column should appear in the data. It is optional to set the time column in the contextObject.
+#' @param timeSeriesMap. This context creates multiple time series per column, group by a key. This object requires a keyed time window column to be defined in the main text. The key and time column may be set in the column subset, 
 contextTypesList = function(
 		geoSpatial = FALSE,
 		#geoSpatialWithPartition = FALSE,

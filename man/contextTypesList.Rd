@@ -13,7 +13,19 @@ contextTypesList(geoSpatial = FALSE, graph = FALSE, invertedIndex = FALSE,
 
 \item{graph.}{This context allows looking for features on a graph or a network. This context requires defining the edges in the graph by setting the source column and target column in the contextObject.}
 
-\item{invertedIndex.}{}
+\item{invertedIndex.}{This context creates an inverted index out of text column provided in a context. The properties of each text can be search for in a KNN-fashion. A text column is required for this context object.}
+
+\item{lookupTables.}{This context creates a lookup table for each key column using all other columns as properties that can be associated with the key. The key column should be unique and can be defined in the keyColumns parameter.}
+
+\item{membershipSet.}{This context creates a bag of elements and supports the "contain" operation for the set.}
+
+\item{shapeFile.}{This context allows providing shape files. The structure of the input should be the location of the shapeFile, one per row.}
+
+\item{termsMap.}{This context associates a string / text column with some numeric value that can be looked at for every term.}
+
+\item{timeSeries.}{This context creates a single time series per column for all the rows provided. The context is sorted by the time/data column. It is necessary that at least one time window column should appear in the data. It is optional to set the time column in the contextObject.}
+
+\item{timeSeriesMap.}{This context creates multiple time series per column, group by a key. This object requires a keyed time window column to be defined in the main text. The key and time column may be set in the column subset,}
 }
 \description{
 contextTypesList
