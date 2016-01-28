@@ -1,0 +1,115 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{yummly}
+%\VignetteDepends{xtable}
+-->
+
+
+### Cuisine Classification ###
+Goal: Predict Cuisine type from an Ingredient list
+
+####Training data####
+
+```{r basicYummlyData, eval=TRUE,cache=TRUE,message=FALSE,warning=FALSE}
+library(jsonlite)
+download.file("http://s3.amazonaws.com/public-sparkbeyond/yummly.json.gz","./yummly.json.gz")
+yummlyData = sampleData(fromJSON(readLines("./yummly.json.gz")), 0.3)
+print(yummlyData[1, c("cuisine","ingredients")])
+```
+
+```{r basicYummlyModel, eval=TRUE, message=FALSE, results = 'hide',cache=TRUE}
+yummlyModel=learn(
+	projectName="Yummly",
+	trainData = yummlyData,
+	target = "cuisine",
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+)
+```
+
+<br>
+
+####Top features####
+
+```{r basicYummlyFeatures, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(yummlyModel$features()[1:5,c("RIG", "feature")]), type='html', comment=F) 
+```
+
+<br>
+
+####Evaluation####
+```{r basicYummlyEval, eval=TRUE, message=FALSE, cache=TRUE}
+evaluation = yummlyModel$evaluate()
+```
+
+<br><br>
+###Countries Distance
+Goal: Predict (calculate) the distance between two given countries
+
+####Training data####
+```{r country_distances_data, eval=TRUE, results='asis',cache=TRUE}
+countriesDistance = getData("countries_distance")
+print(xtable(head(countriesDistance,n=5)), type='html', comment=F)
+```
+
+####Pipeline####
+```{r country_distances, eval=TRUE, message=FALSE,results = 'hide',cache=TRUE}
+countryModel=learn(projectName="CountriesDistance",countriesDistance,"distance",
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+)
+```
+<br>
+
+####Top features####
+
+```{r country_distancesFeatures, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(countryModel$features()[1:5,c("RIG", "feature")]), type='html', comment=F) 
+```
+
+<br>
+
+####Evaluation####
+```{r country_distancesEval, eval=TRUE, message=FALSE, cache=TRUE}
+evaluation = countryModel$evaluate()
+```
+
+<br><br>
+
+### Spam Email
+
+Goal: Predict whether or not an email contains spam based on given statistics (UCI)
+
+####Training data####
+
+```{r spamData, eval=TRUE, results='asis',cache=TRUE}
+spam = getData("spambase")
+print(xtable(head(spam[,1:7],n=5)), type='html', comment=F)
+```
+
+<br>
+
+####Pipeline####
+```{r spambase, eval=TRUE, message=FALSE,results = 'hide',cache=TRUE}
+spamModel=learn(projectName="spambase",spam,"isSpam",
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+)
+```
+
+####Top features####
+
+```{r spamFeatures, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(spamModel$features()[1:5,c("RIG", "feature","Lift.0","Lift.1")]), type='html', comment=F) 
+```
+
+<br>
+
+####Evaluation####
+```{r spamEval, eval=TRUE, message=FALSE, cache=TRUE}
+evaluation = spamModel$evaluate()
+```
