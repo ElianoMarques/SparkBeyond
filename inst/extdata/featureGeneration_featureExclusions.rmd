@@ -14,9 +14,11 @@ output:
 ##Feature Generation Control##
  
 <br>
+<br>
 
 ###Function exclusions###
 
+<img src="http://s3.amazonaws.com/public-sparkbeyond/images/includeExclude.jpg" width="318" height="298">
 
 ####Overview####
 

@@ -13,7 +13,12 @@ output:
 
 ##Text analysis - tweets sentiment##
 
+<img src="http://s3.amazonaws.com/public-sparkbeyond/images/sentiment.jpg" width="462" height="260">
+<br>
+
 ###Internal text functions###
+
+<br>
 
 ####Overview####
 
@@ -21,19 +26,19 @@ Goal: Identify sentiment in twitter tweets. The sentiment dataset contains a col
 <br>
 
 ####Training data####
-```{r context_tweets_0, eval=TRUE, results='asis'}
+```{r context_tweets_0, eval=TRUE, results='asis', cache=TRUE}
 tweets = getData("tweets_sentiment")
 print(xtable(head(tweets,n=5)), type='html', comment=F)
 ```
 
 ####Pipeline####
 
-```{r context_tweets_1, eval=TRUE, message=FALSE, results='hide'}
+```{r context_tweets_1, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
 SentimentModel = learn(
 	projectName="tweets",
 	trainData=tweets,
 	target="sentiment",
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40))
 )
 ```
 <br>
@@ -42,18 +47,20 @@ SentimentModel = learn(
 
 The top feature is a textSentimentScore which is automatically computed.
 
-```{r context_tweets_2, eval=TRUE, results='asis'}
-print(xtable(SentimentModel$features()[1:5,c("idx","feature")]), type='html', comment=F)
+```{r context_tweets_2, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(SentimentModel$features()[1:5,c("feature", "RIG")]), type='html', comment=F)
 ```
 
 ####Evaluation####
 
-```{r context_tweets_3, eval=TRUE, echo=TRUE, cache=FALSE}
+```{r context_tweets_3, eval=TRUE, echo=TRUE, cache=TRUE}
 SentimentModelEval = SentimentModel$evaluate()
 ```
 <br>
 
 ###Terms Map context###
+
+<img src="http://s3.amazonaws.com/public-sparkbeyond/images/context1.jpg" width="400" height="324">
 
 <br>
 
@@ -63,7 +70,7 @@ In order to improve performance we can include a custom context Dataset. The sen
 
 ####Context data####
 
-```{r context_tweets_4_0, eval=TRUE, results='asis'}
+```{r context_tweets_4_0, eval=TRUE, results='asis', cache=TRUE}
 lexicon = getData("sentiment_lexicon")
 print(xtable(head(lexicon, n=5)), type='html', comment=F)
 ```
@@ -75,25 +82,25 @@ Based on the column types in the context data, various context objects can be cr
 <br>
 <br>
 
-```{r context_tweets_4, eval=TRUE, message=FALSE, results='hide'}
+```{r context_tweets_4, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
 SentimentModelContext = learn(
 	projectName = "tweets",
 	trainData = tweets,
 	target = "sentiment",
 	contextDatasets = list(contextObject(data = getData("sentiment_lexicon"), name = "sentiment_lexicon",
 		contextTypes = contextTypesList(termsMap = TRUE))), #defining the context type explicity
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40))
 )
 ```
 
 ####Top features####
 
-```{r context_tweets_5, eval=TRUE, results='asis'}
-print(xtable(SentimentModelContext$features()[1:5,c("idx","feature")]), type='html', comment=F) 
+```{r context_tweets_5, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(SentimentModelContext$features()[1:5,c("feature", "RIG")]), type='html', comment=F) 
 ```
 
 ####Evaluation####
-```{r context_tweets_7, eval=TRUE, echo=TRUE, cache=FALSE}
+```{r context_tweets_7, eval=TRUE, echo=TRUE, cache=TRUE}
 SentimentContextEval = SentimentModelContext$evaluate()
 ```
 
@@ -112,14 +119,14 @@ In this example we will see how to add an Inverted Index context. Specifically, 
 
 We will first split the data into train and test data using the trainTestSplit function.
 
-```{r context_tweets_8, eval=TRUE, message=FALSE, results='hide'}
+```{r context_tweets_8, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
 trainTestData=trainTestSplit(tweets,0.5)
 SentimentModelContext2 = learn(
 	projectName="tweets_semtiment3",
 	trainData=trainTestData$train,
 	testData =trainTestData$test,
 	target="sentiment",
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50)), 
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40)), 
 	contextDatasets = list(contextObject(data = trainTestData$train, name = "tweets_context", 
 				contextTypes = contextTypesList(invertedIndex = TRUE))), #defining the context type explicitly
 	autoSave = FALSE
@@ -130,7 +137,7 @@ SentimentModelContext2 = learn(
 ####Top features####
 
 ```{r context_tweets_9, eval=TRUE, results='asis', cache=TRUE}
-print(xtable(SentimentModelContext2$features()[1:5,c("idx","feature")]), type='html', comment=F) 
+print(xtable(SentimentModelContext2$features()[1:5,c("feature", "RIG")]), type='html', comment=F) 
 ```
 
 ####Evaluation####

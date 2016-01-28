@@ -13,6 +13,7 @@ output:
   
 ##Basic regression##
 <br>
+<img src="http://s3.amazonaws.com/public-sparkbeyond/images/titanicAge.png" width="560" height="420">
 <br>
 
 ####Overview####
@@ -26,7 +27,7 @@ We will use the same titanic data but now we will aim to predict the column `age
 ####Training data####
 
 Here are all the columns available:
-```{r basic_classification_1, results='asis'}
+```{r basic_classification_1, results='asis',cache=TRUE}
 data = getData("titanic_train")
 #View(data) # in order to view the data in an RStudio tab
 print(xtable(data[1:5,]), type='html', comment=F)
@@ -38,7 +39,7 @@ print(xtable(data[1:5,]), type='html', comment=F)
 
 The problem was automatically identified as a regression problem because the target is continuous.
 <br>
-```{r basic_regression_2, eval=TRUE, message=FALSE, results='hide'}
+```{r basic_regression_2, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
 titanicAgeModel = learn(
 	projectName = "titanic_age",
 	trainData = data,
@@ -52,8 +53,14 @@ titanicAgeModel = learn(
 
 From this example, we can see that having the tokens 'master' and 'miss' in the passenger name are strong indicators of the gender. 
 <br>
-```{r basic_regression_3, eval=TRUE, results='asis'}
-library(xtable)
-print(xtable(titanicAgeModel$features()[1:20,c("idx", "feature")]), type='html', comment=F)
+```{r basic_regression_3, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(titanicAgeModel$features()[1:20,c("feature", "RIG")]), type='html', comment=F)
 ```
 
+<br>
+
+####Evaluation####
+
+```{r basic_regression_4, eval=TRUE, eval=TRUE, echo=TRUE, cache=TRUE}
+evaluation =  titanicAgeModel$evaluate()
+```

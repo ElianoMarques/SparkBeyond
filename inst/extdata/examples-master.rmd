@@ -31,7 +31,7 @@ Show predict / create package etc example - should be in a different section
 
 #Spark Beyond Package Examples#
 
-<img src="http://s3.amazonaws.com/public-sparkbeyond/images/overview" width="800" height="650">
+<img src="http://s3.amazonaws.com/public-sparkbeyond/images/overview.jpg" width="800" height="650">
 <br>
 
 #A. Basic modeling#
@@ -43,6 +43,8 @@ Show predict / create package etc example - should be in a different section
 ```
 <br>
 <br>
+
+----
 
 #B. Basic controls#
 
@@ -56,12 +58,16 @@ Show predict / create package etc example - should be in a different section
 <br>
 <br>
 
+----
+
 #C. Text analysis#
 
 ```{r context_tweets, child='context_tweets.rmd', eval = TRUE, cache=TRUE}
 ```
 <br>
 <br>
+
+----
 
 #D. GeoSpatial analysis#
 ```{r context_geoSpatial, child='context_geoSpatial.rmd', eval = TRUE, cache=TRUE}
@@ -72,6 +78,8 @@ Show predict / create package etc example - should be in a different section
 ```
 <br>
 <br>
+
+----
 
 #E. Time series analysis#
 
@@ -85,12 +93,21 @@ Show predict / create package etc example - should be in a different section
 <br>
 <br>
 
+----
+
 #F. Additional World knowledge resources#
+
+```{r external_countries, child='external_countries.rmd', eval=TRUE, cache=TRUE}
+```
+<br>
+<br>
 
 ```{r external_weather, child='external_weather.rmd', eval=TRUE, cache=TRUE}
 ```
 <br>
 <br>
+
+----
 
 #G. Advanced feature controls#
 
@@ -113,6 +130,8 @@ Show predict / create package etc example - should be in a different section
 <br>
 <br>
 
+----
+
 #H. Unsupervised learning#
 
 <br>
@@ -124,6 +143,8 @@ Show predict / create package etc example - should be in a different section
 <br>
 <br>
 <br>
+
+----
 
 #I. More info#
 

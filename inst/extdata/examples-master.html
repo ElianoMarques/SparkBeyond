@@ -889,7 +889,7 @@ Show sampling, grouping examples - in a different section
 Show predict / create package etc example - should be in a different section
 -->
 <h1 id="spark-beyond-package-examples">Spark Beyond Package Examples</h1>
-<p><img src="http://s3.amazonaws.com/public-sparkbeyond/images/overview" width="800" height="650"> <br></p>
+<p><img src="http://s3.amazonaws.com/public-sparkbeyond/images/overview.jpg" width="800" height="650"> <br></p>
 <h1 id="a.-basic-modeling">A. Basic modeling</h1>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
@@ -897,7 +897,7 @@ Show predict / create package etc example - should be in a different section
 %\VignetteDepends{xtable}
 -->
 <h2 id="basic-classification">Basic classification</h2>
-<p><br> <br></p>
+<p><br> <img src="http://s3.amazonaws.com/public-sparkbeyond/images/titanic.jpeg" width="686" height="385"> <br></p>
 <h4 id="overview">Overview</h4>
 <p>Goal: Predict Titanic Passenger Survival <br> This example demonstrates how to perform a simple classification. We will use data from the famous Kaggle competition to predict whether a passenger will survive.</p>
 <p><br> <br></p>
@@ -1134,13 +1134,10 @@ Before we can start learning we will need to log in.
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">print(xtable(titanicSurvivedModel$features()[1:3,c("idx", "feature", "Lift.0", "Lift.1")]), type='html', comment=F)</code></pre>
+<pre style=""><code class="source r">print(xtable(titanicSurvivedModel$features()[1:3,c("feature", "Lift.0", "Lift.1")]), type='html', comment=F)</code></pre>
 <table border="1">
 <tr>
 <th>
-</th>
-<th>
-idx
 </th>
 <th>
 feature
@@ -1156,11 +1153,8 @@ Lift.1
 <td align="right">
 1
 </td>
-<td align="right">
-0
-</td>
 <td>
-tokenizeByPunctuation(name) does not contain mr
+name.inferredGender != Some(male)
 </td>
 <td align="right">
 0.49
@@ -1172,9 +1166,6 @@ tokenizeByPunctuation(name) does not contain mr
 <tr>
 <td align="right">
 2
-</td>
-<td align="right">
-1
 </td>
 <td>
 pclass != 3
@@ -1189,9 +1180,6 @@ pclass != 3
 <tr>
 <td align="right">
 3
-</td>
-<td align="right">
-2
 </td>
 <td>
 numberIn(ticket) in range (8854.5, 231932)
@@ -1254,7 +1242,7 @@ need to find a way to link it to "/Library/Frameworks/R.framework/Versions/3.1/R
 %\VignetteDepends{xtable}
 -->
 <h2 id="basic-regression">Basic regression</h2>
-<p><br> <br></p>
+<p><br> <img src="http://s3.amazonaws.com/public-sparkbeyond/images/titanicAge.png" width="560" height="420"> <br></p>
 <h4 id="overview-1">Overview</h4>
 <p>Goal: Predict Titanic Passenger <br> This example demonstrates how to perform a simple regression using the SparkBeyond platform. We will use the same titanic data but now we will aim to predict the column <code>age</code>. <br></p>
 <h4 id="training-data-1">Training data</h4>
@@ -1513,240 +1501,265 @@ From this example, we can see that having the tokens 'master' and 'miss' in the 
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">library(xtable)
-print(xtable(titanicAgeModel$features()[1:20,c("idx", "feature")]), type='html', comment=F)</code></pre>
+<pre style=""><code class="source r">print(xtable(titanicAgeModel$features()[1:20,c("feature", "RIG")]), type='html', comment=F)</code></pre>
 <table border="1">
 <tr>
 <th>
 </th>
 <th>
-idx
+feature
 </th>
 <th>
-feature
+RIG
 </th>
 </tr>
 <tr>
 <td align="right">
 1
 </td>
-<td align="right">
-0
-</td>
 <td>
 name contains master
+</td>
+<td align="right">
+0.04
 </td>
 </tr>
 <tr>
 <td align="right">
 2
 </td>
-<td align="right">
-1
-</td>
 <td>
 pclass &lt; 3
+</td>
+<td align="right">
+0.04
 </td>
 </tr>
 <tr>
 <td align="right">
 3
 </td>
-<td align="right">
-2
-</td>
 <td>
 wordFrequencies(name).valueOf(miss) orIfMissing 0.5773502691896258 &lt; 0.5386751345948129
+</td>
+<td align="right">
+0.02
 </td>
 </tr>
 <tr>
 <td align="right">
 4
 </td>
-<td align="right">
-3
-</td>
 <td>
 parch in range (0, 3.5)
+</td>
+<td align="right">
+0.04
 </td>
 </tr>
 <tr>
 <td align="right">
 5
 </td>
-<td align="right">
-4
-</td>
 <td>
 fare &lt; 9.54375
+</td>
+<td align="right">
+0.03
 </td>
 </tr>
 <tr>
 <td align="right">
 6
 </td>
-<td align="right">
-5
-</td>
 <td>
 embarked == Q
+</td>
+<td align="right">
+0.02
 </td>
 </tr>
 <tr>
 <td align="right">
 7
 </td>
-<td align="right">
-6
-</td>
 <td>
 normalizedNgrams(name) does not contain (mr)
+</td>
+<td align="right">
+0.04
 </td>
 </tr>
 <tr>
 <td align="right">
 8
 </td>
-<td align="right">
-7
-</td>
 <td>
 sibsp in range (3.5, 6.5)
+</td>
+<td align="right">
+0.03
 </td>
 </tr>
 <tr>
 <td align="right">
 9
 </td>
-<td align="right">
-8
-</td>
 <td>
 numberOfWords(name) &lt; 4
+</td>
+<td align="right">
+0.02
 </td>
 </tr>
 <tr>
 <td align="right">
 10
 </td>
-<td align="right">
-9
-</td>
 <td>
 sentimentDistribution(name) == Map((0, 3))
+</td>
+<td align="right">
+0.02
 </td>
 </tr>
 <tr>
 <td align="right">
 11
 </td>
-<td align="right">
-10
-</td>
 <td>
 cabin.size in range (2.5, 4.5)
+</td>
+<td align="right">
+0.03
 </td>
 </tr>
 <tr>
 <td align="right">
 12
 </td>
-<td align="right">
-11
-</td>
 <td>
 name.inferredGender == None
+</td>
+<td align="right">
+0.02
 </td>
 </tr>
 <tr>
 <td align="right">
 13
 </td>
-<td align="right">
-12
-</td>
 <td>
 sentimentDistribution(name) contains (0, 3)
+</td>
+<td align="right">
+0.01
 </td>
 </tr>
 <tr>
 <td align="right">
 14
 </td>
-<td align="right">
-13
-</td>
 <td>
 upperCaseRatio(ticket) == 0.1111
+</td>
+<td align="right">
+0.01
 </td>
 </tr>
 <tr>
 <td align="right">
 15
 </td>
-<td align="right">
-14
-</td>
 <td>
 ceil(fare) == 12.0
+</td>
+<td align="right">
+0.01
 </td>
 </tr>
 <tr>
 <td align="right">
 16
 </td>
-<td align="right">
-15
-</td>
 <td>
 upperCaseRatio(name) &gt;= 0.16172624237140365
+</td>
+<td align="right">
+0.01
 </td>
 </tr>
 <tr>
 <td align="right">
 17
 </td>
-<td align="right">
-16
-</td>
 <td>
 parch != 0
+</td>
+<td align="right">
+0.04
 </td>
 </tr>
 <tr>
 <td align="right">
 18
 </td>
-<td align="right">
-17
-</td>
 <td>
 smallSubsets(cabin) contains List(1)
+</td>
+<td align="right">
+0.01
 </td>
 </tr>
 <tr>
 <td align="right">
 19
 </td>
-<td align="right">
-18
-</td>
 <td>
 name contains &quot;&quot;
+</td>
+<td align="right">
+0.01
 </td>
 </tr>
 <tr>
 <td align="right">
 20
 </td>
-<td align="right">
-19
-</td>
 <td>
 cos(fare) in range (-0.05638243077105439, 0.1326807604187568)
 </td>
+<td align="right">
+0.01
+</td>
 </tr>
 </table>
+</div>
+<p><br></p>
+<h4 id="evaluation-1">Evaluation</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">evaluation =  titanicAgeModel$evaluate()</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">##                                                  
+## Correlation coefficient             0.64839      
+## R2                                  0.42041      
+## Mean absolute error                 7.91608      
+## Root mean squared error             10.934383    
+## Relative absolute error             75.4454456 % 
+## Root relative squared error         76.63504678 %
+## Root relative prior squared error   14.2681227   
+## Actuals mean                        30.22055249  
+## Estimations mean                    29.78955612  
+## Actuals std                         14.26712733  
+## Estimations std                     8.06795146   
+## Total Number of Instances           181          
+## 
+</code></pre>
 </div>
 <p><br> <br></p>
 <h1 id="b.-basic-controls">B. Basic controls</h1>
@@ -1756,8 +1769,9 @@ cos(fare) in range (-0.05638243077105439, 0.1326807604187568)
 %\VignetteDepends{xtable}
 -->
 <h2 id="feature-generation-control">Feature Generation Control</h2>
-<p><br></p>
+<p><br> <br></p>
 <h3 id="function-exclusions">Function exclusions</h3>
+<p><img src="http://s3.amazonaws.com/public-sparkbeyond/images/includeExclude.jpg" width="318" height="298"></p>
 <h4 id="overview-2">Overview</h4>
 <p>Goal: Predict Titanic Passenger Age <br> This example demonstrates two important capabilities: <br> 1. controlling the number of features in the output <br> 2. excluding elements from the generated features. <br> <br> For example in order to reduce overfit, we would like generate only 25 features. (Or alternatively, create either 25 features or 50 features and use the model the performs better on cross validation of the training set.) This can be set in the <code>maxFeaturesCount</code> of <code>featureGenerationCtrl</code>. <br> <br> In addition, we would prefer to not create mathematical features (such as &quot;ceil&quot;), trigonometry features, and also exclude features that contains the word &quot;master&quot;. These can be set via the <code>functionsBlackList</code> parameter to exclude these terms. <br> Please refer to the SparkBeyond function catalog by calling <code>functionCatalog()</code> to view the list of functions and associated domains Lastly, you can notice that in this example we are using the <code>featureSearch</code> capability instead of the regular <code>learn</code> without actually building a model. <br> <br></p>
 <h4 id="pipeline-2">Pipeline</h4>
@@ -2076,7 +2090,9 @@ writeLines(gsub("-{2}","",readLines(paste0(titanicSurvivedModel$artifact_loc,"/r
 %\VignetteDepends{xtable}
 -->
 <h2 id="text-analysis---tweets-sentiment">Text analysis - tweets sentiment</h2>
+<p><img src="http://s3.amazonaws.com/public-sparkbeyond/images/sentiment.jpg" width="462" height="260"> <br></p>
 <h3 id="internal-text-functions">Internal text functions</h3>
+<p><br></p>
 <h4 id="overview-3">Overview</h4>
 <p>Goal: Identify sentiment in twitter tweets. The sentiment dataset contains a column with a tweet and a setiment target (-1 or 1). <br></p>
 <h4 id="training-data-2">Training data</h4>
@@ -2163,7 +2179,7 @@ Best form this season has coincided with him starting in the centre of midfield
     projectName="tweets",
     trainData=tweets,
     target="sentiment",
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40))
 )</code></pre>
 </div>
 <p><br></p>
@@ -2173,76 +2189,76 @@ Best form this season has coincided with him starting in the centre of midfield
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">print(xtable(SentimentModel$features()[1:5,c("idx","feature")]), type='html', comment=F)</code></pre>
+<pre style=""><code class="source r">print(xtable(SentimentModel$features()[1:5,c("feature", "RIG")]), type='html', comment=F)</code></pre>
 <table border="1">
 <tr>
 <th>
 </th>
 <th>
-idx
+feature
 </th>
 <th>
-feature
+RIG
 </th>
 </tr>
 <tr>
 <td align="right">
 1
 </td>
-<td align="right">
-0
-</td>
 <td>
 textSentimentScore(tweet) &lt; -0.017857142857142856
+</td>
+<td align="right">
+0.27
 </td>
 </tr>
 <tr>
 <td align="right">
 2
 </td>
-<td align="right">
-1
-</td>
 <td>
 extractKeys(sentimentDistribution(tweet)) == List(1, 0)
+</td>
+<td align="right">
+0.19
 </td>
 </tr>
 <tr>
 <td align="right">
 3
 </td>
-<td align="right">
-2
-</td>
 <td>
 tweet contains great
+</td>
+<td align="right">
+0.12
 </td>
 </tr>
 <tr>
 <td align="right">
 4
 </td>
-<td align="right">
-3
-</td>
 <td>
 wordFrequencies(tweet).valueOf(best) orIfMissing 0 &gt;= 0.17349064404453718
+</td>
+<td align="right">
+0.08
 </td>
 </tr>
 <tr>
 <td align="right">
 5
 </td>
-<td align="right">
-4
-</td>
 <td>
 numberIn(tweet) == -1.0
+</td>
+<td align="right">
+0.09
 </td>
 </tr>
 </table>
 </div>
-<h4 id="evaluation-1">Evaluation</h4>
+<h4 id="evaluation-2">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2252,17 +2268,18 @@ numberIn(tweet) == -1.0
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
 <pre style=""><code class="output r">## === Detailed Accuracy By Class ===
-##                                                                                     
-## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini
-##                                                                                     
-## -1              1         0.36      0.735       1        0.847       0.885      0.77
-## 1               0.64      0         1           0.64     0.78        0.885      0.77
-## Weighted Avg.   0.82      0.18      0.868       0.82     0.814       0.885      0.77
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## -1              1         0.28      0.781       1        0.877       0.869      0.738
+## 1               0.72      0         1           0.72     0.837       0.869      0.738
+## Weighted Avg.   0.86      0.14      0.891       0.86     0.857       0.869      0.738
 ## 
 </code></pre>
 </div>
 <p><br></p>
 <h3 id="terms-map-context">Terms Map context</h3>
+<p><img src="http://s3.amazonaws.com/public-sparkbeyond/images/context1.jpg" width="400" height="324"></p>
 <p><br></p>
 <h4 id="overview-4">Overview</h4>
 <p>In order to improve performance we can include a custom context Dataset. The sentimentLexicon includes over 6000 single words with a either a positive or negative sentiment. The top features now are actually derived by looking up the values in the lexcion (data_column) and the classificaiton performance is boosted.</p>
@@ -2353,7 +2370,7 @@ accessable
     target = "sentiment",
     contextDatasets = list(contextObject(data = getData("sentiment_lexicon"), name = "sentiment_lexicon",
         contextTypes = contextTypesList(termsMap = TRUE))), #defining the context type explicity
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40))
 )</code></pre>
 </div>
 <h4 id="top-features-4">Top features</h4>
@@ -2361,76 +2378,76 @@ accessable
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">print(xtable(SentimentModelContext$features()[1:5,c("idx","feature")]), type='html', comment=F) </code></pre>
+<pre style=""><code class="source r">print(xtable(SentimentModelContext$features()[1:5,c("feature", "RIG")]), type='html', comment=F) </code></pre>
 <table border="1">
 <tr>
 <th>
 </th>
 <th>
-idx
+feature
 </th>
 <th>
-feature
+RIG
 </th>
 </tr>
 <tr>
 <td align="right">
 1
 </td>
-<td align="right">
-0
-</td>
 <td>
 extractKeys(entitiesHistogram(tweet, sentiment_lexicon_lexicon)) == List(1)
+</td>
+<td align="right">
+0.42
 </td>
 </tr>
 <tr>
 <td align="right">
 2
 </td>
-<td align="right">
-1
-</td>
 <td>
 extractKeys(entitiesHistogram(tweet, sentiment_lexicon_lexicon)) == List(-1)
+</td>
+<td align="right">
+0.34
 </td>
 </tr>
 <tr>
 <td align="right">
 3
 </td>
-<td align="right">
-2
-</td>
 <td>
 textSentimentScore(tweet) &lt; -0.017857142857142856
+</td>
+<td align="right">
+0.27
 </td>
 </tr>
 <tr>
 <td align="right">
 4
 </td>
-<td align="right">
-3
-</td>
 <td>
 tweet contains great
+</td>
+<td align="right">
+0.12
 </td>
 </tr>
 <tr>
 <td align="right">
 5
 </td>
-<td align="right">
-4
-</td>
 <td>
 extractKeys(entitiesHistogram(tweet, sentiment_lexicon_lexicon)) does not contain -1
+</td>
+<td align="right">
+0.35
 </td>
 </tr>
 </table>
 </div>
-<h4 id="evaluation-2">Evaluation</h4>
+<h4 id="evaluation-3">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2440,12 +2457,12 @@ extractKeys(entitiesHistogram(tweet, sentiment_lexicon_lexicon)) does not contai
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
 <pre style=""><code class="output r">## === Detailed Accuracy By Class ===
-##                                                                                     
-## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini
-##                                                                                     
-## -1              0.96      0.12      0.889       0.96     0.923       0.965      0.93
-## 1               0.88      0.04      0.957       0.88     0.917       0.965      0.93
-## Weighted Avg.   0.92      0.08      0.923       0.92     0.92        0.965      0.93
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## -1              0.96      0.12      0.889       0.96     0.923       0.982      0.965
+## 1               0.88      0.04      0.957       0.88     0.917       0.982      0.965
+## Weighted Avg.   0.92      0.08      0.923       0.92     0.92        0.982      0.965
 ## 
 </code></pre>
 </div>
@@ -2465,7 +2482,7 @@ SentimentModelContext2 = learn(
     trainData=trainTestData$train,
     testData =trainTestData$test,
     target="sentiment",
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50)), 
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40)), 
     contextDatasets = list(contextObject(data = trainTestData$train, name = "tweets_context", 
                 contextTypes = contextTypesList(invertedIndex = TRUE))), #defining the context type explicitly
     autoSave = FALSE
@@ -2477,76 +2494,76 @@ SentimentModelContext2 = learn(
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">print(xtable(SentimentModelContext2$features()[1:5,c("idx","feature")]), type='html', comment=F) </code></pre>
+<pre style=""><code class="source r">print(xtable(SentimentModelContext2$features()[1:5,c("feature", "RIG")]), type='html', comment=F) </code></pre>
 <table border="1">
 <tr>
 <th>
 </th>
 <th>
-idx
+feature
 </th>
 <th>
-feature
+RIG
 </th>
 </tr>
 <tr>
 <td align="right">
 1
 </td>
-<td align="right">
-0
-</td>
 <td>
 textSentimentScore(tweet) &lt; -0.017857142857142856
+</td>
+<td align="right">
+0.28
 </td>
 </tr>
 <tr>
 <td align="right">
 2
 </td>
-<td align="right">
-1
-</td>
 <td>
 weightedAverageOf3MostSimilar(tweets_context_text_index_of_tweet_with_attributes, tweet).valueOf(sentiment) orIfMissing -1 &gt;= 0.40339977700357676
+</td>
+<td align="right">
+0.12
 </td>
 </tr>
 <tr>
 <td align="right">
 3
 </td>
-<td align="right">
-2
-</td>
 <td>
 wordFrequencies(tweet).valueOf(the) orIfMissing 0 &gt;= 0.33569751761237
+</td>
+<td align="right">
+0.09
 </td>
 </tr>
 <tr>
 <td align="right">
 4
 </td>
-<td align="right">
-3
-</td>
 <td>
 extractKeys(sentimentDistribution(tweet)) == List(1, 0)
+</td>
+<td align="right">
+0.18
 </td>
 </tr>
 <tr>
 <td align="right">
 5
 </td>
-<td align="right">
-4
-</td>
 <td>
 wordFrequencies(tweet).valueOf(best) orIfMissing 0 &gt;= 0.17349064404453718
+</td>
+<td align="right">
+0.10
 </td>
 </tr>
 </table>
 </div>
-<h4 id="evaluation-3">Evaluation</h4>
+<h4 id="evaluation-4">Evaluation</h4>
 <p>During prediction we can match the context objects to the ones used in the train by using the same name. <br></p>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -2884,7 +2901,7 @@ mostFrequentFromClosest3WeightedByDistance(latLong, languages_lang_by_location) 
 </tr>
 </table>
 </div>
-<h4 id="evaluation-4">Evaluation</h4>
+<h4 id="evaluation-5">Evaluation</h4>
 <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3112,7 +3129,7 @@ OSMmethods.attributesOfNearestObjects(latLong).valueOf((name, HSBC)) orIfMissing
 </tr>
 </table>
 </div>
-<h4 id="evaluation-5">Evaluation</h4>
+<h4 id="evaluation-6">Evaluation</h4>
 <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3223,13 +3240,14 @@ true
         knowledgeCtrl = knowledgeControl(useGraph = TRUE, useOpenStreetMap = TRUE)
 )</code></pre>
 </div>
+<p><br></p>
 <h4 id="top-features-8">Top features</h4>
-<br> Indeed the top feature indicates that parks are in the vicinity of the input.<br /><br>
+Indeed the top feature indicates that parks are in the vicinity of the input.<br /><br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">print(xtable(museumsModel$features()[1:5,c("idx","feature")]), type='html', comment=F)  </code></pre>
+<pre style=""><code class="source r">print(xtable(museumsModel$features()[1:3,c("idx","feature")]), type='html', comment=F)  </code></pre>
 <table border="1">
 <tr>
 <th>
@@ -3249,7 +3267,7 @@ feature
 0
 </td>
 <td>
-OpenStreetMap.attributesOfNearestObjectsIn500mRadius(text.latLongs).valueOf((leisure, park)) orIfMissing 0.4848349094390869 &gt;= 0.4825352132320404
+extractKeys(OpenStreetMap.attributesOfObjectsIn500mRadius(text.latLongs)) does not contain (leisure, park)
 </td>
 </tr>
 <tr>
@@ -3271,30 +3289,13 @@ upperCaseRatio(text) in range (0.06350806451612903, 0.07846153846153847)
 2
 </td>
 <td>
-OpenStreetMap.attributesOfNearestObjectsIn500mRadius(text.latLongs).valueOf((barrier, gate)) orIfMissing 0.008211690001189709 &lt; 0.009463546797633171
-</td>
-</tr>
-<tr>
-<td align="right">
-NA
-</td>
-<td align="right">
-</td>
-<td>
-</td>
-</tr>
-<tr>
-<td align="right">
-NA.1
-</td>
-<td align="right">
-</td>
-<td>
+extractKeys(OpenStreetMap.attributesOfObjectsIn500mRadius(text.latLongs)) does not contain (amenity, telephone)
 </td>
 </tr>
 </table>
 </div>
-<h4 id="evaluation-6">Evaluation</h4>
+<p><br></p>
+<h4 id="evaluation-7">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3315,14 +3316,18 @@ NA.1
 </code></pre>
 </div>
 <p><br> <br> <br></p>
+<hr />
 <h1 id="e.-time-series-analysis">E. Time series analysis</h1>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{timeSeries_timeWindow}
 %\VignetteDepends{xtable}
 -->
-<h2 id="adding-time-window">Adding Time Window</h2>
+<h2 id="time-window">Time Window</h2>
+<p><br></p>
+<h4 id="overview-9">Overview</h4>
 <p>Constructing a window around each point to use the recent history for predictions. <br></p>
+<h4 id="training-data-6">Training data</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3330,15 +3335,12 @@ NA.1
 <pre style=""><code class="source r">simulateData2 = function(n=1000, l = 10){
     startDate = as.Date("2013-01-01")
     data.table(
-        index = 1:n, 
         timeDate = startDate+1:n,
-        timeString = as.character(startDate+1:n),       
-        timePOSIX = as.POSIXct(startDate+1:n),      
         temperature = sapply(1:n, function(i) i%%l * 0.1 + abs(rnorm(1))) 
     )
 }
 data = simulateData2()
-data$target = sapply(1:nrow(data), function(i) ifelse(sum(data$temperature[(max(1, i-3):i)]) > 7, 1, 0)) #alternatively regression - time to failure
+data$target = sapply(1:nrow(data), function(i) ifelse(sum(data$temperature[(max(1, i-3):i)]) > 7, 1, 0)) 
 sum(data$target)</code></pre>
 <button class="output R toggle btn btn-xs btn-success">
 <span class="glyphicon glyphicon-chevron-down"></span> R output
@@ -3346,26 +3348,157 @@ sum(data$target)</code></pre>
 <pre style=""><code class="output r">## [1] 106
 </code></pre>
 </div>
+<p><br></p>
+<h4 id="pipeline-9">Pipeline</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">timeColumn = "timeDate" #"index"
-timeUnit = "Days" #"Number"
-dataFinal = addTimeWindow(data = data, dateCol = timeColumn,dateFormat = "%Y-%m-%d", window = 10, unit = timeUnit, includeUntil = TRUE, relativeTime = TRUE) 
-head(dataFinal)
+<pre style=""><code class="source r"># adding a column defining the time window in which features can be searched for.   
+dataFinal = addTimeWindow(data = data, dateCol = "timeDate",dateFormat = "%Y-%m-%d", window = 10, unit = "Days", includeUntil = TRUE, relativeTime = TRUE) 
 
 timeWindowModel = learn(
     projectName = "ts_test", 
-    trainData = colsWhiteList(dataFinal,c(paste0("last_10_", timeUnit),"target")), #last_10_Days
+    trainData = colsWhiteList(dataFinal,c("last_10_Days","target")), # keeping only the time window and the label
     target = "target", 
-    weightByClass = TRUE,
-    contextDatasets = list(contextObject(data=colsWhiteList(data, c(timeColumn,"temperature")), name="time_info", timeColumn = timeColumn)), 
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25), featureSearchMode = "ADVANCED"),
-    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),
-    autoSave = FALSE
+    contextDatasets = list(contextObject(data=colsWhiteList(data, c("timeDate","temperature")), 
+        name="time_info", timeColumn = timeColumn, contextTypes = contextTypesList(timeSeries = TRUE))), 
+    problemDefintion = problemDefinitionControl(weightByClass = TRUE),
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))
 )</code></pre>
 </div>
+<p><br></p>
+<h4 id="top-features-9">Top features</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(timeWindowModel$features()[1:10,c("feature","RIG")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+feature
+</th>
+<th>
+RIG
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td>
+exponentialMovingAverage(window(last_10_Days, time_info_temperature)) &lt; 1.4274415909182416
+</td>
+<td align="right">
+0.54
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td>
+average(window(last_10_Days, time_info_temperature).secondHalf) &lt; 1.4093725
+</td>
+<td align="right">
+0.48
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td>
+timeOfMaximum(window(last_10_Days, time_info_temperature)) &lt; -3.5 days
+</td>
+<td align="right">
+0.22
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td>
+globalTrendSmoothed(window(last_10_Days, time_info_temperature)) &gt;= 4.4968380979938255E-10
+</td>
+<td align="right">
+0.23
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td>
+window(last_10_Days, time_info_temperature).timeAndValuePairs.valueOf(&quot;-2.592E+8&quot;) orIfMissing 0 &lt; 1.2918726
+</td>
+<td align="right">
+0.18
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td>
+maxValue(window(last_10_Days, time_info_temperature).lastQuartile) &lt; 2.0309060150000002
+</td>
+<td align="right">
+0.29
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td>
+maxValue(window(last_10_Days, time_info_temperature).secondHalf) &lt; 2.1923280849999998
+</td>
+<td align="right">
+0.28
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td>
+average(window(last_10_Days, time_info_temperature).lastQuartile) &lt; 1.5706677299999998
+</td>
+<td align="right">
+0.30
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td>
+window(last_10_Days, time_info_temperature).timeAndValuePairs.valueOf(&quot;-1.728E+8&quot;) orIfMissing 0 &lt; 0.71601814
+</td>
+<td align="right">
+0.13
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td>
+minSlope(window(last_10_Days, time_info_temperature).lastQuartile) in range (-7.003010416666667E-9, -2.8122334490740753E-9)
+</td>
+<td align="right">
+0.08
+</td>
+</tr>
+</table>
+</div>
+<p><br></p>
+<h4 id="evaluation-8">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3378,139 +3511,11 @@ timeWindowModel = learn(
 ##                                                                                      
 ## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
 ##                                                                                      
-## 0               0.977     0.344     0.643       0.977    0.775       0.941      0.883
-## 1               0.656     0.023     0.978       0.656    0.785       0.941      0.883
-## Weighted Avg.   0.781     0.148     0.848       0.781    0.782       0.941      0.883
+## 0               0.988     0.531     0.541       0.988    0.699       0.961      0.922
+## 1               0.469     0.012     0.984       0.469    0.635       0.961      0.922
+## Weighted Avg.   0.67      0.213     0.812       0.67     0.66        0.961      0.922
 ## 
 </code></pre>
-</div>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">print(xtable(timeWindowModel$features()[1:10,c("idx","feature")]), type='html', comment=F) </code></pre>
-<table border="1">
-<tr>
-<th>
-</th>
-<th>
-idx
-</th>
-<th>
-feature
-</th>
-</tr>
-<tr>
-<td align="right">
-1
-</td>
-<td align="right">
-0
-</td>
-<td>
-exponentialMovingAverage(window(last_10_Days, temperature_history).secondHalf) &lt; 1.5143913847307444
-</td>
-</tr>
-<tr>
-<td align="right">
-2
-</td>
-<td align="right">
-1
-</td>
-<td>
-softMax(window(last_10_Days, temperature_history).secondHalf) &lt; 3.293247049212046
-</td>
-</tr>
-<tr>
-<td align="right">
-3
-</td>
-<td align="right">
-2
-</td>
-<td>
-timeOfMaximum(window(last_10_Days, temperature_history)) &lt; 1970.01.07 11:30
-</td>
-</tr>
-<tr>
-<td align="right">
-4
-</td>
-<td align="right">
-3
-</td>
-<td>
-average(window(last_10_Days, temperature_history).secondHalf) &lt; 1.4699409656754008
-</td>
-</tr>
-<tr>
-<td align="right">
-5
-</td>
-<td align="right">
-4
-</td>
-<td>
-sharpe(window(last_10_Days, temperature_history)) &lt; -0.7794939297942249
-</td>
-</tr>
-<tr>
-<td align="right">
-6
-</td>
-<td align="right">
-5
-</td>
-<td>
-exponentialMovingAverage(window(last_10_Days, temperature_history)) &gt;= 1.4794849145088063
-</td>
-</tr>
-<tr>
-<td align="right">
-7
-</td>
-<td align="right">
-6
-</td>
-<td>
-globalTrendSmoothed(window(last_10_Days, temperature_history)) &lt; 2.048958323111026E-10
-</td>
-</tr>
-<tr>
-<td align="right">
-8
-</td>
-<td align="right">
-7
-</td>
-<td>
-timeOfSecondHighest(window(last_10_Days, temperature_history)) == Tue Jan 06 23:00:00 IST 1970
-</td>
-</tr>
-<tr>
-<td align="right">
-9
-</td>
-<td align="right">
-8
-</td>
-<td>
-squared(globalTrendSmoothed(window(last_10_Days, temperature_history))) &gt;= 1.8667799126258333E-18
-</td>
-</tr>
-<tr>
-<td align="right">
-10
-</td>
-<td align="right">
-9
-</td>
-<td>
-tan(exponentialMovingAverage(window(last_10_Days, temperature_history))) &lt; -0.7824625015288054
-</td>
-</tr>
-</table>
 </div>
 <p><br> <br></p>
 <!--
@@ -3518,14 +3523,16 @@ tan(exponentialMovingAverage(window(last_10_Days, temperature_history))) &lt; -0
 %\VignetteIndexEntry{timeSeries_frequency}
 %\VignetteDepends{xtable}
 -->
-<h2 id="adding-time-window---identify-frequency-change">Adding Time Window - identify frequency change</h2>
-<br> Goal: Detect frequency changes in a time varying signal <br>
+<h2 id="time-window---identify-frequency-change">Time Window - identify frequency change</h2>
+<p><br></p>
+<h4 id="overview-10">Overview</h4>
+<p><br> Goal: Detect frequency changes in a time varying signal <br></p>
+<h4 id="training-data-7">Training data</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
 <pre style=""><code class="source r">frequencyChangeDS = getData("frequencyChange")
-timeWindow = 30 # time window to examine
 print(xtable(head(frequencyChangeDS,n=5)), type='html', comment=F)</code></pre>
 <table border="1">
 <tr>
@@ -3618,7 +3625,8 @@ Wed Jan 06 00:00:00 -0500 1999
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">failures = which(frequencyChangeDS$failure==1)
+<pre style=""><code class="source r">timeWindow = 30 # time window to examine
+failures = which(frequencyChangeDS$failure==1)
 par(mfrow=c(4,1))
 plot(frequencyChangeDS[(failures[20]-timeWindow):failures[20],]$signal1,type="l",ylab=NA,main = "Failure")
 plot(frequencyChangeDS[(failures[5000]-timeWindow):failures[5000],]$signal1,type="l",ylab=NA,main = "Failure")
@@ -3650,12 +3658,13 @@ plot(abs(fft(frequencyChangeDS[(failures[1]-timeWindow-1000):(failures[1]-1000),
 </div>
 </div>
 </div>
-<br> The failures are characteried by wider band signals and higher frequency ranges <br><br> In order to model this particular problem the features need to be represented as a windowed time series:
+<p><br> The failures are characteried by wider band signals and higher frequency ranges <br><br></p>
+In order to model this particular problem the features need to be represented as a windowed time series:
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">frequencyChangeDSwindowed = addTimeWindow(data = frequencyChangeDS, dateCol = "date", window = timeWindow, unit="Days",dateFormat = "%a %b %d %H:%M:%S %z %Y",relativeTime=FALSE)
+<pre style=""><code class="source r">frequencyChangeDSwindowed = addTimeWindow(data = frequencyChangeDS, dateCol = "date", window = timeWindow, unit="Days",dateFormat = "%a %b %d %H:%M:%S %z %Y",relativeTime=FALSE, offset = 0)
 print(xtable(head(frequencyChangeDSwindowed,n=5)), type='html', comment=F)</code></pre>
 <table border="1">
 <tr>
@@ -3688,7 +3697,7 @@ Sat Jan 02 00:00:00 -0500 1999
 0
 </td>
 <td>
-NA,12/03/1998 00:00:00 AM EST,01/02/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
+TW:NA,12/03/1998 00:00:00 AM EST,01/02/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
 </td>
 </tr>
 <tr>
@@ -3705,7 +3714,7 @@ Sun Jan 03 00:00:00 -0500 1999
 0
 </td>
 <td>
-NA,12/04/1998 00:00:00 AM EST,01/03/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
+TW:NA,12/04/1998 00:00:00 AM EST,01/03/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
 </td>
 </tr>
 <tr>
@@ -3722,7 +3731,7 @@ Mon Jan 04 00:00:00 -0500 1999
 0
 </td>
 <td>
-NA,12/05/1998 00:00:00 AM EST,01/04/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
+TW:NA,12/05/1998 00:00:00 AM EST,01/04/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
 </td>
 </tr>
 <tr>
@@ -3739,7 +3748,7 @@ Tue Jan 05 00:00:00 -0500 1999
 0
 </td>
 <td>
-NA,12/06/1998 00:00:00 AM EST,01/05/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
+TW:NA,12/06/1998 00:00:00 AM EST,01/05/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
 </td>
 </tr>
 <tr>
@@ -3756,44 +3765,46 @@ Wed Jan 06 00:00:00 -0500 1999
 0
 </td>
 <td>
-NA,12/07/1998 00:00:00 AM EST,01/06/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
+TW:NA,12/07/1998 00:00:00 AM EST,01/06/1999 00:00:00 AM EST,FALSE,FALSE,Days,2147483647
 </td>
 </tr>
 </table>
 </div>
-<br> Now that we have the sliding window column prepared we will split the data temporally to a testing and training set. We will retain only the target and time window information (including the date) in the training and testing data and access the actual signal (and any other columns) in a context dataset (date will serve as a key). The train and test data only hold logical information regarding the time windows which is constructed during matching with the context data set which holds the actual signal. This allows us to construct the windows in memory and we do not need to hold all the overlapping time windows in the training and testing data.
+<br> Now that we have the sliding window column prepared we will split the data temporally to a testing and training set. We will retain only the target and time window information (including the date) in the training and testing data and access the actual signal (and any other columns) in a context dataset (date will serve as a key). The train and test data only hold logical information regarding the time windows which is constructed during matching with the context data set which holds the actual signal. This allows us to construct the windows in memory and we do not need to hold all the overlapping time windows in the training and testing data. <br><br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">temporalSplit = failures[round(length(failures)*0.6)]
-trainData = frequencyChangeDSwindowed[1:temporalSplit,c("failure",paste0("last_",timeWindow, "_Days"))] # keep only date, target and sliding window parameters
-testData = frequencyChangeDSwindowed[(temporalSplit+1):nrow(frequencyChangeDSwindowed),c("failure",paste0("last_",timeWindow, "_Days"))] # keep only date, target and sliding window parameters
-contextData = frequencyChangeDSwindowed[,c("date","signal1")] # keep only the key (date in our case) and all other signals/columns</code></pre>
+<pre style=""><code class="source r"># keep only date, target and sliding window parameters
+trainData = frequencyChangeDSwindowed[,c("date","failure",paste0("last_",timeWindow, "_Days"))] 
+# keep only the key (date in our case) and all other signals/columns
+contextData = frequencyChangeDSwindowed[,c("date","signal1")] </code></pre>
 </div>
+<p><br></p>
+<h4 id="pipeline-10">Pipeline</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">contextDataPth = writeToServer(contextData)
-frequencyModel = learn(
-        projectName = "frequency_change_example",
+<pre style=""><code class="source r">frequencyModel = learn(
+    projectName = "frequency_change_example",
     trainData = trainData,
-    testData = testData,
     target = "failure",
-    contextDatasets = list(contextObject(data = contextDataPth, name = "signals")),
-        featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25)),                                  
-    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
-    autoSave = FALSE
+    # we split the data into train and test by the date column. Features will not be looked at on the date column
+    problemDefinition = problemDefinitionControl(trainTestSplitRatio = 0.6, temporalSplitColumn="date"), 
+    contextDatasets = list(contextObject(data = contextData, name = "signals", 
+        contextTypes = contextTypesList(timeSeries = TRUE))),
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))                                
 )</code></pre>
 </div>
+<p><br></p>
+<h4 id="top-features-10">Top features</h4>
 The model finds the exact anomolies causing the failure: frequency content outside the range of the carrier signal as well as gradient and slope changes.
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">library(xtable)
-print(xtable(frequencyModel$features()[1:5,c("idx","feature")]), type='html', comment=F) </code></pre>
+<pre style=""><code class="source r">print(xtable(frequencyModel$features()[1:4,c("idx","feature")]), type='html', comment=F) </code></pre>
 <table border="1">
 <tr>
 <th>
@@ -3813,7 +3824,7 @@ feature
 0
 </td>
 <td>
-minSlope(window(last_30_Days, signal1_history)) not in range (-1.6378394683051487E-8, -1.0804693677115568E-8)
+-minSlope(window(last_30_Days, signals_signal1)) not in range (1.0732027434606483E-8, 1.644621759085648E-8)
 </td>
 </tr>
 <tr>
@@ -3824,7 +3835,7 @@ minSlope(window(last_30_Days, signal1_history)) not in range (-1.637839468305148
 1
 </td>
 <td>
-window(last_30_Days, signal1_history).firstTime in range (2017.03.12 19:00, 2026.04.19 20:00)
+window(last_30_Days, signals_signal1).lastTime in range (2017.04.09 20:00, 2026.05.18 08:00)
 </td>
 </tr>
 <tr>
@@ -3835,7 +3846,7 @@ window(last_30_Days, signal1_history).firstTime in range (2017.03.12 19:00, 2026
 2
 </td>
 <td>
-gradientChanges(window(last_30_Days, signal1_history)) == 9
+minSlope(smoothMovingAverage10(window(last_30_Days, signals_signal1))) not in range (-2.6854244626736107E-9, -2.018343268402778E-9)
 </td>
 </tr>
 <tr>
@@ -3846,48 +3857,285 @@ gradientChanges(window(last_30_Days, signal1_history)) == 9
 3
 </td>
 <td>
-gradientChanges(window(last_30_Days, signal1_history)) &gt;= 10
+stddev(smoothMovingAverage10(window(last_30_Days, signals_signal1))) in range (0.012995010029908771, 0.12750652011173863)
+</td>
+</tr>
+</table>
+</div>
+<p><br></p>
+<h4 id="evaluation-9">Evaluation</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">frequencyModelEvaluation = frequencyModel$evaluate()</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## === Detailed Accuracy By Class ===
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## 0               0.999     0.052     0.836       0.999    0.911       0.992      0.984
+## 1               0.948     0.001     1.0         0.948    0.973       0.992      0.984
+## Weighted Avg.   0.959     0.011     0.966       0.959    0.96        0.992      0.984
+## 
+</code></pre>
+</div>
+<p><br> <br></p>
+<hr />
+<h1 id="f.-additional-world-knowledge-resources">F. Additional World knowledge resources</h1>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{external_countries}
+%\VignetteDepends{xtable}
+-->
+<h2 id="external-data">External data</h2>
+<p><br> <img src="http://s3.amazonaws.com/public-sparkbeyond/images/wikipedia.png" width="500" height="412"> <br></p>
+<h4 id="overview-11">Overview</h4>
+<p>Goal: what is common to these countries?</p>
+<h4 id="training-data-8">Training data</h4>
+Here are all the columns available:
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">data = getData("countries")
+print(xtable(data[1:5,]), type='html', comment=F)</code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+country
+</th>
+<th>
+label
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td>
+british virgin islands
+</td>
+<td>
+red
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td>
+indonesia
+</td>
+<td>
+blue
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td>
+kazakhstan
+</td>
+<td>
+blue
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td>
+angola
+</td>
+<td>
+blue
 </td>
 </tr>
 <tr>
 <td align="right">
 5
 </td>
-<td align="right">
-4
+<td>
+national transitional council
 </td>
 <td>
-window(last_30_Days, signal1_history).firstTime &lt; 2017.03.12 19:00
+blue
 </td>
 </tr>
 </table>
 </div>
+<p><br> <br></p>
+<h4 id="pipeline-11">Pipeline</h4>
+The problem was automatically identified as a regression problem because the target is continuous. <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">frequencyModelEval = frequencyModel$evaluate()</code></pre>
+<pre style=""><code class="source r">countriesModel = learn(
+    projectName = "countries",
+    trainData = data,
+    target = "label",
+    knowledgeCtrl = knowledgeControl(useGraph = TRUE),
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = 20,maxDepth = 3)
+)</code></pre>
+</div>
+<p><br> <br></p>
+<h4 id="top-features-11">Top features</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(countriesModel$features()[1:10, c("feature","RIG")]), type='html', comment=F)</code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+feature
+</th>
+<th>
+RIG
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td>
+country leaderName hasGender contains female
+</td>
+<td align="right">
+0.93
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td>
+country.expandForward.zipWithIndex.valueOf(&quot;NodePath(category,dc:constitutional_monarchies)&quot;) orIfMissing 31 &lt; 19
+</td>
+<td align="right">
+0.06
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td>
+country.expandForward.valueOf(&quot;geo:lat, disambiguates&quot;) orIfMissing -59.45000076293945 in range (-34.016666412353516, 24.016666412353516)
+</td>
+<td align="right">
+0.06
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td>
+country category broader contains constitutional monarchies
+</td>
+<td align="right">
+0.04
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td>
+country.expand.valueOf(&quot;numberOfEmployees, !o:location&quot;) orIfMissing 0 in range (180, 375)
+</td>
+<td align="right">
+0.05
+</td>
+</tr>
+<tr>
+<td align="right">
+6
+</td>
+<td>
+deviation(country.latLongs) in range (15.710010489367578, 29.065404204962505)
+</td>
+<td align="right">
+0.04
+</td>
+</tr>
+<tr>
+<td align="right">
+7
+</td>
+<td>
+country.expand.valueOf(&quot;areaTotal, !o:location&quot;) orIfMissing 2.24E+10 &lt; 3250000
+</td>
+<td align="right">
+0.03
+</td>
+</tr>
+<tr>
+<td align="right">
+8
+</td>
+<td>
+country.expand.zipWithIndex contains (NodePath(type,ol:book), 671)
+</td>
+<td align="right">
+0.04
+</td>
+</tr>
+<tr>
+<td align="right">
+9
+</td>
+<td>
+country.expand.valueOf(&quot;birthYear, !o:birthPlace&quot;) orIfMissing 1997 &lt; 1855
+</td>
+<td align="right">
+0.05
+</td>
+</tr>
+<tr>
+<td align="right">
+10
+</td>
+<td>
+country headquarter language contains french language
+</td>
+<td align="right">
+0.03
+</td>
+</tr>
+</table>
+</div>
+<p><br></p>
+<h4 id="evaluation-10">Evaluation</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">evaluation = countriesModel$evaluate()</code></pre>
 <button class="output R toggle btn btn-xs btn-success">
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
-<pre style=""><code class="output r">##                                                  
-## Correlation coefficient             0.986993     
-## R2                                  0.974156     
-## Mean absolute error                 3.140721     
-## Root mean squared error             4.39577      
-## Relative absolute error             14.57009441 %
-## Root relative squared error         16.66050721 %
-## Root relative prior squared error   26.38436863  
-## Actuals mean                        69.85551708  
-## Estimations mean                    69.81659569  
-## Actuals std                         26.03583105  
-## Estimations std                     24.35471644  
-## Total Number of Instances           203          
+<pre style=""><code class="output r">## === Detailed Accuracy By Class ===
+##                                                                                     
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini
+##                                                                                     
+## blue            1         0         1           1        1           1          1   
+## red             1         0         1           1        1           1          1   
+## Weighted Avg.   1         0         1           1        1           1          1   
 ## 
 </code></pre>
 </div>
 <p><br> <br></p>
-<h1 id="f.-additional-world-knowledge-resources">F. Additional World knowledge resources</h1>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{external_weather}

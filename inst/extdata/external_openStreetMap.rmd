@@ -95,15 +95,16 @@ museumsModel = learn(
 		knowledgeCtrl = knowledgeControl(useGraph = TRUE, useOpenStreetMap = TRUE)
 )
 ```
+<br>
 
 ####Top features####
 
-<br>
 Indeed the top feature indicates that parks are in the vicinity of the input.      
 <br>
 ```{r external_openStreetMap_2_4, eval=TRUE, results='asis'}
-print(xtable(museumsModel$features()[1:5,c("idx","feature")]), type='html', comment=F)  
+print(xtable(museumsModel$features()[1:3,c("idx","feature")]), type='html', comment=F)  
 ```
+<br>
 
 ####Evaluation####
 

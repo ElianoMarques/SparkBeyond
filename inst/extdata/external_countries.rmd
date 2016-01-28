@@ -1,0 +1,62 @@
+---
+output:
+  knitrBootstrap::bootstrap_document:
+    theme.chooser: TRUE
+    highlight.chooser: TRUE
+---
+
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{external_countries}
+%\VignetteDepends{xtable}
+-->
+  
+##External data##
+<br>
+<img src="http://s3.amazonaws.com/public-sparkbeyond/images/wikipedia.png" width="500" height="412">
+<br>
+
+####Overview####
+
+Goal: what is common to these countries?
+
+####Training data####
+
+Here are all the columns available:
+```{r external_countries_1, results='asis',cache=TRUE}
+data = getData("countries")
+print(xtable(data[1:5,]), type='html', comment=F)
+```
+<br>
+<br>
+
+####Pipeline####
+
+The problem was automatically identified as a regression problem because the target is continuous.
+<br>
+```{r external_countries_2, eval=TRUE, message=FALSE, results='hide', cache=TRUE}
+countriesModel = learn(
+	projectName = "countries",
+	trainData = data,
+	target = "label",
+	knowledgeCtrl = knowledgeControl(useGraph = TRUE),
+	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = 20,maxDepth = 3)
+)
+```
+<br>
+<br>
+
+####Top features####
+
+```{r external_countries_3, eval=TRUE, results='asis', cache=TRUE}
+print(xtable(countriesModel$features()[1:10, c("feature","RIG")]), type='html', comment=F)
+```
+
+<br>
+
+####Evaluation####
+
+```{r external_countries_4, , eval=TRUE, echo=TRUE, cache=TRUE}
+evaluation = countriesModel$evaluate()
+```
+
