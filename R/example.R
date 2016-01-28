@@ -74,7 +74,14 @@ run_SB_examples <- function(configuration='1', weightByClass = FALSE) {
 
 #' Auxiliary function to get public test datasets.
 #'
-#' @param String of the name of the dataset. Should be one of "titanic_train", "titanic_test", "flights_delay"
+#' @param String of the name of the dataset. Options are:
+#' \itemize{
+#' \item titanic_train
+#' \item titanic_test
+#' \item tweets_sentiment
+#' \item tweets_sentimentkaggle
+#' \item sentiment_lexicon
+#' }
 #' @return DataFrame containing the data.
 #' @examples
 #' # Do Not Run:
@@ -108,6 +115,7 @@ getData <- function(datasetName) {
     emergency_locations = getExtData("emergency_locations.tsv"),
     museums = getExtData("museumsNextToParks.tsv"),
     countries_distance = getExtData("country_distance.tsv"),
+    countries = getExtData("countries.csv"),
     spambase = getExtData("spambase.csv"),
     #flights_delay = getExtData("flights_weatherDelay.tsv.gz"), #the git upload in RStudio doesn't support tsv.gz
 #      flights_delay =       {

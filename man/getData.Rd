@@ -7,7 +7,14 @@
 getData(datasetName)
 }
 \arguments{
-\item{String}{of the name of the dataset. Should be one of "titanic_train", "titanic_test", "flights_delay"}
+\item{String}{of the name of the dataset. Options are:
+\itemize{
+\item 1. titanic_train
+\item 2. titanic_test
+\item 3. tweets_sentiment
+\item 4. tweets_sentimentkaggle
+\item 5. sentiment_lexicon
+}}
 }
 \value{
 DataFrame containing the data.
