@@ -9,7 +9,11 @@ contextTypesList(geoSpatial = FALSE, graph = FALSE, invertedIndex = FALSE,
   termsMap = FALSE, timeSeries = FALSE, timeSeriesMap = FALSE)
 }
 \arguments{
-\item{geoSpatial.}{This context allows looking for geo spatial features. All rows are indexed based on their latitude and longitude information, and then all the objects in the}
+\item{geoSpatial.}{This context allows looking for geo spatial features. All rows are indexed based on their coordinate information, allowing properties from the surrounding environment to be searched for in a KNN-fashion. A coordinate column is required for this context object to be created.}
+
+\item{graph.}{This context allows looking for features on a graph or a network. This context requires defining the edges in the graph by setting the source column and target column in the contextObject.}
+
+\item{invertedIndex.}{}
 }
 \description{
 contextTypesList

@@ -1,14 +1,32 @@
 # S3 functions (De facto constructors of Session)
 
-#' preProcessingContorl
+
+#' problemDefinitionControl
+#' 
+#' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
+#' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param temporalSplitColumn: Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.  
+problemDefinitionControl = function(
+	weightColumn = NA,
+	weightByClass = FALSE,
+	trainTestSplitRatio = 0.8,
+	temporalSplitColumn = NA
+){
+	list(
+		trainTestSplitRatio = trainTestSplitRatio,
+		temporalSplitColumn = temporalSplitColumn,
+		weightByClass = weightByClass,
+		weightColumn = weightColumn
+	)
+}
+
+#' preProcessingControl
+#' 
 #' @param emptyValuePolicy: Controls how empty values in the data are being handled NA by default will replace numeric value with median value, and strings with empty strings.
 #' @param fileEncoding: Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
 #' @param fileEscaping: Define how escaping (e.g., \\n) should be handled when files are parsed.
 preProcessingControl = function(
-	trainTestSplitRatio = 0.8,
-	temporalSplitColumn = NA,
 	emptyValuePolicy = NA,
 	fileEncoding = NA,
 	fileEscaping = TRUE
@@ -16,8 +34,6 @@ preProcessingControl = function(
 	list(
 		emptyValuePolicy = emptyValuePolicy,
 		fileEncoding = fileEncoding,
-		trainTestSplitRatio = trainTestSplitRatio,
-		temporalSplitColumn = temporalSplitColumn,
 		fileEscaping = fileEscaping
 	)
 }
@@ -202,7 +218,15 @@ reportingControl = function(
 
 #' contextTypesList
 #' 
-#' @param geoSpatial. This context allows looking for geo spatial features. All rows are indexed based on their latitude and longitude information, and then all the objects in the  
+#' @param geoSpatial. This context allows looking for geo spatial features. All rows are indexed based on their coordinate information, allowing properties from the surrounding environment to be searched for in a KNN-fashion. A coordinate column is required for this context object to be created.
+#' @param graph. This context allows looking for features on a graph or a network. This context requires defining the edges in the graph by setting the source column and target column in the contextObject.
+#' @param invertedIndex. 
+#' @param lookupTables.
+#' @param membershipSet.
+#' @param shapeFile.
+#' @param termsMap.
+#' @param timeSeries.
+#' @param timeSeriesMap.
 contextTypesList = function(
 		geoSpatial = FALSE,
 		#geoSpatialWithPartition = FALSE,
@@ -248,13 +272,12 @@ contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list
 #' @param trainData: train data to analyze.
 #' @param target String of the column name of in the training file that contains the target of the prediction.
 #' @param testData: Optional. test data to validate model results. NA by default.
-#' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
-#' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
+#' @param problemDefinition: A \code{\link{problemDefinitionControl}} object with specific problem definition parameters.
 #' @param preProcessingCtrl: A \code{\link{preProcessingControl}} object with specific preprocessing parameters.
-#' @param featureGenerationCtrll: A \code{\link{featureGenerationControl}} object with specific feature generation parameters.
-#' @param knowledgeCtrll: A \code{\link{knowledgeControl}} object with specific external knowledge parameters.
-#' @param modelBuildingCtrll: A \code{\link{modelBuildingControl}} object with specific model building parameters.
+#' @param featureGenerationCtrl: A \code{\link{featureGenerationControl}} object with specific feature generation parameters.
+#' @param knowledgeCtrl: A \code{\link{knowledgeControl}} object with specific external knowledge parameters.
+#' @param modelBuildingCtrl: A \code{\link{modelBuildingControl}} object with specific model building parameters.
 #' @param reportingCtrl: A \code{\link{reportingControl}} object with specific reporting parameters.
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
@@ -274,9 +297,8 @@ learn <- function(
 			 trainData,
 			 target,
 			 testData = NULL,
-			 weightColumn = NA,
-			 weightByClass = FALSE,
 			 contextDatasets = NULL,
+			 problemDefinition = problemDefinitionControl(),
 			 preProcessingCtrl = preProcessingControl(),
 			 featureGenerationCtrl = featureGenerationControl(),
 			 knowledgeCtrl = knowledgeControl(),
@@ -294,7 +316,7 @@ learn <- function(
 	projectName = gsub(" ", "_", projectName)
 	
 	if(is.null(trainData) && !is.null(extraParams$trainData)) trainData = extraParams$trainData
-	trainTestSplitRatio = if(!is.null(extraParams$trainTestSplitRatio)) extraParams$trainTestSplitRatio else preProcessingCtrl$trainTestSplitRatio
+	trainTestSplitRatio = if(!is.null(extraParams$trainTestSplitRatio)) extraParams$trainTestSplitRatio else problemDefinition$trainTestSplitRatio
 	
 	if (!is.null(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
 	
@@ -343,17 +365,20 @@ learn <- function(
 				),
 				NA
 		),	
-				
-		trainTestSplitRatio = trainTestSplitRatio,
-		weightColumn = weightColumn,
-		weightByClass = weightByClass,
+		
 		contextDatasets = contextDatasets,
+				
+		#problem definition
+		trainTestSplitRatio = trainTestSplitRatio,
+		temporalSplitColumn = if(!is.null(extraParams$temporalSplitColumn)) extraParams$temporalSplitColumn else problemDefinition$temporalSplitColumn,
+		weightColumn = if(!is.null(extraParams$weightColumn)) extraParams$weightColumn else problemDefinition$weightColumn,
+		weightByClass = if(!is.null(extraParams$weightByClass)) extraParams$weightByClass else problemDefinition$weightByClass,
+		
 		
 		# preprocessing control
 		emptyValuePolicy = if(!is.null(extraParams$emptyValuePolicy)) extraParams$emptyValuePolicy else preProcessingCtrl$emptyValuePolicy,
 		fileEncoding = if(!is.null(extraParams$fileEncoding)) extraParams$fileEncoding else preProcessingCtrl$fileEncoding,
 		fileEscaping = if(!is.null(extraParams$fileEscaping)) extraParams$fileEscaping else preProcessingCtrl$fileEscaping,
-		temporalSplitColumn = if(!is.null(extraParams$temporalSplitColumn)) extraParams$temporalSplitColumn else preProcessingCtrl$temporalSplitColumn,
 		
 		#feature search parameters
 		featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,

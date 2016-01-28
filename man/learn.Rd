@@ -4,8 +4,8 @@
 \alias{learn}
 \title{learn}
 \usage{
-learn(projectName, trainData, target, testData = NULL, weightColumn = NA,
-  weightByClass = FALSE, contextDatasets = NULL,
+learn(projectName, trainData, target, testData = NULL,
+  contextDatasets = NULL, problemDefinition = problemDefinitionControl(),
   preProcessingCtrl = preProcessingControl(),
   featureGenerationCtrl = featureGenerationControl(),
   knowledgeCtrl = knowledgeControl(),
@@ -21,19 +21,17 @@ learn(projectName, trainData, target, testData = NULL, weightColumn = NA,
 
 \item{testData:}{Optional. test data to validate model results. NA by default.}
 
-\item{weightColumn:}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}
-
-\item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
-
 \item{contextDatasets:}{Optional. A list of paths to context datasets to be added to the learning.}
+
+\item{problemDefinition:}{A \code{\link{problemDefinitionControl}} object with specific problem definition parameters.}
 
 \item{preProcessingCtrl:}{A \code{\link{preProcessingControl}} object with specific preprocessing parameters.}
 
-\item{featureGenerationCtrll:}{A \code{\link{featureGenerationControl}} object with specific feature generation parameters.}
+\item{featureGenerationCtrl:}{A \code{\link{featureGenerationControl}} object with specific feature generation parameters.}
 
-\item{knowledgeCtrll:}{A \code{\link{knowledgeControl}} object with specific external knowledge parameters.}
+\item{knowledgeCtrl:}{A \code{\link{knowledgeControl}} object with specific external knowledge parameters.}
 
-\item{modelBuildingCtrll:}{A \code{\link{modelBuildingControl}} object with specific model building parameters.}
+\item{modelBuildingCtrl:}{A \code{\link{modelBuildingControl}} object with specific model building parameters.}
 
 \item{reportingCtrl:}{A \code{\link{reportingControl}} object with specific reporting parameters.}
 
