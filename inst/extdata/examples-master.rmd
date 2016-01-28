@@ -53,10 +53,16 @@ Show predict / create package etc example - should be in a different section
 <br>
 <br>
 
-```{r basic_pizza, child='basic_pizza.rmd', eval=FALSE, cache=TRUE}
+```{r basic_pizza, child='basic_pizza.rmd', eval=TRUE, cache=TRUE}
 ```
 <br>
 <br>
+
+```{r yummly, child='yummly.rmd', eval=TRUE, cache=TRUE}
+```
+<br>
+<br>
+
 
 ----
 

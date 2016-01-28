@@ -1762,6 +1762,7 @@ cos(fare) in range (-0.05638243077105439, 0.1326807604187568)
 </code></pre>
 </div>
 <p><br> <br></p>
+<hr />
 <h1 id="b.-basic-controls">B. Basic controls</h1>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
@@ -2082,7 +2083,819 @@ writeLines(gsub("-{2}","",readLines(paste0(titanicSurvivedModel$artifact_loc,"/r
 
 -->
 <p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{basic_pizza}
+%\VignetteDepends{xtable}
+-->
+<h3 id="preprocessing-control---pizza">Preprocessing control - Pizza</h3>
+<h4 id="overview-3">Overview</h4>
+<p><br></p>
+<h3 id="training-data-2">Training data</h3>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">data = read.csv("http://s3.amazonaws.com/public-sparkbeyond/pizza_full.csv", stringsAsFactors = FALSE)
+data = excludeCols(data, c("giver_username_if_known", 
+                                                     "requester_days_since_first_post_on_raop_at_request",
+                                                     "requester_days_since_first_post_on_raop_at_retrieval",
+                                                     "requester_number_of_posts_on_raop_at_request",
+                                                     "requester_number_of_posts_on_raop_at_retrieval",
+                                                     "requester_number_of_comments_in_raop_at_request",
+                                                     "requester_number_of_comments_in_raop_at_retrieval",
+                                                     "requester_user_flair"))</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## [1] "giver_username_if_known, requester_days_since_first_post_on_raop_at_request, requester_days_since_first_post_on_raop_at_retrieval, requester_number_of_posts_on_raop_at_request, requester_number_of_posts_on_raop_at_retrieval, requester_number_of_comments_in_raop_at_request, requester_number_of_comments_in_raop_at_retrieval, requester_user_flair were removed"
+## [1] "Note: the input object is of type data.frame hence, a new data.frame with the excluded columns will be returned."
+</code></pre>
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(data[1,"request_text"])</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## [1] "I'm not in College, or a starving artist or anything like that. I've just been a bit unlucky lately. I'm a 36 year old single guy with a job. But rent, and other bills killed me this month. I thought I had enough funds in my account to at least keep me set with Mr. Noodles, I forgot about my monthly banking fee.  I had a small bag of chips Wednesday afternoon, and I get paid Monday, so I'll be fine then.. It's just really painful at this point and food is something I'm constantly thinking about.  I've got a few bucks to get on the bus to work on Saturday, so I can't really use that.  I'm really embarrassed to even be asking like this and I'm not sure how it works, so please be patient with me.  I guess that covers it. Thank you in advance.  Cheers folks."
+</code></pre>
+</div>
 <p><br> <br></p>
+<h4 id="pipeline-3">Pipeline</h4>
+<p><br></p>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">pizzaModel = learn(
+        projectName = "pizza",
+    trainData = data,
+    target = "requester_received_pizza",                        
+        preProcessingCtrl = preProcessingControl(fileEscaping = FALSE)
+)</code></pre>
+</div>
+<p><br></p>
+<h4 id="topfeatures">Topfeatures</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(pizzaModel$features()[1:3,c("RIG", "feature", "Lift.false", "Lift.true")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+RIG
+</th>
+<th>
+feature
+</th>
+<th>
+Lift.false
+</th>
+<th>
+Lift.true
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0.12
+</td>
+<td>
+request_number_of_comments_at_retrieval &gt;= 2
+</td>
+<td align="right">
+0.78
+</td>
+<td align="right">
+1.72
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+0.04
+</td>
+<td>
+requester_upvotes_minus_downvotes_at_retrieval &lt; 12
+</td>
+<td align="right">
+1.20
+</td>
+<td align="right">
+0.35
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+0.01
+</td>
+<td>
+evenness(request_number_of_comments_at_retrieval) == 1
+</td>
+<td align="right">
+0.91
+</td>
+<td align="right">
+1.30
+</td>
+</tr>
+</table>
+</div>
+<p><br></p>
+<h4 id="evaluation-2">Evaluation</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">e=pizzaModel$evaluate()$summary  </code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## === Detailed Accuracy By Class ===
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## true            0.207     0.034     0.633       0.207    0.313       0.766      0.533
+## false           0.966     0.793     0.81        0.966    0.881       0.766      0.533
+## Weighted Avg.   0.797     0.624     0.77        0.797    0.754       0.766      0.533
+## 
+</code></pre>
+</div>
+<p><br> <br></p>
+<!--
+%\VignetteEngine{knitr}
+%\VignetteIndexEntry{yummly}
+%\VignetteDepends{xtable}
+-->
+<h3 id="cuisine-classification">Cuisine Classification</h3>
+<p>Goal: Predict Cuisine type from an Ingredient list</p>
+<h4 id="training-data-3">Training data</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">library(jsonlite)
+download.file("http://s3.amazonaws.com/public-sparkbeyond/yummly.json.gz","./yummly.json.gz")
+yummlyData = sampleData(fromJSON(readLines("./yummly.json.gz")), 0.3)
+print(yummlyData[1, c("cuisine","ingredients")])</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">##       cuisine
+## 10561 italian
+##                                                                                               ingredients
+## 10561 unsalted butter, water, sharp cheddar cheese, kosher salt, whole milk, ground black pepper, polenta
+</code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">yummlyModel=learn(
+    projectName="Yummly",
+    trainData = yummlyData,
+    target = "cuisine",
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+)</code></pre>
+</div>
+<p><br></p>
+<h4 id="top-features-3">Top features</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(yummlyModel$features()[1:5,c("RIG", "feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+RIG
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0.07
+</td>
+<td>
+normalizedNgrams(seqToTextList(ingredients)) contains (soi, sauc)
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+0.05
+</td>
+<td>
+seqToTextList(ingredients) contains cilantro
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+0.05
+</td>
+<td>
+normalizedNgrams(seqToTextList(ingredients)) contains (oliv)
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+0.06
+</td>
+<td>
+stemmedWordsWithoutCommonTerms(seqToTextList(ingredients)) contains ginger
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+0.04
+</td>
+<td>
+stemmedWordsWithoutCommonTerms(seqToTextList(ingredients)) contains tortilla
+</td>
+</tr>
+</table>
+</div>
+<p><br></p>
+<h4 id="evaluation-3">Evaluation</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">evaluation = yummlyModel$evaluate()</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## === Detailed Accuracy By Class ===
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## thai            0.634     0.011     0.694       0.634    0.663       0.961      0.921
+## greek           0.569     0.005     0.759       0.569    0.651       0.926      0.852
+## french          0.363     0.035     0.455       0.363    0.404       0.884      0.767
+## korean          0.568     0.003     0.75        0.568    0.646       0.968      0.937
+## spanish         0.03      0.002     0.286       0.03     0.055       0.818      0.636
+## cajun_creole    0.5       0.013     0.587       0.5      0.54        0.92       0.841
+## moroccan        0.596     0.007     0.66        0.596    0.626       0.879      0.758
+## filipino        0.392     0.007     0.541       0.392    0.455       0.901      0.801
+## southern_us     0.664     0.116     0.438       0.664    0.528       0.879      0.757
+## russian         0         0.002     0           0        0           0.833      0.665
+## brazilian       0.258     0.003     0.533       0.258    0.348       0.911      0.823
+## indian          0.823     0.01      0.873       0.823    0.847       0.971      0.941
+## british         0.047     0.001     0.4         0.047    0.083       0.789      0.578
+## jamaican        0.321     0.0       0.9         0.321    0.474       0.884      0.768
+## irish           0         0.0       0           0        0           0.762      0.524
+## italian         0.816     0.123     0.613       0.816    0.7         0.924      0.849
+## vietnamese      0.397     0.004     0.697       0.397    0.505       0.955      0.911
+## japanese        0.361     0.01      0.603       0.361    0.452       0.871      0.742
+## mexican         0.864     0.042     0.791       0.864    0.826       0.956      0.912
+## chinese         0.742     0.028     0.633       0.742    0.683       0.957      0.914
+## Weighted Avg.   0.628     0.051     0.613       0.628    0.603       0.916      0.832
+## 
+</code></pre>
+</div>
+<p><br><br> ###Countries Distance Goal: Predict (calculate) the distance between two given countries</p>
+<h4 id="training-data-4">Training data</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">countriesDistance = getData("countries_distance")
+print(xtable(head(countriesDistance,n=5)), type='html', comment=F)</code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+country1
+</th>
+<th>
+country2
+</th>
+<th>
+distance
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td>
+french southern and antarctic lands
+</td>
+<td>
+federated states of micronesia
+</td>
+<td align="right">
+6202.32
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td>
+ecuador
+</td>
+<td>
+gibraltar
+</td>
+<td align="right">
+5312.52
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td>
+bosnia and herzegovina
+</td>
+<td>
+ethiopia
+</td>
+<td align="right">
+2782.68
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td>
+ascension
+</td>
+<td>
+jersey
+</td>
+<td align="right">
+4507.93
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td>
+india
+</td>
+<td>
+ethiopia
+</td>
+<td align="right">
+2734.49
+</td>
+</tr>
+</table>
+</div>
+<h4 id="pipeline-4">Pipeline</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">countryModel=learn(projectName="CountriesDistance",countriesDistance,"distance",
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+)</code></pre>
+</div>
+<p><br></p>
+<h4 id="top-features-4">Top features</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(countryModel$features()[1:5,c("RIG", "feature")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+RIG
+</th>
+<th>
+feature
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0.38
+</td>
+<td>
+normalizeByDeciles(country1.distanceFrom(country2)) &lt; 0.49869474945012415
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+0.03
+</td>
+<td>
+stemmedWordsWithoutCommonTerms(country2) contains island
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+0.02
+</td>
+<td>
+compressionDistance(country1, country2) &gt;= 0.9023809523809524
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+0.03
+</td>
+<td>
+sentimentDistribution(country2) does not contain (0, 1)
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+0.01
+</td>
+<td>
+compressionDistance(country1, country2) == 0.9167
+</td>
+</tr>
+</table>
+</div>
+<p><br></p>
+<h4 id="evaluation-4">Evaluation</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">evaluation = countryModel$evaluate()</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">##                                                  
+## Correlation coefficient             0.99412      
+## R2                                  0.988274     
+## Mean absolute error                 149.251767   
+## Root mean squared error             315.121625   
+## Relative absolute error             6.28897266 % 
+## Root relative squared error         11.12831087 %
+## Root relative prior squared error   2831.71119445
+## Actuals mean                        5313.96994394
+## Estimations mean                    5321.18604002
+## Actuals std                         2831.7090959 
+## Estimations std                     2742.79547289
+## Total Number of Instances           611          
+## 
+</code></pre>
+</div>
+<p><br><br></p>
+<h3 id="spam-email">Spam Email</h3>
+<p>Goal: Predict whether or not an email contains spam based on given statistics (UCI)</p>
+<h4 id="training-data-5">Training data</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">spam = getData("spambase")
+print(xtable(head(spam[,1:7],n=5)), type='html', comment=F)</code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+word_freq_make
+</th>
+<th>
+word_freq_address
+</th>
+<th>
+word_freq_all
+</th>
+<th>
+word_freq_3d
+</th>
+<th>
+word_freq_our
+</th>
+<th>
+word_freq_over
+</th>
+<th>
+word_freq_remove
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0.21
+</td>
+<td align="right">
+0.28
+</td>
+<td align="right">
+0.50
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.14
+</td>
+<td align="right">
+0.28
+</td>
+<td align="right">
+0.21
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+0.06
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.71
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+1.23
+</td>
+<td align="right">
+0.19
+</td>
+<td align="right">
+0.19
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.63
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.31
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.63
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.31
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+1.85
+</td>
+<td align="right">
+0.00
+</td>
+<td align="right">
+0.00
+</td>
+</tr>
+</table>
+</div>
+<p><br></p>
+<h4 id="pipeline-5">Pipeline</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">spamModel=learn(projectName="spambase",spam,"isSpam",
+    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+)</code></pre>
+</div>
+<h4 id="top-features-5">Top features</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">print(xtable(spamModel$features()[1:5,c("RIG", "feature","Lift.0","Lift.1")]), type='html', comment=F) </code></pre>
+<table border="1">
+<tr>
+<th>
+</th>
+<th>
+RIG
+</th>
+<th>
+feature
+</th>
+<th>
+Lift.0
+</th>
+<th>
+Lift.1
+</th>
+</tr>
+<tr>
+<td align="right">
+1
+</td>
+<td align="right">
+0.25
+</td>
+<td>
+char_freq_4 &gt;= 0.0555
+</td>
+<td align="right">
+0.20
+</td>
+<td align="right">
+2.23
+</td>
+</tr>
+<tr>
+<td align="right">
+2
+</td>
+<td align="right">
+0.25
+</td>
+<td>
+char_freq_3 &gt;= 0.0795
+</td>
+<td align="right">
+0.46
+</td>
+<td align="right">
+1.83
+</td>
+</tr>
+<tr>
+<td align="right">
+3
+</td>
+<td align="right">
+0.23
+</td>
+<td>
+word_freq_remove != 0.0
+</td>
+<td align="right">
+0.08
+</td>
+<td align="right">
+2.41
+</td>
+</tr>
+<tr>
+<td align="right">
+4
+</td>
+<td align="right">
+0.16
+</td>
+<td>
+word_freq_hp &gt;= 0.12
+</td>
+<td align="right">
+1.60
+</td>
+<td align="right">
+0.09
+</td>
+</tr>
+<tr>
+<td align="right">
+5
+</td>
+<td align="right">
+0.19
+</td>
+<td>
+word_freq_free &gt;= 0.095
+</td>
+<td align="right">
+0.31
+</td>
+<td align="right">
+2.06
+</td>
+</tr>
+</table>
+</div>
+<p><br></p>
+<h4 id="evaluation-5">Evaluation</h4>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">evaluation = spamModel$evaluate()</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## === Detailed Accuracy By Class ===
+##                                                                                      
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
+##                                                                                      
+## 0               0.961     0.071     0.955       0.961    0.958       0.983      0.966
+## 1               0.929     0.039     0.939       0.929    0.934       0.983      0.966
+## Weighted Avg.   0.948     0.059     0.948       0.948    0.948       0.983      0.966
+## 
+</code></pre>
+</div>
+<p><br> <br></p>
+<hr />
 <h1 id="c.-text-analysis">C. Text analysis</h1>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
@@ -2093,9 +2906,9 @@ writeLines(gsub("-{2}","",readLines(paste0(titanicSurvivedModel$artifact_loc,"/r
 <p><img src="http://s3.amazonaws.com/public-sparkbeyond/images/sentiment.jpg" width="462" height="260"> <br></p>
 <h3 id="internal-text-functions">Internal text functions</h3>
 <p><br></p>
-<h4 id="overview-3">Overview</h4>
+<h4 id="overview-4">Overview</h4>
 <p>Goal: Identify sentiment in twitter tweets. The sentiment dataset contains a column with a tweet and a setiment target (-1 or 1). <br></p>
-<h4 id="training-data-2">Training data</h4>
+<h4 id="training-data-6">Training data</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2170,7 +2983,7 @@ Best form this season has coincided with him starting in the centre of midfield
 </tr>
 </table>
 </div>
-<h4 id="pipeline-3">Pipeline</h4>
+<h4 id="pipeline-6">Pipeline</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2183,7 +2996,7 @@ Best form this season has coincided with him starting in the centre of midfield
 )</code></pre>
 </div>
 <p><br></p>
-<h4 id="top-features-3">Top features</h4>
+<h4 id="top-features-6">Top features</h4>
 <p>The top feature is a textSentimentScore which is automatically computed.</p>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -2258,7 +3071,7 @@ numberIn(tweet) == -1.0
 </tr>
 </table>
 </div>
-<h4 id="evaluation-2">Evaluation</h4>
+<h4 id="evaluation-6">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2281,7 +3094,7 @@ numberIn(tweet) == -1.0
 <h3 id="terms-map-context">Terms Map context</h3>
 <p><img src="http://s3.amazonaws.com/public-sparkbeyond/images/context1.jpg" width="400" height="324"></p>
 <p><br></p>
-<h4 id="overview-4">Overview</h4>
+<h4 id="overview-5">Overview</h4>
 <p>In order to improve performance we can include a custom context Dataset. The sentimentLexicon includes over 6000 single words with a either a positive or negative sentiment. The top features now are actually derived by looking up the values in the lexcion (data_column) and the classificaiton performance is boosted.</p>
 <h4 id="context-data">Context data</h4>
 <div class="row">
@@ -2358,7 +3171,7 @@ accessable
 </tr>
 </table>
 </div>
-<h4 id="pipeline-4">Pipeline</h4>
+<h4 id="pipeline-7">Pipeline</h4>
 <p><br> Based on the column types in the context data, various context objects can be created. See contextTypesList for complete information on all possible context object types. It is also possible to define the requested context types to be generated explicitly in contextObject. Specifically, in this case we will define a Terms Map context. <br> <br></p>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -2373,7 +3186,7 @@ accessable
     featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40))
 )</code></pre>
 </div>
-<h4 id="top-features-4">Top features</h4>
+<h4 id="top-features-7">Top features</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2447,7 +3260,7 @@ extractKeys(entitiesHistogram(tweet, sentiment_lexicon_lexicon)) does not contai
 </tr>
 </table>
 </div>
-<h4 id="evaluation-3">Evaluation</h4>
+<h4 id="evaluation-7">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2468,9 +3281,9 @@ extractKeys(entitiesHistogram(tweet, sentiment_lexicon_lexicon)) does not contai
 </div>
 <p><br> <br></p>
 <h3 id="inverted-index-context">Inverted Index context</h3>
-<h4 id="overview-5">Overview</h4>
+<h4 id="overview-6">Overview</h4>
 <p><br> In this example we will see how to add an Inverted Index context. Specifically, this will allow us to use similar textual instances to augment the feature search, in a KNN-fashion. In this example, during the training, only the context information of the train data will be made available for feature search purposes. However, during prediction, the context information of both the train data and the test data can be made available. <br> <br></p>
-<h4 id="pipeline-5">Pipeline</h4>
+<h4 id="pipeline-8">Pipeline</h4>
 <p>We will first split the data into train and test data using the trainTestSplit function.</p>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -2489,7 +3302,7 @@ SentimentModelContext2 = learn(
 )</code></pre>
 </div>
 <p><br></p>
-<h4 id="top-features-5">Top features</h4>
+<h4 id="top-features-8">Top features</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2563,7 +3376,7 @@ wordFrequencies(tweet).valueOf(best) orIfMissing 0 &gt;= 0.17349064404453718
 </tr>
 </table>
 </div>
-<h4 id="evaluation-4">Evaluation</h4>
+<h4 id="evaluation-8">Evaluation</h4>
 <p>During prediction we can match the context objects to the ones used in the train by using the same name. <br></p>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -2577,6 +3390,7 @@ wordFrequencies(tweet).valueOf(best) orIfMissing 0 &gt;= 0.17349064404453718
 </code></pre>
 </div>
 <p><br> <br></p>
+<hr />
 <h1 id="d.-geospatial-analysis">D. GeoSpatial analysis</h1>
 <!--
 %\VignetteEngine{knitr::rmarkdown}
@@ -2584,7 +3398,7 @@ wordFrequencies(tweet).valueOf(best) orIfMissing 0 &gt;= 0.17349064404453718
 %\VignetteDepends{xtable}
 -->
 <h2 id="geo-spatial-context">Geo spatial context</h2>
-<h4 id="overview-6">Overview</h4>
+<h4 id="overview-7">Overview</h4>
 <p>Using Geospatial KNN in order to infer from near by locations that have similar properties. <br> <br> In this example we pass the input also as a context data. A GeoSpatial Index object will be created, keeping properties for each coordinate that were provided. A set of KNN based functions can be triggered for the geoSpatial index object, that can collect and aggregate properties from near by locations. Note that the actual location is not used to prevent target leaks.</p>
 <!-- 
 langFull = data.table(getData("languages")) # get full data from "Google Drive/data/datasets/public/lang-long-lat.csv"
@@ -2596,7 +3410,7 @@ names = rownames(c[1:10,])      #FAILS with 10 - USState is identified as label 
 langFiltered = langFull[lang %in% names]
 langData=sampleData(langFiltered, 0.05)
 -->
-<h4 id="training-data-3">Training data</h4>
+<h4 id="training-data-7">Training data</h4>
 <p>The input dataset contains locations in the world (based on a lat/long) and the language spoken at this location (for top 15 most spoken languages).</p>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -2691,7 +3505,7 @@ und
 </table>
 </div>
 <p><br> <br></p>
-<h4 id="pipeline-6">Pipeline</h4>
+<h4 id="pipeline-9">Pipeline</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -2705,7 +3519,7 @@ und
     featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))
 )</code></pre>
 </div>
-<h4 id="top-features-6">Top features</h4>
+<h4 id="top-features-9">Top features</h4>
 <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -2901,7 +3715,7 @@ mostFrequentFromClosest3WeightedByDistance(latLong, languages_lang_by_location) 
 </tr>
 </table>
 </div>
-<h4 id="evaluation-5">Evaluation</h4>
+<h4 id="evaluation-9">Evaluation</h4>
 <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -2941,9 +3755,9 @@ mostFrequentFromClosest3WeightedByDistance(latLong, languages_lang_by_location) 
 %\VignetteDepends{xtable}
 -->
 <h2 id="open-street-map-data-1">Open Street Map data 1</h2>
-<h4 id="overview-7">Overview</h4>
+<h4 id="overview-8">Overview</h4>
 <p>The emergency locations dataset contains locations in the London, UK metro and associcates each location with a 'risk' score based on the distance within a 2-mile radius to the nearest fire station or hospital. If only fire station or hospital are in the radius of a point a penalty of 20.0 is added, and if no hospitals or fire stations are in the radius a penalty of 40.0 is added.</p>
-<h4 id="training-data-4">Training data</h4>
+<h4 id="training-data-8">Training data</h4>
 <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3038,7 +3852,7 @@ risk
 </table>
 </div>
 <p><br> By setting useOpenStreetMap to TRUE, the area around each latLong will be downloaded and the points of interests available in that area will be used during the feature search. <br></p>
-<h4 id="pipeline-7">Pipeline</h4>
+<h4 id="pipeline-10">Pipeline</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3054,7 +3868,7 @@ risk
 )</code></pre>
 </div>
 <p><br></p>
-<h4 id="top-features-7">Top features</h4>
+<h4 id="top-features-10">Top features</h4>
 <p>Indeed the top 3 features identify that the target is correlated with short distance to fire stations and hospitals.<br /><br></p>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3129,7 +3943,7 @@ OSMmethods.attributesOfNearestObjects(latLong).valueOf((name, HSBC)) orIfMissing
 </tr>
 </table>
 </div>
-<h4 id="evaluation-6">Evaluation</h4>
+<h4 id="evaluation-10">Evaluation</h4>
 <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3145,9 +3959,9 @@ OSMmethods.attributesOfNearestObjects(latLong).valueOf((name, HSBC)) orIfMissing
 </div>
 <p><br> <br> <br> <br></p>
 <h2 id="open-street-map-data-2">Open Street Map data 2</h2>
-<h4 id="overview-8">Overview</h4>
+<h4 id="overview-9">Overview</h4>
 <p>The museums dataset contains synthetic tweets mentioning names of museums in London. A boolean label is attached to each tweet marking whether there are parks within 0.4KM from the museum that was mentioned.<br /><br></p>
-<h4 id="training-data-5">Training data</h4>
+<h4 id="training-data-9">Training data</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3223,7 +4037,7 @@ true
 </table>
 </div>
 <p><br></p>
-<h4 id="pipeline-8">Pipeline</h4>
+<h4 id="pipeline-11">Pipeline</h4>
 <p>In this example, we will need to use both the knowledge graph in order to identify entities in the text, and open street map in order took for points of interest near each location. <br></p>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3241,7 +4055,7 @@ true
 )</code></pre>
 </div>
 <p><br></p>
-<h4 id="top-features-8">Top features</h4>
+<h4 id="top-features-11">Top features</h4>
 Indeed the top feature indicates that parks are in the vicinity of the input.<br /><br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3295,7 +4109,7 @@ extractKeys(OpenStreetMap.attributesOfObjectsIn500mRadius(text.latLongs)) does n
 </table>
 </div>
 <p><br></p>
-<h4 id="evaluation-7">Evaluation</h4>
+<h4 id="evaluation-11">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3325,9 +4139,9 @@ extractKeys(OpenStreetMap.attributesOfObjectsIn500mRadius(text.latLongs)) does n
 -->
 <h2 id="time-window">Time Window</h2>
 <p><br></p>
-<h4 id="overview-9">Overview</h4>
+<h4 id="overview-10">Overview</h4>
 <p>Constructing a window around each point to use the recent history for predictions. <br></p>
-<h4 id="training-data-6">Training data</h4>
+<h4 id="training-data-10">Training data</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3349,7 +4163,7 @@ sum(data$target)</code></pre>
 </code></pre>
 </div>
 <p><br></p>
-<h4 id="pipeline-9">Pipeline</h4>
+<h4 id="pipeline-12">Pipeline</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3368,7 +4182,7 @@ timeWindowModel = learn(
 )</code></pre>
 </div>
 <p><br></p>
-<h4 id="top-features-9">Top features</h4>
+<h4 id="top-features-12">Top features</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3498,7 +4312,7 @@ minSlope(window(last_10_Days, time_info_temperature).lastQuartile) in range (-7.
 </table>
 </div>
 <p><br></p>
-<h4 id="evaluation-8">Evaluation</h4>
+<h4 id="evaluation-12">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3525,9 +4339,9 @@ minSlope(window(last_10_Days, time_info_temperature).lastQuartile) in range (-7.
 -->
 <h2 id="time-window---identify-frequency-change">Time Window - identify frequency change</h2>
 <p><br></p>
-<h4 id="overview-10">Overview</h4>
+<h4 id="overview-11">Overview</h4>
 <p><br> Goal: Detect frequency changes in a time varying signal <br></p>
-<h4 id="training-data-7">Training data</h4>
+<h4 id="training-data-11">Training data</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3781,7 +4595,7 @@ trainData = frequencyChangeDSwindowed[,c("date","failure",paste0("last_",timeWin
 contextData = frequencyChangeDSwindowed[,c("date","signal1")] </code></pre>
 </div>
 <p><br></p>
-<h4 id="pipeline-10">Pipeline</h4>
+<h4 id="pipeline-13">Pipeline</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3798,7 +4612,7 @@ contextData = frequencyChangeDSwindowed[,c("date","signal1")] </code></pre>
 )</code></pre>
 </div>
 <p><br></p>
-<h4 id="top-features-10">Top features</h4>
+<h4 id="top-features-13">Top features</h4>
 The model finds the exact anomolies causing the failure: frequency content outside the range of the carrier signal as well as gradient and slope changes.
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3863,7 +4677,7 @@ stddev(smoothMovingAverage10(window(last_30_Days, signals_signal1))) in range (0
 </table>
 </div>
 <p><br></p>
-<h4 id="evaluation-9">Evaluation</h4>
+<h4 id="evaluation-13">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -3892,9 +4706,9 @@ stddev(smoothMovingAverage10(window(last_30_Days, signals_signal1))) in range (0
 -->
 <h2 id="external-data">External data</h2>
 <p><br> <img src="http://s3.amazonaws.com/public-sparkbeyond/images/wikipedia.png" width="500" height="412"> <br></p>
-<h4 id="overview-11">Overview</h4>
+<h4 id="overview-12">Overview</h4>
 <p>Goal: what is common to these countries?</p>
-<h4 id="training-data-8">Training data</h4>
+<h4 id="training-data-12">Training data</h4>
 Here are all the columns available:
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3971,7 +4785,7 @@ blue
 </table>
 </div>
 <p><br> <br></p>
-<h4 id="pipeline-11">Pipeline</h4>
+<h4 id="pipeline-14">Pipeline</h4>
 The problem was automatically identified as a regression problem because the target is continuous. <br>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3986,7 +4800,7 @@ The problem was automatically identified as a regression problem because the tar
 )</code></pre>
 </div>
 <p><br> <br></p>
-<h4 id="top-features-11">Top features</h4>
+<h4 id="top-features-14">Top features</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -4116,7 +4930,7 @@ country headquarter language contains french language
 </table>
 </div>
 <p><br></p>
-<h4 id="evaluation-10">Evaluation</h4>
+<h4 id="evaluation-14">Evaluation</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -4681,6 +5495,7 @@ date == Fri Feb 22 02:00:00 IST 2008
 </code></pre>
 </div>
 <p><br> <br></p>
+<hr />
 <h1 id="g.-advanced-feature-controls">G. Advanced feature controls</h1>
 <p><br> <br></p>
 <!--
@@ -5591,10 +6406,12 @@ ceil(distance of latLong from closest of latLong_column) == 1.0
 <p>idx feature 1 0 number in range (350.5, 398)</p>
 </div>
 <p><br> <br></p>
+<hr />
 <h1 id="h.-unsupervised-learning">H. Unsupervised learning</h1>
 <p><br> <br></p>
 <h2 id="coming-soon.">Coming soon.</h2>
 <p><br> <br> <br> <br></p>
+<hr />
 <h1 id="i.-more-info">I. More info</h1>
 <p><br> <br> For more information please check:</p>
 <ul>
