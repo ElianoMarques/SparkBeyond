@@ -8,6 +8,7 @@
 #' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param temporalSplitColumn: Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.  
 problemDefinitionControl = function(
+	regressionMode = NA,
 	weightColumn = NA,
 	weightByClass = FALSE,
 	trainTestSplitRatio = 0.8,
@@ -226,7 +227,7 @@ reportingControl = function(
 #' @param shapeFile. This context allows providing shape files. The structure of the input should be the location of the shapeFile, one per row.
 #' @param termsMap. This context associates a string / text column with some numeric value that can be looked at for every term. 
 #' @param timeSeries. This context creates a single time series per column for all the rows provided. The context is sorted by the time/data column. It is necessary that at least one time window column should appear in the data. It is optional to set the time column in the contextObject.
-#' @param timeSeriesMap. This context creates multiple time series per column, group by a key. This object requires a keyed time window column to be defined in the main text. The key and time column may be set in the column subset, 
+#' @param timeSeriesMap. This context creates multiple time series per column, group by a key. This object requires a keyed time window column to be defined in the main text. The key and time column may be set in the contextObject. 
 contextTypesList = function(
 		geoSpatial = FALSE,
 		#geoSpatialWithPartition = FALSE,
@@ -369,6 +370,7 @@ learn <- function(
 		contextDatasets = contextDatasets,
 				
 		#problem definition
+		regressionMode = if(!is.null(extraParams$regressionMode)) extraParams$regressionMode else problemDefinition$regressionMode,
 		trainTestSplitRatio = trainTestSplitRatio,
 		temporalSplitColumn = if(!is.null(extraParams$temporalSplitColumn)) extraParams$temporalSplitColumn else problemDefinition$temporalSplitColumn,
 		weightColumn = if(!is.null(extraParams$weightColumn)) extraParams$weightColumn else problemDefinition$weightColumn,

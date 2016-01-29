@@ -25,7 +25,7 @@ contextTypesList(geoSpatial = FALSE, graph = FALSE, invertedIndex = FALSE,
 
 \item{timeSeries.}{This context creates a single time series per column for all the rows provided. The context is sorted by the time/data column. It is necessary that at least one time window column should appear in the data. It is optional to set the time column in the contextObject.}
 
-\item{timeSeriesMap.}{This context creates multiple time series per column, group by a key. This object requires a keyed time window column to be defined in the main text. The key and time column may be set in the column subset,}
+\item{timeSeriesMap.}{This context creates multiple time series per column, group by a key. This object requires a keyed time window column to be defined in the main text. The key and time column may be set in the contextObject.}
 }
 \description{
 contextTypesList
