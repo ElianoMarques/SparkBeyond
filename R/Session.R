@@ -291,7 +291,7 @@ Session = setRefClass("Session",
         			localfile = paste0(outputName, ".tsv.gz")
         			writeBin(httr::content(res2), localfile)
         			print(paste0("Results written to: ", getwd(),"/", localfile))
-        			df = read.table(localfile, sep="\t", header=TRUE)
+        			df = read.table(localfile, sep="\t", quote = "",header=TRUE)
         			for(i in 1:ncol(df)) {
         				if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
         					df[,i] = as.logical(as.character(df[,i]))
@@ -302,7 +302,7 @@ Session = setRefClass("Session",
         			df
         		} else NA        		
         	} else {
-	          df = read.table(outputPath, header = TRUE, sep="\t")
+	          df = read.table(outputPath, header = TRUE, quote = "",sep="\t")
 	          for(i in 1:ncol(df)) {
 	            if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
 	              df[,i] = as.logical(as.character(df[,i]))
