@@ -36,11 +36,9 @@ library('SparkBeyond')
 <br>
 <br>
 
-#Initial setup #
+#Login#
 ```{r, eval = FALSE, message=FALSE, results='hide'}
-setSBserverHost("127.0.0.1") #server ip address
-setSBserverPort("9000") #server port
-setSBserverIOfolder("/path/to/server's/shared/folder") # shared folder on the server to which input data is being written and output files with results are being created  
+login('username','password','domain')
 ```
 
 <br>
@@ -67,12 +65,13 @@ The complete list of reports is available `reportsList()`: [explantion of all th
 setSBserverIOfolder("/tmp/")
 ```
 
-```{r tutorial_basic_example, eval=TRUE, cache = TRUE}
+```{r tutorial_basic_example, eval=FALSE, cache = TRUE}
 train = getData("titanic_train")
-model = learn(projectName = "titanic",
-                        trainData = train,
-                        target = "survived",
-                        algorithmsWhiteList = list("RRandomForest"))
+model = learn(
+	projectName = "titanic",
+  trainData = train,
+  target = "survived"
+)
 ```
 
 The returned `Session` object named `model` encapsulates a predictive-model on which we can perform various operations.
