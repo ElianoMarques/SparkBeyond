@@ -4,8 +4,9 @@
 \alias{problemDefinitionControl}
 \title{problemDefinitionControl}
 \usage{
-problemDefinitionControl(weightColumn = NA, weightByClass = FALSE,
-  trainTestSplitRatio = 0.8, temporalSplitColumn = NA)
+problemDefinitionControl(regressionMode = NA, weightColumn = NA,
+  weightByClass = FALSE, trainTestSplitRatio = 0.8,
+  temporalSplitColumn = NA)
 }
 \arguments{
 \item{weightColumn:}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}

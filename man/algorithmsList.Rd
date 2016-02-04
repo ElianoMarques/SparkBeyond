@@ -16,7 +16,7 @@ algorithmsList(isClassification = NA, randomForest = TRUE,
 
 \item{xgBoost}{eXtreme gradient boosted machine algorithm from the xgBoost package.  (currently does not support multiclass)}
 
-\item{GBM}{gradient boosten machine algorithm from the xgBoost package.}
+\item{GBM}{gradient boosted machine algorithm from the xgBoost package.}
 
 \item{rpart}{decision tree algorithm from the rpart package.}
 

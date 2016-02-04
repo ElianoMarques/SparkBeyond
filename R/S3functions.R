@@ -149,7 +149,7 @@ modelBuildingControl = function(
 #' @param isClassification A boolean indicator for whether to use only classification algorithms or only regression algorithms. If is NA the relevant algorithms are selected based on the target type and cardinality using the learning process. 
 #' @param randomForest random forest algorithm from the randomForest package.
 #' @param xgBoost eXtreme gradient boosted machine algorithm from the xgBoost package.  (currently does not support multiclass)
-#' @param GBM gradient boosten machine algorithm from the xgBoost package.  
+#' @param GBM gradient boosted machine algorithm from the xgBoost package.  
 #' @param rpart decision tree algorithm from the rpart package.  
 #' @param lassoGlmnet logistic regression / linear regression algorithm with alpha = 0 from the glmnet package.  
 #' @param ridgeGlmnet logistic regression / linear regression algorithm with alpha = 1 from the glmnet package.  
