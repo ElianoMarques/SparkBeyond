@@ -169,26 +169,23 @@ algorithmsList = function(
 		stackingEnsemble = FALSE
 	){
 		algsList = vector()
-		if (randomForest) algsList = c(algsList, "RRandomForest")
-		if (xgBoost) algsList = c(algsList, "RXGBoost")
-		if (GBM) algsList = c(algsList, "RCaretGBM")
-		if (rpart) algsList = c(algsList, "RRpartDecisionTree")
-		if (lassoGlmnet && is.na(isClassification)) algsList = c(algsList, "RLassoL")
-		if (ridgeGlmnet && is.na(isClassification)) algsList = c(algsList, "RRidgeL")
-		if (linearEnsemble) algsList = c(algsList, "RLinearEnsembleGBM_with_Rpart")
-		if (stackingEnsemble) algsList = c(algsList, "RStackingEnsembleGBM_of_GBM_with_Rpart")
-		
-		if (!is.na(isClassification) && isClassification == TRUE) algsList = paste0(algsList, "Classifier")
-		if (!is.na(isClassification) && isClassification == FALSE) algsList = paste0(algsList, "Regressor")
-		
+		if (randomForest) algsList = c(algsList, "RRandomForestClassifier", "RRandomForestRegressor")
+		if (xgBoost) algsList = c(algsList, "RXGBoostClassifier" , "RXGBoostRegressor")
+		if (GBM) algsList = c(algsList, "RCaretGBMClassifier","RCaretGBMRegressor")
+		if (rpart) algsList = c(algsList, "RRpartDecisionTreeClassifier", "RRpartDecisionTreeRegressor")
+		if (lassoGlmnet) algsList = c(algsList, "RLassoLogisticRegressionGlmnetClassifier", "RLassoLinearRegressionGlmnetRegressor")
+		if (ridgeGlmnet) algsList = c(algsList, "RRidgeLogisticRegressionGlmnetClassifier",  "RRidgeLinearRegressionGlmnetRegressor")
+		if (linearEnsemble) algsList = c(algsList, "RLinearEnsembleGBM_with_RpartClassifier", "RLinearEnsembleGBM_with_RpartRegressor")
+		if (stackingEnsemble) algsList = c(algsList, "RStackingEnsembleGBM_of_GBM_with_RpartClassifier", "RStackingEnsembleGBM_of_GBM_with_RpartRegressor")
+
 		if (linearRegression) algsList = c(algsList, "RLinearRegressionLMRegressor")
 		
-		if (!is.na(isClassification)){
-			if (lassoGlmnet && isClassification == TRUE) algsList = c(algsList, "RLassoLogisticRegressionGlmnetClassifier")
-			if (ridgeGlmnet && isClassification == TRUE) algsList = c(algsList, "RRidgeLogisticRegressionGlmnetClassifier")
-			if (lassoGlmnet && isClassification == FALSE) algsList = c(algsList, "RLassoLinearRegressionGlmnetClassifier")
-			if (ridgeGlmnet && isClassification == FALSE) algsList = c(algsList, "RRidgeLinearRegressionGlmnetClassifier")
-		}	
+		toKeep = if (!is.na(isClassification)){
+			if (isClassification == TRUE) which(grepl("Classifier", algsList))
+			else if (isClassification == FALSE) which(grepl("Regressor", algsList))
+		} else NULL
+	
+		if (!is.null(toKeep)) algsList = algsList[toKeep]
 		
 		algsList
 }
