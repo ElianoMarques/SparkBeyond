@@ -15,7 +15,7 @@ addTimeWindow(data, dateCol, keyCol = NA, window, unit = "Days",
 
 \item{window:}{The window length (numeric)}
 
-\item{unit:}{The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Months", "Years", "Number"}
+\item{unit:}{The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Weeks", "Years", "Number"}
 
 \item{dateFormat:}{provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"}
 

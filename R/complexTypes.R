@@ -346,7 +346,7 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @param data: data.table to be modified.
 #' @param dateCol: The column name in \code{data} that will be used.
 #' @param window: The window length (numeric)
-#' @param unit: The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Months", "Years", "Number"
+#' @param unit: The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Weeks", "Years", "Number"
 #' @param dateFormat: provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"
 #' @param keyCol: An optional key for the sliding window (NA as default)
 #' @param includeUntil: optional argument
@@ -356,14 +356,14 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @return The new data
 addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, offset = 0, ...) {
   unitVal = switch(unit,
-  			 "Number" = 1,
+  			 "Number"  = 1,
          "Seconds" = 1,
          "Minutes" = 60,
-         "Hours" = 60*60,
-         "Days" = 24*60*60,
-         "Months" = 4*7*24*60*60,
-         "Years" = 12*4*7*24*60*60,
-         stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Months', 'Years', 'Number'")
+         "Hours"   = 3600,
+         "Days"    = 86400,
+         "Weeks"   = 604800,
+         "Years"   = 31536000,
+         stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Weeks', 'Years', 'Number'")
   )
   
   newCol = if (is.na(keyCol)) {
@@ -392,6 +392,8 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   dateType = sapply(data, class)[dateColIndex] #charachter, integer, numeric, date, POSIXct
   if(length(class(dateType)) > 1) dateType = dateType[1] 
   
+  datesFromNAcount = 0
+  datesUntilNAcount = 0
   generateWindow = function(dateVal, keyVal = NA) {
   	dates = if (dateType == "character") {
   		convertDateToString = function(dValue) as.character(as.POSIXct(dValue),format=datePOSIXformatOut)
@@ -411,6 +413,8 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
 		} else {
 			stop (paste("Date column", dateCol,"type should be one of 'character', 'integer', 'numeric', 'date', 'POSIXct'."))
 		}
+  	if (is.na(dates[1])) datesFromNAcount = datesFromNAcount + 1
+  	if (is.na(dates[2])) datesUntilNAcount = datesUntilNAcount + 1
   	paste0(prefix, keyVal,",",dates[1],",",dates[2],",",includeUntil,",",relativeTime,",",unit,",",sample)
   }
   
@@ -420,6 +424,14 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
     keyColData = colsWhiteList(data, keyCol)
     data[,newCol] = mapply(generateWindow,dateColData,keyColData)
   }
+	
+  percentNAFrom = datesFromNAcount / nrow(data) * 100
+  percentNAUntil = datesUntilNAcount / nrow(data) * 100
+  if (percentNAFrom > 10)
+  	warning(paste(percentNAFrom, "%% of the time window start times are NA - are the function parameter correct?"))
+  if (percentNAUntil > 10)
+  	warning(paste(percentNAUntil, "%% of the time window end times are NA - are the function parameter correct?"))
+  
   data[]
 }
 
