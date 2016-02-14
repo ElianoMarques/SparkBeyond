@@ -231,11 +231,9 @@ functionCatalog = function() {
 #' login
 
 #' Login to SparkBeyond
-login = function(username, password, domain = NA) {	
-	if (!is.na(domain)){
-		setSBserverHost(domain)
-		setSBserverPort("")
-	}
+login = function(username, password, domain) {	
+	if (nchar(domain) < 6) stop("Please provide a domain to log in to")
+	if (substr(domain, 1,4) != "http") warning("The provided domain does not start with 'http' - please verify in case of failure")
 	url <- paste0(getSBserverDomain(),"/login")
 	res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
 	loggedIn = if (res$status_code == 404 || res$status_code == 200) {		#there is a weird redirection causing this, but this actually OK
@@ -287,6 +285,31 @@ currentUser = function(showInfo = TRUE) {
 		loggedIn
 	}
 }
+
+#' projectRevisions
+#' 
+#' Shows information on previous revisions of the project 
+#' @param projectName
+projectRevisions = function(projectName) {
+	#if(!currentUser(FALSE)) stop("Please login")	
+	url = paste0(getSBserverDomain(), "/analytics/revisions/",projectName)
+	res = httr::GET(url)
+	ret = if (res$status_code == 200) {
+		tryCatch({
+			txt =httr::content(res, as="text")
+			if (nchar(txt) > 0 & txt != "[]") {
+				projectInfo = jsonlite::fromJSON(txt=txt,simplifyDataFrame=TRUE)
+				if(!is.null(projectInfo)) {
+					projectInfo$name = as.numeric(projectInfo$name) 
+					projectInfo
+				}else NULL
+			} else NULL
+		})
+	} else NULL
+	if (is.null(ret)) print ("Project not found")
+	excludeCols(ret, c("jsonClass"), verbose = FALSE)
+}
+
 
 #' showProjectsLocks
 
@@ -452,6 +475,7 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 		attempts = 2
 		succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
 		if (!succeeded) {  #uploading only if doesn't exist
+			print(paste("Starting to upload"), filename)
 			urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
 			colHeaders = paste0(colnames(data), collapse = "\t")
 			body = paste0(colHeaders, "\n", 
@@ -463,29 +487,13 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 				succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
 			}
 		}
-		ifelse (succeeded, paste0("/uploaded/",filename), NA)
+		ifelse (succeeded, {
+				print(paste("Successfully uploaded"), filename)
+				paste0("/uploaded/",filename)
+			}, NA)
 	}
 }
 
-projectRevisions = function(projectName) {
-	#if(!currentUser(FALSE)) stop("Please login")	
-	url = paste0(getSBserverDomain(), "/analytics/revisions/",projectName)
-	res = httr::GET(url)
-	ret = if (res$status_code == 200) {
-		tryCatch({
-			txt =httr::content(res, as="text")
-			if (nchar(txt) > 0 & txt != "[]") {
-				projectInfo = jsonlite::fromJSON(txt=txt,simplifyDataFrame=TRUE)
-				if(!is.null(projectInfo)) {
-					projectInfo$name = as.numeric(projectInfo$name) 
-				projectInfo
-				}else NULL
-			} else NULL
-		})
-	} else NULL
-	if (is.null(ret)) print ("Project not found")
-	excludeCols(ret, c("jsonClass"), verbose = FALSE)
-}
 
 #' writeToServer
 #' 
