@@ -4,20 +4,20 @@
 \alias{reportingControl}
 \title{reportingContorl}
 \usage{
-reportingControl(produceFeatureClusteringReport = FALSE,
-  produceReports = NA, scoreOnTestSet = FALSE, emailForNotification = NA,
-  showWebView = FALSE)
+reportingControl(showWebView = FALSE, emailForNotification = NA,
+  scoreOnTestSet = FALSE, featureClustersReport = FALSE,
+  evaluatedFunctionsReport = FALSE)
 }
 \arguments{
-\item{produceFeatureClusteringReport:}{An indicator to produce feature cluster visualization. FALSE by default.}
+\item{showWebView}{control for whether to show a dynamic web view of the analysis in a browser.}
 
-\item{produceReports:}{"EVALUATED_FUNCTIONS".}
+\item{scoreOnTestSet}{Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.}
 
-\item{scoreOnTestSet:}{Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.}
+\item{featureClustersReport}{Produce feature cluster visualization. FALSE by default.}
 
-\item{emailNotification:}{An optional email to notify when the learning is finished.}
+\item{evaluatedFunctionsReport}{Creates a report with the entire list of functions that were evaluated. For contextObjects will also show for each object which functions directly used the contextObject.}
 
-\item{showWebView:}{control for whether to show a dynamic web view of the analysis in a browser.}
+\item{emailNotification}{An optional email to notify when the learning is finished.}
 }
 \description{
 reportingContorl

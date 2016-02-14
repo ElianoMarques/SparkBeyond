@@ -4,18 +4,20 @@
 \alias{problemDefinitionControl}
 \title{problemDefinitionControl}
 \usage{
-problemDefinitionControl(regressionMode = NA, weightColumn = NA,
+problemDefinitionControl(forceRegression = NA, weightColumn = NA,
   weightByClass = FALSE, trainTestSplitRatio = 0.8,
   temporalSplitColumn = NA)
 }
 \arguments{
-\item{weightColumn:}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}
+\item{forceRegression}{Boolean. Force the problem to be regression problem instead of classification. Optional - NA by default will choose the best problem definition based on the target.}
 
-\item{weightByClass:}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
+\item{weightColumn}{Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.}
 
-\item{trainTestSplitRatio:}{Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.}
+\item{weightByClass}{Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.}
 
-\item{temporalSplitColumn:}{Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.}
+\item{trainTestSplitRatio}{Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.}
+
+\item{temporalSplitColumn}{Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.}
 }
 \description{
 problemDefinitionControl

@@ -4,22 +4,28 @@
 \alias{knowledgeControl}
 \title{knowledge Control}
 \usage{
-knowledgeControl(useGraph = FALSE, useOpenStreetMap = FALSE,
-  useWeather = FALSE, useCustomGraphs = FALSE, customGraphsWhiteList = NA,
-  customGraphsBlackList = NA, customFunctions = NA)
+knowledgeControl(linkedDataCore = FALSE, openStreetMap = FALSE,
+  weather = FALSE, usCensus = FALSE, news = FALSE, worldBank = FALSE,
+  twitter = FALSE, searchEngines = FALSE, customDatasets = FALSE)
 }
 \arguments{
-\item{useGraph:}{Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.}
+\item{linkedDataCore}{Includes DBPedia, Yago2, Wordnet and OpenLibrary. DBpedia is a crowd-sourced community effort to extract structured information from Wikipedia. Matches training data by Text elements.}
 
-\item{useOpenStreetMap:}{Optional. A boolean indicating whether Open Street Map data should be included in feature search. FALSE by default.}
+\item{openStreetMap}{OpenStreetMap (OSM) is a collaborative project to create a free editable map of the world. Matches training data by location (coordinate).}
 
-\item{useCustomGraphs:}{A boolean indicating whether custom graphs should be used. FALSE by default.}
+\item{weather}{Weather data from NOAA Climate.gov. Matches the training data by date and location.}
 
-\item{customGraphsWhiteList:}{Optional. A list that filters which domains should be used. NA by default.}
+\item{usCensus}{Experimental: The United States Census decennial census. Matches training data by Zipcode.}
 
-\item{customGraphsBlackList:}{Optional. A list that filters which custom graphs should be ignored. NA by default.}
+\item{news}{Experimental: News data from the GDELT Project that monitors the world's broadcast, print, and web news. Matches the training data based on a date, location or both.}
 
-\item{customFunctions:}{Optional. A list of additional functions that should be incorporated to the feature search. NA by default.}
+\item{worldBank}{Experimental: Historical values of the World Bank Global Development Indicators (WDI) by country. Matches the training data by a country.}
+
+\item{twitter}{Experimental: information from tweets that appeared on a certain date (based on dates in the data). (Limited by the maximum allowed Twitter quota per day).}
+
+\item{searchEngines}{Experimental: Use search engines to find matching datasets. Matches training data by textual elements}
+
+\item{customDatasets}{Custom datasets current include include US zipcode information with 44 parameters, UK postcode information, data on the largest 1000 cities and airport information.}
 }
 \description{
 knowledge Control

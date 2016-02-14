@@ -6,6 +6,9 @@
 \usage{
 projectRevisions(projectName)
 }
+\arguments{
+\item{projectName}{name of project}
+}
 \description{
 Shows information on previous revisions of the project
 }

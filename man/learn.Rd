@@ -6,11 +6,10 @@
 \usage{
 learn(projectName, trainData, target, testData = NULL,
   contextDatasets = NULL, problemDefinition = problemDefinitionControl(),
-  preProcessingCtrl = preProcessingControl(),
-  featureGenerationCtrl = featureGenerationControl(),
-  knowledgeCtrl = knowledgeControl(),
-  modelBuildingCtrl = modelBuildingControl(),
-  reportingCtrl = reportingControl(), runBlocking = TRUE, ...)
+  preProcessing = preProcessingControl(),
+  featureGeneration = featureGenerationControl(),
+  knowledge = knowledgeControl(), modelBuilding = modelBuildingControl(),
+  reporting = reportingControl(), runBlocking = TRUE, ...)
 }
 \arguments{
 \item{target}{String of the column name of in the training file that contains the target of the prediction.}
@@ -25,15 +24,15 @@ learn(projectName, trainData, target, testData = NULL,
 
 \item{problemDefinition:}{A \code{\link{problemDefinitionControl}} object with specific problem definition parameters.}
 
-\item{preProcessingCtrl:}{A \code{\link{preProcessingControl}} object with specific preprocessing parameters.}
+\item{preProcessing:}{A \code{\link{preProcessingControl}} object with specific preprocessing parameters.}
 
-\item{featureGenerationCtrl:}{A \code{\link{featureGenerationControl}} object with specific feature generation parameters.}
+\item{featureGeneration:}{A \code{\link{featureGenerationControl}} object with specific feature generation parameters.}
 
-\item{knowledgeCtrl:}{A \code{\link{knowledgeControl}} object with specific external knowledge parameters.}
+\item{knowledge:}{A \code{\link{knowledgeControl}} object with specific external knowledge parameters.}
 
-\item{modelBuildingCtrl:}{A \code{\link{modelBuildingControl}} object with specific model building parameters.}
+\item{modelBuilding:}{A \code{\link{modelBuildingControl}} object with specific model building parameters.}
 
-\item{reportingCtrl:}{A \code{\link{reportingControl}} object with specific reporting parameters.}
+\item{reporting:}{A \code{\link{reportingControl}} object with specific reporting parameters.}
 
 \item{runBlocking:}{Block the R console while the session is running. FALSE by default.}
 }
@@ -44,6 +43,6 @@ Session object that encapsulates the model.
 Runs SparkBeyond feature enrichment and learning process.
 }
 \examples{
-#session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
+#session = learn("titanic", getData("titanic_train"), target = "survived")
 }
 

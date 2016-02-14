@@ -4,15 +4,17 @@
 \alias{preProcessingControl}
 \title{preProcessingControl}
 \usage{
-preProcessingControl(emptyValuePolicy = NA, fileEncoding = NA,
-  fileEscaping = TRUE)
+preProcessingControl(fileEscaping = TRUE, fileEncoding = NA,
+  linesForTypeDetection = NA, emptyValuePolicy = emptyValuePolicyList())
 }
 \arguments{
-\item{emptyValuePolicy:}{Controls how empty values in the data are being handled NA by default will replace numeric value with median value, and strings with empty strings.}
+\item{fileEscaping}{Define how escaping (e.g., \\n) should be handled when files are parsed.}
 
-\item{fileEncoding:}{Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.}
+\item{fileEncoding}{Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.}
 
-\item{fileEscaping:}{Define how escaping (e.g., \\n) should be handled when files are parsed.}
+\item{linesForTypeDetection}{maximum number of lines that should be used for type detection. 10000 by default.}
+
+\item{emptyValuePolicy}{Controls how empty values in numeric columns in the input data are being handled. Median is default see \code{\link{emptyValuePolicyList}}.}
 }
 \description{
 preProcessingControl

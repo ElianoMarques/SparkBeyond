@@ -292,7 +292,7 @@ currentUser = function(showInfo = TRUE) {
 #' projectRevisions
 #' 
 #' Shows information on previous revisions of the project 
-#' @param projectName
+#' @param projectName name of project
 projectRevisions = function(projectName) {
 	#if(!currentUser(FALSE)) stop("Please login")	
 	url = paste0(getSBserverDomain(), "/analytics/revisions/",projectName)
@@ -478,7 +478,7 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 		attempts = 2
 		succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
 		if (!succeeded) {  #uploading only if doesn't exist
-			print(paste("Starting to upload"), filename)
+			print(paste("Starting to upload", filename))
 			urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
 			colHeaders = paste0(colnames(data), collapse = "\t")
 			body = paste0(colHeaders, "\n", 
@@ -491,7 +491,7 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 			}
 		}
 		ifelse (succeeded, {
-				print(paste("Successfully uploaded"), filename)
+				print(paste("Successfully uploaded", filename))
 				paste0("/uploaded/",filename)
 			}, NA)
 	}

@@ -4,48 +4,59 @@
 \alias{featureGenerationControl}
 \title{featureGenerationControl}
 \usage{
-featureGenerationControl(maxDepth = 2, featureSearchMode = "DEFAULT",
+featureGenerationControl(maxFeaturesCount = list(300),
+  automaticSelectionOfNumberOfFeatures = FALSE, minSupportAbsolute = NA,
+  maxDepth = 2, featureSearchMode = featureSearchModeList(),
   functionsWhiteList = NA, functionsBlackList = NA,
+  localTopFeatureCount = NA, regressionDiscretizerBinsOverride = NA,
   booleanNumericFeatures = NA, numericEqualityFeatures = TRUE,
   allowRangeFeatures = TRUE, crossRowFeatureSearch = FALSE,
-  maxFeaturesCount = list(300), autoColumnSubSets = list("CONCEPT"),
-  customColumnSubsets = NA, maxFeatureDuration = 100,
+  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
+  maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
   allocatedMemoryMB = 1000, maxCollectionSize = NA,
   useCachedFeatures = TRUE)
 }
 \arguments{
-\item{maxDepth:}{Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
+\item{maxFeaturesCount}{A list of integers indicating how many features should be created by the SparkBeyond engine. Optional 300 by default. Please note that if several feature cuts are defined they will be evaluated during the model building by cross validation and may result in increased running time.}
 
-\item{featureSearchMode:}{One of the following DEFAULT, ADVANCED, ADVANCED_WITH_PAIRS, DIG_DEEP}
+\item{minSupportAbsolute}{Minimal support in absolute number of instances that any feature should have. 3 by default. Setting this parameter to a high value may result in less (than requested) features being produced.}
 
-\item{functionsWhiteList:}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
+\item{maxDepth}{Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.}
 
-\item{functionsBlackList:}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.}
+\item{featureSearchMode}{Smart presets for creating deep features and explore interactions. See \code{\link{featureSearchModeList}} for details.}
 
-\item{booleanNumericFeatures:}{A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.}
+\item{functionsWhiteList}{Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.}
 
-\item{numericEqualityFeatures:}{A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.}
+\item{functionsBlackList}{Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.}
 
-\item{allowRangeFeatures:}{A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.}
+\item{localTopFeatureCount}{The maximal number of top features that should be created from a single column. 1000 by default.}
+
+\item{regressionDiscretizerBinsOverride}{Define the bin boundaries that should be created for regresion problem bins. By default 6 bins will be created, with boundaries defined by equal mass (in order to not create a bias towards any of the bins). Should be a list of numbers spanning the entire target range. These bins will be used only for feature search purposes and not for model building.}
+
+\item{booleanNumericFeatures}{A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.}
+
+\item{numericEqualityFeatures}{A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.}
+
+\item{allowRangeFeatures}{A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.}
+
+\item{autoColumnSubSets}{Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.}
+
+\item{customColumnSubsets}{Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.}
+
+\item{maxFeatureDuration}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.}
+
+\item{overrideMaxFeatureDurationForExternalData}{A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.}
+
+\item{allocatedMemoryMB}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
+
+\item{maxCollectionSize}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. NA by default corresponding to 200K.}
+
+\item{useCachedFeatures}{Optional. A boolean indicating whether to use cached features (from previous run). TRUE by default.}
+
+\item{automaticSelectionOfNumberOfFeatures.}{A heuristic that aims to produce a one or more feature counts that will improve the cummulative RIG for the set of features. (All automatically produced cutoffs are guaranteed to be below the maximum limit defined in maxFeaturesCount). Please note that as several feature cuts can be produced and evaluated during the model building using cross validation, setting this feature to TRUE may result in increased running time.}
 
 \item{crossRowFeatureSearch.}{A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.}
-
-\item{maxFeaturesCount:}{Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.}
-
-\item{autoColumnSubSets:}{Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.}
-
-\item{customColumnSubsets:}{Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.}
-
-\item{maxFeatureDuration:}{Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.}
-
-\item{overrideMaxFeatureDurationForExternalData:}{A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.}
-
-\item{allocatedMemoryMB:}{Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.}
-
-\item{maxCollectionSize:}{Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. NA by default corresponding to 200K.}
-
-\item{useCachedFeatures:}{Optional. A boolean indicating whether to use cached features (from previous run). TRUE by default.}
 }
 \description{
 featureGenerationControl

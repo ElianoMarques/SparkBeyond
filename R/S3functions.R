@@ -3,18 +3,20 @@
 
 #' problemDefinitionControl
 #' 
-#' @param weightColumn: Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
-#' @param weightByClass: Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
-#' @param trainTestSplitRatio: Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
-#' @param temporalSplitColumn: Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.  
+#' @param forceRegression Boolean. Force the problem to be regression problem instead of classification. Optional - NA by default will choose the best problem definition based on the target.
+#' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
+#' @param weightByClass Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
+#' @param trainTestSplitRatio Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
+#' @param temporalSplitColumn Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.  
 problemDefinitionControl = function(
-	regressionMode = NA,
+	forceRegression = NA,
 	weightColumn = NA,
 	weightByClass = FALSE,
 	trainTestSplitRatio = 0.8,
 	temporalSplitColumn = NA
 ){
 	list(
+		forceRegression = forceRegression,
 		trainTestSplitRatio = trainTestSplitRatio,
 		temporalSplitColumn = temporalSplitColumn,
 		weightByClass = weightByClass,
@@ -24,13 +26,15 @@ problemDefinitionControl = function(
 
 #' preProcessingControl
 #' 
-#' @param emptyValuePolicy: Controls how empty values in the data are being handled NA by default will replace numeric value with median value, and strings with empty strings.
-#' @param fileEncoding: Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
-#' @param fileEscaping: Define how escaping (e.g., \\n) should be handled when files are parsed.
+#' @param fileEscaping Define how escaping (e.g., \\n) should be handled when files are parsed.
+#' @param fileEncoding Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
+#' @param linesForTypeDetection maximum number of lines that should be used for type detection. 10000 by default.
+#' @param emptyValuePolicy Controls how empty values in numeric columns in the input data are being handled. Median is default see \code{\link{emptyValuePolicyList}}.
 preProcessingControl = function(
-	emptyValuePolicy = NA,
+	fileEscaping = TRUE,
 	fileEncoding = NA,
-	fileEscaping = TRUE
+	linesForTypeDetection = NA,
+	emptyValuePolicy = emptyValuePolicyList()
 ) {
 	list(
 		emptyValuePolicy = emptyValuePolicy,
@@ -39,36 +43,88 @@ preProcessingControl = function(
 	)
 }
 
+#' emptyValuePolicyList
+#' 
+#' Defines how empty values in numeric columns in the original data are being handled.
+#' Please note - only one of the following should be set to true
+#' @param median Median value of a column
+#' @param average Average value of a column
+#' @param nan Not a number
+#' @param negativeInfinity Negative infinity 
+emptyValuePolicyList = function(
+	median = TRUE,
+	average = FALSE,
+	nan = FALSE,
+	negativeInfinity = FALSE
+) {
+	policy = "Median"
+	if (average) policy = "Average"
+	if (nan) policy = "NaN"
+	if (negativeInfinity) policy = "NegativeInfinity"
+	policy
+}
+
+#' featureSearchModeList
+#' 
+#' Smart presets for creating deep features and explore interactions.
+#' Please note - only one of the following should be set to true
+#' @param default This mode is the standard feature search mode that composes all possible function up to a predefined complexity which is based on the column type, specific functions combination, and the depth definition.
+#' @param advanced This mode uses a genetic algorithm approach that will attempt to create more composite functions combination in places where a stronger signal was found - e.g., if an interim feature on time series data has shown signal in preliminary analysis, more effort will be made to exact additional signal by creating more complex expression which use or variant of that interim feature. 
+#' @param advancedWithPairs This mode is similar to the one above with a focus on combining signals from pairs of interactions and producing more complex features from promising interim features pairs - please check "deep feature search with pairs example" in section G of the examples page.
+#' @param aggressiveWithPairs Experimental: In this mode the algorithm selects fewer pair interactions to examine but explores them more aggressively.
+#' @param digDeep This mode would follow more aggressively at looking for interactions between multiple interim features, and can attempt to create features using up to 5 fields. please check "deep feature search with many interactions" example in section G of the examples page.
+featureSearchModeList = function(
+	default = TRUE,
+	advanced = FALSE,
+	advancedWithPairs = FALSE,
+	aggressiveWithPairs = FALSE,
+	digDeep = FALSE
+) {
+	mode = "DEFAULT"
+	if (advanced) mode = "ADVANCED"
+	if (advancedWithPairs) mode = "ADVANCED_WITH_PAIRS"
+	if (aggressiveWithPairs) mode = "AGGRESSIVE_WITH_PAIRS"
+	if (digDeep) mode = "DIG_DEEP"
+	mode
+}
+
 #' featureGenerationControl
 #' 
-#' @param maxDepth: Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
-#' @param featureSearchMode: One of the following DEFAULT, ADVANCED, ADVANCED_WITH_PAIRS, DIG_DEEP
-#' @param functionsWhiteList: Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
-#' @param functionsBlackList: Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
-#' @param booleanNumericFeatures: A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.
-#' @param numericEqualityFeatures: A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.
-#' @param allowRangeFeatures: A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.
-
+#' @param maxFeaturesCount A list of integers indicating how many features should be created by the SparkBeyond engine. Optional 300 by default. Please note that if several feature cuts are defined they will be evaluated during the model building by cross validation and may result in increased running time. 
+#' @param automaticSelectionOfNumberOfFeatures. A heuristic that aims to produce a one or more feature counts that will improve the cummulative RIG for the set of features. (All automatically produced cutoffs are guaranteed to be below the maximum limit defined in maxFeaturesCount). Please note that as several feature cuts can be produced and evaluated during the model building using cross validation, setting this feature to TRUE may result in increased running time. 
+#' @param minSupportAbsolute Minimal support in absolute number of instances that any feature should have. 3 by default. Setting this parameter to a high value may result in less (than requested) features being produced. 
+#' @param maxDepth Optional. Integer < 8 which represent the maximum number of transformations allowed during the feature search phase. Increasing this value should be considered with cautious as the feature search phase is exponential. 2 by default.
+#' @param featureSearchMode Smart presets for creating deep features and explore interactions. See \code{\link{featureSearchModeList}} for details.
+#' @param functionsWhiteList Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
+#' @param functionsBlackList Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
+#' @param localTopFeatureCount The maximal number of top features that should be created from a single column. 1000 by default.
+#' @param regressionDiscretizerBinsOverride Define the bin boundaries that should be created for regresion problem bins. By default 6 bins will be created, with boundaries defined by equal mass (in order to not create a bias towards any of the bins). Should be a list of numbers spanning the entire target range. These bins will be used only for feature search purposes and not for model building. 
+#' @param booleanNumericFeatures A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.
+#' @param numericEqualityFeatures A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.
+#' @param allowRangeFeatures A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
-#' @param maxFeaturesCount: Optional. A list of integers indicating how many features should be created by the SB engine. 300 by default.
-#' @param autoColumnSubSets: Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
-#' @param customColumnSubsets: Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.
-#' @param maxFeatureDuration: Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
-#' @param overrideMaxFeatureDurationForExternalData: A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.
-#' @param allocatedMemoryMB: Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
-#' @param maxCollectionSize: Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. NA by default corresponding to 200K.
-#' @param useCachedFeatures: Optional. A boolean indicating whether to use cached features (from previous run). TRUE by default.
+#' @param autoColumnSubSets Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
+#' @param customColumnSubsets Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.
+#' @param maxFeatureDuration Optional. A numeric value representing the maximum allowed time a feature may take during search per row in milliseconds. 100 by default.
+#' @param overrideMaxFeatureDurationForExternalData A boolean indicating whether the maxFeatureDuration parameter should not be used for features that use external data. TRUE by default.
+#' @param allocatedMemoryMB Optional. Integer value representing how to chunk the memory during feature search . 1000MB by default.
+#' @param maxCollectionSize Optional. Integer  value repsenting what is the maximum cardinality allowed for a transformation during feature search. NA by default corresponding to 200K.
+#' @param useCachedFeatures Optional. A boolean indicating whether to use cached features (from previous run). TRUE by default.
 featureGenerationControl = function(
+	maxFeaturesCount = list(300),
+	automaticSelectionOfNumberOfFeatures = FALSE,
+	minSupportAbsolute = NA,
 	maxDepth = 2,
-	featureSearchMode = "DEFAULT", 
+	featureSearchMode = featureSearchModeList(), 
 	functionsWhiteList = NA,
 	functionsBlackList = NA,
+	localTopFeatureCount = NA,
+	regressionDiscretizerBinsOverride = NA, 
 	booleanNumericFeatures = NA,
 	numericEqualityFeatures = TRUE,
 	allowRangeFeatures = TRUE,
-	
+
 	crossRowFeatureSearch = FALSE,
-	maxFeaturesCount = list(300),
 	autoColumnSubSets = list("CONCEPT"),
 	customColumnSubsets = NA,
 	maxFeatureDuration = 100,
@@ -78,16 +134,18 @@ featureGenerationControl = function(
 	useCachedFeatures = TRUE
 ) {
 	list(
+		maxFeaturesCount = maxFeaturesCount,
+		minSupportAbsolute = minSupportAbsolute,
 		maxDepth = maxDepth,
 		featureSearchMode = featureSearchMode,
 		functionsWhiteList = functionsWhiteList,
 		functionsBlackList = functionsBlackList,
+		regressionDiscretizerBinsOverride = if (is.na(regressionDiscretizerBinsOverride)) NA else as.list(regressionDiscretizerBinsOverride),
 		booleanNumericFeatures = booleanNumericFeatures,
 		numericEqualityFeatures = numericEqualityFeatures,
 		allowRangeFeatures = allowRangeFeatures,
 		
 		crossRowFeatureSearch = crossRowFeatureSearch,
-		maxFeaturesCount = maxFeaturesCount,
 		autoColumnSubSets = autoColumnSubSets,
 		customColumnSubsets = customColumnSubsets,
 		maxFeatureDuration = maxFeatureDuration,
@@ -100,29 +158,48 @@ featureGenerationControl = function(
 
 #' knowledge Control
 #' 
-#' @param useGraph: Optional. A boolean indicating whether the knowledge graph should be used. FALSE by default.
-#' @param useOpenStreetMap: Optional. A boolean indicating whether Open Street Map data should be included in feature search. FALSE by default.
-#' @param useCustomGraphs: A boolean indicating whether custom graphs should be used. FALSE by default.
-#' @param customGraphsWhiteList: Optional. A list that filters which domains should be used. NA by default.
-#' @param customGraphsBlackList: Optional. A list that filters which custom graphs should be ignored. NA by default.
-#' @param customFunctions: Optional. A list of additional functions that should be incorporated to the feature search. NA by default.
+#' @param linkedDataCore Includes DBPedia, Yago2, Wordnet and OpenLibrary. DBpedia is a crowd-sourced community effort to extract structured information from Wikipedia. Matches training data by Text elements.
+#' @param openStreetMap OpenStreetMap (OSM) is a collaborative project to create a free editable map of the world. Matches training data by location (coordinate).
+#' @param weather Weather data from NOAA Climate.gov. Matches the training data by date and location.
+#' @param usCensus Experimental: The United States Census decennial census. Matches training data by Zipcode.
+#' @param news Experimental: News data from the GDELT Project that monitors the world's broadcast, print, and web news. Matches the training data based on a date, location or both.
+#' @param worldBank Experimental: Historical values of the World Bank Global Development Indicators (WDI) by country. Matches the training data by a country.
+#' @param twitter Experimental: information from tweets that appeared on a certain date (based on dates in the data). (Limited by the maximum allowed Twitter quota per day).
+#' @param searchEngines Experimental: Use search engines to find matching datasets. Matches training data by textual elements
+#' @param customDatasets Custom datasets current include include US zipcode information with 44 parameters, UK postcode information, data on the largest 1000 cities and airport information. 
 knowledgeControl = function(
-	useGraph = FALSE,
-	useOpenStreetMap = FALSE,
-	useWeather = FALSE,
-	useCustomGraphs = FALSE,	
-	customGraphsWhiteList = NA,
-	customGraphsBlackList = NA,
-	customFunctions = NA
+	linkedDataCore = FALSE,
+	openStreetMap = FALSE,
+	weather = FALSE,
+	usCensus = FALSE,
+	news = FALSE,
+	worldBank = FALSE,
+	twitter = FALSE, 
+	searchEngines = FALSE,
+	customDatasets = FALSE
+	
+	#useCustomGraphs = FALSE,	
+	#customGraphsWhiteList = NA,
+	#customGraphsBlackList = NA
 	) {
-		list(
-			useGraph = useGraph,
-			useWeather = useWeather,
-			useOpenStreetMap = useOpenStreetMap,
-			useCustomGraphs = useCustomGraphs,			
-			customGraphsWhiteList = customGraphsWhiteList,
-			customGraphsBlackList = customGraphsBlackList,
-			customFunctions = customFunctions
+	# customGraphsWhiteList A list that filters which domains should be used. NA by default.
+	# customGraphsBlackList A list that filters which custom graphs should be ignored. NA by default.
+	# customFunctions A list of additional functions that should be incorporated to the feature search. NA by default.
+	
+			list(
+				linkedDataCore = linkedDataCore,
+				openStreetMap = openStreetMap,
+				weather = weather,
+				usCensus = usCensus,
+				news = news,
+				worldBank = worldBank,
+				twitter = twitter,
+				searchEngines = searchEngines,
+				customDatasets = customDatasets
+			
+				#customGraphsWhiteList = customGraphsWhiteList,
+				#customGraphsBlackList = customGraphsBlackList,
+				#customFunctions = customFunctions
 		)
 }
 
@@ -192,22 +269,21 @@ algorithmsList = function(
 
 #' reportingContorl
 #' 
-
-#' @param produceFeatureClusteringReport: An indicator to produce feature cluster visualization. FALSE by default.
-#' @param produceReports: "EVALUATED_FUNCTIONS".
-#' @param scoreOnTestSet: Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
-#' @param emailNotification: An optional email to notify when the learning is finished.
-#' @param showWebView: control for whether to show a dynamic web view of the analysis in a browser.
+#' @param showWebView control for whether to show a dynamic web view of the analysis in a browser.
+#' @param emailNotification An optional email to notify when the learning is finished.
+#' @param scoreOnTestSet Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
+#' @param featureClustersReport Produce feature cluster visualization. FALSE by default.
+#' @param evaluatedFunctionsReport Creates a report with the entire list of functions that were evaluated. For contextObjects will also show for each object which functions directly used the contextObject.
 reportingControl = function(
-	produceFeatureClusteringReport = FALSE,
-	produceReports = NA,
-	scoreOnTestSet = FALSE,
+	showWebView = FALSE,
 	emailForNotification = NA,
-	showWebView = FALSE
+	scoreOnTestSet = FALSE,
+	featureClustersReport = FALSE,
+	evaluatedFunctionsReport = FALSE
 ) {
 	list(
-		produceFeatureClusteringReport = produceFeatureClusteringReport,
-		produceReports = produceReports,
+		featureClustersReport = featureClustersReport,
+		eevaluatedFunctionsReport = evaluatedFunctionsReport,
 		scoreOnTestSet = scoreOnTestSet,
 		emailForNotification = emailForNotification,
 		showWebView = showWebView
@@ -273,24 +349,15 @@ contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list
 #' @param testData: Optional. test data to validate model results. NA by default.
 #' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
 #' @param problemDefinition: A \code{\link{problemDefinitionControl}} object with specific problem definition parameters.
-#' @param preProcessingCtrl: A \code{\link{preProcessingControl}} object with specific preprocessing parameters.
-#' @param featureGenerationCtrl: A \code{\link{featureGenerationControl}} object with specific feature generation parameters.
-#' @param knowledgeCtrl: A \code{\link{knowledgeControl}} object with specific external knowledge parameters.
-#' @param modelBuildingCtrl: A \code{\link{modelBuildingControl}} object with specific model building parameters.
-#' @param reportingCtrl: A \code{\link{reportingControl}} object with specific reporting parameters.
+#' @param preProcessing: A \code{\link{preProcessingControl}} object with specific preprocessing parameters.
+#' @param featureGeneration: A \code{\link{featureGenerationControl}} object with specific feature generation parameters.
+#' @param knowledge: A \code{\link{knowledgeControl}} object with specific external knowledge parameters.
+#' @param modelBuilding: A \code{\link{modelBuildingControl}} object with specific model building parameters.
+#' @param reporting: A \code{\link{reportingControl}} object with specific reporting parameters.
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
 #' @return Session object that encapsulates the model.
 #' @examples
-#' #session = learn("titanic", getData("titanic_train"), target = "survived", algorithmsWhiteList = list("RRandomForest"), runBlocking = TRUE)
-
-# supportThreshold
-# localTopFeatureCount
-# regressionDiscretizerBinsOverride
-# automaticSelectionOfNumberOfFeatures
-# regressionMode
-# empty value policy
-# linesForTypeDetection
-
+#' #session = learn("titanic", getData("titanic_train"), target = "survived")
 learn <- function(
 			 projectName,
 			 trainData,
@@ -298,11 +365,11 @@ learn <- function(
 			 testData = NULL,
 			 contextDatasets = NULL,
 			 problemDefinition = problemDefinitionControl(),
-			 preProcessingCtrl = preProcessingControl(),
-			 featureGenerationCtrl = featureGenerationControl(),
-			 knowledgeCtrl = knowledgeControl(),
-			 modelBuildingCtrl = modelBuildingControl(),
-			 reportingCtrl = reportingControl(),
+			 preProcessing = preProcessingControl(),
+			 featureGeneration = featureGenerationControl(),
+			 knowledge = knowledgeControl(),
+			 modelBuilding = modelBuildingControl(),
+			 reporting = reportingControl(),
 			 runBlocking = TRUE,
 			 ...
 ){
@@ -336,10 +403,10 @@ learn <- function(
 				ifelse(!remoteMode,
 					writeToServer(contextDatasets[[i]]$data, 
 						prefix = paste0(projectName,"_context", contextName),
-						useEscaping = preProcessingCtrl$fileEscaping
+						useEscaping = preProcessing$fileEscaping
 					),
 					uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
-												 , useEscaping = preProcessingCtrl$fileEscaping)
+												 , useEscaping = preProcessing$fileEscaping)
 			)
 		}
 	}
@@ -348,10 +415,10 @@ learn <- function(
 		projectName = projectName,
 		trainingFilePath = 
 			ifelse (!remoteMode,
-					writeToServer(trainData, prefix = paste0(projectName,"_train"), useEscaping = preProcessingCtrl$fileEscaping),
+					writeToServer(trainData, prefix = paste0(projectName,"_train"), useEscaping = preProcessing$fileEscaping),
 					{
 						uploadedPath = uploadToServer(data = trainData,projectName = projectName, name = "train"
-																					, useEscaping = preProcessingCtrl$fileEscaping)
+																					, useEscaping = preProcessing$fileEscaping)
 						if(is.na(uploadedPath)) stop("failed to upload training file to server")
 						uploadedPath
 					}
@@ -360,8 +427,8 @@ learn <- function(
 		testFilePath = 
 			ifelse (!is.null(testData) && (any(grep("data.frame", class(testData))) || class(testData)=="character"),
 				ifelse(!remoteMode,
-						writeToServer(testData, prefix = paste0(projectName,"_test"), useEscaping = preProcessingCtrl$fileEscaping),
-						uploadToServer(data = testData,projectName = projectName, name = "test", useEscaping = preProcessingCtrl$fileEscaping)	
+						writeToServer(testData, prefix = paste0(projectName,"_test"), useEscaping = preProcessing$fileEscaping),
+						uploadToServer(data = testData,projectName = projectName, name = "test", useEscaping = preProcessing$fileEscaping)	
 				),
 				NA
 		),	
@@ -369,55 +436,65 @@ learn <- function(
 		contextDatasets = contextDatasets,
 				
 		#problem definition
-		regressionMode = if(!is.null(extraParams$regressionMode)) extraParams$regressionMode else problemDefinition$regressionMode,
+		regressionMode = if(!is.null(extraParams$forceRegression)) extraParams$forceRegression else problemDefinition$forceRegression,
 		trainTestSplitRatio = trainTestSplitRatio,
 		temporalSplitColumn = if(!is.null(extraParams$temporalSplitColumn)) extraParams$temporalSplitColumn else problemDefinition$temporalSplitColumn,
 		weightColumn = if(!is.null(extraParams$weightColumn)) extraParams$weightColumn else problemDefinition$weightColumn,
 		weightByClass = if(!is.null(extraParams$weightByClass)) extraParams$weightByClass else problemDefinition$weightByClass,
 		
-		
 		# preprocessing control
-		emptyValuePolicy = if(!is.null(extraParams$emptyValuePolicy)) extraParams$emptyValuePolicy else preProcessingCtrl$emptyValuePolicy,
-		fileEncoding = if(!is.null(extraParams$fileEncoding)) extraParams$fileEncoding else preProcessingCtrl$fileEncoding,
-		fileEscaping = if(!is.null(extraParams$fileEscaping)) extraParams$fileEscaping else preProcessingCtrl$fileEscaping,
+		fileEscaping = if(!is.null(extraParams$fileEscaping)) extraParams$fileEscaping else preProcessing$fileEscaping,
+		fileEncoding = if(!is.null(extraParams$fileEncoding)) extraParams$fileEncoding else preProcessing$fileEncoding,
+		emptyValuePolicy = if(!is.null(extraParams$emptyValuePolicy)) extraParams$emptyValuePolicy else preProcessing$emptyValuePolicy,
+		linesForTypeDetection = if(!is.null(extraParams$linesForTypeDetection)) extraParams$linesForTypeDetection else preProcessing$linesForTypeDetection,
 		
 		#feature search parameters
-		featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGenerationCtrl$featureSearchMode,
-		functionsWhiteList = if(!is.null(extraParams$functionsWhiteList)) extraParams$functionsWhiteList else featureGenerationCtrl$functionsWhiteList, 
-		functionsBlackList = if(!is.null(extraParams$functionsBlackList)) extraParams$functionsBlackList else featureGenerationCtrl$functionsBlackList, 
-		booleanNumericFeatures = if(!is.null(extraParams$booleanNumericFeatures)) extraParams$booleanNumericFeatures else featureGenerationCtrl$booleanNumericFeatures,
-		numericEqualityFeatures = if(!is.null(extraParams$numericEqualityFeatures)) extraParams$numericEqualityFeatures else featureGenerationCtrl$numericEqualityFeatures,
-		allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGenerationCtrl$allowRangeFeatures,																
-		crossRowFeatureSearch = if(!is.null(extraParams$crossRowFeatureSearch)) extraParams$crossRowFeatureSearch else featureGenerationCtrl$crossRowFeatureSearch,
-		maxFeaturesCount = if(!is.null(extraParams$maxFeaturesCount)) extraParams$maxFeaturesCount else featureGenerationCtrl$maxFeaturesCount, 
-		autoColumnSubSets = if(!is.null(extraParams$autoColumnSubSets)) extraParams$autoColumnSubSets else featureGenerationCtrl$autoColumnSubSets,
-		customColumnSubsets = if(!is.null(extraParams$customColumnSubsets)) extraParams$customColumnSubsets else featureGenerationCtrl$customColumnSubsets,
-		maxFeatureDuration = if(!is.null(extraParams$maxFeatureDuration)) extraParams$maxFeatureDuration else featureGenerationCtrl$maxFeatureDuration, 
-		overrideMaxFeatureDurationForExternalData = if(!is.null(extraParams$overrideMaxFeatureDurationForExternalData)) extraParams$overrideMaxFeatureDurationForExternalData else featureGenerationCtrl$overrideMaxFeatureDurationForExternalData,
-		useCachedFeatures = if(!is.null(extraParams$useCachedFeatures)) extraParams$useCachedFeatures else featureGenerationCtrl$useCachedFeatures,
-		allocatedMemoryMB = if(!is.null(extraParams$allocatedMemoryMB)) extraParams$allocatedMemoryMB else featureGenerationCtrl$allocatedMemoryMB,
-		maxCollectionSize = if(!is.null(extraParams$maxCollectionSize)) extraParams$maxCollectionSize else featureGenerationCtrl$maxCollectionSize,
-		maxDepth = if(!is.null(extraParams$maxDepth)) extraParams$maxDepth else featureGenerationCtrl$maxDepth,
+		maxFeaturesCount = if(!is.null(extraParams$maxFeaturesCount)) extraParams$maxFeaturesCount else featureGeneration$maxFeaturesCount, 
+		automaticSelectionOfNumberOfFeatures = if(!is.null(extraParams$automaticSelectionOfNumberOfFeatures)) extraParams$automaticSelectionOfNumberOfFeatures else featureGeneration$automaticSelectionOfNumberOfFeatures, 		
+		supportThreshold = if(!is.null(extraParams$minSupportAbsolute)) extraParams$minSupportAbsolute else featureGeneration$minSupportAbsolute, 		
+		featureSearchMode = if(!is.null(extraParams$featureSearchMode)) extraParams$featureSearchMode else featureGeneration$featureSearchMode,
+		functionsWhiteList = if(!is.null(extraParams$functionsWhiteList)) extraParams$functionsWhiteList else featureGeneration$functionsWhiteList, 
+		functionsBlackList = if(!is.null(extraParams$functionsBlackList)) extraParams$functionsBlackList else featureGeneration$functionsBlackList, 
+		localTopFeatureCount = if(!is.null(extraParams$localTopFeatureCount)) extraParams$localTopFeatureCount else featureGeneration$localTopFeatureCount, 
+		regressionDiscretizerBinsOverride = if(!is.null(extraParams$regressionDiscretizerBinsOverride)) extraParams$regressionDiscretizerBinsOverride else featureGeneration$regressionDiscretizerBinsOverride, 
+		booleanNumericFeatures = if(!is.null(extraParams$booleanNumericFeatures)) extraParams$booleanNumericFeatures else featureGeneration$booleanNumericFeatures,
+		numericEqualityFeatures = if(!is.null(extraParams$numericEqualityFeatures)) extraParams$numericEqualityFeatures else featureGeneration$numericEqualityFeatures,
+		allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGeneration$allowRangeFeatures,																
+		crossRowFeatureSearch = if(!is.null(extraParams$crossRowFeatureSearch)) extraParams$crossRowFeatureSearch else featureGeneration$crossRowFeatureSearch,
+		autoColumnSubSets = if(!is.null(extraParams$autoColumnSubSets)) extraParams$autoColumnSubSets else featureGeneration$autoColumnSubSets,
+		customColumnSubsets = if(!is.null(extraParams$customColumnSubsets)) extraParams$customColumnSubsets else featureGeneration$customColumnSubsets,
+		maxFeatureDuration = if(!is.null(extraParams$maxFeatureDuration)) extraParams$maxFeatureDuration else featureGeneration$maxFeatureDuration, 
+		overrideMaxFeatureDurationForExternalData = if(!is.null(extraParams$overrideMaxFeatureDurationForExternalData)) extraParams$overrideMaxFeatureDurationForExternalData else featureGeneration$overrideMaxFeatureDurationForExternalData,
+		useCachedFeatures = if(!is.null(extraParams$useCachedFeatures)) extraParams$useCachedFeatures else featureGeneration$useCachedFeatures,
+		allocatedMemoryMB = if(!is.null(extraParams$allocatedMemoryMB)) extraParams$allocatedMemoryMB else featureGeneration$allocatedMemoryMB,
+		maxCollectionSize = if(!is.null(extraParams$maxCollectionSize)) extraParams$maxCollectionSize else featureGeneration$maxCollectionSize,
+		maxDepth = if(!is.null(extraParams$maxDepth)) extraParams$maxDepth else featureGeneration$maxDepth,
 		
 		#knowledge parameters
-		useGraph = if(!is.null(extraParams$useGraph)) extraParams$useGraph else knowledgeCtrl$useGraph,
-		useOpenStreetMap = if(!is.null(extraParams$useOpenStreetMap)) extraParams$useOpenStreetMap else knowledgeCtrl$useOpenStreetMap,
-		useWeather = if(!is.null(extraParams$useWeather)) extraParams$useWeather else knowledgeCtrl$useWeather,
-		useCustomGraphs = if(!is.null(extraParams$useCustomGraphs)) extraParams$useCustomGraphs else knowledgeCtrl$useCustomGraphs,								
-		customGraphsWhiteList = if(!is.null(extraParams$customGraphsWhiteList)) extraParams$customGraphsWhiteList else knowledgeCtrl$customGraphsWhiteList,
-		customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else knowledgeCtrl$customGraphsBlackList,
-		customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else knowledgeCtrl$customFunctions,
+		useGraph = if(!is.null(extraParams$linkedDataCore)) extraParams$linkedDataCore else knowledge$linkedDataCore,
+		useOpenStreetMap = if(!is.null(extraParams$openStreetMap)) extraParams$openStreetMap else knowledge$openStreetMap,
+		useWeather = if(!is.null(extraParams$weather)) extraParams$weather else knowledge$weather,
+		usCensus = if(!is.null(extraParams$usCensus)) extraParams$usCensus else knowledge$usCensus,
+		news = if(!is.null(extraParams$news)) extraParams$news else knowledge$news,
+		worldBank = if(!is.null(extraParams$worldBank)) extraParams$worldBank else knowledge$worldBank,
+		twitter = if(!is.null(extraParams$twitter)) extraParams$twitter else knowledge$twitter,
+		searchEngines = if(!is.null(extraParams$searchEngines)) extraParams$searchEngines else knowledge$searchEngines,
+		useCustomGraphs = if(!is.null(extraParams$customDatasets)) extraParams$customDatasets else knowledge$customDatasets,								
+		
+		#customGraphsWhiteList = if(!is.null(extraParams$customGraphsWhiteList)) extraParams$customGraphsWhiteList else knowledge$customGraphsWhiteList,
+		#customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else knowledge$customGraphsBlackList,
+		#customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else knowledge$customFunctions,
 		
 		# model building parameters
-		algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuildingCtrl$algorithmsWhiteList,
-		evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuildingCtrl$evaluationMetric,
-		crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuildingCtrl$crossValidation,
+		algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuilding$algorithmsWhiteList,
+		evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuilding$evaluationMetric,
+		crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuilding$crossValidation,
 		
 		#reporting parameters
-		produceFeatureClusteringReport = if(!is.null(extraParams$produceFeatureClusteringReport)) extraParams$produceFeatureClusteringReport else reportingCtrl$produceFeatureClusteringReport,
-		produceReports = if(!is.null(extraParams$produceReports)) extraParams$produceReports else reportingCtrl$produceReports,
-		scoreOnTestSet = if(!is.null(extraParams$scoreOnTestSet)) extraParams$scoreOnTestSet else reportingCtrl$scoreOnTestSet,
-		emailForNotification = reportingCtrl$emailForNotification,
+		produceFeatureClusteringReport = if(!is.null(extraParams$featureClustersReport)) extraParams$featureClustersReport else reporting$featureClustersReport,
+		produceEvaluatedFunctionsReport = if(!is.null(extraParams$evaluatedFunctionsReport)) extraParams$evaluatedFunctionsReport else reporting$evaluatedFunctionsReport,
+		scoreOnTestSet = if(!is.null(extraParams$scoreOnTestSet)) extraParams$scoreOnTestSet else reporting$scoreOnTestSet,
+		emailForNotification = reporting$emailForNotification,
 		
 		externalPrefixPath = ifelse(!remoteMode, getSBserverIOfolder(), NA)
 	)
@@ -458,14 +535,13 @@ learn <- function(
 # 			print (paste("auto saved Session object to a variable named '", varName,"'. To retrieve use:" ,paste0("load('",saveFilename,"').")))
 # 		})
 # 	}
-	if (reportingCtrl$showWebView == TRUE && remoteMode == TRUE) session$webView() 
+	if (reporting$showWebView == TRUE && remoteMode == TRUE) session$webView() 
 	if (runBlocking)session$waitForProcess(remoteMode=remoteMode)
  
 	session$modelBuilt = TRUE
 	return(session)
+	
 }
-
-#################################################################
 
 # Depreacted 
 learn.file = function(...) { 
