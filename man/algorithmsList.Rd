@@ -7,7 +7,12 @@
 algorithmsList(isClassification = NA, randomForest = TRUE,
   xgBoost = FALSE, GBM = FALSE, rpart = FALSE, lassoGlmnet = FALSE,
   ridgeGlmnet = FALSE, linearRegression = FALSE, linearEnsemble = FALSE,
-  stackingEnsemble = FALSE)
+  stackingEnsemble = FALSE, naiveBayes.weka = FALSE, bagging.weka = FALSE,
+  votedPerceptron.weka = FALSE, classificationViaClustering.weka = FALSE,
+  classificationViaRegression.weka = FALSE, randomSubSpace.weka = FALSE,
+  bayesNet.weka = FALSE, libSVM.weka = FALSE, adaBoostM1.weka = FALSE,
+  decisionTable.weka = FALSE, smo.weka = FALSE,
+  smo.regression.weka = FALSE, regressionByDiscretization.weka = FALSE)
 }
 \arguments{
 \item{isClassification}{A boolean indicator for whether to use only classification algorithms or only regression algorithms. If is NA the relevant algorithms are selected based on the target type and cardinality using the learning process.}
@@ -29,6 +34,32 @@ algorithmsList(isClassification = NA, randomForest = TRUE,
 \item{linearEnsemble}{A linear ensemble of a collection of GBM and rpart algorithms.}
 
 \item{stackingEnsemble}{A stacking ensemble of GBM as meta-model that ensmebles a collection of GBM and rpart algorithms.}
+
+\item{naiveBayes.weka}{Classification algorithm. A naive Bayes classifier is a simple probabilistic classifier based on applying Bayes' theorem with strong independence assumptions.}
+
+\item{bagging.weka}{Classification algorithm}
+
+\item{votedPerceptron.weka}{= Classification algorithm. The perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs.}
+
+\item{classificationViaClustering.weka}{Classification algorithm.}
+
+\item{classificationViaRegression.weka}{Classification algorithm.}
+
+\item{randomSubSpace.weka}{Classification algorithm.}
+
+\item{bayesNet.weka}{Classification algorithm.}
+
+\item{libSVM.weka}{Classification algorithm.}
+
+\item{adaBoostM1.weka}{Classification algorithm.}
+
+\item{decisionTable.weka}{Classification algorithm.}
+
+\item{smo.weka}{Classification algorithm.}
+
+\item{smo.regression.weka}{Regression algorithm.}
+
+\item{regressionByDiscretization.weka}{Regression algorithm.}
 }
 \description{
 algorithmsList

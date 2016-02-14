@@ -233,6 +233,19 @@ modelBuildingControl = function(
 #' @param linearRegression linear regression algorithm. lm from the base package.  
 #' @param linearEnsemble A linear ensemble of a collection of GBM and rpart algorithms.
 #' @param stackingEnsemble A stacking ensemble of GBM as meta-model that ensmebles a collection of GBM and rpart algorithms.
+#' @param naiveBayes.weka Classification algorithm. A naive Bayes classifier is a simple probabilistic classifier based on applying Bayes' theorem with strong independence assumptions.
+#' @param bagging.weka Classification algorithm
+#' @param votedPerceptron.weka = Classification algorithm. The perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs.
+#' @param classificationViaClustering.weka Classification algorithm.
+#' @param classificationViaRegression.weka Classification algorithm.
+#' @param randomSubSpace.weka Classification algorithm.
+#' @param bayesNet.weka Classification algorithm.
+#' @param libSVM.weka Classification algorithm.
+#' @param adaBoostM1.weka Classification algorithm.
+#' @param decisionTable.weka Classification algorithm.
+#' @param smo.weka Classification algorithm.
+#' @param smo.regression.weka Regression algorithm.
+#' @param regressionByDiscretization.weka Regression algorithm.
 algorithmsList = function(
 		isClassification = NA,
 		randomForest = TRUE,
@@ -243,7 +256,20 @@ algorithmsList = function(
 		ridgeGlmnet = FALSE,
 		linearRegression = FALSE,
 		linearEnsemble = FALSE,
-		stackingEnsemble = FALSE
+		stackingEnsemble = FALSE,
+		naiveBayes.weka = FALSE,
+		bagging.weka = FALSE,
+		votedPerceptron.weka = FALSE,
+		classificationViaClustering.weka = FALSE,
+		classificationViaRegression.weka = FALSE,
+		randomSubSpace.weka = FALSE,
+		bayesNet.weka = FALSE,
+		libSVM.weka = FALSE,
+		adaBoostM1.weka = FALSE,
+		decisionTable.weka = FALSE,
+		smo.weka = FALSE,
+		smo.regression.weka = FALSE,
+		regressionByDiscretization.weka = FALSE
 	){
 		algsList = vector()
 		if (randomForest) algsList = c(algsList, "RRandomForestClassifier", "RRandomForestRegressor")
@@ -264,6 +290,20 @@ algorithmsList = function(
 	
 		if (!is.null(toKeep)) algsList = algsList[toKeep]
 		
+		if (naiveBayes.weka) algsList = c(algsList, "weka.classifiers.bayes.NaiveBayes")
+		if (bagging.weka) algsList = c(algsList, "weka.classifiers.meta.Bagging(-I 20)")
+		if (votedPerceptron.weka) algsList = c(algsList, "weka.classifiers.functions.VotedPerceptron")
+		if (classificationViaClustering.weka) algsList = c(algsList, "weka.classifiers.meta.ClassificationViaClustering")
+		if (classificationViaRegression.weka) algsList = c(algsList, "weka.classifiers.meta.ClassificationViaRegression")
+		if (randomSubSpace.weka) algsList = c(algsList, "weka.classifiers.meta.RandomSubSpace")
+		if (bayesNet.weka) algsList = c(algsList, "weka.classifiers.bayes.BayesNet")
+		if (libSVM.weka) algsList = c(algsList, "weka.classifiers.functions.LibSVM")
+		if (adaBoostM1.weka) algsList = c(algsList, "weka.classifiers.meta.AdaBoostM1")
+		if (decisionTable.weka) algsList = c(algsList, "weka.classifiers.rules.DecisionTable")
+		if (smo.weka) algsList = c(algsList, "weka.functions.SMO")
+		if (smo.regression.weka) algsList = c(algsList, "weka.classifiers.functions.SMOreg")
+		if (regressionByDiscretization.weka) algsList = c(algsList, "weka.classifiers.meta.RegressionByDiscretization(-B 3 -W weka.classifiers.trees.RandomForest)")
+	
 		algsList
 }
 
