@@ -258,6 +258,7 @@ contextTypesList = function(
 #' @param keyColumns: Specify the key columns to be used by the context object (optional).
 #' @param timeColumn: Specify the time column to be used by the context object (relevant in time series contexts) (optional).
 contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL ) { #TODO: help
+	keyColumns = as.list(keyColumns)
 	obj = list(data = data, contextTypes = contextTypes, name=name, keyColumns = keyColumns, timeColumn=timeColumn, graphSourceNodeColumn=graphSourceNodeColumn, graphTargetNodeColumn=graphTargetNodeColumn)
 	class(obj) = "contextObject"
 	obj
@@ -327,6 +328,7 @@ learn <- function(
 			if (class(contextDatasets) != "contextObject") error("contextDatasets are not of class contextObject")
 			contextDatasets=list(contextDatasets)
 		}
+		contextDatasets = as.list(contextDatasets)
 		if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
 		for (i in 1:length(contextDatasets)) {
 			contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
