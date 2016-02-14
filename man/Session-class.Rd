@@ -44,6 +44,8 @@ SB object that encapsulates a session
 
 \item{\code{reports()}}{Shows all reports applicable for the current analysis.}
 
+\item{\code{revisions()}}{Show previous revisions of a project.}
+
 \item{\code{showConfusionMatrix(normalized = FALSE)}}{Shows a confusion matrix of a model.}
 
 \item{\code{showContextObjects()}}{Shows context objects report.}

@@ -654,6 +654,10 @@ Session = setRefClass("Session",
 				token = httr::content(res, as="text")
 				htmlSource = paste0(getSBserverDomain(), "/?token=", token,"#/visualPipeline/", projectName, "?revision=", revision, "&forceByRevision=true")
 				browseURL(htmlSource)
+			},
+			revisions = function (){
+				"Show previous revisions of a project."
+				projectRevisions(projectName = projectName)
 			}
 
 # save and load are probably more confusing at this time hence commented out. Just use regular save and load.
