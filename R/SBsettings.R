@@ -230,7 +230,10 @@ functionCatalog = function() {
 
 #' login
 
-#' Login to SparkBeyond
+#' Login to SparkBeyond server
+#' @param username Username (usually in email format)
+#' @param password Password
+#' @param domain Domain name or ip of the SparkBeyond Server. (Usually starts with http or https. May require also the port of the server).
 login = function(username, password, domain) {	
 	if (nchar(domain) < 6) stop("Please provide a domain to log in to")
 	if (substr(domain, 1,4) != "http") warning("The provided domain does not start with 'http' - please verify in case of failure")

@@ -3,12 +3,19 @@
 \name{login}
 \alias{login}
 \title{login
-Login to SparkBeyond}
+Login to SparkBeyond server}
 \usage{
-login(username, password, domain = NA)
+login(username, password, domain)
+}
+\arguments{
+\item{username}{Username (usually in email format)}
+
+\item{password}{Password}
+
+\item{domain}{Domain name or ip of the SparkBeyond Server. (Usually starts with http or https. May require also the port of the server).}
 }
 \description{
 login
-Login to SparkBeyond
+Login to SparkBeyond server
 }
 
