@@ -74,7 +74,7 @@ SB object that encapsulates a session
 
 \item{\code{waitForProcess(...)}}{Blocking the R console until session is finished.}
 
-\item{\code{webView()}}{Show a dynamic web view of the analysis.}
+\item{\code{webView(show = TRUE)}}{Show a dynamic web view of the analysis.}
 }}
 \examples{
 # Learning example
