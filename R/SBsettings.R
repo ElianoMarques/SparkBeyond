@@ -488,12 +488,10 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 				httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
 				attempts = attempts - 1
 				succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
+				if (succeeded) print(paste("Successfully uploaded", filename))
 			}
 		}
-		ifelse (succeeded, {
-				print(paste("Successfully uploaded", filename))
-				paste0("/uploaded/",filename)
-			}, NA)
+		ifelse (succeeded, paste0("/uploaded/",filename), NA)
 	}
 }
 
