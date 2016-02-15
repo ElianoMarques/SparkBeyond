@@ -417,6 +417,14 @@ learn <- function(
 ){
 	isLatestRpackage()
 	extraParams = list(...)
+	if(!is.null(extraParams$problemDefinitionCtrl)) problemDefinition = extraParams$problemDefinitionCtrl
+	if(!is.null(extraParams$preProcessingCtrl)) preProcessing = extraParams$preProcessingCtrl
+	if(!is.null(extraParams$featureGenerationCtrl)) featureGeneration = extraParams$featureGenerationCtrl
+	if(!is.null(extraParams$knowledgeCtrl)) knowledge = extraParams$knowledgeCtrl
+	if(!is.null(extraParams$modelBuildingCtrl)) modelBuilding = extraParams$modelBuildingCtrl
+	if(!is.null(extraParams$reportingCtrl)) reporting = extraParams$reportingCtrl
+	
+	
 	# TODO: verify that there are no supurious parameters, e.g. (projectname instead of projectName)
 	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
 	if(remoteMode && !currentUser(FALSE)) stop("Please login before calling the learn function. Thank you.")
