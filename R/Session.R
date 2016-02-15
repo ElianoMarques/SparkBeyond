@@ -647,13 +647,14 @@ Session = setRefClass("Session",
 					reportList
 				}else NULL
 			},
-			webView = function (){
+			webView = function (show=TRUE){
 				"Show a dynamic web view of the analysis."
 				url <- paste0(getSBserverDomain(),paste0("/getToken")) 
 				res = httr::GET(url)
 				token = httr::content(res, as="text")
 				htmlSource = paste0(getSBserverDomain(), "/?token=", token,"#/visualPipeline/", projectName, "?revision=", revision, "&forceByRevision=true")
-				browseURL(htmlSource)
+				if (show == T) browseURL(htmlSource)
+				htmlSource
 			},
 			revisions = function (){
 				"Show previous revisions of a project."
