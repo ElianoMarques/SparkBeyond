@@ -11,7 +11,7 @@ algorithmsList(isClassification = NA, randomForest = TRUE,
   votedPerceptron.weka = FALSE, classificationViaClustering.weka = FALSE,
   classificationViaRegression.weka = FALSE, randomSubSpace.weka = FALSE,
   bayesNet.weka = FALSE, libSVM.weka = FALSE, adaBoostM1.weka = FALSE,
-  decisionTable.weka = FALSE, smo.weka = FALSE,
+  decisionTable.weka = FALSE, smo.weka = FALSE, repTree.weka = FALSE,
   smo.regression.weka = FALSE, regressionByDiscretization.weka = FALSE)
 }
 \arguments{
@@ -39,7 +39,7 @@ algorithmsList(isClassification = NA, randomForest = TRUE,
 
 \item{bagging.weka}{Classification algorithm}
 
-\item{votedPerceptron.weka}{= Classification algorithm. The perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs.}
+\item{votedPerceptron.weka}{Classification algorithm. The perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs.}
 
 \item{classificationViaClustering.weka}{Classification algorithm.}
 
@@ -56,6 +56,8 @@ algorithmsList(isClassification = NA, randomForest = TRUE,
 \item{decisionTable.weka}{Classification algorithm.}
 
 \item{smo.weka}{Classification algorithm.}
+
+\item{repTree.weka}{Regression algorithm.}
 
 \item{smo.regression.weka}{Regression algorithm.}
 

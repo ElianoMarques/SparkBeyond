@@ -235,7 +235,7 @@ modelBuildingControl = function(
 #' @param stackingEnsemble A stacking ensemble of GBM as meta-model that ensmebles a collection of GBM and rpart algorithms.
 #' @param naiveBayes.weka Classification algorithm. A naive Bayes classifier is a simple probabilistic classifier based on applying Bayes' theorem with strong independence assumptions.
 #' @param bagging.weka Classification algorithm
-#' @param votedPerceptron.weka = Classification algorithm. The perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs.
+#' @param votedPerceptron.weka Classification algorithm. The perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs.
 #' @param classificationViaClustering.weka Classification algorithm.
 #' @param classificationViaRegression.weka Classification algorithm.
 #' @param randomSubSpace.weka Classification algorithm.
@@ -244,6 +244,7 @@ modelBuildingControl = function(
 #' @param adaBoostM1.weka Classification algorithm.
 #' @param decisionTable.weka Classification algorithm.
 #' @param smo.weka Classification algorithm.
+#' @param repTree.weka Regression algorithm.
 #' @param smo.regression.weka Regression algorithm.
 #' @param regressionByDiscretization.weka Regression algorithm.
 algorithmsList = function(
@@ -268,6 +269,7 @@ algorithmsList = function(
 		adaBoostM1.weka = FALSE,
 		decisionTable.weka = FALSE,
 		smo.weka = FALSE,
+		repTree.weka = FALSE,
 		smo.regression.weka = FALSE,
 		regressionByDiscretization.weka = FALSE
 	){
@@ -301,9 +303,9 @@ algorithmsList = function(
 		if (adaBoostM1.weka) algsList = c(algsList, "weka.classifiers.meta.AdaBoostM1")
 		if (decisionTable.weka) algsList = c(algsList, "weka.classifiers.rules.DecisionTable")
 		if (smo.weka) algsList = c(algsList, "weka.functions.SMO")
+		if (repTree.weka) algsList = c(algsList, "weka.classifiers.trees.REPTree(-M 5)")
 		if (smo.regression.weka) algsList = c(algsList, "weka.classifiers.functions.SMOreg")
 		if (regressionByDiscretization.weka) algsList = c(algsList, "weka.classifiers.meta.RegressionByDiscretization(-B 3 -W weka.classifiers.trees.RandomForest)")
-	
 		algsList
 }
 
