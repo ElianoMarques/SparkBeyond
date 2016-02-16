@@ -238,6 +238,7 @@ login = function(username, password, domain) {
 	if (nchar(domain) < 6) stop("Please provide a domain to log in to")
 	if (substr(domain, 1,4) != "http") warning("The provided domain does not start with 'http' - please verify in case of failure")
 	url <- paste0(domain,"/login")
+	setSBserverHost(domain)
 	res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
 	loggedIn = if (res$status_code == 404 || res$status_code == 200) {		#there is a weird redirection causing this, but this actually OK
 		setSBserverIOfolder(NULL)
