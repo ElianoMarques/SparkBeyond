@@ -479,7 +479,7 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 		attempts = 2
 		succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
 		if (!succeeded) {  #uploading only if doesn't exist
-			print(paste("Starting to upload", filename))
+			message(paste("Starting to upload", filename))
 			urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
 			colHeaders = paste0(colnames(data), collapse = "\t")
 			body = paste0(colHeaders, "\n", 
@@ -489,7 +489,7 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 				httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
 				attempts = attempts - 1
 				succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
-				if (succeeded) print(paste("Successfully uploaded", filename))
+				if (succeeded) message(paste("Successfully uploaded", filename))
 			}
 		}
 		ifelse (succeeded, paste0("/uploaded/",filename), NA)

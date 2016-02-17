@@ -60,8 +60,8 @@ Session = setRefClass("Session",
         hasShownFeatures = FALSE
         isRunning = FALSE
         lastQueuePosition = -1
-        print("You are now running in a Blocking Mode")
-				print("In order to see the job queue, terminate the current command and run showJobs(status='queued')")
+        message("You are now running in a Blocking Mode")
+				message("In order to see the job queue, terminate the current command and run showJobs(status='queued')")
                 
         readStreamingAPI = function(prevLine = 0) {
         	#/rapi/notificationsLog/:project/:revision?skipLines=x
@@ -70,7 +70,7 @@ Session = setRefClass("Session",
 					if (res$status == 200) {
 						txt = httr::content(res, as="text")
 						if (nchar(txt) > 0) {
-							writeLines(txt)
+							message(txt)
 							length(strsplit(x = txt, split = "\n")[[1]]) # returning the number of lines read
 						} else 0
 					} else 0
@@ -100,7 +100,7 @@ Session = setRefClass("Session",
 					if (!is.null(queuedJobs) && !is.na(jobId) && length(which(queuedJobs$id == jobId)) > 0) {
 						curQueuePosition = which(queuedJobs$id == jobId)
     				if (curQueuePosition != lastQueuePosition) {
-							print(paste("Learning job (", jobId ,") position in the queue is", curQueuePosition))
+							message(paste("Learning job (", jobId ,") position in the queue is", curQueuePosition))
     				}
 						curQueuePosition
 					}
@@ -121,8 +121,8 @@ Session = setRefClass("Session",
 						if (!is.null(f)) {
 							featuresCount = nrow(f)
 							cntToShow = min(featuresCount, 50)
-							print(paste("Printing top", cntToShow, "features out of", featuresCount))
-							print(f[1:cntToShow,c("idx","feature","RIG", "lin..score", "support")])
+							message(paste("Printing top", cntToShow, "features out of", featuresCount))
+							print(f[1:cntToShow,c("idx","feature","RIG", "lin..score", "support")]) #TODO: need to understand how to show this properly as a message
 							internalHasShownFeatures = TRUE
 						}
 					}
@@ -159,7 +159,7 @@ Session = setRefClass("Session",
           				 		jobFinished = TRUE
           				 },
           				 canceled = {
-          				 		print ("Learning session was cancelled")
+          				 		message ("Learning session was cancelled")
           				 		finalStatus = "Cancelled"
           				 		jobFinished = TRUE
           				 },
@@ -275,9 +275,9 @@ Session = setRefClass("Session",
         )
         params = params[!is.na(params)]
 
-        print (paste("Enriching ",params$dataPath))
+        message (paste("Enriching ",params$dataPath))
         url <- paste0(getSBserverDomain(),"/rapi/enrich")
-        print(paste("Calling:", url))
+        message(paste("Calling:", url))
 
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
@@ -290,7 +290,7 @@ Session = setRefClass("Session",
         		if (res2$status == 200) {
         			localfile = paste0(outputName, ".tsv.gz")
         			writeBin(httr::content(res2), localfile)
-        			print(paste0("Results written to: ", getwd(),"/", localfile))
+        			message(paste0("Results written to: ", getwd(),"/", localfile))
         			df = read.table(localfile, sep="\t", quote = "",header=TRUE)
         			for(i in 1:ncol(df)) {
         				if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
@@ -314,10 +314,10 @@ Session = setRefClass("Session",
         	}
         } else {
           message = paste("Enrichment failed: ", res$error)
-          print(message)
+          message(message)
           stop(message)
         }
-        print("Done.")
+        message("Done.")
         return(finalRes)
       },
 
@@ -367,9 +367,9 @@ Session = setRefClass("Session",
         )        							
         params = params[!is.na(params)] 							
 
-        print (paste("Predicting ",params$dataPath))
+        message (paste("Predicting ",params$dataPath))
         url <- paste0(getSBserverDomain(),"/rapi/predict")
-        print(paste("Calling:", url))
+        message(paste("Calling:", url))
 
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
@@ -382,13 +382,13 @@ Session = setRefClass("Session",
         		if (res2$status == 200) {
         			localfile = paste0(outputName, ".tsv.gz")
         			writeBin(httr::content(res2), localfile)
-        			print(paste0("Results written to: ", getwd(),"/", localfile))
+        			message(paste0("Results written to: ", getwd(),"/", localfile))
         			read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE)
         		} else NA 
         	} else {
 	          table = read.table(res$result, header = TRUE, sep="\t")
 	          resultsLocation = paste0(artifact_loc, "/reports/predictions/test/")
-	          print (paste("Predictions and plots are available at:", resultsLocation))
+	          message (paste("Predictions and plots are available at:", resultsLocation))
 	          files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
 	          if (length(files) > 0) {
 	            htmlFilesInd = which(files)
@@ -401,10 +401,10 @@ Session = setRefClass("Session",
         	}
         } else {
           message = paste("Prediction failed: ", res$error)
-          print(message)
+          message(message)
           stop(message)
         }
-        print("Done.")
+        message("Done.")
         return(finalRes)
       },
 
@@ -434,7 +434,7 @@ Session = setRefClass("Session",
         params = params[!is.na(params)]
 
         url <- paste0(getSBserverDomain(),"/rapi/liftFromPredictionResults")
-        print(paste("Calling:", url))
+        message(paste("Calling:", url))
 
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
@@ -453,15 +453,15 @@ Session = setRefClass("Session",
           if (res2$status == 200) {
           	localfile = paste0(outputName, ".tsv.gz")
           	writeBin(httr::content(res2), localfile)
-          	print(paste0("Results written to: ", getwd(),"/", localfile))
+          	message(paste0("Results written to: ", getwd(),"/", localfile))
           	read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE)
           } else NA 
         } else {
           message = paste("Lift failed: ", res$error)
-          print(message)
+          message(message)
           stop(message)
         }
-        print("Done.")
+        message("Done.")
         return(finalRes)
       },
 
@@ -485,14 +485,14 @@ Session = setRefClass("Session",
         params = params[!is.na(params)]
 
         url <- paste0(getSBserverDomain(),"/rapi/createPackage")
-        print(paste("Calling:", url))
+        message(paste("Calling:", url))
 
         body = rjson::toJSON(params)
        # print(body)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
         finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK") {
-          print ("Package created successfully")
+        	message ("Package created successfully")
           TRUE
         } else {
           errorFile = paste0(artifact_loc,"/package-errors.txt")
@@ -641,7 +641,7 @@ Session = setRefClass("Session",
 					n <- readline("enter a number of report to show or <enter> otherwise:")
 					n <- ifelse(grepl("\\D",n),-1,as.integer(n))
 					if(!is.na(n) && n >= 1 && n <= length(reportList)) {
-						print(paste("showing",n))
+						message(paste("showing",n))
 						showReport(reportList[n])
 					}										
 					reportList

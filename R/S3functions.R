@@ -376,6 +376,9 @@ contextTypesList = function(
 #' @param keyColumns: Specify the key columns to be used by the context object (optional).
 #' @param timeColumn: Specify the time column to be used by the context object (relevant in time series contexts) (optional).
 contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL ) { #TODO: help
+	camelizeColumnName = function(originalName) {
+		
+	} 
 	keyColumns = as.list(keyColumns)
 	obj = list(data = data, contextTypes = contextTypes, name=name, keyColumns = keyColumns, timeColumn=timeColumn, graphSourceNodeColumn=graphSourceNodeColumn, graphTargetNodeColumn=graphTargetNodeColumn)
 	class(obj) = "contextObject"
@@ -434,10 +437,10 @@ learn <- function(
 	if(is.null(trainData) && !is.null(extraParams$trainData)) trainData = extraParams$trainData
 	trainTestSplitRatio = if(!is.null(extraParams$trainTestSplitRatio)) extraParams$trainTestSplitRatio else problemDefinition$trainTestSplitRatio
 	
-	if (!is.null(testData) && !is.na(trainTestSplitRatio)) print ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
+	if (!is.null(testData) && !is.na(trainTestSplitRatio)) message ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
 	
 	url <- paste0(getSBserverDomain(),"/rapi/learn")
-	print(paste("Calling:", url))
+	message(paste("Calling:", url))
 	
 	if (!is.null(contextDatasets)) { #writing context data to server if necessary
 		if (class(contextDatasets) != "list") {
@@ -556,7 +559,7 @@ learn <- function(
 	params$maxFeaturesCount = verifyList(params$maxFeaturesCount)
 	params = params[!is.na(params)]
 	
-	print (paste("Training on ",params$trainingFilePath))
+	message (paste("Training on ",params$trainingFilePath))
 	
 	body = rjson::toJSON(params)
 	#if (verbose) print(body)
@@ -564,11 +567,11 @@ learn <- function(
 	res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
 	if (!is.null(res$error)) {
 		res = paste("Train error: ", res$error, " - terminating.")
-		print(res)
+		message(res)
 		stop(res)
 	}
 	
-	print(paste("Artifact location was created at:", res$artifactPath))
+	message(paste("Artifact location was created at:", res$artifactPath))
 	session = Session(artifact_loc = res$artifactPath, 
 							modelBuilt = !(length(params$algorithmsWhiteList) == 1 && 
 								tolower(params$algorithmsWhiteList[[1]]) == "zeror"),
