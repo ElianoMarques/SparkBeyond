@@ -567,11 +567,13 @@ Session = setRefClass("Session",
       showReport = function(report_name = NA){ #confine to a specific list
         "\\code{report_name} name of report to show"        
         #htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
-      	url <- paste0(getSBserverDomain(),paste0("/getToken")) 
-      	res = httr::GET(url)
-      	token = httr::content(res, as="text")
-        htmlSource = paste0(getSBserverDomain(), "/analytics/report/", projectName, "/", revision, "/", report_name,"?token=", token)
-      	browseURL(htmlSource)
+      	suppressWarnings({
+	      	url <- paste0(getSBserverDomain(),paste0("/getToken")) 
+	      	res = httr::GET(url)
+	      	token = httr::content(res, as="text")
+	        htmlSource = paste0(getSBserverDomain(), "/analytics/report/", projectName, "/", revision, "/", report_name,"?token=", token)
+	      	browseURL(htmlSource)
+      	})
       },
 
       showExtractors = function() {
@@ -649,12 +651,14 @@ Session = setRefClass("Session",
 			},
 			webView = function (show=TRUE){
 				"Show a dynamic web view of the analysis."
-				url <- paste0(getSBserverDomain(),paste0("/getToken")) 
-				res = httr::GET(url)
-				token = httr::content(res, as="text")
-				htmlSource = paste0(getSBserverDomain(), "/?token=", token,"#/visualPipeline/", projectName, "?revision=", revision, "&forceByRevision=true")
-				if (show == T) browseURL(htmlSource)
-				htmlSource
+				suppressWarnings({
+					url <- paste0(getSBserverDomain(),paste0("/getToken")) 
+					res = httr::GET(url)
+					token = httr::content(res, as="text")
+					htmlSource = paste0(getSBserverDomain(), "/?token=", token,"#/visualPipeline/", projectName, "?revision=", revision, "&forceByRevision=true")
+					if (show == T) browseURL(htmlSource)
+					htmlSource
+				})
 			},
 			revisions = function (){
 				"Show previous revisions of a project."
