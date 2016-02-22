@@ -659,6 +659,10 @@ Session = setRefClass("Session",
 			revisions = function (){
 				"Show previous revisions of a project."
 				projectRevisions(projectName = projectName)
+			},
+			cancel = function(){
+				"Cancel a queued / running job of this model"
+				cancelJob(jobId = jobId)
 			}
 
 # save and load are probably more confusing at this time hence commented out. Just use regular save and load.
