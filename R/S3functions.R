@@ -34,7 +34,7 @@ preProcessingControl = function(
 	fileEscaping = TRUE,
 	fileEncoding = NA,
 	linesForTypeDetection = NA,
-	emptyValuePolicy = NA
+	emptyValuePolicy = emptyValuePolicyList()
 ) {
 	list(
 		emptyValuePolicy = emptyValuePolicy,
@@ -315,18 +315,21 @@ algorithmsList = function(
 #' @param emailNotification An optional email to notify when the learning is finished.
 #' @param scoreOnTestSet Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.
 #' @param featureClustersReport Produce feature cluster visualization. FALSE by default.
+#' @param featureVisualizations Show visual distribution of the feature against the target for classification problems. FALSE by default.
 #' @param evaluatedFunctionsReport Creates a report with the entire list of functions that were evaluated. For contextObjects will also show for each object which functions directly used the contextObject.
 reportingControl = function(
 	showWebView = FALSE,
 	emailForNotification = NA,
 	scoreOnTestSet = FALSE,
 	featureClustersReport = FALSE,
+	featureVisualizations = FALSE,
 	evaluatedFunctionsReport = FALSE
 ) {
 	list(
 		featureClustersReport = featureClustersReport,
 		eevaluatedFunctionsReport = evaluatedFunctionsReport,
 		scoreOnTestSet = scoreOnTestSet,
+		featureVisualizations = featureVisualizations,
 		emailForNotification = emailForNotification,
 		showWebView = showWebView
 	)
@@ -546,6 +549,7 @@ learn <- function(
 		#reporting parameters
 		produceFeatureClusteringReport = if(!is.null(extraParams$featureClustersReport)) extraParams$featureClustersReport else reporting$featureClustersReport,
 		produceEvaluatedFunctionsReport = if(!is.null(extraParams$evaluatedFunctionsReport)) extraParams$evaluatedFunctionsReport else reporting$evaluatedFunctionsReport,
+		featureVisualizations = if(!is.null(extraParams$featureVisualizations)) extraParams$featureVisualizations else reporting$featureVisualizations,
 		scoreOnTestSet = if(!is.null(extraParams$scoreOnTestSet)) extraParams$scoreOnTestSet else reporting$scoreOnTestSet,
 		emailForNotification = reporting$emailForNotification,
 		

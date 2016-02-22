@@ -6,7 +6,7 @@
 \usage{
 reportingControl(showWebView = FALSE, emailForNotification = NA,
   scoreOnTestSet = FALSE, featureClustersReport = FALSE,
-  evaluatedFunctionsReport = FALSE)
+  featureVisualizations = FALSE, evaluatedFunctionsReport = FALSE)
 }
 \arguments{
 \item{showWebView}{control for whether to show a dynamic web view of the analysis in a browser.}
@@ -14,6 +14,8 @@ reportingControl(showWebView = FALSE, emailForNotification = NA,
 \item{scoreOnTestSet}{Optional. A boolean representing whether scoring should be provided for the test set. FALSE by default.}
 
 \item{featureClustersReport}{Produce feature cluster visualization. FALSE by default.}
+
+\item{featureVisualizations}{Show visual distribution of the feature against the target for classification problems. FALSE by default.}
 
 \item{evaluatedFunctionsReport}{Creates a report with the entire list of functions that were evaluated. For contextObjects will also show for each object which functions directly used the contextObject.}
 
