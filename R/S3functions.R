@@ -34,7 +34,7 @@ preProcessingControl = function(
 	fileEscaping = TRUE,
 	fileEncoding = NA,
 	linesForTypeDetection = NA,
-	emptyValuePolicy = emptyValuePolicyList()
+	emptyValuePolicy = NA
 ) {
 	list(
 		emptyValuePolicy = emptyValuePolicy,
