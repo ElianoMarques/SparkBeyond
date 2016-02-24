@@ -34,10 +34,10 @@ emergencyLocationsModel = learn(
 		projectName = "emergencyLocations_example",
     trainData = emergencyLocations,
     target = "risk",
-    featureGenerationCtrl = featureGenerationControl(			 
+    featureGeneration = featureGenerationControl(			 
 			maxFeaturesCount = list(5)
 		),
-		knowledgeCtrl = knowledgeControl(openStreetMap = TRUE)
+		knowledge = knowledgeControl(openStreetMap = TRUE)
 )
 ```
 <br>
@@ -88,11 +88,11 @@ museumsModel = learn(
 		projectName = "OSM_museums_example",
     trainData = museums,
     target = "label",
-    featureGenerationCtrl = featureGenerationControl(	booleanNumericFeatures = FALSE,		 
+    featureGeneration = featureGenerationControl(	booleanNumericFeatures = FALSE,		 
 			maxFeaturesCount = list(3),			
 			maxDepth = 3
 		),
-		knowledgeCtrl = knowledgeControl(linkedDataCore = TRUE, openStreetMap = TRUE)
+		knowledge = knowledgeControl(linkedDataCore = TRUE, openStreetMap = TRUE)
 )
 ```
 <br>

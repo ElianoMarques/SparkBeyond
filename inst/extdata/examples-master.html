@@ -5215,7 +5215,7 @@ flightsModel = learn(
             maxFeaturesCount = list(30),
             functionsBlackList = list("trigonometry")
         ),
-        knowledge = knowledgeControl(linkedDataCore = TRUE),
+        knowledge = knowledgeControl(weather = TRUE),
     modelBuilding = modelBuildingControl(algorithmsWhiteList = list("RXGBoostRegressor")),    
     autoSave = FALSE
 )</code></pre>

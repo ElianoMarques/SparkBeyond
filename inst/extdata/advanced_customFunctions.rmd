@@ -25,10 +25,10 @@ data = data.frame(number = 1:500, target = 1:500 %% 7 == 0)
 modModel = learn(projectName = "custom_function_example",
     trainData = data,
     target = "target",
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = 5),
+    featureGeneration = featureGenerationControl(maxFeaturesCount = 5),
     # using a function from the web in the following url    	
-    knowledgeCtrl = knowledgeControl(customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala")),
-    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
+    knowledge = knowledgeControl(customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala")),
+    modelBuilding = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
     autoSave = FALSE
 )
 ```

@@ -43,7 +43,7 @@ pizzaModel = learn(
 		projectName = "pizza",
     trainData = data,
     target = "requester_received_pizza",                        
-		preProcessingCtrl = preProcessingControl(fileEscaping = FALSE)
+		preProcessing = preProcessingControl(fileEscaping = FALSE)
 )
 ```
 <br>
