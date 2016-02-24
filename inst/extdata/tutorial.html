@@ -965,7 +965,7 @@ enriched = model$enrich(data = test,
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
 <pre style=""><code class="source r">colnames(predicted)
-predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]</code></pre>
+predicted[1:5,c("survived_predicted", "probability_0", "probability_1")]</code></pre>
 </div>
 <p>We now have 3 additional columns:</p>
 <ol style="list-style-type: decimal">
@@ -996,9 +996,8 @@ predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]</co
 </ul>
 <h2>Model</h2>
 <ul>
-<li><code>showROC</code> - ROC plot</li>
+<li><code>showReport</code> - Show a specific report</li>
 <li><code>showConfusionMatrix</code> - Confusion matrix (option for a normalized version)</li>
-<li><code>showROC_CV</code> - Combined ROC plot of the various algorithms attempted</li>
 <li><code>showModelComparison</code> - Comparison evaluation table of the various algorithms attempted</li>
 </ul>
 <p><br> <br></p>
@@ -1027,7 +1026,7 @@ predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]</co
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">model$showROC()</code></pre>
+<pre style=""><code class="source r"> model$showReport(report_name ="model/roc_best_0.html")</code></pre>
 </div>
 <iframe width="1000" height="800" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/roc_best.html" frameborder="0" seamless>
 </iframe>
@@ -1037,12 +1036,12 @@ predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]</co
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">model = featureSearch(sessionName = "titanic",
+<pre style=""><code class="source r">model = featureSearch(projectName = "titanic",
                         trainData = train,
                         target = "survived")</code></pre>
 </div>
 <p>In this case, the user will be able to call <code>evaluate</code> but will get an exception when calling <code>predict</code>.</p>
-<p>In addition, some of the reports pertaining to model evaluation (e.g., <code>showROC</code> and <code>showConfusionMatrix</code>) will not be available.</p>
+<p>In addition, some of the reports pertaining to model evaluation (e.g., <code>showReport</code> and <code>showConfusionMatrix</code>) will not be available.</p>
 <p><br> <br></p>
 <h1>Saving and loading models</h1>
 <p>Models can be saved using regular R <code>load()</code> and <code>save()</code> methods. By default, the result of each learning session is saved into the current directory.</p>

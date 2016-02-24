@@ -1774,7 +1774,7 @@ cos(fare) in range (-0.05638243077105439, 0.1326807604187568)
 <h3 id="function-exclusions">Function exclusions</h3>
 <p><img src="http://s3.amazonaws.com/public-sparkbeyond/images/includeExclude.jpg" width="318" height="298"></p>
 <h4 id="overview-2">Overview</h4>
-<p>Goal: Predict Titanic Passenger Age <br> This example demonstrates two important capabilities: <br> 1. controlling the number of features in the output <br> 2. excluding elements from the generated features. <br> <br> For example in order to reduce overfit, we would like generate only 25 features. (Or alternatively, create either 25 features or 50 features and use the model the performs better on cross validation of the training set.) This can be set in the <code>maxFeaturesCount</code> of <code>featureGenerationCtrl</code>. <br> <br> In addition, we would prefer to not create mathematical features (such as &quot;ceil&quot;), trigonometry features, and also exclude features that contains the word &quot;master&quot;. These can be set via the <code>functionsBlackList</code> parameter to exclude these terms. <br> Please refer to the SparkBeyond function catalog by calling <code>functionCatalog()</code> to view the list of functions and associated domains Lastly, you can notice that in this example we are using the <code>featureSearch</code> capability instead of the regular <code>learn</code> without actually building a model. <br> <br></p>
+<p>Goal: Predict Titanic Passenger Age <br> This example demonstrates two important capabilities: <br> 1. controlling the number of features in the output <br> 2. excluding elements from the generated features. <br> <br> For example in order to reduce overfit, we would like generate only 25 features. (Or alternatively, create either 25 features or 50 features and use the model the performs better on cross validation of the training set.) This can be set in the <code>maxFeaturesCount</code> of <code>featureGeneration</code>. <br> <br> In addition, we would prefer to not create mathematical features (such as &quot;ceil&quot;), trigonometry features, and also exclude features that contains the word &quot;master&quot;. These can be set via the <code>functionsBlackList</code> parameter to exclude these terms. <br> Please refer to the SparkBeyond function catalog by calling <code>functionCatalog()</code> to view the list of functions and associated domains Lastly, you can notice that in this example we are using the <code>featureSearch</code> capability instead of the regular <code>learn</code> without actually building a model. <br> <br></p>
 <h4 id="pipeline-2">Pipeline</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -1786,7 +1786,7 @@ titanicAgeFeatures = featureSearch(
     trainData = data,
     target = "age", 
                      
-    featureGenerationCtrl = featureGenerationControl(
+    featureGeneration = featureGenerationControl(
         #limit the number of features to 25
         maxFeaturesCount = 25, #list(25,50)
         # blacklist trigonometric functions, "abs" function, and features containing "master"
@@ -2040,7 +2040,7 @@ feature generation control
 
 model building control
     # optional - specify algorithms to use - check modelBuildingControl
-    modelBuildingCtrl = modelBuildingControl(
+    modelBuilding = modelBuildingControl(
     algorithmsWhiteList = algorithmsList(isClassification = TRUE, randomForest = TRUE)),
 
 
@@ -2050,7 +2050,7 @@ reporting control
     
     web view
     
-    reportingCtrl = reportingControl(scoreOnTestSet = TRUE), 
+    reporting = reportingControl(scoreOnTestSet = TRUE), 
     
     feature clusteres
     +
@@ -2129,10 +2129,10 @@ data = excludeCols(data, c("giver_username_if_known",
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
 <pre style=""><code class="source r">pizzaModel = learn(
-        projectName = "pizza",
+    projectName = "pizza",
     trainData = data,
     target = "requester_received_pizza",                        
-        preProcessingCtrl = preProcessingControl(fileEscaping = FALSE)
+    preProcessing = preProcessingControl(fileEscaping = FALSE)
 )</code></pre>
 </div>
 <p><br></p>
@@ -2266,7 +2266,7 @@ print(yummlyData[1, c("cuisine","ingredients")])</code></pre>
     projectName="Yummly",
     trainData = yummlyData,
     target = "cuisine",
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+    featureGeneration = featureGenerationControl(maxFeaturesCount = list(50))
 )</code></pre>
 </div>
 <p><br></p>
@@ -2482,7 +2482,7 @@ ethiopia
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
 <pre style=""><code class="source r">countryModel=learn(projectName="CountriesDistance",countriesDistance,"distance",
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+    featureGeneration = featureGenerationControl(maxFeaturesCount = list(50))
 )</code></pre>
 </div>
 <p><br></p>
@@ -2761,7 +2761,7 @@ word_freq_remove
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
 <pre style=""><code class="source r">spamModel=learn(projectName="spambase",spam,"isSpam",
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+    featureGeneration = featureGenerationControl(maxFeaturesCount = list(50))
 )</code></pre>
 </div>
 <h4 id="top-features-5">Top features</h4>
@@ -2992,7 +2992,7 @@ Best form this season has coincided with him starting in the centre of midfield
     projectName="tweets",
     trainData=tweets,
     target="sentiment",
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40))
+    featureGeneration = featureGenerationControl(maxFeaturesCount = list(40))
 )</code></pre>
 </div>
 <p><br></p>
@@ -3183,7 +3183,7 @@ accessable
     target = "sentiment",
     contextDatasets = list(contextObject(data = getData("sentiment_lexicon"), name = "sentiment_lexicon",
         contextTypes = contextTypesList(termsMap = TRUE))), #defining the context type explicity
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40))
+    featureGeneration = featureGenerationControl(maxFeaturesCount = list(40))
 )</code></pre>
 </div>
 <h4 id="top-features-7">Top features</h4>
@@ -3295,7 +3295,7 @@ SentimentModelContext2 = learn(
     trainData=trainTestData$train,
     testData =trainTestData$test,
     target="sentiment",
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40)), 
+    featureGeneration = featureGenerationControl(maxFeaturesCount = list(40)), 
     contextDatasets = list(contextObject(data = trainTestData$train, name = "tweets_context", 
                 contextTypes = contextTypesList(invertedIndex = TRUE))), #defining the context type explicitly
     autoSave = FALSE
@@ -3516,7 +3516,7 @@ und
     target = "lang", 
     contextDatasets = list(contextObject(data=langData, name="languages",
         contextTypes = contextTypesList(geoSpatial = TRUE))),
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))
+    featureGeneration = featureGenerationControl(maxFeaturesCount = list(25))
 )</code></pre>
 </div>
 <h4 id="top-features-9">Top features</h4>
@@ -3851,7 +3851,7 @@ risk
 </tr>
 </table>
 </div>
-<p><br> By setting useOpenStreetMap to TRUE, the area around each latLong will be downloaded and the points of interests available in that area will be used during the feature search. <br></p>
+<p><br> By setting openStreetMap to TRUE, the area around each latLong will be downloaded and the points of interests available in that area will be used during the feature search. <br></p>
 <h4 id="pipeline-10">Pipeline</h4>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -3861,10 +3861,10 @@ risk
         projectName = "emergencyLocations_example",
     trainData = emergencyLocations,
     target = "risk",
-    featureGenerationCtrl = featureGenerationControl(            
+    featureGeneration = featureGenerationControl(            
             maxFeaturesCount = list(5)
         ),
-        knowledgeCtrl = knowledgeControl(useOpenStreetMap = TRUE)
+        knowledge = knowledgeControl(openStreetMap = TRUE)
 )</code></pre>
 </div>
 <p><br></p>
@@ -4047,11 +4047,11 @@ true
         projectName = "OSM_museums_example",
     trainData = museums,
     target = "label",
-    featureGenerationCtrl = featureGenerationControl(   booleanNumericFeatures = FALSE,      
+    featureGeneration = featureGenerationControl(   booleanNumericFeatures = FALSE,      
             maxFeaturesCount = list(3),         
             maxDepth = 3
         ),
-        knowledgeCtrl = knowledgeControl(useGraph = TRUE, useOpenStreetMap = TRUE)
+        knowledge = knowledgeControl(linkedDataCore = TRUE, openStreetMap = TRUE)
 )</code></pre>
 </div>
 <p><br></p>
@@ -4178,7 +4178,7 @@ timeWindowModel = learn(
     contextDatasets = list(contextObject(data=colsWhiteList(data, c("timeDate","temperature")), 
         name="time_info", timeColumn = timeColumn, contextTypes = contextTypesList(timeSeries = TRUE))), 
     problemDefintion = problemDefinitionControl(weightByClass = TRUE),
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))
+    featureGeneration = featureGenerationControl(maxFeaturesCount = list(25))
 )</code></pre>
 </div>
 <p><br></p>
@@ -4608,7 +4608,7 @@ contextData = frequencyChangeDSwindowed[,c("date","signal1")] </code></pre>
     problemDefinition = problemDefinitionControl(trainTestSplitRatio = 0.6, temporalSplitColumn="date"), 
     contextDatasets = list(contextObject(data = contextData, name = "signals", 
         contextTypes = contextTypesList(timeSeries = TRUE))),
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))                                
+    featureGeneration = featureGenerationControl(maxFeaturesCount = list(25))                                
 )</code></pre>
 </div>
 <p><br></p>
@@ -4795,8 +4795,8 @@ The problem was automatically identified as a regression problem because the tar
     projectName = "countries",
     trainData = data,
     target = "label",
-    knowledgeCtrl = knowledgeControl(useGraph = TRUE),
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = 20,maxDepth = 3)
+    knowledge = knowledgeControl(linkedDataCore = TRUE),
+    featureGeneration = featureGenerationControl(maxFeaturesCount = 20,maxDepth = 3)
 )</code></pre>
 </div>
 <p><br> <br></p>
@@ -5211,12 +5211,12 @@ flightsModel = learn(
         projectName = "flights_delay_example",
     trainData = flightSampled,
     target = "weatherDelay",
-    featureGenerationCtrl = featureGenerationControl(            
+    featureGeneration = featureGenerationControl(            
             maxFeaturesCount = list(30),
             functionsBlackList = list("trigonometry")
         ),
-        knowledgeCtrl = knowledgeControl(useCustomGraphs = TRUE),
-    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RXGBoostRegressor")),    
+        knowledge = knowledgeControl(linkedDataCore = TRUE),
+    modelBuilding = modelBuildingControl(algorithmsWhiteList = list("RXGBoostRegressor")),    
     autoSave = FALSE
 )</code></pre>
 </div>
@@ -5740,7 +5740,7 @@ true
     trainData = googleTrainTest[[1]],
     testData = googleTrainTest[[2]],
     target = "happy",
-    featureGenerationCtrl = featureGenerationControl(
+    featureGeneration = featureGenerationControl(
             maxFeaturesCount = 50
     )
 )
@@ -5846,7 +5846,7 @@ Now let's enable a deep feature search using an advanced feature search with pai
     trainData = googleTrainTest[[1]],
     testData = googleTrainTest[[2]],
     target = "happy",
-        featureGenerationCtrl = featureGenerationControl(
+        featureGeneration = featureGenerationControl(
                     featureSearchMode = "ADVANCED_WITH_PAIRS",
                     maxFeaturesCount = 50,
                     maxFeatureDuration=5
@@ -6117,7 +6117,7 @@ tgt
     projectName = "complexSum",
     trainData = complexSum,
     target = "tgt",
-    featureGenerationCtrl = featureGenerationControl(
+    featureGeneration = featureGenerationControl(
             maxFeaturesCount = 25
      )
 )</code></pre>
@@ -6159,7 +6159,7 @@ tgt
     projectName = "complexSumAdvanced",
     trainData = complexSum,
     target = "tgt",
-    featureGenerationCtrl = featureGenerationControl(
+    featureGeneration = featureGenerationControl(
                 featureSearchMode = "DIG_DEEP",
                 maxFeaturesCount = 25
     )
@@ -6285,14 +6285,14 @@ data[,target:=sapply(1:n, function(i) 1/min({a = (data$lat[i]-data$lat)^2+(data$
 densityModel = learn(projectName = "density_example",
     trainData = data,
     target = "target",
-        featureGenerationCtrl = featureGenerationControl(
+        featureGeneration = featureGenerationControl(
             # indicates that points from all rows should be considered together during feature search
         crossRowFeatureSearch = TRUE,  
       maxFeaturesCount = 5,
         maxDepth = 3,                               # allowing a higher search space depth
         functionsBlackList = list("trigonometry")  # blacklist trigonometric functions
     ),
-    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestRegressor")),
+    modelBuilding = modelBuildingControl(algorithmsWhiteList = list("RRandomForestRegressor")),
     autoSave = FALSE
 )</code></pre>
 </div>
@@ -6391,10 +6391,10 @@ ceil(distance of latLong from closest of latLong_column) == 1.0
 <pre style=""><code class="source r">modModel = learn(projectName = "custom_function_example",
     trainData = data,
     target = "target",
-    featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = 5),
+    featureGeneration = featureGenerationControl(maxFeaturesCount = 5),
     # using a function from the web in the following url        
-    knowledgeCtrl = knowledgeControl(customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala")),
-    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
+    knowledge = knowledgeControl(customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala")),
+    modelBuilding = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
     autoSave = FALSE
 )</code></pre>
 </div>

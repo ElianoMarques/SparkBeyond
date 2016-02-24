@@ -24,7 +24,7 @@ emergencyLocations = getData("emergency_locations")
 print(xtable(tail(emergencyLocations,n=5)), type='html', comment=F) 
 ```
 <br>
-By setting useOpenStreetMap to TRUE, the area around each latLong will be downloaded and the points of interests available in that area will be used during the feature search.
+By setting openStreetMap to TRUE, the area around each latLong will be downloaded and the points of interests available in that area will be used during the feature search.
 <br>
 
 ####Pipeline####
@@ -37,7 +37,7 @@ emergencyLocationsModel = learn(
     featureGenerationCtrl = featureGenerationControl(			 
 			maxFeaturesCount = list(5)
 		),
-		knowledgeCtrl = knowledgeControl(useOpenStreetMap = TRUE)
+		knowledgeCtrl = knowledgeControl(openStreetMap = TRUE)
 )
 ```
 <br>
@@ -92,7 +92,7 @@ museumsModel = learn(
 			maxFeaturesCount = list(3),			
 			maxDepth = 3
 		),
-		knowledgeCtrl = knowledgeControl(useGraph = TRUE, useOpenStreetMap = TRUE)
+		knowledgeCtrl = knowledgeControl(linkedDataCore = TRUE, openStreetMap = TRUE)
 )
 ```
 <br>

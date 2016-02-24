@@ -129,7 +129,7 @@ The resulting prediction is added to the `dataset` as a set of new columns
 
 ```{r,  eval=FALSE}
 colnames(predicted)
-predicted[1:5,c("survived_predicted", "X_0_probability", "X_1_probability")]
+predicted[1:5,c("survived_predicted", "probability_0", "probability_1")]
 ```
 
 We now have 3 additional columns:
@@ -166,9 +166,8 @@ These are HTML reports and will show either in the RStudio viewer pane or in an 
 * `showExtractors` - Extractors used to generate the features
 
 ##Model ##
-* `showROC` - ROC plot
+* `showReport` - Show a specific report
 * `showConfusionMatrix` - Confusion matrix  (option for a normalized version)
-* `showROC_CV` - Combined ROC plot of the various algorithms attempted
 * `showModelComparison` - Comparison evaluation table of the various algorithms attempted
 
 <br>
@@ -192,7 +191,7 @@ model$showConfusionMatrix()
 
 ### ROC plot ###
 ```{r,  eval = FALSE}
-model$showROC()
+model$showReport(report_name ="model/roc_best_0.html")
 ```
 <iframe width="1000" height="800" src="https://3ceaeb28a951bf57d68ca32211bb4c98dd31f5fc.googledrive.com/host/0Byt-OjYvY171fnJIS25JTmZxQ2RqMzc5dlFQZTNiaVZ1bXpqWGxiRDVsSWlzTEpUbU5lMjg/SB_Rplugin/img/roc_best.html"  frameborder="0" seamless></iframe>
 
@@ -200,13 +199,13 @@ model$showROC()
 There is an option to perform only feature discovery at the learning stage using `featureSearch`
 
 ```{r, eval = FALSE}
-model = featureSearch(sessionName = "titanic",
+model = featureSearch(projectName = "titanic",
                         trainData = train,
                         target = "survived")
 ```
 In this case, the user will be able to call `evaluate` but will get an exception when calling `predict`.
 
-In addition, some of the reports pertaining to model evaluation (e.g., `showROC` and `showConfusionMatrix`) will not be available.  
+In addition, some of the reports pertaining to model evaluation (e.g., `showReport` and `showConfusionMatrix`) will not be available.  
 
 <br>
 <br>
