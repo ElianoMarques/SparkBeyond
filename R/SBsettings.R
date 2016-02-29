@@ -240,7 +240,18 @@ login = function(username, password, domain) {
 	if (substr(domain, 1,4) != "http") warning("The provided domain does not start with 'http' - please verify in case of failure")
 	url <- paste0(domain,"/login")
 	setSBserverHost(domain)
-	res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
+	res = tryCatch(
+		httr::POST(url, encode = "form", body = list(email=username, password=password, hash="")), 
+		error = function(cond) {
+			if(grepl("certificate", cond)) {
+				set_config( config(  ssl_verifypeer = 0L ) )
+				message("Please ask the system administrator to sign the SSL certificate.")
+				httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
+			}
+			else stop(cond)
+	})
+	
+	#res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
 	loggedIn = if (res$status_code == 404 || res$status_code == 200) {		#there is a weird redirection causing this, but this actually OK
 		currentUser()
 	} else {
