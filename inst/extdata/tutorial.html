@@ -884,7 +884,15 @@ Tutorial
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
-<pre style=""><code class="source r">install.packages("devtools")
+<pre style=""><code class="source r">
+#Please make sure the libraries httr and digest are installed:
+library(httr)
+library(digest)
+#If they are not, please install them first:
+#install.packages("httr")
+#install.packages("digest")
+
+install.packages("devtools")
 devtools::install_github('zinman/SparkBeyond')
 library('SparkBeyond')</code></pre>
 </div>
