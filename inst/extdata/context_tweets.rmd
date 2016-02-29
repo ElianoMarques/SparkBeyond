@@ -38,7 +38,7 @@ SentimentModel = learn(
 	projectName="tweets",
 	trainData=tweets,
 	target="sentiment",
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40))
+	featureGeneration = featureGenerationControl(maxFeaturesCount = list(40))
 )
 ```
 <br>
@@ -89,7 +89,7 @@ SentimentModelContext = learn(
 	target = "sentiment",
 	contextDatasets = list(contextObject(data = getData("sentiment_lexicon"), name = "sentiment_lexicon",
 		contextTypes = contextTypesList(termsMap = TRUE))), #defining the context type explicity
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40))
+	featureGeneration = featureGenerationControl(maxFeaturesCount = list(40))
 )
 ```
 
@@ -126,7 +126,7 @@ SentimentModelContext2 = learn(
 	trainData=trainTestData$train,
 	testData =trainTestData$test,
 	target="sentiment",
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(40)), 
+	featureGeneration = featureGenerationControl(maxFeaturesCount = list(40)), 
 	contextDatasets = list(contextObject(data = trainTestData$train, name = "tweets_context", 
 				contextTypes = contextTypesList(invertedIndex = TRUE))), #defining the context type explicitly
 	autoSave = FALSE

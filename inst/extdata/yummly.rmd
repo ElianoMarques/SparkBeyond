@@ -29,7 +29,7 @@ yummlyModel=learn(
 	projectName="Yummly",
 	trainData = yummlyData,
 	target = "cuisine",
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+	featureGeneration = featureGenerationControl(maxFeaturesCount = list(50))
 )
 ```
 
@@ -61,7 +61,7 @@ print(xtable(head(countriesDistance,n=5)), type='html', comment=F)
 ####Pipeline####
 ```{r country_distances, eval=TRUE, message=FALSE,results = 'hide',cache=TRUE}
 countryModel=learn(projectName="CountriesDistance",countriesDistance,"distance",
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+	featureGeneration = featureGenerationControl(maxFeaturesCount = list(50))
 )
 ```
 <br>
@@ -97,7 +97,7 @@ print(xtable(head(spam[,1:7],n=5)), type='html', comment=F)
 ####Pipeline####
 ```{r spambase, eval=TRUE, message=FALSE,results = 'hide',cache=TRUE}
 spamModel=learn(projectName="spambase",spam,"isSpam",
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(50))
+	featureGeneration = featureGenerationControl(maxFeaturesCount = list(50))
 )
 ```
 

@@ -39,8 +39,8 @@ countriesModel = learn(
 	projectName = "countries",
 	trainData = data,
 	target = "label",
-	knowledgeCtrl = knowledgeControl(useGraph = TRUE),
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = 20,maxDepth = 3)
+	knowledge = knowledgeControl(linkedDataCore = TRUE),
+	featureGeneration = featureGenerationControl(maxFeaturesCount = 20,maxDepth = 3)
 )
 ```
 <br>

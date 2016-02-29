@@ -31,7 +31,7 @@ This example demonstrates two important capabilities:
 2. excluding elements from the generated features.
 <br>
 <br>
-For example in order to reduce overfit, we would like generate only 25 features. (Or alternatively, create either 25 features or 50 features and use the model the performs better on cross validation of the training set.) This can be set in the `maxFeaturesCount` of `featureGenerationCtrl`.
+For example in order to reduce overfit, we would like generate only 25 features. (Or alternatively, create either 25 features or 50 features and use the model the performs better on cross validation of the training set.) This can be set in the `maxFeaturesCount` of `featureGeneration`.
 <br>
 <br>
 In addition, we would prefer to not create mathematical features (such as "ceil"), trigonometry features, and also exclude features that contains the word "master". These can be set via the `functionsBlackList` parameter to exclude these terms. 
@@ -50,7 +50,7 @@ titanicAgeFeatures = featureSearch(
 	trainData = data,
 	target = "age", 
 					 
-	featureGenerationCtrl = featureGenerationControl(
+	featureGeneration = featureGenerationControl(
 		#limit the number of features to 25
 		maxFeaturesCount = 25, #list(25,50)
 		# blacklist trigonometric functions, "abs" function, and features containing "master"
@@ -74,7 +74,7 @@ feature generation control
 
 model building control
 	# optional - specify algorithms to use - check modelBuildingControl
-	modelBuildingCtrl = modelBuildingControl(
+	modelBuilding = modelBuildingControl(
 	algorithmsWhiteList = algorithmsList(isClassification = TRUE, randomForest = TRUE)),
 
 
@@ -84,7 +84,7 @@ reporting control
     
     web view
     
-    reportingCtrl = reportingControl(scoreOnTestSet = TRUE), 
+    reporting = reportingControl(scoreOnTestSet = TRUE), 
     
     feature clusteres
     +

@@ -24,14 +24,14 @@ data[,target:=sapply(1:n, function(i) 1/min({a = (data$lat[i]-data$lat)^2+(data$
 densityModel = learn(projectName = "density_example",
     trainData = data,
     target = "target",
- 		featureGenerationCtrl = featureGenerationControl(
+ 		featureGeneration = featureGenerationControl(
  			# indicates that points from all rows should be considered together during feature search
     	crossRowFeatureSearch = TRUE,  
       maxFeaturesCount = 5,
     	maxDepth = 3,                               # allowing a higher search space depth
     	functionsBlackList = list("trigonometry")  # blacklist trigonometric functions
     ),
-    modelBuildingCtrl = modelBuildingControl(algorithmsWhiteList = list("RRandomForestRegressor")),
+    modelBuilding = modelBuildingControl(algorithmsWhiteList = list("RRandomForestRegressor")),
     autoSave = FALSE
 )
 ```
