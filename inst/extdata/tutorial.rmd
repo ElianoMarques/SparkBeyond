@@ -24,7 +24,15 @@ output:
   eval should always be FALSE here. I set eval = FALSE with spaces so that it won't be found in replace all 
 --> 
   
+
 ```{r, eval = FALSE, message=FALSE, results='hide'}
+#Please make sure the libraries httr and digest are installed:
+library(httr)
+library(digest)
+#If they are not, please install them first:
+#install.packages("httr")
+#install.packages("digest")
+
 install.packages("devtools")
 devtools::install_github('zinman/SparkBeyond')
 library('SparkBeyond')
