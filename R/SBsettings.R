@@ -244,7 +244,7 @@ login = function(username, password, domain) {
 		httr::POST(url, encode = "form", body = list(email=username, password=password, hash="")), 
 		error = function(cond) {
 			if(grepl("certificate", cond)) {
-				set_config( config(  ssl_verifypeer = 0L ) )
+				httr::set_config( config(  ssl_verifypeer = 0L ) )
 				message("Please ask the system administrator to sign the SSL certificate.")
 				httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
 			}
