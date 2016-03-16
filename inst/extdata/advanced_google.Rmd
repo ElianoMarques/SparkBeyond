@@ -33,11 +33,10 @@ googleModel = learn(
 	trainData = googleTrainTest[[1]],
 	testData = googleTrainTest[[2]],
 	target = "happy",
-	featureGenerationCtrl = featureGenerationControl(
+	featureGeneration = featureGenerationControl(
 	 		maxFeaturesCount = 50
 	)
 )
-googleModelEval = googleModel$evaluate()
 ```
 
 ```{r advanced_google_4, eval=TRUE, results='asis'}
@@ -54,10 +53,10 @@ googleModelAdvanced = learn(projectName = "googleStockAdvanced",
     trainData = googleTrainTest[[1]],
     testData = googleTrainTest[[2]],
     target = "happy",
-	 	featureGenerationCtrl = featureGenerationControl(
+	 	featureGeneration = featureGenerationControl(
 	 				featureSearchMode = "ADVANCED_WITH_PAIRS",
  					maxFeaturesCount = 50,
-	 				maxFeatureDuration=5
+	 				maxFeatureDuration = 5
 	 	)
 )
 ```

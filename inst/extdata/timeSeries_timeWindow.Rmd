@@ -47,9 +47,9 @@ timeWindowModel = learn(
 	trainData = colsWhiteList(dataFinal,c("last_10_Days","target")), # keeping only the time window and the label
 	target = "target", 
 	contextDatasets = list(contextObject(data=colsWhiteList(data, c("timeDate","temperature")), 
-		name="time_info", timeColumn = timeColumn, contextTypes = contextTypesList(timeSeries = TRUE))), 
+		name="time_info", timeColumn = "timeDate", contextTypes = contextTypesList(timeSeries = TRUE))), 
 	problemDefintion = problemDefinitionControl(weightByClass = TRUE),
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))
+	featureGeneration = featureGenerationControl(maxFeaturesCount = list(25))
 )
 ```
 

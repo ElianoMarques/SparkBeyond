@@ -31,7 +31,7 @@ complexSumModel = learn(
 	projectName = "complexSum",
 	trainData = complexSum,
 	target = "tgt",
-	featureGenerationCtrl = featureGenerationControl(
+	featureGeneration = featureGenerationControl(
 			maxFeaturesCount = 25
 	 )
 )
@@ -46,7 +46,7 @@ complexSumAdvancedModel = learn(
 	projectName = "complexSumAdvanced",
 	trainData = complexSum,
 	target = "tgt",
-	featureGenerationCtrl = featureGenerationControl(
+	featureGeneration = featureGenerationControl(
 				featureSearchMode = "DIG_DEEP",
 				maxFeaturesCount = 25
 	)

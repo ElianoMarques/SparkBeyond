@@ -128,8 +128,7 @@ SentimentModelContext2 = learn(
 	target="sentiment",
 	featureGeneration = featureGenerationControl(maxFeaturesCount = list(40)), 
 	contextDatasets = list(contextObject(data = trainTestData$train, name = "tweets_context", 
-				contextTypes = contextTypesList(invertedIndex = TRUE))), #defining the context type explicitly
-	autoSave = FALSE
+				contextTypes = contextTypesList(invertedIndex = TRUE))) #defining the context type explicitly
 )
 ```
 <br>
@@ -145,7 +144,7 @@ print(xtable(SentimentModelContext2$features()[1:5,c("feature", "RIG")]), type='
 During prediction we can match the context objects to the ones used in the train by using the same name.
 <br>
 
-```{r context_tweets_10, eval=TRUE, echo=FALSE, , results='hide', cache=TRUE, message=FALSE}
+```{r context_tweets_10, eval=TRUE, echo=TRUE, , results='hide', cache=TRUE, message=FALSE}
 	pred = SentimentModelContext2$predict(data = trainTestData$test, 
 				contextDatasets = list(contextObject(data = tweets, name = "tweets_context")))
 ```

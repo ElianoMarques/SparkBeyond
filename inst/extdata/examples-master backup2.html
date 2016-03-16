@@ -2129,10 +2129,10 @@ data = excludeCols(data, c("giver_username_if_known",
 <span class="glyphicon glyphicon-chevron-down"></span> R source
 </button>
 <pre style=""><code class="source r">pizzaModel = learn(
-        projectName = "pizza",
+    projectName = "pizza",
     trainData = data,
     target = "requester_received_pizza",                        
-        preProcessing = preProcessingControl(fileEscaping = FALSE)
+    preProcessing = preProcessingControl(fileEscaping = FALSE)
 )</code></pre>
 </div>
 <p><br></p>
@@ -3297,7 +3297,8 @@ SentimentModelContext2 = learn(
     target="sentiment",
     featureGeneration = featureGenerationControl(maxFeaturesCount = list(40)), 
     contextDatasets = list(contextObject(data = trainTestData$train, name = "tweets_context", 
-                contextTypes = contextTypesList(invertedIndex = TRUE))) #defining the context type explicitly
+                contextTypes = contextTypesList(invertedIndex = TRUE))), #defining the context type explicitly
+    autoSave = FALSE
 )</code></pre>
 </div>
 <p><br></p>
@@ -3377,13 +3378,6 @@ wordFrequencies(tweet).valueOf(best) orIfMissing 0 &gt;= 0.17349064404453718
 </div>
 <h4 id="evaluation-8">Evaluation</h4>
 <p>During prediction we can match the context objects to the ones used in the train by using the same name. <br></p>
-<div class="row">
-<button class="source R toggle btn btn-xs btn-primary">
-<span class="glyphicon glyphicon-chevron-down"></span> R source
-</button>
-<pre style=""><code class="source r">   pred = SentimentModelContext2$predict(data = trainTestData$test, 
-                contextDatasets = list(contextObject(data = tweets, name = "tweets_context")))</code></pre>
-</div>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
 <span class="glyphicon glyphicon-chevron-down"></span> R source
@@ -4182,7 +4176,7 @@ timeWindowModel = learn(
     trainData = colsWhiteList(dataFinal,c("last_10_Days","target")), # keeping only the time window and the label
     target = "target", 
     contextDatasets = list(contextObject(data=colsWhiteList(data, c("timeDate","temperature")), 
-        name="time_info", timeColumn = "timeDate", contextTypes = contextTypesList(timeSeries = TRUE))), 
+        name="time_info", timeColumn = timeColumn, contextTypes = contextTypesList(timeSeries = TRUE))), 
     problemDefintion = problemDefinitionControl(weightByClass = TRUE),
     featureGeneration = featureGenerationControl(maxFeaturesCount = list(25))
 )</code></pre>
@@ -5749,7 +5743,8 @@ true
     featureGeneration = featureGenerationControl(
             maxFeaturesCount = 50
     )
-)</code></pre>
+)
+googleModelEval = googleModel$evaluate()</code></pre>
 </div>
 <div class="row">
 <button class="source R toggle btn btn-xs btn-primary">
@@ -5833,12 +5828,12 @@ tan(close) in range (1.136782707100604, 5.621293751828938)
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
 <pre style=""><code class="output r">## === Detailed Accuracy By Class ===
-##                                                                                      
-## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
-##                                                                                      
-## true            0.857     0.143     0.923       0.857    0.889       0.909      0.819
-## false           0.857     0.143     0.75        0.857    0.8         0.909      0.819
-## Weighted Avg.   0.857     0.143     0.865       0.857    0.859       0.909      0.819
+##                                                                                     
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini
+##                                                                                     
+## true            1         0         1           1        1           1          1   
+## false           1         0         1           1        1           1          1   
+## Weighted Avg.   1         0         1           1        1           1          1   
 ## 
 </code></pre>
 </div>
@@ -5854,7 +5849,7 @@ Now let's enable a deep feature search using an advanced feature search with pai
         featureGeneration = featureGenerationControl(
                     featureSearchMode = "ADVANCED_WITH_PAIRS",
                     maxFeaturesCount = 50,
-                    maxFeatureDuration = 5
+                    maxFeatureDuration=5
         )
 )</code></pre>
 </div>
@@ -5896,12 +5891,12 @@ average(derivativeY(close_sliding).drop(criticalDay)) &lt; -0.04053124999999937
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
 <pre style=""><code class="output r">## === Detailed Accuracy By Class ===
-##                                                                                      
-## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini 
-##                                                                                      
-## true            0.857     0.143     0.923       0.857    0.889       0.915      0.829
-## false           0.857     0.143     0.75        0.857    0.8         0.915      0.829
-## Weighted Avg.   0.857     0.143     0.865       0.857    0.859       0.915      0.829
+##                                                                                     
+## Class           TP Rate   FP Rate   Precision   Recall   F-Measure   ROC Area   Gini
+##                                                                                     
+## true            1         0         1           1        1           1          1   
+## false           1         0         1           1        1           1          1   
+## Weighted Avg.   1         0         1           1        1           1          1   
 ## 
 </code></pre>
 </div>
@@ -6252,24 +6247,24 @@ leftSlantedGeometricMean(sinh(f_0), log1p(f_1)).toInt &lt; 64099219
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
 <pre style=""><code class="output r">##                                                  
-## Correlation coefficient             0.982925     
-## R2                                  0.966141     
-## Mean absolute error                 3.804724     
-## Root mean squared error             5.003196     
-## Relative absolute error             17.65046392 %
-## Root relative squared error         18.96272898 %
+## Correlation coefficient             0.986627     
+## R2                                  0.973432     
+## Mean absolute error                 3.105214     
+## Root mean squared error             4.431243     
+## Relative absolute error             14.40537614 %
+## Root relative squared error         16.79495546 %
 ## Root relative prior squared error   26.38436863  
 ## Actuals mean                        69.85551708  
-## Estimations mean                    69.73505679  
+## Estimations mean                    69.94605408  
 ## Actuals std                         26.03583105  
-## Estimations std                     24.15409823  
+## Estimations std                     24.41554189  
 ## Total Number of Instances           203          
 ## 
 </code></pre>
 <button class="output R toggle btn btn-xs btn-success">
 <span class="glyphicon glyphicon-chevron-down"></span> R output
 </button>
-<pre style=""><code class="output r">## [1] 5.003196
+<pre style=""><code class="output r">## [1] 4.431243
 </code></pre>
 </div>
 <p><br> <br></p>
@@ -6296,7 +6291,9 @@ densityModel = learn(projectName = "density_example",
       maxFeaturesCount = 5,
         maxDepth = 3,                               # allowing a higher search space depth
         functionsBlackList = list("trigonometry")  # blacklist trigonometric functions
-    )
+    ),
+    modelBuilding = modelBuildingControl(algorithmsWhiteList = list("RRandomForestRegressor")),
+    autoSave = FALSE
 )</code></pre>
 </div>
 <br> Note that in this example: <br> 1. While we provided the columns <code>lat</code> and <code>long</code> as two separate columns, a new feature named <code>latLong</code> was created that can operate in the 2D space. 2. The resulting best feature was able to capture our target by being able to generate features using the entire column information.
@@ -6353,7 +6350,61 @@ ceil(distance of latLong from closest of latLong_column) == 1.0
 </tr>
 </table>
 </div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">writeLines(readLines(paste0(densityModel$artifact_loc,"/reports/features/features_trace.txt"),n=9))</code></pre>
+<button class="output R toggle btn btn-xs btn-success">
+<span class="glyphicon glyphicon-chevron-down"></span> R output
+</button>
+<pre style=""><code class="output r">## Human friendly: inverse(distance of latLong from closest of latLong_column) >= 0.6940667049710194
+## Canonical: (core.Solving.SpecialFunctions.inverse(core.common.zeroComplexity.ZeroComplexityFunctions.distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/zinman/localdata/artifacts/density_example/6/resources/latLong_column"), latLong))) >= 0.6940667049710194
+## +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------+----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+## | sub-expression                                                                                                                                                                                         | positive sample                            | negative sample                              | type                        | root function                                                                                                                                               | reference / explanation   |
+## +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------+----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+## | inverse(distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/zinman/localdata/artifacts/density_example/6/resources/latLong_column"), latLong)) | 0.7282626904504894                         | 0.3479900011460833                           | Double                      | core.Solving.SpecialFunctions.inverse(num: Double): Double                                                                                                  | 1 / num                   |
+## |  distanceFromClosest(core.LoadCached[scala.collection.immutable.Vector[core.datastructures.LatLong]]("/Users/zinman/localdata/artifacts/density_example/6/resources/latLong_column"), latLong)         | 1.3731308950914662                         | 2.8736457849552073                           | Double                      | core.common.zeroComplexity.ZeroComplexityFunctions.distanceFromClosest(points: Seq[core.datastructures.LatLong],point: core.datastructures.LatLong): Double |                           |
+## |   latLong                                                                                                                                                                                              | LatLong(0.39135928102769,0.52709619468078) | LatLong(0.856131664710119,0.828075018012896) | core.datastructures.LatLong | latLong                                                                                                                                                     | Input parameter 'latLong' |
+## +--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------+----------------------------------------------+-----------------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------+
+</code></pre>
+</div>
 <p><br> <br></p>
+<!--
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteIndexEntry{advanced_customFunctions}
+%\VignetteDepends{xtable}
+-->
+<h2 id="add-custom-functions">Add custom functions</h2>
+<p>Goal: Identify numbers that are multiples of 7 You can create your own functions, which will be used as building blocks during the feature search. All you need to do, is to specify the url/s of the source files containing the custom functions code (currently only Scala is supported). The file can be local (on the server) or on the web.</p>
+<br>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">data = data.frame(number = 1:500, target = 1:500 %% 7 == 0)</code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">modModel = learn(projectName = "custom_function_example",
+    trainData = data,
+    target = "target",
+    featureGeneration = featureGenerationControl(maxFeaturesCount = 5),
+    # using a function from the web in the following url        
+    knowledge = knowledgeControl(customFunctions = list("https://raw.githubusercontent.com/mesagie/etcetra/master/SampleFunctions.scala")),
+    modelBuilding = modelBuildingControl(algorithmsWhiteList = list("RRandomForestClassifier")),  
+    autoSave = FALSE
+)</code></pre>
+</div>
+<div class="row">
+<button class="source R toggle btn btn-xs btn-primary">
+<span class="glyphicon glyphicon-chevron-down"></span> R source
+</button>
+<pre style=""><code class="source r">modModel$features()[1:1,c("idx","feature")]</code></pre>
+<p>idx feature 1 0 number in range (350.5, 398)</p>
+</div>
 <p><br> <br></p>
 <hr />
 <h1 id="h.-unsupervised-learning">H. Unsupervised learning</h1>

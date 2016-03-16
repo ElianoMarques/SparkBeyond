@@ -52,7 +52,7 @@ languagesModel = learn(
 	target = "lang", 
 	contextDatasets = list(contextObject(data=langData, name="languages",
 		contextTypes = contextTypesList(geoSpatial = TRUE))),
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))
+	featureGeneration = featureGenerationControl(maxFeaturesCount = list(25))
 )
 ```
 

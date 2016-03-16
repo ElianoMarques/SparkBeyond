@@ -131,7 +131,7 @@ Show predict / create package etc example - should be in a different section
 ```
 <br>
 <br>
-```{r advanced_customFunctions, child='advanced_customFunctions.rmd', eval = TRUE, cache=TRUE}
+```{r advanced_customFunctions, child='advanced_customFunctions.rmd', eval = FALSE, echo = FALSE, cache=TRUE}
 ```
 <br>
 <br>

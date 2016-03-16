@@ -84,7 +84,7 @@ frequencyModel = learn(
 	problemDefinition = problemDefinitionControl(trainTestSplitRatio = 0.6, temporalSplitColumn="date"), 
 	contextDatasets = list(contextObject(data = contextData, name = "signals", 
 		contextTypes = contextTypesList(timeSeries = TRUE))),
-	featureGenerationCtrl = featureGenerationControl(maxFeaturesCount = list(25))                                
+	featureGeneration = featureGenerationControl(maxFeaturesCount = list(25))                                
 )
 ```
 
