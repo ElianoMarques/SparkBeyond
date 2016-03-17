@@ -356,7 +356,7 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @return The new data
 addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, offset = 0, ...) {
   prevTZ = Sys.timezone() 
-  if (prevTZ == "CET") Sys.setenv(TZ = "UTC") #temporary fix
+  if (!is.na(prevTZ) && prevTZ == "CET") Sys.setenv(TZ = "UTC") #temporary fix
 
   unitVal = switch(unit,
   			 "Number"  = 1,
@@ -436,7 +436,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   if (percentNAUntil > 10)
   	warning(paste(percentNAUntil, "%% of the time window end times are NA - are the function parameter correct?"))
   
-  Sys.setenv(TZ = prevTZ)
+  if(!is.na(prevTZ)) Sys.setenv(TZ = prevTZ)
   
   data[]
 }
