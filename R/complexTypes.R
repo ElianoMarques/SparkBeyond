@@ -366,6 +366,8 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
          "Years"   = 31536000,
          stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Weeks', 'Years', 'Number'")
   )
+  prevTZ = Sys.timezone() 
+  if (prevTZ == "CET") Sys.setenv(TZ = "UTC") #temporary fix
   
   newCol = if (is.na(keyCol)) {
   	paste0("last_", window, "_", unit)
@@ -433,6 +435,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   if (percentNAUntil > 10)
   	warning(paste(percentNAUntil, "%% of the time window end times are NA - are the function parameter correct?"))
   
+  Sys.setenv(TZ = prevTZ)
   data[]
 }
 
