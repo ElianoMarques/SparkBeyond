@@ -75,7 +75,7 @@ setSBserverIOfolder = function(folder) {
 
 getSBserverIOfolder = function() {
   folder = if (exists("IOfolder")) IOfolder else {
-    print("Server IO folder was not defined. Please define folder using setSBserverIOfolder")
+    #print("Server IO folder was not defined. Please define folder using setSBserverIOfolder")
     NULL
   }
   return(folder)
@@ -539,6 +539,6 @@ writeToServer = function(data, filename = NA, prefix = "data_in", useEscaping = 
 }
 
 .onLoad <- function(libname = find.package("SparkBeyond"), pkgname = "SparkBeyond") {
-  print(paste0("Automatically trying to load settings saved in :",getwd()))
+  #print(paste0("Automatically trying to load settings saved in :",getwd()))
   #loadSettings()
 }
