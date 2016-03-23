@@ -291,7 +291,11 @@ Session = setRefClass("Session",
         			localfile = paste0(outputName, ".tsv.gz")
         			writeBin(httr::content(res2), localfile)
         			message(paste0("Results written to: ", getwd(),"/", localfile))
-        			df = read.table(localfile, sep="\t", quote = "",header=TRUE)
+        			df = read.table(localfile, sep="\t", quote = "",header=FALSE, skip = 1)
+        			headers = readLines(localfile , n=1)
+        			cols = strsplit(headers, '\t')
+        			colnames(df) = cols[[1]]
+        			
         			for(i in 1:ncol(df)) {
         				if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
         					df[,i] = as.logical(as.character(df[,i]))
