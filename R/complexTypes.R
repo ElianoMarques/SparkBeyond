@@ -355,7 +355,8 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @param sample: optional maximal possible sample value (default to maxint)
 #' @return The new data
 addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, offset = 0, ...) {
-  unitVal = switch(unit,
+
+	  unitVal = switch(unit,
   			 "Number"  = 1,
          "Seconds" = 1,
          "Minutes" = 60,
@@ -367,7 +368,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
          stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Weeks', 'Years', 'Number'")
   )
   prevTZ = Sys.timezone() 
-  if (prevTZ == "CET") Sys.setenv(TZ = "UTC") #temporary fix
+  if (!is.na(prevTZ) && prevTZ == "CET") Sys.setenv(TZ = "UTC") #temporary fix
   
   newCol = if (is.na(keyCol)) {
   	paste0("last_", window, "_", unit)
@@ -435,7 +436,8 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   if (percentNAUntil > 10)
   	warning(paste(percentNAUntil, "%% of the time window end times are NA - are the function parameter correct?"))
   
-  Sys.setenv(TZ = prevTZ)
+  if(!is.na(prevTZ)) Sys.setenv(TZ = prevTZ)
+
   data[]
 }
 
