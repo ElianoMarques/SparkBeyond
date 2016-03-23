@@ -252,11 +252,12 @@ login = function(username, password, domain) {
 	})
 	
 	#res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
-	loggedIn = if (res$status_code == 404 || res$status_code == 200) {		#there is a weird redirection causing this, but this actually OK
+	loggedIn = if (res$status_code == 404 || res$status_code == 200 || res$status_code == 400) {		#there is a weird redirection causing this, but this actually OK
 		currentUser()
 	} else {
-		if (res$status_code == 400)	print ("Login failed. Please check your credentials.")
-		else  print ("Login failed.")
+		#if (res$status_code == 400)	print ("Login failed. Please check your credentials.") # not sure why this is working although we get 400 sometimes
+		#else  
+		print ("Login failed.")
 		FALSE
 	}
 	loggedIn
