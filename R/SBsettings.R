@@ -75,7 +75,7 @@ setSBserverIOfolder = function(folder) {
 
 getSBserverIOfolder = function() {
   folder = if (exists("IOfolder")) IOfolder else {
-    print("Server IO folder was not defined. Please define folder using setSBserverIOfolder")
+    #print("Server IO folder was not defined. Please define folder using setSBserverIOfolder")
     NULL
   }
   return(folder)
