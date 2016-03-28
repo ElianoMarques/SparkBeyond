@@ -375,9 +375,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   }else{
   	paste0("last_keyed_", window, "_", unit)
   }
-  data = as.data.frame(data)
-  #TODO: support data.table as well
-  
+
   #TODO: support non-dates,  support offset calculation, Date POSix objects
   
   extraParams = list(...)
@@ -385,7 +383,9 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   
   prefix = if(!remoteMode) "" else {
   	if (is.na(keyCol)) "TW:" else {
-  		if (is.numeric(data[,keyCol])) "DKTW:" else "SKTW:"
+			if (is.numeric(data[,keyCol])) "DKTW:" else "SKTW:"
+  		#"SKTW:"
+			#TODO: return "SKTW:" for all
   	}
   }
 
@@ -421,14 +421,23 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   	if (is.na(dates[2])) datesUntilNAcount = datesUntilNAcount + 1
   	paste0(prefix, keyVal,",",dates[1],",",dates[2],",",includeUntil,",",relativeTime,",",unit,",",sample)
   }
-  
-  if (is.na(keyCol)) {
-    data[,newCol] = sapply(dateColData, generateWindow)
-  } else {    
-    keyColData = colsWhiteList(data, keyCol)
-    data[,newCol] = mapply(generateWindow,dateColData,keyColData)
+  if (is.data.table(data)){
+  	if (is.na(keyCol)) {
+  		data[,eval(as.symbol(newCol)):=sapply(dateColData, generateWindow)]
+  	} else {    
+  		data[,eval(as.symbol(newCol)):=mapply(generateWindow,dateColData,eval(as.symbol(keyCol)))]
+  	}
+  } else {
+  	if (is.na(keyCol)) {
+  		data[,newCol] = sapply(dateColData, generateWindow)
+  	} else {    
+  		keyColData = colsWhiteList(data, keyCol)
+  		data[,newCol] = mapply(generateWindow,dateColData,keyColData)
+  	}
+  	
   }
-	
+  	
+  
   percentNAFrom = datesFromNAcount / nrow(data) * 100
   percentNAUntil = datesUntilNAcount / nrow(data) * 100
   if (percentNAFrom > 10)
