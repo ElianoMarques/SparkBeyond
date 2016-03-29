@@ -346,7 +346,7 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @param data: data.table to be modified.
 #' @param dateCol: The column name in \code{data} that will be used.
 #' @param window: The window length (numeric)
-#' @param unit: The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Weeks", "Years", "Number"
+#' @param unit: The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Years", "Number"
 #' @param dateFormat: provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"
 #' @param keyCol: An optional key for the sliding window (NA as default)
 #' @param includeUntil: optional argument
@@ -365,7 +365,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
          #"Weeks"   = 604800,
   			 "Months"  = 2419200,
          "Years"   = 31536000,
-         stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Weeks', 'Years', 'Number'")
+         stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Years', 'Number'")
   )
   prevTZ = Sys.timezone() 
   if (!is.na(prevTZ) && prevTZ == "CET") Sys.setenv(TZ = "UTC") #temporary fix
