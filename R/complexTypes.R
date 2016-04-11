@@ -417,8 +417,8 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
 		} else {
 			stop (paste("Date column", dateCol,"type should be one of 'character', 'integer', 'numeric', 'date', 'POSIXct'."))
 		}
-  	if (is.na(dates[1])) datesFromNAcount = datesFromNAcount + 1
-  	if (is.na(dates[2])) datesUntilNAcount = datesUntilNAcount + 1
+  	if (is.na(dates[1])) datesFromNAcount <<- datesFromNAcount + 1
+  	if (is.na(dates[2])) datesUntilNAcount <<- datesUntilNAcount + 1
   	paste0(prefix, keyVal,",",dates[1],",",dates[2],",",includeUntil,",",relativeTime,",",unit,",",sample)
   }
   if (is.data.table(data)){
