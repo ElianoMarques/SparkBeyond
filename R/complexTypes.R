@@ -441,9 +441,9 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   percentNAFrom = datesFromNAcount / nrow(data) * 100
   percentNAUntil = datesUntilNAcount / nrow(data) * 100
   if (percentNAFrom > 10)
-  	warning(paste(percentNAFrom, "%% of the time window start times are NA - are the function parameter correct?"))
+  	warning(paste0(percentNAFrom, "% of the time window start times are NA - are the function parameter correct?"))
   if (percentNAUntil > 10)
-  	warning(paste(percentNAUntil, "%% of the time window end times are NA - are the function parameter correct?"))
+  	warning(paste0(percentNAUntil, "% of the time window end times are NA - are the function parameter correct?"))
   
   if(!is.na(prevTZ)) Sys.setenv(TZ = prevTZ)
 
