@@ -237,6 +237,7 @@ functionCatalog = function() {
 login = function(username, password, domain) {	
 	setSBserverIOfolder(NULL)
 	if (nchar(domain) < 6) stop("Please provide a domain to log in to")
+	if (substr(domain, nchar(domain), nchar(domain)) == "/") domain = substr(domain, 1, nchar(domain)-1) #remove trailing /
 	if (substr(domain, 1,4) != "http") warning("The provided domain does not start with 'http' - please verify in case of failure")
 	url <- paste0(domain,"/login")
 	setSBserverHost(domain)
@@ -248,17 +249,29 @@ login = function(username, password, domain) {
 				message("Please ask the system administrator to sign the SSL certificate.")
 				httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
 			}
+			else if (grepl("resolve host name", cond)) {
+				stop(paste("SparkBeyond server does not exist at:",domain))
+			}
 			else stop(cond)
 	})
 	
 	#res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
-	loggedIn = if (res$status_code == 404 || res$status_code == 200 || res$status_code == 400) {		#there is a weird redirection causing this, but this actually OK
+	loggedIn = if (res$status_code == 404 || res$status_code == 200) {		#there is a weird redirection causing this, but this actually OK
 		currentUser()
 	} else {
-		#if (res$status_code == 400)	print ("Login failed. Please check your credentials.") # not sure why this is working although we get 400 sometimes
-		#else  
-		print ("Login failed.")
-		FALSE
+		if (res$status_code == 400){ # not sure why this is working although we get 400 sometimes
+			if (currentUser(FALSE))	{
+				currentUser() 
+				TRUE
+			}
+			else {
+				print ("Login failed. Please check your credentials.") 
+				FALSE
+			}
+		} else {  
+			print ("Login failed.")
+			FALSE
+		}
 	}
 	loggedIn
 }
@@ -296,7 +309,7 @@ currentUser = function(showInfo = TRUE) {
 			ret				
 		} else FALSE
 			
-		if(showInfo && !loggedIn)	print("You are currently not logged in - please use the login() function first.")
+		if(showInfo && !loggedIn)	print("You are currently not logged in.")
 			
 		loggedIn
 	}
