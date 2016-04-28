@@ -442,6 +442,14 @@ learn <- function(
 	
 	if (!is.null(testData) && !is.na(trainTestSplitRatio)) message ("Note: test data was provided - ignoring trainTestSplitRatio defintion.")	
 	
+	if (!is.null(testData) && setequal(names(trainData),names(testData))==FALSE) {
+		message("trainData:")
+		message(paste0(names(trainData),","))
+		message("testData:")
+		message(paste0(names(testData),","))
+		stop ("testData and trainData have different schemas")
+	}
+	
 	url <- paste0(getSBserverDomain(),"/rapi/learn")
 	message(paste("Calling:", url))
 	
