@@ -207,15 +207,18 @@ knowledgeControl = function(
 #' modelBuildingControl
 #' 
 #' @param algorithmsWhiteList: Optional. A list of strings that represents the set of algorithms to run. Uses \code{\link{algorithmsList}}
+#' @param extraModels: Optional. A named list of algorithms to run, along with the hyperparameters to set for these algorithms.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". NA by default automatically selects AUC for classification and RMSE for regression.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
 modelBuildingControl = function(
-	algorithmsWhiteList = algorithmsList(), 
+	algorithmsWhiteList = algorithmsList(),
+	extraModels = list(),
 	evaluationMetric = NA,
 	crossValidation = 5
 ) {
 	list(
 		algorithmsWhiteList = algorithmsWhiteList,
+    	extraModels = extraModels,
 		evaluationMetric = evaluationMetric,
 		crossValidation = crossValidation
 	)
@@ -551,6 +554,7 @@ learn <- function(
 		
 		# model building parameters
 		algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuilding$algorithmsWhiteList,
+		extraModels = if(!is.null(extraParams$extraModels)) extraParams$extraModels else modelBuilding$extraModels,
 		evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuilding$evaluationMetric,
 		crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuilding$crossValidation,
 		
@@ -564,7 +568,7 @@ learn <- function(
 		externalPrefixPath = ifelse(!remoteMode, getSBserverIOfolder(), NA)
 	)
 	
-	verifyList = function(l) {if(is.vector(l) && !is.na(l)) as.list(l) else l}
+	verifyList = function(l) {if(is.vector(l) && length(l)>0 && !is.na(l)) as.list(l) else l}
 	params$algorithmsWhiteList = verifyList(params$algorithmsWhiteList)
 	params$functionsWhiteList = verifyList(params$functionsWhiteList)
 	params$functionsBlackList = verifyList(params$functionsBlackList)
@@ -585,8 +589,9 @@ learn <- function(
 	
 	message(paste("Artifact location was created at:", res$artifactPath))
 	session = Session(artifact_loc = res$artifactPath, 
-							modelBuilt = !(length(params$algorithmsWhiteList) == 1 && 
-								tolower(params$algorithmsWhiteList[[1]]) == "zeror"),
+							modelBuilt = !(length(params$algorithmsWhiteList) == 1 &&
+								tolower(params$algorithmsWhiteList[[1]]) == "zeror" &&
+								length(params$extraModels) == 0),
 							jobId = if(is.null(res$jobId)) -1 else res$jobId
 					)
 	
