@@ -448,9 +448,9 @@ Session = setRefClass("Session",
           plotName = res$result
           subFolder = gsub("\\s+","_", title)
           resultsLocation = paste0("predictions/", subFolder, "/")
-          showReport(paste0(resultsLocation, "CumulativeGain_counts_", plotName)) #cummGain_counts
-          showReport(paste0(resultsLocation, "CumulativeGain_percent_", plotName)) #cummGain_percent
-          showReport(paste0(resultsLocation, "Lift_plot_", plotName)) #lift plot
+          showReport(paste0(resultsLocation, "CumulativeGain_counts_", plotName,".html")) #cummGain_counts
+          showReport(paste0(resultsLocation, "CumulativeGain_percent_", plotName,".html")) #cummGain_percent
+          showReport(paste0(resultsLocation, "Lift_plot_", plotName,".html")) #lift plot
           
           url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/reports/", resultsLocation, "lift_table_",plotName, ".tsv.gz")
           res2 = httr::GET(url)
