@@ -546,7 +546,7 @@ learn <- function(
 		worldBank = if(!is.null(extraParams$worldBank)) extraParams$worldBank else knowledge$worldBank,
 		twitter = if(!is.null(extraParams$twitter)) extraParams$twitter else knowledge$twitter,
 		searchEngines = if(!is.null(extraParams$searchEngines)) extraParams$searchEngines else knowledge$searchEngines,
-		useCustomGraphs = if(!is.null(extraParams$customDatasets)) extraParams$customDatasets else knowledge$customDatasets,								
+		customDatasets = if(!is.null(extraParams$customDatasets)) extraParams$customDatasets else knowledge$customDatasets,								
 		
 		#customGraphsWhiteList = if(!is.null(extraParams$customGraphsWhiteList)) extraParams$customGraphsWhiteList else knowledge$customGraphsWhiteList,
 		#customGraphsBlackList = if(!is.null(extraParams$customGraphsBlackList)) extraParams$customGraphsBlackList else knowledge$customGraphsBlackList,
@@ -567,6 +567,7 @@ learn <- function(
 		
 		externalPrefixPath = ifelse(!remoteMode, getSBserverIOfolder(), NA)
 	)
+
 	
 	verifyList = function(l) {if(is.vector(l) && length(l)>0 && !is.na(l)) as.list(l) else l}
 	params$algorithmsWhiteList = verifyList(params$algorithmsWhiteList)
