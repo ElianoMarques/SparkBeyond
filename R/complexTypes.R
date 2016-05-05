@@ -401,8 +401,8 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   generateWindow = function(dateVal, keyVal = NA) {
   	dates = if (dateType == "character") {
   		convertDateToString = function(dValue) as.character(as.POSIXct(dValue),format=datePOSIXformatOut)
-  	 	dt = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-offset*unitVal)
-  		dt_from = convertDateToString(strptime(dateVal,dateFormat,tz="EST")-(window+offset)*unitVal) #seconds based
+  	 	dt = convertDateToString(strptime(dateVal,dateFormat,tz="UTC")-offset*unitVal)
+  		dt_from = convertDateToString(strptime(dateVal,dateFormat,tz="UTC")-(window+offset)*unitVal) #seconds based
 			c(dt_from, dt)
 		} else if (dateType == "integer" || dateType == "numeric") {
 			c(dateVal - window, dateVal)
