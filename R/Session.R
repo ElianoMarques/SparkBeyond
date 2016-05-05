@@ -494,17 +494,22 @@ Session = setRefClass("Session",
         body = rjson::toJSON(params)
        # print(body)
         res = httr::POST(url, body = body, httr::content_type_json())
-        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-        finalRes = if (is.null(res$error) && !is.null(res$result) && res$result == "OK") {
+        
+        finalRes = if (res$status == 200) {
+        	print("Saving zipped file")
+        	fileName = paste0(getwd(), "/cli_runner.zip")
+        	writeBin(httr::content(res), fileName)
         	message ("Package created successfully")
-          TRUE
+        	message(paste0("Package is saved to: ", fileName))
+        	print(paste0("Saved zipped file to ", fileName))
+        	TRUE
         } else {
-          errorFile = paste0(artifact_loc,"/package-errors.txt")
-          if (file.exists(errorFile)) {
-            errorLines = readLines(errorFile)
-            writeLines(errorLines)
-          }
-          FALSE
+        	errorFile = paste0(artifact_loc,"/package-errors.txt")
+        	if (file.exists(errorFile)) {
+        		errorLines = readLines(errorFile)
+        		writeLines(errorLines)
+        	}
+        	FALSE
         }
 
         return(finalRes)
