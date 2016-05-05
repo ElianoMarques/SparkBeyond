@@ -12,11 +12,12 @@ getSBserverHost = function() {
 }
 
 getSBserverDomain = function() {
-	port = getSBserverPort()
-	if (substr(getSBserverHost(), 1, 5) == "https" || grepl(":", substr(getSBserverHost(), 6, nchar(getSBserverHost()))) || nchar(port) == 0)
-		getSBserverHost()
-	else		
-		paste0(getSBserverHost(),":", port)
+# 	port = getSBserverPort()
+# 	if (substr(getSBserverHost(), 1, 5) == "https" || grepl(":", substr(getSBserverHost(), 6, nchar(getSBserverHost()))) || nchar(port) == 0)
+# 		getSBserverHost()
+# 	else		
+# 		paste0(getSBserverHost(),":", port)
+	getSBserverHost()
 }
 
 printSBserverHost = function() {
@@ -240,7 +241,6 @@ login = function(username, password, domain) {
 	if (substr(domain, nchar(domain), nchar(domain)) == "/") domain = substr(domain, 1, nchar(domain)-1) #remove trailing /
 	if (substr(domain, 1,4) != "http") warning("The provided domain does not start with 'http' - please verify in case of failure")
 	url <- paste0(domain,"/login")
-	setSBserverHost(domain)
 	res = tryCatch(
 		httr::POST(url, encode = "form", body = list(email=username, password=password, hash="")), 
 		error = function(cond) {
@@ -254,7 +254,7 @@ login = function(username, password, domain) {
 			}
 			else stop(cond)
 	})
-	
+	setSBserverHost(domain)
 	#res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
 	loggedIn = if (res$status_code == 404 || res$status_code == 200) {		#there is a weird redirection causing this, but this actually OK
 		currentUser()
