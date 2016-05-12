@@ -1,3 +1,4 @@
+
 # S3 functions (De facto constructors of Session)
 
 
@@ -388,6 +389,25 @@ contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list
 	obj
 }
 
+#' fileContextObject
+#' 
+#' @param data: a path to a file containing the context data
+#' @param name: an identifier for the context object to be created (optional).
+#' @param keyColumns: Specify the key columns to be used by the context object (optional).
+#' @param timeColumn: Specify the time column to be used by the context object (relevant in time series contexts) (optional).
+fileContextObject = function(path, name = NULL, ...) {
+	data = list(
+		jsonClass = "com.sparkbeyond.runtime.data.transform.LocalFile",
+		source = list(
+			path = path,
+			name = name
+		),
+		name = name
+	)
+	class(data) = "fileContextInput"
+	contextObject(data = data, name = name, ...)
+}
+
 #' learn
 #' 
 #' Runs SparkBeyond feature enrichment and learning process.
@@ -462,16 +482,30 @@ learn <- function(
 		contextDatasets = as.list(contextDatasets)
 		if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
 		for (i in 1:length(contextDatasets)) {
-			contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
-			contextDatasets[[i]]$data = 
-				ifelse(!remoteMode,
-					writeToServer(contextDatasets[[i]]$data, 
-						prefix = paste0(projectName,"_context", contextName),
-						useEscaping = preProcessing$fileEscaping
-					),
-					uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
-												 , useEscaping = preProcessing$fileEscaping)
-			)
+			if(class(contextDatasets[[i]]$data) == "fileContextInput") {
+				contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
+				contextDatasets[[i]]$data$source$path = 
+					ifelse(!remoteMode,
+								 writeToServer(contextDatasets[[i]]$data$source$path, 
+								 							prefix = paste0(projectName,"_context", contextName),
+								 							useEscaping = preProcessing$fileEscaping
+								 ),
+								 uploadToServer(data = contextDatasets[[i]]$data$source$path, projectName = projectName, name = paste0("context", contextName)
+								 							 , useEscaping = preProcessing$fileEscaping)
+					)
+			} else {
+				#left for backward compatibility with server version 1.5
+				contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
+				contextDatasets[[i]]$data =
+					ifelse(!remoteMode,
+						writeToServer(contextDatasets[[i]]$data,
+							prefix = paste0(projectName,"_context", contextName),
+							useEscaping = preProcessing$fileEscaping
+						),
+						uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
+													 , useEscaping = preProcessing$fileEscaping)
+				)
+			}
 		}
 	}
 	
