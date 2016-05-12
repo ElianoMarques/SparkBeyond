@@ -382,9 +382,6 @@ contextTypesList = function(
 #' @param keyColumns: Specify the key columns to be used by the context object (optional).
 #' @param timeColumn: Specify the time column to be used by the context object (relevant in time series contexts) (optional).
 contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL ) { #TODO: help
-	camelizeColumnName = function(originalName) {
-		
-	} 
 	keyColumns = as.list(keyColumns)
 	obj = list(data = data, contextTypes = contextTypes, name=name, keyColumns = keyColumns, timeColumn=timeColumn, graphSourceNodeColumn=graphSourceNodeColumn, graphTargetNodeColumn=graphTargetNodeColumn)
 	class(obj) = "contextObject"
