@@ -459,6 +459,17 @@ isServerAlive = function() {
 	status
 }
 
+isKnowledgeServerAlive = function() { #add help, match with engine version
+	if(!currentUser(showInfo = FALSE)) stop("This function requires you to be logged in")
+	url <- paste0(getSBserverDomain(),"/knowledge/ping")
+	res = httr::GET(url, httr::content_type_json())
+	content=httr::content(res)
+	if(!content$allConnected){
+			warning(paste(content$connectionTest$url, content$connectionTest$isConnected))	
+			warning(paste(content$connectionTest$nextConnections[[1]]$url, content$connectionTest$nextConnections[[1]]$isConnected))	
+	}
+	content$allConnected
+}
 
 #' A function to get the server version information
 #' @return The server version information.
