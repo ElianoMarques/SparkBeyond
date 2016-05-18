@@ -140,6 +140,7 @@ featureGenerationControl = function(
 		featureSearchMode = featureSearchMode,
 		functionsWhiteList = functionsWhiteList,
 		functionsBlackList = functionsBlackList,
+		localTopFeatureCount = localTopFeatureCount,
 		regressionDiscretizerBinsOverride = if (is.na(regressionDiscretizerBinsOverride)) NA else as.list(regressionDiscretizerBinsOverride),
 		booleanNumericFeatures = booleanNumericFeatures,
 		numericEqualityFeatures = numericEqualityFeatures,
