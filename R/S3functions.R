@@ -181,26 +181,28 @@ knowledgeControl = function(
 	#useCustomGraphs = FALSE,	
 	#customGraphsWhiteList = NA,
 	#customGraphsBlackList = NA
-	) {
+) {
 	# customGraphsWhiteList A list that filters which domains should be used. NA by default.
 	# customGraphsBlackList A list that filters which custom graphs should be ignored. NA by default.
 	# customFunctions A list of additional functions that should be incorporated to the feature search. NA by default.
+	customDatasets = customDatasets ||
+		weather || usCensus || news || worldBank || twitter || searchEngines
 	
-			list(
-				linkedDataCore = linkedDataCore,
-				openStreetMap = openStreetMap,
-				weather = weather,
-				usCensus = usCensus,
-				news = news,
-				worldBank = worldBank,
-				twitter = twitter,
-				searchEngines = searchEngines,
-				customDatasets = customDatasets
-			
-				#customGraphsWhiteList = customGraphsWhiteList,
-				#customGraphsBlackList = customGraphsBlackList,
-				#customFunctions = customFunctions
-		)
+	list(
+		linkedDataCore = linkedDataCore,
+		openStreetMap = openStreetMap,
+		weather = weather,
+		usCensus = usCensus,
+		news = news,
+		worldBank = worldBank,
+		twitter = twitter,
+		searchEngines = searchEngines,
+		customDatasets = customDatasets
+	
+		#customGraphsWhiteList = customGraphsWhiteList,
+		#customGraphsBlackList = customGraphsBlackList,
+		#customFunctions = customFunctions
+	)
 }
 
 
