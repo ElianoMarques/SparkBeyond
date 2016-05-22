@@ -213,17 +213,20 @@ knowledgeControl = function(
 #' @param extraModels: Optional. A named list of algorithms to run, along with the hyperparameters to set for these algorithms.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". NA by default automatically selects AUC for classification and RMSE for regression.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
+#' @param maxRecordsForModelBuild: Optional. Integer value representing how many records should be used.
 modelBuildingControl = function(
 	algorithmsWhiteList = algorithmsList(),
 	extraModels = list(),
 	evaluationMetric = NA,
-	crossValidation = 5
+	crossValidation = 5,
+	maxRecordsForModelBuild = NA
 ) {
 	list(
 		algorithmsWhiteList = algorithmsWhiteList,
-    	extraModels = extraModels,
+    extraModels = extraModels,
 		evaluationMetric = evaluationMetric,
-		crossValidation = crossValidation
+		crossValidation = crossValidation,
+		maxRecordsForModelBuild = maxRecordsForModelBuild
 	)
 }
 
@@ -560,6 +563,7 @@ learn <- function(
 		extraModels = if(!is.null(extraParams$extraModels)) extraParams$extraModels else modelBuilding$extraModels,
 		evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuilding$evaluationMetric,
 		crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuilding$crossValidation,
+		maxRecordsForModelBuild = if(!is.null(extraParams$maxRecordsForModelBuild)) extraParams$maxRecordsForModelBuild else modelBuilding$maxRecordsForModelBuild,
 		
 		#reporting parameters
 		produceFeatureClusteringReport = if(!is.null(extraParams$featureClustersReport)) extraParams$featureClustersReport else reporting$featureClustersReport,

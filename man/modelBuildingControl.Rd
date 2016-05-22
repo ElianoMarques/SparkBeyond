@@ -5,14 +5,19 @@
 \title{modelBuildingControl}
 \usage{
 modelBuildingControl(algorithmsWhiteList = algorithmsList(),
-  evaluationMetric = NA, crossValidation = 5)
+  extraModels = list(), evaluationMetric = NA, crossValidation = 5,
+  maxRecordsForModelBuild = NA)
 }
 \arguments{
 \item{algorithmsWhiteList:}{Optional. A list of strings that represents the set of algorithms to run. Uses \code{\link{algorithmsList}}}
 
+\item{extraModels:}{Optional. A named list of algorithms to run, along with the hyperparameters to set for these algorithms.}
+
 \item{evaluationMetric:}{Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". NA by default automatically selects AUC for classification and RMSE for regression.}
 
 \item{crossValidation:}{Optional. Integer value representing how many cross validation splits should be used. 5 by default.}
+
+\item{maxRecordsForModelBuild:}{Optional. Integer value representing how many records should be used.}
 }
 \description{
 modelBuildingControl
