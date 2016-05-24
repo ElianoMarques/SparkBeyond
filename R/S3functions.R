@@ -234,6 +234,7 @@ modelBuildingControl = function(
 #' 
 #' @param isClassification A boolean indicator for whether to use only classification algorithms or only regression algorithms. If is NA the relevant algorithms are selected based on the target type and cardinality using the learning process. 
 #' @param randomForest random forest algorithm from the randomForest package.
+#' @param zeroR predicts the mean (for a numeric class) or the mode (for a nominal class). This method requires almost no computation and will be the fastest to apply.
 #' @param xgBoost eXtreme gradient boosted machine algorithm from the xgBoost package.  (currently does not support multiclass)
 #' @param GBM gradient boosted machine algorithm from the xgBoost package.  
 #' @param rpart decision tree algorithm from the rpart package.  
@@ -243,22 +244,23 @@ modelBuildingControl = function(
 #' @param linearEnsemble A linear ensemble of a collection of GBM and rpart algorithms.
 #' @param stackingEnsemble A stacking ensemble of GBM as meta-model that ensmebles a collection of GBM and rpart algorithms.
 #' @param naiveBayes.weka Classification algorithm. A naive Bayes classifier is a simple probabilistic classifier based on applying Bayes' theorem with strong independence assumptions.
-#' @param bagging.weka Classification algorithm
+#' @param bagging.weka bagging a classifier to reduce variance Can do classification and regression.
 #' @param votedPerceptron.weka Classification algorithm. The perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs.
-#' @param classificationViaClustering.weka Classification algorithm.
-#' @param classificationViaRegression.weka Classification algorithm.
-#' @param randomSubSpace.weka Classification algorithm.
-#' @param bayesNet.weka Classification algorithm.
-#' @param libSVM.weka Classification algorithm.
-#' @param adaBoostM1.weka Classification algorithm.
-#' @param decisionTable.weka Classification algorithm.
-#' @param smo.weka Classification algorithm.
-#' @param repTree.weka Regression algorithm.
-#' @param smo.regression.weka Regression algorithm.
-#' @param regressionByDiscretization.weka Regression algorithm.
+#' @param classificationViaClustering.weka A simple meta-classifier that uses a clusterer for classification. For cluster algorithms that use a fixed number of clusterers.
+#' @param classificationViaRegression.weka Doing classification using regression methods. Class is binarized and one regression model is built for each class value.
+#' @param randomSubSpace.weka Constructs a decision tree based classifier that maintains highest accuracy on training data and improves on generalization accuracy as it grows in complexity. The classifier consists of multiple trees constructed systematically by pseudorandomly selecting subsets of components of the feature vector, that is, trees constructed in randomly chosen subspaces.
+#' @param bayesNet.weka A Bayes Network classifier. Provides datastructures (network structure, conditional probability distributions, etc.) and facilities common to Bayes Network learning algorithms like K2 and B.
+#' @param libSVM.weka Wrapper for the libSVM library, an integrated software for support vector classification, (C-SVC, nu-SVC), regression (epsilon-SVR, nu-SVR) and distribution estimation (one-class SVM). It supports multi-class classification.
+#' @param adaBoostM1.weka Algorithm for boosting a nominal class classifier using the Adaboost M1 method. Only nominal class problems can be tackled.
+#' @param decisionTable.weka Algorithm for building and using a simple decision table majority classifier.
+#' @param smo.weka Implements John Platt's sequential minimal optimization algorithm for training a support vector classifier.
+#' @param repTree.weka Fast decision tree learner. Builds a decision/regression tree using information gain/variance and prunes it using reduced-error pruning (with backfitting).
+#' @param smo.regression.weka SMOreg implements the support vector machine for regression.A regression scheme that employs any classifier on a copy of the data that has the class attribute (equal-width) discretized. 
+#' @param regressionByDiscretization.weka A regression scheme that employs any classifier on a copy of the data that has the class attribute (equal-width) discretized. 
 algorithmsList = function(
 		isClassification = NA,
 		randomForest = TRUE,
+		zeroR = FALSE,
 		xgBoost = FALSE,
 		GBM = FALSE,
 		rpart = FALSE,
@@ -315,6 +317,7 @@ algorithmsList = function(
 		if (repTree.weka) algsList = c(algsList, "weka.classifiers.trees.REPTree(-M 5)")
 		if (smo.regression.weka) algsList = c(algsList, "weka.classifiers.functions.SMOreg")
 		if (regressionByDiscretization.weka) algsList = c(algsList, "weka.classifiers.meta.RegressionByDiscretization(-B 3 -W weka.classifiers.trees.RandomForest)")
+		if (zeroR) algsList = c(algsList, "ZeroR")
 		algsList
 }
 

@@ -4,7 +4,7 @@
 \alias{algorithmsList}
 \title{algorithmsList}
 \usage{
-algorithmsList(isClassification = NA, randomForest = TRUE,
+algorithmsList(isClassification = NA, randomForest = TRUE, zeroR = FALSE,
   xgBoost = FALSE, GBM = FALSE, rpart = FALSE, lassoGlmnet = FALSE,
   ridgeGlmnet = FALSE, linearRegression = FALSE, linearEnsemble = FALSE,
   stackingEnsemble = FALSE, naiveBayes.weka = FALSE, bagging.weka = FALSE,
@@ -18,6 +18,8 @@ algorithmsList(isClassification = NA, randomForest = TRUE,
 \item{isClassification}{A boolean indicator for whether to use only classification algorithms or only regression algorithms. If is NA the relevant algorithms are selected based on the target type and cardinality using the learning process.}
 
 \item{randomForest}{random forest algorithm from the randomForest package.}
+
+\item{zeroR}{predicts the mean (for a numeric class) or the mode (for a nominal class). This method requires almost no computation and will be the fastest to apply.}
 
 \item{xgBoost}{eXtreme gradient boosted machine algorithm from the xgBoost package.  (currently does not support multiclass)}
 
@@ -37,31 +39,31 @@ algorithmsList(isClassification = NA, randomForest = TRUE,
 
 \item{naiveBayes.weka}{Classification algorithm. A naive Bayes classifier is a simple probabilistic classifier based on applying Bayes' theorem with strong independence assumptions.}
 
-\item{bagging.weka}{Classification algorithm}
+\item{bagging.weka}{bagging a classifier to reduce variance Can do classification and regression.}
 
 \item{votedPerceptron.weka}{Classification algorithm. The perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs.}
 
-\item{classificationViaClustering.weka}{Classification algorithm.}
+\item{classificationViaClustering.weka}{A simple meta-classifier that uses a clusterer for classification. For cluster algorithms that use a fixed number of clusterers.}
 
-\item{classificationViaRegression.weka}{Classification algorithm.}
+\item{classificationViaRegression.weka}{Doing classification using regression methods. Class is binarized and one regression model is built for each class value.}
 
-\item{randomSubSpace.weka}{Classification algorithm.}
+\item{randomSubSpace.weka}{Constructs a decision tree based classifier that maintains highest accuracy on training data and improves on generalization accuracy as it grows in complexity. The classifier consists of multiple trees constructed systematically by pseudorandomly selecting subsets of components of the feature vector, that is, trees constructed in randomly chosen subspaces.}
 
-\item{bayesNet.weka}{Classification algorithm.}
+\item{bayesNet.weka}{A Bayes Network classifier. Provides datastructures (network structure, conditional probability distributions, etc.) and facilities common to Bayes Network learning algorithms like K2 and B.}
 
-\item{libSVM.weka}{Classification algorithm.}
+\item{libSVM.weka}{Wrapper for the libSVM library, an integrated software for support vector classification, (C-SVC, nu-SVC), regression (epsilon-SVR, nu-SVR) and distribution estimation (one-class SVM). It supports multi-class classification.}
 
-\item{adaBoostM1.weka}{Classification algorithm.}
+\item{adaBoostM1.weka}{Algorithm for boosting a nominal class classifier using the Adaboost M1 method. Only nominal class problems can be tackled.}
 
-\item{decisionTable.weka}{Classification algorithm.}
+\item{decisionTable.weka}{Algorithm for building and using a simple decision table majority classifier.}
 
-\item{smo.weka}{Classification algorithm.}
+\item{smo.weka}{Implements John Platt's sequential minimal optimization algorithm for training a support vector classifier.}
 
-\item{repTree.weka}{Regression algorithm.}
+\item{repTree.weka}{Fast decision tree learner. Builds a decision/regression tree using information gain/variance and prunes it using reduced-error pruning (with backfitting).}
 
-\item{smo.regression.weka}{Regression algorithm.}
+\item{smo.regression.weka}{SMOreg implements the support vector machine for regression.A regression scheme that employs any classifier on a copy of the data that has the class attribute (equal-width) discretized.}
 
-\item{regressionByDiscretization.weka}{Regression algorithm.}
+\item{regressionByDiscretization.weka}{A regression scheme that employs any classifier on a copy of the data that has the class attribute (equal-width) discretized.}
 }
 \description{
 algorithmsList

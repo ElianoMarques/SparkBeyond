@@ -2,18 +2,24 @@
 % Please edit documentation in R/example.R
 \name{getData}
 \alias{getData}
-\title{Auxiliary function to get public test datasets.}
+\title{getData}
 \usage{
 getData(datasetName)
 }
 \arguments{
 \item{String}{of the name of the dataset. Options are:
 \itemize{
-\item titanic_train
-\item titanic_test
-\item tweets_sentiment
-\item tweets_sentimentkaggle
-\item sentiment_lexicon
+\item titanic_train (see A. Basic modeling example)
+\item titanic_test (see A. Basic modeling example)
+\item tweets_sentiment (see C. Text analysis example)
+\item sentiment_lexicon (see C. Text analysis example)
+\item languages (see D. GeoSpatial analysis example)
+\item frequencychange (see E. TimeSeries analysis example)
+\item emergency_locations (see F. World knowledge example)
+\item museums (see F. World knowledge example)
+\item flights_delay (see F. World knowledge example)
+\item googlestock (see G. Advanced features control example)
+\item complexsum (see G. Advanced features control example)
 }}
 }
 \value{

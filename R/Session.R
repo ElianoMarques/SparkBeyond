@@ -2,21 +2,28 @@ library(methods) #to support RScript
 
 
 #' SB object that encapsulates a session
-#' @field artifact_loc String location pointing to the model artifact.
-#' @field modelBuilt Indication for whether only a feature search was performed or a full model was created.
+#' @field projectName the name of the project that this Session object is part of
+#' @field revision an incremental number assigned to each learning iteration for this project
 #' @examples
 #' # Learning example
 #' \donttest{
-#' session = learn("titanic", getData("titanic_train"), target="survived",algorithmsWhiteList = list("xgboostClassifier"),  scoreOnTestSet = TRUE, useCachedFeatures=TRUE)
-#' #session = featureSearch("titanic", getData("titanic_train"), target="survived")
+#' # Create a Session object from scratch
+#' session = Session("project name", revision_id)
+#' # Learn
+#' session = learn("titanic", getData("titanic_train"), target="survived")
+#' # Enrich
 #' enriched = session$enrich(getData("titanic_train"), featureCount = 10)
 #' colnames(enriched)
+#' # Predict
 #' predicted = session$predict(getData("titanic_test"))
 #' colnames(predicted)
 #' predicted[1:5,c("survived_predicted", "probability_0", "probability_1")]
+#' #Evaluate
 #' eval = session$evaluate()
-#' #session$showFeatures()
-#' #session$showConfusionMatrix()
+#' #Show reports
+#' session$reports()
+#' session$showFeaturesTrain()
+#' session$showConfusionMatrix()
 #' }
 
 Session = setRefClass("Session",

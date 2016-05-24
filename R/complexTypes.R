@@ -363,7 +363,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
          "Hours"   = 3600,
          "Days"    = 86400,
          #"Weeks"   = 604800,
-  			 "Months"  = 2419200,
+  			 #"Months"  = 2419200,
          "Years"   = 31536000,
          stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Years', 'Number'")
   )
