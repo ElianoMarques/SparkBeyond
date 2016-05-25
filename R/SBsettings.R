@@ -423,7 +423,7 @@ cancelJob = function(jobId) {
 	#if(!currentUser(FALSE)) stop("Please login")
 	#url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId,"/cancel"))
 	#res = httr::POST(url)
-	url <- paste0(getSBserverDomain(),paste0("/api2/terminateJob/", jobId)) 
+	url <- paste0(getSBserverDomain(), "/api2/deleteFromQueue/", jobId)
 	res = httr::DELETE(url)
 	ifelse(res$status == 200, {
 			print(paste("Job", jobId, "was canceled"))
