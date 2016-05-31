@@ -343,18 +343,18 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #'
 #' Add a sliding window column to the data
 #'
-#' @param data: data.table to be modified.
-#' @param dateCol: The column name in \code{data} that will be used.
-#' @param window: The window length (numeric)
-#' @param unit: The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Years", "Number"
-#' @param dateFormat: provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"
-#' @param keyCol: An optional key for the sliding window (NA as default)
-#' @param includeUntil: optional argument
-#' @param relativeTime: optional relative time boolean flag
-#' @param offset: optional offset to target. 0 by default.
-#' @param sample: optional maximal possible sample value (default to maxint)
+#' @param data data frame with the training data to which the time window definition should be added.
+#' @param dateCol The column name in \code{data} that will be used.
+#' @param window The window length (numeric)
+#' @param unit The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Years", "Number"
+#' @param dateFormat provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"
+#' @param keyCol An optional key for the sliding window (NA as default)
+#' @param includeUntil a boolean indicator for whether the very last time point should be included in the time window search space. FALSE by default.
+#' @param relativeTime a boolean indicator for whether the time series should be coded with absolute timestamps or relative to the last point. In this case all time stamps will be negative using the defined time unit (e.g. -10 days). TRUE by default.
+#' @param offset allows defining an additional time gap between that will be masked for the feature search. The entire time series will be shifted accordingly using the time window that was picked. 0 by default.
+#' @param sample allows defining the maximum number of time points to be included in each time series. Random points are sampled from the time series to reduce the time series resolution in order to better capture global trends and increase runtime performance. By default set to 100.
 #' @return The new data
-addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 2147483647, offset = 0, ...) {
+addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 100, offset = 0, ...) {
 
 	  unitVal = switch(unit,
   			 "Number"  = 1,

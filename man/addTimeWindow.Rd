@@ -6,28 +6,28 @@
 \usage{
 addTimeWindow(data, dateCol, keyCol = NA, window, unit = "Days",
   dateFormat = "\%m/\%d/\%Y", includeUntil = FALSE, relativeTime = TRUE,
-  sample = 2147483647, offset = 0, ...)
+  sample = 100, offset = 0, ...)
 }
 \arguments{
-\item{data:}{data.table to be modified.}
+\item{data}{data frame with the training data to which the time window definition should be added.}
 
-\item{dateCol:}{The column name in \code{data} that will be used.}
+\item{dateCol}{The column name in \code{data} that will be used.}
 
-\item{window:}{The window length (numeric)}
+\item{keyCol}{An optional key for the sliding window (NA as default)}
 
-\item{unit:}{The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Years", "Number"}
+\item{window}{The window length (numeric)}
 
-\item{dateFormat:}{provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"}
+\item{unit}{The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Years", "Number"}
 
-\item{keyCol:}{An optional key for the sliding window (NA as default)}
+\item{dateFormat}{provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"}
 
-\item{includeUntil:}{optional argument}
+\item{includeUntil}{a boolean indicator for whether the very last time point should be included in the time window search space. FALSE by default.}
 
-\item{relativeTime:}{optional relative time boolean flag}
+\item{relativeTime}{a boolean indicator for whether the time series should be coded with absolute timestamps or relative to the last point. In this case all time stamps will be negative using the defined time unit (e.g. -10 days). TRUE by default.}
 
-\item{offset:}{optional offset to target. 0 by default.}
+\item{sample}{allows defining the maximum number of time points to be included in each time series. Random points are sampled from the time series to reduce the time series resolution in order to better capture global trends and increase runtime performance. By default set to 100.}
 
-\item{sample:}{optional maximal possible sample value (default to maxint)}
+\item{offset}{allows defining an additional time gap between that will be masked for the feature search. The entire time series will be shifted accordingly using the time window that was picked. 0 by default.}
 }
 \value{
 The new data
