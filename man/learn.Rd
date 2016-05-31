@@ -20,7 +20,7 @@ learn(projectName, trainData, target, testData = NULL,
 
 \item{testData:}{Optional. test data to validate model results. NA by default.}
 
-\item{contextDatasets:}{Optional. A list of paths to context datasets to be added to the learning.}
+\item{contextDatasets:}{Optional. A list of \code{\link{contextObject}} to be added to the learning.}
 
 \item{problemDefinition:}{A \code{\link{problemDefinitionControl}} object with specific problem definition parameters.}
 

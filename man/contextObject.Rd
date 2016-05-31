@@ -9,13 +9,19 @@ contextObject(data, contextTypes = NULL, name = NULL, keyColumns = list(),
   graphTargetNodeColumn = NULL)
 }
 \arguments{
-\item{data:}{a data frame or a path to a file containing the context data}
+\item{data}{a data frame or a path to a file containing the context data}
 
-\item{name:}{an identifier for the context object to be created (optional).}
+\item{contextTypes}{one of the context types available in \code{\link{contextTypesList}}.}
 
-\item{keyColumns:}{Specify the key columns to be used by the context object (optional).}
+\item{name}{an identifier for the context object to be created (optional).}
 
-\item{timeColumn:}{Specify the time column to be used by the context object (relevant in time series contexts) (optional).}
+\item{keyColumns}{allows to specify the key columns to be used by the context object (for lookupTables and timeSeriesMap contexts). (Optional).}
+
+\item{timeColumn}{allows to specify the time column to be used by the context object (for timeSeries and timeSeriesMap contexts). (Optional).}
+
+\item{graphSourceNodeColumn}{allows to specify the graph source node column (for graph context). (Optional)}
+
+\item{graphTargetNodeColumn}{allows to specify the graph target node column (for graph context). (Optional)}
 }
 \description{
 contextObject

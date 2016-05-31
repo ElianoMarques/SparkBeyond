@@ -349,15 +349,16 @@ reportingControl = function(
 
 #' contextTypesList
 #' 
-#' @param geoSpatial. This context allows looking for geo spatial features. All rows are indexed based on their coordinate information, allowing properties from the surrounding environment to be searched for in a KNN-fashion. A coordinate column is required for this context object to be created.
-#' @param graph. This context allows looking for features on a graph or a network. This context requires defining the edges in the graph by setting the source column and target column in the contextObject.
-#' @param invertedIndex. This context creates an inverted index out of text column provided in a context. The properties of each text can be search for in a KNN-fashion. A text column is required for this context object.
-#' @param lookupTables. This context creates a lookup table for each key column using all other columns as properties that can be associated with the key. The key column should be unique and can be defined in the keyColumns parameter.
-#' @param membershipSet. This context creates a bag of elements and supports the "contain" operation for the set. 
-#' @param shapeFile. This context allows providing shape files. The structure of the input should be the location of the shapeFile, one per row.
-#' @param termsMap. This context associates a string / text column with some numeric value that can be looked at for every term. 
-#' @param timeSeries. This context creates a single time series per column for all the rows provided. The context is sorted by the time/data column. It is necessary that at least one time window column should appear in the data. It is optional to set the time column in the contextObject.
-#' @param timeSeriesMap. This context creates multiple time series per column, group by a key. This object requires a keyed time window column to be defined in the main text. The key and time column may be set in the contextObject. 
+#' @param geoSpatial This context allows looking for geo spatial features. All rows are indexed based on their coordinate information, allowing properties from the surrounding environment to be searched for in a KNN-fashion. A coordinate column is required for this context object to be created.
+#' @param graph This context allows looking for features on a graph or a network. This context requires defining the edges in the graph by setting the source column and target column in the contextObject.
+#' @param invertedIndex This context creates an inverted index out of text column provided in a context. The properties of each text can be search for in a KNN-fashion. A text column is required for this context object.
+#' @param lookupTables This context creates a lookup table for each key column using all other columns as properties that can be associated with the key. The key column should be unique and can be defined in the keyColumns parameter.
+#' @param membershipSet This context creates a bag of elements and supports the "contain" operation for the set. 
+#' @param osmFile This context allows providing OSM files. The structure of the input should be the location of the osmFile, one per row.
+#' @param shapeFile This context allows providing shape files. The structure of the input should be the location of the shapeFile, one per row.
+#' @param termsMap This context associates a string / text column with some numeric value that can be looked at for every term. 
+#' @param timeSeries This context creates a single time series per column for all the rows provided. The context is sorted by the time/data column. It is necessary that at least one time window column should appear in the data. It is optional to set the time column in the contextObject.
+#' @param timeSeriesMap This context creates multiple time series per column, group by a key. This object requires a keyed time window column to be defined in the main text. The key and time column may be set in the contextObject. 
 contextTypesList = function(
 		geoSpatial = FALSE,
 		#geoSpatialWithPartition = FALSE,
@@ -366,6 +367,7 @@ contextTypesList = function(
 		invertedIndex = FALSE,
 		lookupTables = FALSE,
 		membershipSet = FALSE, 
+		osmFile = FALSE,
 		shapeFile = FALSE,
 		termsMap = FALSE,
 		timeSeries = FALSE,
@@ -377,6 +379,7 @@ contextTypesList = function(
 		if (invertedIndex) contextList = c(contextList, "InvertedIndex")
 		if (lookupTables) contextList = c(contextList, "LookupTables")
 		if (membershipSet) contextList = c(contextList, "MembershipSet")
+		if (osmFile) contextList = c(contextList, "OSMFile")
 		if (shapeFile) contextList = c(contextList, "ShapeFile")
 		if (termsMap) contextList = c(contextList, "TermsMap")
 		if (timeSeries) contextList = c(contextList, "TimeSeries")
@@ -386,18 +389,22 @@ contextTypesList = function(
 
 #' contextObject
 #' 
-#' @param data: a data frame or a path to a file containing the context data
-#' @param name: an identifier for the context object to be created (optional).
-#' @param keyColumns: Specify the key columns to be used by the context object (optional).
-#' @param timeColumn: Specify the time column to be used by the context object (relevant in time series contexts) (optional).
-contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL ) { #TODO: help
-	camelizeColumnName = function(originalName) {
-		
-	} 
+#' @param data a data frame or a path to a file containing the context data
+#' @param contextTypes one of the context types available in \code{\link{contextTypesList}}. 
+#' @param name an identifier for the context object to be created (optional).
+#' @param keyColumns allows to specify the key columns to be used by the context object (for lookupTables and timeSeriesMap contexts). (Optional).
+#' @param timeColumn allows to specify the time column to be used by the context object (for timeSeries and timeSeriesMap contexts). (Optional).
+#' @param graphSourceNodeColumn allows to specify the graph source node column (for graph context). (Optional)
+#' @param graphTargetNodeColumn allows to specify the graph target node column (for graph context). (Optional)
+contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL ) { 
 	keyColumns = as.list(keyColumns)
 	obj = list(data = data, contextTypes = contextTypes, name=name, keyColumns = keyColumns, timeColumn=timeColumn, graphSourceNodeColumn=graphSourceNodeColumn, graphTargetNodeColumn=graphTargetNodeColumn)
 	class(obj) = "contextObject"
 	obj
+}
+
+contextObjectMapFile = function(data, filePath) { #TODO: construct the right data frame with file = 
+	contextObject(data = data, contextTypes = contextTypesList(osmFile = TRUE))
 }
 
 #' learn
@@ -407,7 +414,7 @@ contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list
 #' @param trainData: train data to analyze.
 #' @param target String of the column name of in the training file that contains the target of the prediction.
 #' @param testData: Optional. test data to validate model results. NA by default.
-#' @param contextDatasets: Optional. A list of paths to context datasets to be added to the learning.
+#' @param contextDatasets: Optional. A list of \code{\link{contextObject}} to be added to the learning.
 #' @param problemDefinition: A \code{\link{problemDefinitionControl}} object with specific problem definition parameters.
 #' @param preProcessing: A \code{\link{preProcessingControl}} object with specific preprocessing parameters.
 #' @param featureGeneration: A \code{\link{featureGenerationControl}} object with specific feature generation parameters.
