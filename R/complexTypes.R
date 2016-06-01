@@ -382,11 +382,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
   
   prefix = if(!remoteMode) "" else {
-  	if (is.na(keyCol)) "TW:" else {
-			if (is.numeric(data[,keyCol])) "DKTW:" else "SKTW:"
-  		#"SKTW:"
-			#TODO: return "SKTW:" for all
-  	}
+  	ifelse (is.na(keyCol), "TW:", "SKTW:")
   }
 
   datePOSIXformatOut = "%m/%d/%Y %H:%M:%S %p %Z" #TODO: check if multiple output formats are possible
