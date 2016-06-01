@@ -481,8 +481,8 @@ Session = setRefClass("Session",
         "Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \\code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE)."
         if (is.na(modelBuilt) || !modelBuilt) warning("createPackage requires full model building using learn")
 
-        sampleDataFilename = if (is.null(sampleData)) NA else {		        	
-          writeToServer(if ("data.frame" %in% class(data)) sampleData[1:20,] else sampleData, prefix="createPackage_sample", useEscaping = fileEscaping) #projectName
+        sampleDataFilename = if (is.null(sampleData)) NA else {		     
+        	uploadToServer(if ("data.frame" %in% class(data)) sampleData[1:20,] else sampleData, projectName = projectName, name ="createPackage_sample", useEscaping = fileEscaping)
         }
         extraParams = list(...)
         
@@ -503,12 +503,13 @@ Session = setRefClass("Session",
         res = httr::POST(url, body = body, httr::content_type_json())
         
         finalRes = if (res$status == 200) {
-        	print("Saving zipped file")
-        	fileName = paste0(getwd(), "/cli_runner.zip")
-        	writeBin(httr::content(res), fileName)
-        	message ("Package created successfully")
-        	message(paste0("Package is saved to: ", fileName))
-        	print(paste0("Saved zipped file to ", fileName))
+            # Extract file name from 'content-disposition' header
+        	contentDispositionHeader = httr::headers(res)$'content-disposition'
+        	fileName = strsplit(contentDispositionHeader, "filename=")[[1]][2]
+
+        	fullFileName = paste0(getwd(), "/", fileName)
+        	writeBin(httr::content(res), fullFileName)
+        	print(paste0("Package was saved at: ", fullFileName))
         	TRUE
         } else {
         	errorFile = paste0(artifact_loc,"/package-errors.txt")
