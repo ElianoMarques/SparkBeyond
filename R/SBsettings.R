@@ -465,8 +465,10 @@ isKnowledgeServerAlive = function() { #add help, match with engine version
 	res = httr::GET(url, httr::content_type_json())
 	content=httr::content(res)
 	if(!content$allConnected){
-			warning(paste(content$connectionTest$url, content$connectionTest$isConnected))	
-			warning(paste(content$connectionTest$nextConnections[[1]]$url, content$connectionTest$nextConnections[[1]]$isConnected))	
+		warning(paste(content$connectionTest$url, content$connectionTest$isConnected))
+		for(connection in content$connectionTest$nextConnections) {
+			warning(paste(connection$url, connection$isConnected))	
+		}
 	}
 	content$allConnected
 }
