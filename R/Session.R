@@ -298,7 +298,7 @@ Session = setRefClass("Session",
         			localfile = paste0(outputName, ".tsv.gz")
         			writeBin(httr::content(res2), localfile)
         			message(paste0("Results written to: ", getwd(),"/", localfile))
-        			df = read.table(localfile, sep="\t", quote = "",header=FALSE, skip = 1)
+        			df = read.table(localfile, sep="\t", quote = "",header=FALSE, skip = 1, comment.char = "")
         			headers = readLines(localfile , n=1)
         			cols = strsplit(headers, '\t')
         			colnames(df) = cols[[1]]
@@ -394,7 +394,7 @@ Session = setRefClass("Session",
         			localfile = paste0(outputName, ".tsv.gz")
         			writeBin(httr::content(res2), localfile)
         			message(paste0("Results written to: ", getwd(),"/", localfile))
-        			read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE)
+        			read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
         		} else NA 
         	} else {
 	          table = read.table(res$result, header = TRUE, sep="\t")
@@ -465,7 +465,7 @@ Session = setRefClass("Session",
           	localfile = paste0(outputName, ".tsv.gz")
           	writeBin(httr::content(res2), localfile)
           	message(paste0("Results written to: ", getwd(),"/", localfile))
-          	read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE)
+          	read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
           } else NA 
         } else {
           message = paste("Lift failed: ", res$error)
@@ -571,7 +571,7 @@ Session = setRefClass("Session",
         	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/reports/features/train_features.tsv")
         	res = httr::GET(url)
         	txt = httr::content(res, as="text")
-        	if (res$status == 200) suppressWarnings(read.table(textConnection(txt),sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = ""))
+        	if (res$status == 200) suppressWarnings(read.table(textConnection(txt),sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = "", comment.char = ""))
         	else NULL
         } else {
 	        featuresFile = paste0(artifact_loc,"/reports/features/train_features.tsv")
