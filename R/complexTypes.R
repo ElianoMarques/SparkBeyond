@@ -231,10 +231,10 @@ excludeCols = function(data, cols, verbose = TRUE) {
     if (verbose) print (paste(paste(effectiveCols, collapse=", "), "were removed"))
     if ("data.table" %in% class(data)){
       data[, (effectiveCols) := NULL] #note: parenthesis around cols are important
-      if (verbose) print("Note: the input object is of type data.table hence NULL is returned and the input object will be modified,")
+      if (verbose) print("Note: excludeCols is applied a data.table. Hence, NULL is returned and the input data.table is modified.")
       NULL
     } else {
-    	if (verbose) print("Note: the input object is of type data.frame hence, a new data.frame with the excluded columns will be returned.")
+    	if (verbose) print("Note: excludeCols is applied a data.frame. Hence, a new data.frame with the excluded columns is returned.")
       data[ ,-which(names(data) %in% cols)]
     }
   } else {
@@ -406,9 +406,9 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
 			dt = as.character(as.POSIXct(dateVal) - offset*unitVal,format=datePOSIXformatOut)
 			dt_from = as.character(as.POSIXct(dateVal) - (window+offset)*unitVal,format=datePOSIXformatOut)
 			c(dt_from, dt)			
-		} else if (dateType == "POSIXct") {
-			dt = as.character(dateVal - offset*unitVal)
-			dt_from = as.character(dateVal -(window+offset)*unitVal)
+		} else if ("POSIXct" %in% unlist(dateType)) {
+			dt = as.character(dateVal - offset*unitVal, format=datePOSIXformatOut)
+			dt_from = as.character(dateVal -(window+offset)*unitVal, format=datePOSIXformatOut)
 			c(dt_from, dt)
 		} else {
 			stop (paste("Date column", dateCol,"type should be one of 'character', 'integer', 'numeric', 'date', 'POSIXct'."))
