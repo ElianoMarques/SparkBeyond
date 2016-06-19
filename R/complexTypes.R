@@ -151,6 +151,8 @@ classofCols = function(data) {
 #' typeofCols(textGrouped)
 #' textGrouped[1,]
 cols2Text = function(data, useEscaping = TRUE) {
+	datePOSIXformatOut = "%b %d, %Y %I:%M:%S%p %Z"  #should match MMM dd, yyyy hh:mm:ssaa z
+	
   col2Text = function(x) {
     escapeFun = function(s) {
       s = gsub('"','""',s)
@@ -162,7 +164,7 @@ cols2Text = function(data, useEscaping = TRUE) {
     printNonCharElement = function(e) {
     	eType = class(e)
     	if (length(eType) > 1) eType = eType[1]
-    	if (eType == "Date" || eType == "POSIXct") as.character(e)
+    	if (eType == "Date" || eType == "POSIXct") as.character(e, format = datePOSIXformatOut)
     	else e
     }
     
