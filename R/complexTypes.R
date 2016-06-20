@@ -348,7 +348,7 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 #' @param data data frame with the training data to which the time window definition should be added.
 #' @param dateCol The column name in \code{data} that will be used.
 #' @param window The window length (numeric)
-#' @param unit The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Years", "Number"
+#' @param unit The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Years"
 #' @param dateFormat provide date format for parsing. defaults to "\%m/\%d/\%Y " see strtptime for more examples i.e. "\%m/\%d/\%Y \%I:\%M:\%S \%p"
 #' @param keyCol An optional key for the sliding window (NA as default)
 #' @param includeUntil a boolean indicator for whether the very last time point should be included in the time window search space. FALSE by default.
@@ -359,7 +359,7 @@ offsetTime = function(data, dateCol = "SB_times_col", refDate, datesFormat = "%m
 addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", dateFormat ="%m/%d/%Y",includeUntil = FALSE, relativeTime = TRUE, sample = 100, offset = 0, ...) {
 
 	  unitVal = switch(unit,
-  			 "Number"  = 1,
+  			# "Number"  = 1,
          "Seconds" = 1,
          "Minutes" = 60,
          "Hours"   = 3600,
@@ -367,7 +367,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
          #"Weeks"   = 604800,
   			 #"Months"  = 2419200,
          "Years"   = 31536000,
-         stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Years', 'Number'")
+         stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Years'")
   )
   prevTZ = Sys.timezone() 
   if (!is.na(prevTZ) && prevTZ == "CET") Sys.setenv(TZ = "UTC") #temporary fix
