@@ -251,7 +251,8 @@ Session = setRefClass("Session",
       },
 
 			################################## enrich #####################
-      enrich = function(data, featureCount = NA, enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, ...) {
+      enrich = function(data, featureCount = NA,  contextDatasets = NULL ,enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, ...) {
+
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         extraParams = list(...)
         
@@ -269,7 +270,23 @@ Session = setRefClass("Session",
         outputPath = ifelse(remoteMode,
         								outputName,		#potentially get a name for the enriched output
         								tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz"))
-
+       
+         if (!is.null(contextDatasets)){
+        	if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
+        	for (i in 1:length(contextDatasets)) {
+        		contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
+        		contextDatasets[[i]]$data = 
+        			ifelse(!remoteMode,
+        						 writeToServer(contextDatasets[[i]]$data, 
+        						 							prefix = paste0(projectName,"_context", contextName),
+        						 							useEscaping = preProcessingCtrl$fileEscaping
+        						 ),
+        						 uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
+        						 							 , useEscaping = preProcessingCtrl$fileEscaping)
+        			)
+        	}
+        }
+        
         params <-list(modelPath = artifact_loc,
                       dataPath = datapath,
                       featureCount = featureCount,
@@ -277,7 +294,8 @@ Session = setRefClass("Session",
                       enrichedColumnsOnly = enrichedColumnsOnly,
         							columnsWhiteList = columnsWhiteList,
         							fileEscaping = fileEscaping,
-                      externalPrefixPath = ifelse (remoteMode, NA, getSBserverIOfolder())
+                      externalPrefixPath = ifelse (remoteMode, NA, getSBserverIOfolder()),
+        							enrichContexts = contextDatasets
         							#addBooleanNumericExtractors        							
         )
         params = params[!is.na(params)]
