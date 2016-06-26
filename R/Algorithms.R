@@ -3,8 +3,7 @@
 #' Usage examples:
 #' algorithms$scikit$classifier$RandomForest
 #' algorithms$R$regressor$RXGBoost
-algorithms = (function() {
-	list(
+algorithms = list(
 		Weka = list(
 			classifier = list(
 				ZeroR = "weka.classifiers.rules.ZeroR",
@@ -112,5 +111,5 @@ algorithms = (function() {
 				MLlibRandomForest = "MLlibRandomForestRegressor"
 			)
 		)
-	)
-})()
+)
+
