@@ -6,7 +6,6 @@
 algorithms = list(
 		Weka = list(
 			classifier = list(
-				ZeroR = "weka.classifiers.rules.ZeroR",
 				NaiveBayes = "weka.classifiers.bayes.NaiveBayes",
 				VotedPerceptron = "weka.classifiers.functions.VotedPerceptron",
 				Id3 = "weka.classifiers.trees.Id3",
@@ -29,7 +28,6 @@ algorithms = list(
 				DecisionTable = "weka.classifiers.rules.DecisionTable"
 			),
 			regressor = list(
-				ZeroR = "weka.classifiers.rules.ZeroR",
 				LeastMedSq = "weka.classifiers.functions.LeastMedSq",
 				LinearRegression = "weka.classifiers.functions.LinearRegression",
 				SimpleLinearRegression = "weka.classifiers.functions.SimpleLinearRegression",
