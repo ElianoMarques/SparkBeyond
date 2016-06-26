@@ -40,7 +40,6 @@ algorithms = list(
 		scikit = list(
 			classifier = list(
 				KerasDeepLearning = "KerasDeepLearningClassifier",
-				KerasDeeperDeepLearning = "KerasDeeperDeepLearningClassifier",
 				DecisionTree = "SciKitLearnDecisionTreeClassifier",
 				DecisionTreeGini = "SciKitLearnDecisionTreeGiniClassifier",
 				Bagging = "SciKitLearnBaggingClassifier",
@@ -54,7 +53,6 @@ algorithms = list(
 			),
 			regressor = list(
 				KerasDeepLearning = "KerasDeepLearningRegressor",
-				KerasDeeperDeepLearning = "KerasDeeperDeepLearningRegressor",
 				LinearRegression = "SciKitLearnLinearRegression",
 				DecisionTree = "SciKitLearnDecisionTreeRegressor",
 				Lasso = "SciKitLearnLasso",
