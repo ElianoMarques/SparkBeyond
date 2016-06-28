@@ -407,6 +407,19 @@ contextObjectMapFile = function(data, filePath) { #TODO: construct the right dat
 	contextObject(data = data, contextTypes = contextTypesList(osmFile = TRUE))
 }
 
+#' contextObjectCodeFile
+#'
+#' @param url an url to a code file containing custom functions
+contextObjectCodeFile = function(url) {
+	inputObj = list(
+		jsonClass = "com.sparkbeyond.runtime.data.transform.CodeFile",
+		name = "Code file", 
+		url = url
+	)
+	class(inputObj) = append(class(inputObj), "contextInput")
+	contextObject(inputObj, contextTypes = list())
+}
+
 #' learn
 #' 
 #' Runs SparkBeyond feature enrichment and learning process.
@@ -481,16 +494,23 @@ learn <- function(
 		contextDatasets = as.list(contextDatasets)
 		if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
 		for (i in 1:length(contextDatasets)) {
-			contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
-			contextDatasets[[i]]$data = 
-				ifelse(!remoteMode,
-					writeToServer(contextDatasets[[i]]$data, 
-						prefix = paste0(projectName,"_context", contextName),
-						useEscaping = preProcessing$fileEscaping
-					),
-					uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
-												 , useEscaping = preProcessing$fileEscaping)
-			)
+			if("contextInput" %in% class(contextDatasets[[i]]$data)) {
+				#Handle custom input implementations (not data.frame)
+				contextDatasets[[i]]$contextProvider = contextDatasets[[i]]$data
+				contextDatasets[[i]]$data = "Deprecated"
+			} else {
+				#Handle data.frame input
+				contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
+				contextDatasets[[i]]$data = 
+					ifelse(!remoteMode,
+						writeToServer(contextDatasets[[i]]$data, 
+							prefix = paste0(projectName,"_context", contextName),
+							useEscaping = preProcessing$fileEscaping
+						),
+						uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
+													 , useEscaping = preProcessing$fileEscaping)
+				)
+			}
 		}
 	}
 	
