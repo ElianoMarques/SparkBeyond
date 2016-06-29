@@ -127,10 +127,11 @@ getData <- function(datasetName) {
 #      },
     airports = getExtData("airports.csv.gz"),
     frequencychange = getExtData("frequencyChangeDS.csv"),
-		googlestock = getExtData("googDF.tsv"),
-		complexsum = getExtData("ComplexSum.tsv"),
-		wnvdata = getExtData("wnvData.csv"),
-		wnvweather = getExtData("wnvWeather.csv"),
+    googlestock = getExtData("googDF.tsv"),
+    complexsum = getExtData("ComplexSum.tsv"),
+    wnvdata = getExtData("wnvData.csv"),
+    wnvweather = getExtData("wnvWeather.csv"),
+    primenumbers = getExtData("primeNumbers.tsv"),
     stop(paste0("The requested dataset '",datasetName,"' does not exists in the datasets list"))
   )
 }
