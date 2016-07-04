@@ -250,7 +250,11 @@ login = function(username, password, domain) {
 				httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
 			}
 			else if (grepl("resolve host name", cond)) {
-				stop(paste("SparkBeyond server does not exist at:",domain))
+				stop(paste("SparkBeyond server does not exist at:",domain),
+						 call. = FALSE)
+			} else if(grepl("connect to server", cond)) {
+				stop(paste("Couldn't connect to the SparkBeyond server at:", domain),
+						 call. = FALSE)
 			}
 			else stop(cond)
 	})
@@ -269,7 +273,7 @@ login = function(username, password, domain) {
 				FALSE
 			}
 		} else {  
-			print ("Login failed.")
+			print (paste("Login failed. Http status:", res$status_code))
 			FALSE
 		}
 	}

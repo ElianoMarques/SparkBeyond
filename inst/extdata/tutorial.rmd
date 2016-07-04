@@ -33,7 +33,7 @@ library(digest)
 #install.packages("httr")
 #install.packages("digest")
 
-install.packages("devtools")
+install.packages("http://cran.r-project.org/src/contrib/Archive/devtools/devtools_1.11.1.tar.gz", repos=NULL, type="source")
 devtools::install_github('zinman/SparkBeyond')
 library('SparkBeyond')
 ```
