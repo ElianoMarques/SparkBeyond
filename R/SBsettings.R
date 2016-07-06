@@ -236,6 +236,8 @@ functionCatalog = function() {
 #' @param password Password
 #' @param domain Domain name or ip of the SparkBeyond Server. (Usually starts with http or https. May require also the port of the server).
 login = function(username, password, domain) {	
+	isHttps = function(url) {"https" == substr(url, 1, 5)}
+	
 	setSBserverIOfolder(NULL)
 	if (nchar(domain) < 6) stop("Please provide a domain to log in to")
 	if (substr(domain, nchar(domain), nchar(domain)) == "/") domain = substr(domain, 1, nchar(domain)-1) #remove trailing /
@@ -258,6 +260,12 @@ login = function(username, password, domain) {
 			}
 			else stop(cond)
 	})
+	
+	if(!isHttps(domain) && isHttps(res$url)) {
+		# handle redirect from http to https
+		domain = gsub("http", "https", domain)
+	}
+	
 	setSBserverHost(domain)
 	#res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
 	loggedIn = if (res$status_code == 404 || res$status_code == 200) {		#there is a weird redirection causing this, but this actually OK
@@ -296,7 +304,7 @@ logout = function() {
 #' currentUser
 #' 
 #' Current user information
-currentUser = function(showInfo = TRUE) {
+	currentUser = function(showInfo = TRUE) {
 	if(!is.null(getSBserverIOfolder())) TRUE else {
 		url <- paste0(getSBserverDomain(), "/currentUser")
 		res = httr::GET(url, encode = "form")
