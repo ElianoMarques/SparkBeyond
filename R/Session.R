@@ -288,14 +288,14 @@ Session = setRefClass("Session",
         }
         
         params <-list(modelPath = artifact_loc,
-                      dataPath = datapath,
-                      featureCount = featureCount,
-                      outputName = outputPath,
-                      enrichedColumnsOnly = enrichedColumnsOnly,
+        							dataPath = datapath,
+        							featureCount = featureCount,
+        							outputName = outputPath,
+        							enrichedColumnsOnly = enrichedColumnsOnly,
         							columnsWhiteList = columnsWhiteList,
         							fileEscaping = fileEscaping,
-                      externalPrefixPath = ifelse (remoteMode, NA, getSBserverIOfolder()),
-        							enrichContexts = contextDatasets
+        							externalPrefixPath = ifelse (remoteMode, NA, getSBserverIOfolder()),
+        							contextDatasets = contextDatasets
         							#addBooleanNumericExtractors        							
         )
         params = params[!is.na(params)]
@@ -387,13 +387,14 @@ Session = setRefClass("Session",
         }
 
         params <-list(modelPath = artifact_loc,
-                      dataPath = datapath,
-                      writePredictionColumnsOnly = predictionColumnsOnly,
+        							dataPath = datapath,
+        							writePredictionColumnsOnly = predictionColumnsOnly,
         							columnsWhiteList = columnsWhiteList,
         							fileEscaping = fileEscaping,
-        							predictContexts = contextDatasets,
-                      externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())        							
-        )        							
+        							predictContexts = contextDatasets,  # Backward compatibility with 1.5
+        							contextDatasets = contextDatasets,
+        							externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())
+        							)        							
         params = params[!is.na(params)] 							
 
         message (paste("Predicting ",params$dataPath))
