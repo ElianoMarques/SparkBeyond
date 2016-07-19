@@ -5,7 +5,7 @@
 \title{preProcessingControl}
 \usage{
 preProcessingControl(fileEscaping = TRUE, fileEncoding = NA,
-  linesForTypeDetection = NA, emptyValuePolicy = emptyValuePolicyList())
+  linesForTypeDetection = NA, emptyValuePolicy = NA)
 }
 \arguments{
 \item{fileEscaping}{Define how escaping (e.g., \\n) should be handled when files are parsed.}
