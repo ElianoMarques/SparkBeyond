@@ -7,20 +7,23 @@
 #' @param weightColumn Optional. String of the name of of one of the column that indicate a weighting that is assigned to each example. NA by default.
 #' @param weightByClass Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param trainTestSplitRatio Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
-#' @param temporalSplitColumn Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.  
+#' @param temporalSplitColumn Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.
+#' @param partitionColumn Optional. A column name containing information by which the data will be split to train/test/validation set. The column should contain a subset of the following values: "Train", "Validation", "Test".
 problemDefinitionControl = function(
 	forceRegression = NA,
 	weightColumn = NA,
 	weightByClass = FALSE,
 	trainTestSplitRatio = 0.8,
-	temporalSplitColumn = NA
+	temporalSplitColumn = NA,
+	partitionColumn = NA
 ){
 	list(
 		forceRegression = forceRegression,
 		trainTestSplitRatio = trainTestSplitRatio,
 		temporalSplitColumn = temporalSplitColumn,
 		weightByClass = weightByClass,
-		weightColumn = weightColumn
+		weightColumn = weightColumn,
+		partitionColumn = partitionColumn
 	)
 }
 
@@ -544,6 +547,7 @@ learn <- function(
 		temporalSplitColumn = if(!is.null(extraParams$temporalSplitColumn)) extraParams$temporalSplitColumn else problemDefinition$temporalSplitColumn,
 		weightColumn = if(!is.null(extraParams$weightColumn)) extraParams$weightColumn else problemDefinition$weightColumn,
 		weightByClass = if(!is.null(extraParams$weightByClass)) extraParams$weightByClass else problemDefinition$weightByClass,
+		partitionColumn = if(!is.null(extraParams$partitionColumn)) extraParams$partitionColumn else problemDefinition$partitionColumn,
 		
 		# preprocessing control
 		fileEscaping = if(!is.null(extraParams$fileEscaping)) extraParams$fileEscaping else preProcessing$fileEscaping,
