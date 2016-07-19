@@ -6,7 +6,7 @@
 \usage{
 featureGenerationControl(maxFeaturesCount = list(300),
   automaticSelectionOfNumberOfFeatures = FALSE, minSupportAbsolute = NA,
-  maxDepth = 2, featureSearchMode = featureSearchModeList(),
+  maxDepth = 2.5, featureSearchMode = featureSearchModeList(),
   functionsWhiteList = NA, functionsBlackList = NA,
   localTopFeatureCount = NA, regressionDiscretizerBinsOverride = NA,
   booleanNumericFeatures = NA, numericEqualityFeatures = TRUE,
