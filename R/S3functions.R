@@ -8,7 +8,7 @@
 #' @param weightByClass Adds a weight column with values inverse proportional to the frequency of the class. FALSE by default.
 #' @param trainTestSplitRatio Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param temporalSplitColumn Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.
-#' @param partitionColumn Optional. A column name containing information by which the data will be split to train/test/validation set. The column should contain a subset of the following values: "Train", "Validation", "Test".
+#' @param partitionColumn Optional. A column name containing information by which the data will be split to tain/test/validation set. Allowed values: "Train", "Validation", "Test".
 problemDefinitionControl = function(
 	forceRegression = NA,
 	weightColumn = NA,
@@ -421,6 +421,31 @@ contextObjectCodeFile = function(url) {
 	)
 	class(inputObj) = append(class(inputObj), "contextInput")
 	contextObject(inputObj, contextTypes = list())
+}
+
+#' contextObjectWord2Vec
+#' 
+#' @param data a data frame for word2vec training
+#' @param keyColumns a list of column names used for word2vec training
+#' @param name an identifier for the context object to be created (optional).
+contextObjectWord2Vec = function(data, keyColumns, name = NULL) {
+	contextObject(data, name = name, keyColumns = keyColumns, contextTypes = list("Word2Vec"))
+}
+
+#' contextObjectWord2VecPretrainedS3
+#'
+#' @param modelName a name of the available pretrained model (optional). Available models: "Wikipedia", "Wikipedia-Gigaword", "CommonCrawl", "Twitter", "GoogleNews".
+#' If undefined - a default model will be used.
+#' NOTE: Whenever using a source for the first time a large file will be downloaded, which takes several minutes depending on connection bandwidth.
+#' @param name an identifier for the context object to be created (optional).
+contextObjectWord2VecPretrainedS3 = function(modelName="Wikipedia", name = NULL) {
+	inputObj = list(
+		jsonClass = "com.sparkbeyond.runtime.data.transform.Word2Vec",
+		name = "Word2Vec",
+		S3source = modelName
+	)
+	class(inputObj) = append(class(inputObj), "contextInput")
+	contextObject(inputObj, name = name, contextTypes = list("Word2VecPretrainedS3"))
 }
 
 #' learn

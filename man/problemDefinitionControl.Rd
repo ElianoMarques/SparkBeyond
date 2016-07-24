@@ -19,7 +19,7 @@ problemDefinitionControl(forceRegression = NA, weightColumn = NA,
 
 \item{temporalSplitColumn}{Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.}
 
-\item{partitionColumn}{Optional. A column name containing information by which the data will be split to train/test/validation set. The column should contain a subset of the following values: "Train", "Validation", "Test".}
+\item{partitionColumn}{Optional. A column name containing information by which the data will be split to tain/test/validation set. Allowed values: "Train", "Validation", "Test".}
 }
 \description{
 problemDefinitionControl
