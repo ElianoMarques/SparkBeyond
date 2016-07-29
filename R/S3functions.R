@@ -448,6 +448,14 @@ contextObjectWord2VecPretrainedS3 = function(modelName="Wikipedia", name = NULL)
 	contextObject(inputObj, name = name, contextTypes = list("Word2VecPretrainedS3"))
 }
 
+#' contextObjectWord2VecPretrainedLocal
+#'
+#' @param data a data frame which contains texts column followed by Word2Vec vector columns
+#' @param name an identifier for the context object to be created (optional).
+contextObjectWord2VecPretrainedLocal = function(data, name = NULL) {
+	contextObject(data, name = name, contextTypes = list("Word2VecPretrainedLocal"))
+}
+
 #' learn
 #' 
 #' Runs SparkBeyond feature enrichment and learning process.
