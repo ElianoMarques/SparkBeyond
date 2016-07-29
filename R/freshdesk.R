@@ -1,24 +1,25 @@
 category_id = 16000049489  # https://sparkbeyond.freshdesk.com/solution/categories/16000049489
 folder_id = 16000076461 # https://sparkbeyond.freshdesk.com/solution/folders/16000076425
 # right now folder is hard coded
-# TODO add code to query folder, delete it and create a new one
+# TODO add code to query folder, delete or update items
 
 url = paste('https://sparkbeyond.freshdesk.com/solution/categories',category_id,'folders',folder_id,'articles.json',sep='/')
 
 freshdeskAppKey = '' # add correct key
 #uncomment below lines to run/copy to freshdesk
-
+# 
 # files = list.files('html','*.html')
-# threshold_date = file.info(paste0('html/',files[1]))$mtime
+# threshold_date ='2016-01-06' #file.info(paste0('html/',files[1]))$mtime
 # params = list(1)  # init params
 # for (f in files[-c(1,2)]) { # remove 00frame_toc.html and 00Index.html
-# 	if (as.Date(file.info(paste0('html/',f))$mtime)>=as.Date(threshold_date)) {
+# 	if (as.Date(file.info(paste0('html/',f))$mtime)==as.Date(threshold_date)) {
 # 		params$solution_article$title = sub(".html","",f)
-# 		params$solution_article$description = gsub(" href=.*?>",">",readr::read_file(f)) # read in and sanitize links
+# 		params$solution_article$description = gsub(" href=.*?>",">",readr::read_file(paste0('html/',f)))# read in and sanitize links
 # 		params$solution_article$art_type = 1
 # 		params$solution_article$folder_id = folder_id
 # 		body = rjson::toJSON(params)
 # 		cmd = paste0('curl -v -u ',freshdeskAppKey,':X -H "Content-Type: application/json" -X POST -d \'',body,'\' ',url)
+# 		#print(params$solution_article$title)
 # 		res = system(cmd) 
 # 	}
 # }

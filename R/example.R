@@ -159,24 +159,24 @@ tutorial = function() {
 #' Shows various sparkbeyond resources
 #'
 resources = function() {
-	browseURL("https://docs.google.com/document/d/1wF7EkdyEB8409blpkianOyQxvi-OWasVEGegdLk-MOI/pub")
+	browseURL("https://sparkbeyond.freshdesk.com/support/solutions/16000049489")
 }
 
 #' Shows html help of this package
 #'
 SBhelp = function() {
-	browseURL("https://s3.amazonaws.com/public-sparkbeyond/SBadapterDocs/index.html")
+	browseURL("https://sparkbeyond.freshdesk.com/support/solutions/folders/16000076461")
 }
 
 
 #' Shows FAQ
 #'
 faq = function() {
-	browseURL("https://docs.google.com/document/d/1MfUduRR2jZiLaZPfc8Q68ijvWctjNKgg7smeqEoH9yk/pub")
+	browseURL("https://sparkbeyond.freshdesk.com/support/solutions/folders/16000075995")
 }
 
 #' Shows explantion of all the reports produced by the SparkBeyond enginet
 #'
 reportsList = function() {
-	browseURL("https://docs.google.com/document/d/16ogU45DHrW0x_BVLS5TiyPMblORUGSxaScR8i_lIDI0")
+	browseURL("https://sparkbeyond.freshdesk.com/support/solutions/folders/16000075996")
 }
