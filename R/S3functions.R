@@ -456,6 +456,19 @@ contextObjectWord2VecPretrainedLocal = function(data, name = NULL) {
 	contextObject(data, name = name, contextTypes = list("Word2VecPretrainedLocal"))
 }
 
+#' contextObjectFeaturesFromRevision
+#'
+#' @param revision revision id to extract features from.
+contextObjectFeaturesFromRevision = function(revision) {
+	inputObj = list(
+		jsonClass = "com.sparkbeyond.runtime.data.transform.FeaturesFromRevision",
+		name = "FeaturesFromRevision", 
+		revisionId = revision
+	)
+	class(inputObj) = append(class(inputObj), "contextInput")
+	contextObject(inputObj, contextTypes = list())
+}
+
 #' learn
 #' 
 #' Runs SparkBeyond feature enrichment and learning process.
