@@ -233,11 +233,10 @@ excludeCols = function(data, cols, verbose = TRUE) {
     if (verbose) print (paste(paste(effectiveCols, collapse=", "), "were removed"))
     if ("data.table" %in% class(data)){
       data[, (effectiveCols) := NULL] #note: parenthesis around cols are important
-      if (verbose) print("Note: excludeCols is applied a data.table. Hence, NULL is returned and the input data.table is modified.")
-      NULL
+      if (verbose) print("Note: excludeCols is applied a data.table. Hence, input data.table is modified.")
+      data
     } else {
-    	if (verbose) print("Note: excludeCols is applied a data.frame. Hence, a new data.frame with the excluded columns is returned.")
-      data[ ,-which(names(data) %in% cols)]
+    	data[ ,-which(names(data) %in% cols)]
     }
   } else {
   	if (verbose) print("No columns were removed")
