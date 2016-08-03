@@ -106,6 +106,8 @@ algorithms = list(
 				MLlibGBT = "MLlibGBTRegressor",
 				MLlibRandomForest = "MLlibRandomForestRegressor"
 			)
-		)
+		),
+		
+		ZeroR="ZeroR"
 )
 
