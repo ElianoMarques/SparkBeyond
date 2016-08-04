@@ -32,7 +32,7 @@ problemDefinitionControl = function(
 #' @param fileEscaping Define how escaping (e.g., \\n) should be handled when files are parsed.
 #' @param fileEncoding Optional. Options are: "ISO-8859-1", "UTF-8", "US-ASCII". NA by default will try to automatically find the best encoding.
 #' @param linesForTypeDetection maximum number of lines that should be used for type detection. 10000 by default.
-#' @param emptyValuePolicy Controls how empty values in numeric columns in the input data are being handled. Median is default see \code{\link{emptyValuePolicyList}}.
+#' @param emptyValuePolicy Controls how empty values in numeric columns in the input data are being handled. DoubleNan is default see \code{\link{emptyValuePolicyList}}.
 preProcessingControl = function(
 	fileEscaping = TRUE,
 	fileEncoding = NA,
@@ -55,14 +55,17 @@ preProcessingControl = function(
 #' @param nan Not a number
 #' @param negativeInfinity Negative infinity 
 emptyValuePolicyList = function(
-	median = TRUE,
+	median = FALSE,
 	average = FALSE,
 	nan = FALSE,
+	doubleNan = FALSE,
 	negativeInfinity = FALSE
 ) {
-	policy = "Median"
+	policy = NA
+	if (median) policy = "Median"
 	if (average) policy = "Average"
 	if (nan) policy = "NaN"
+	if (doubleNan) policy = "DoubleNaN"
 	if (negativeInfinity) policy = "NegativeInfinity"
 	policy
 }

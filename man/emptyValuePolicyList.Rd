@@ -4,8 +4,8 @@
 \alias{emptyValuePolicyList}
 \title{emptyValuePolicyList}
 \usage{
-emptyValuePolicyList(median = TRUE, average = FALSE, nan = FALSE,
-  negativeInfinity = FALSE)
+emptyValuePolicyList(median = FALSE, average = FALSE, nan = FALSE,
+  doubleNan = FALSE, negativeInfinity = FALSE)
 }
 \arguments{
 \item{median}{Median value of a column}

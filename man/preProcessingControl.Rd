@@ -14,7 +14,7 @@ preProcessingControl(fileEscaping = TRUE, fileEncoding = NA,
 
 \item{linesForTypeDetection}{maximum number of lines that should be used for type detection. 10000 by default.}
 
-\item{emptyValuePolicy}{Controls how empty values in numeric columns in the input data are being handled. Median is default see \code{\link{emptyValuePolicyList}}.}
+\item{emptyValuePolicy}{Controls how empty values in numeric columns in the input data are being handled. DoubleNan is default see \code{\link{emptyValuePolicyList}}.}
 }
 \description{
 preProcessingControl
