@@ -528,6 +528,7 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 		filename = paste0(name, "_", hash, ".tsv")
 		attempts = 2
 		succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
+		uploadResult = NA
 		if (!succeeded) {  #uploading only if doesn't exist
 			message(paste("Starting to upload", filename))
 			urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
@@ -536,13 +537,18 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 										paste0(apply(cols2Text(data, useEscaping),1,paste0, collapse = "\t"), collapse="\n"))
 			
 			while (!succeeded && attempts > 0 ) {
-				httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
+				uploadResult = httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
 				attempts = attempts - 1
 				succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
 				if (succeeded) message(paste("Successfully uploaded", filename))
 			}
+			
 		}
-		ifelse (succeeded, paste0("/uploaded/",filename), NA)
+		ifelse (succeeded,
+						paste0("/uploaded/",filename),
+						stop(paste0("Failed to upload data: ", name,
+												", Status: ", uploadResult$status_code,
+												", Reason: ", uploadResult)))
 	}
 }
 
