@@ -336,7 +336,7 @@ algorithmsList = function(
 #' @param featureVisualizations Show visual distribution of the feature against the target for classification problems. FALSE by default.
 #' @param evaluatedFunctionsReport Creates a report with the entire list of functions that were evaluated. For contextObjects will also show for each object which functions directly used the contextObject.
 reportingControl = function(
-	showWebView = FALSE,
+	showWebView = TRUE,
 	emailForNotification = NA,
 	scoreOnTestSet = FALSE,
 	featureClustersReport = FALSE,
