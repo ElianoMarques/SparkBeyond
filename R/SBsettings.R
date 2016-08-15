@@ -235,9 +235,9 @@ functionCatalog = function() {
 #' @param username Username (usually in email format)
 #' @param password Password
 #' @param domain Domain name or ip of the SparkBeyond Server. (Usually starts with http or https. May require also the port of the server).
-login = function(username, password, domain) {	
+login = function(username, password, domain) {
 	isHttps = function(url) {"https" == substr(url, 1, 5)}
-	
+
 	setSBserverIOfolder(NULL)
 	if (nchar(domain) < 6) stop("Please provide a domain to log in to")
 	if (substr(domain, nchar(domain), nchar(domain)) == "/") domain = substr(domain, 1, nchar(domain)-1) #remove trailing /
@@ -549,6 +549,48 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
 						stop(paste0("Failed to upload data: ", name,
 												", Status: ", uploadResult$status_code,
 												", Reason: ", uploadResult)))
+	}
+}
+
+#' uploadFileToServer
+#' 
+#' @param filePath relative or absolute path to the file that should be upoloaded to the server
+#' @param projectName the name of the project to save the data under
+#' @param name the prefix of the file name in which the data will be saved
+uploadFileToServer = function(filePath, projectName, name=NA) {
+	originalFileName = basename(tools::file_path_sans_ext(filePath, compression = TRUE))
+	originalFileNameWithExt = basename(filePath)
+	originalFileExt = stringr::str_replace(originalFileNameWithExt, originalFileName, "")
+	hash = tools::md5sum(filePath)
+	filename = paste0(originalFileName, "_", hash, originalFileExt)
+	if(!is.na(name)) {
+		filename = paste0(name, "_", filename)
+	}
+	serverPath = paste0("/uploaded/", filename)
+	
+	uploadBody <- httr::upload_file(path = filePath)
+	uploadUrl = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/", filename)
+	progressBarConfig = httr::progress(type = "up")
+	
+	succeeded = doesFileExistOnServer(projectName, serverPath)
+	
+	if(succeeded) {
+		message(paste("Already uploaded", filename))
+		serverPath
+	} else {
+		message(paste("Starting to upload", filename))
+		response = httr::RETRY("PUT", url = uploadUrl, body = uploadBody, config = progressBarConfig)
+		
+		succeeded = doesFileExistOnServer(projectName, serverPath)
+		
+		if(succeeded) {
+			message(paste("Successfully uploaded", filename))
+			serverPath
+		} else {
+			stop(paste0("Failed to upload data: ", name,
+									", Status: ", response$status_code,
+									", Reason: ", response))
+			}
 	}
 }
 
