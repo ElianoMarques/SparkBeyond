@@ -4,7 +4,7 @@
 \alias{reportingControl}
 \title{reportingContorl}
 \usage{
-reportingControl(showWebView = FALSE, emailForNotification = NA,
+reportingControl(showWebView = TRUE, emailForNotification = NA,
   scoreOnTestSet = FALSE, featureClustersReport = FALSE,
   featureVisualizations = FALSE, evaluatedFunctionsReport = FALSE)
 }
