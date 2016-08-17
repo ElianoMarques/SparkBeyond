@@ -409,69 +409,6 @@ contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list
 	obj
 }
 
-contextObjectMapFile = function(data, filePath) { #TODO: construct the right data frame with file = 
-	contextObject(data = data, contextTypes = contextTypesList(osmFile = TRUE))
-}
-
-#' contextObjectCodeFile
-#'
-#' @param url an url to a code file containing custom functions
-contextObjectCodeFile = function(url) {
-	inputObj = list(
-		jsonClass = "com.sparkbeyond.runtime.data.transform.CodeFile",
-		name = "Code file", 
-		url = url
-	)
-	class(inputObj) = append(class(inputObj), "contextInput")
-	contextObject(inputObj, contextTypes = list())
-}
-
-#' contextObjectWord2Vec
-#' 
-#' @param data a data frame for word2vec training
-#' @param keyColumns a list of column names used for word2vec training
-#' @param name an identifier for the context object to be created (optional).
-contextObjectWord2Vec = function(data, keyColumns, name = NULL) {
-	contextObject(data, name = name, keyColumns = keyColumns, contextTypes = list("Word2Vec"))
-}
-
-#' contextObjectWord2VecPretrainedS3
-#'
-#' @param modelName a name of the available pretrained model (optional). Available models: "Wikipedia", "Wikipedia-Gigaword", "CommonCrawl", "Twitter", "GoogleNews".
-#' If undefined - a default model will be used.
-#' NOTE: Whenever using a source for the first time a large file will be downloaded, which takes several minutes depending on connection bandwidth.
-#' @param name an identifier for the context object to be created (optional).
-contextObjectWord2VecPretrainedS3 = function(modelName="Wikipedia", name = NULL) {
-	inputObj = list(
-		jsonClass = "com.sparkbeyond.runtime.data.transform.Word2Vec",
-		name = "Word2Vec",
-		S3source = modelName
-	)
-	class(inputObj) = append(class(inputObj), "contextInput")
-	contextObject(inputObj, name = name, contextTypes = list("Word2VecPretrainedS3"))
-}
-
-#' contextObjectWord2VecPretrainedLocal
-#'
-#' @param data a data frame which contains texts column followed by Word2Vec vector columns
-#' @param name an identifier for the context object to be created (optional).
-contextObjectWord2VecPretrainedLocal = function(data, name = NULL) {
-	contextObject(data, name = name, contextTypes = list("Word2VecPretrainedLocal"))
-}
-
-#' contextObjectFeaturesFromRevision
-#'
-#' @param revision revision id to extract features from.
-contextObjectFeaturesFromRevision = function(revision) {
-	inputObj = list(
-		jsonClass = "com.sparkbeyond.runtime.data.transform.FeaturesFromRevision",
-		name = "FeaturesFromRevision", 
-		revisionId = revision
-	)
-	class(inputObj) = append(class(inputObj), "contextInput")
-	contextObject(inputObj, contextTypes = list())
-}
-
 #' learn
 #' 
 #' Runs SparkBeyond feature enrichment and learning process.
@@ -537,33 +474,63 @@ learn <- function(
 	url <- paste0(getSBserverDomain(),"/rapi/learn")
 	message(paste("Calling:", url))
 	
-	if (!is.null(contextDatasets)) { #writing context data to server if necessary
+	isContextObjectDefinition = function(c) "contextObject" %in% class(c) || CONTEXT_DEFINITION_CLASS %in% class(c)
+	if (!is.null(contextDatasets)) {
 		if (class(contextDatasets) != "list") {
 			warning("contextDatasets should be a list")
-			if (class(contextDatasets) != "contextObject") error("contextDatasets are not of class contextObject")
+			if (!isContextObjectDefinition(contextDatasets)) error("contextDatasets are not of class contextObject")
 			contextDatasets=list(contextDatasets)
 		}
 		contextDatasets = as.list(contextDatasets)
-		if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
-		for (i in 1:length(contextDatasets)) {
-			if("contextInput" %in% class(contextDatasets[[i]]$data)) {
-				#Handle custom input implementations (not data.frame)
-				contextDatasets[[i]]$contextProvider = contextDatasets[[i]]$data
-				contextDatasets[[i]]$data = "Deprecated"
+		if (!all(sapply(contextDatasets, isContextObjectDefinition))) stop("Not all provided context objects are of type 'contextObject'")
+		contextDatasets = lapply(contextDatasets, function(context) {
+			if(CONTEXT_DEFINITION_CLASS %in% class(context)) {  # the new way of defining contexts
+				createContextObject = function(data=NULL, contextProvider=NULL, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL) {
+					context = contextObject(data, contextTypes, name, keyColumns, timeColumn, graphSourceNodeColumn ,graphTargetNodeColumn)
+					if(!is.null(contextProvider)) {
+						context$contextProvider = contextProvider
+					}
+					context
+				}
+				
+				if("codeFileContextDefinition" %in% class(context)) {
+					createContextObject(contextProvider = list(url = context$url, name = "Code file", jsonClass = "com.sparkbeyond.runtime.data.transform.CodeFile"),
+															name = context$name)
+				} else if("word2VecBasedOnDataContextDefinition" %in% class(context)) {
+					createContextObject(data=context$data,
+															name = context$name,
+															keyColumns = context$keyColumns)
+				} else if("word2VecPretrainedS3ContextDefinition" %in% class(context)) {
+					createContextObject(contextProvider = list(S3source = context$modelName, name = "Word2Vec", jsonClass = "com.sparkbeyond.runtime.data.transform.Word2Vec"),
+															contextTypes = list("Word2VecPretrainedS3"))
+				} else if("word2VecPretrainedLocalContextDefinition" %in% class(context)) {
+					createContextObject(data=context$data, 
+															name = context$name, 
+															contextTypes = list("Word2VecPretrainedLocal"))
+				} else if("featuresFromRevisionContextDefinition" %in% class(context)) {
+					createContextObject(contextProvider = list(revisionId = context$revision, name = "FeaturesFromRevision", jsonClass = "com.sparkbeyond.runtime.data.transform.FeaturesFromRevision"))
+				} else if("openStreetMapContextDefinition" %in% class(context)) {
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name), "")
+					serverPath = uploadFileToServer(filePath = context$filePath, projectName = projectName, name = paste0("context", contextName))
+					createContextObject(contextProvider = list(path = serverPath, jsonClass = "com.sparkbeyond.runtime.data.transform.OpenStreetMapFileInput"),
+															name = context$name,
+															contextTypes = contextTypesList(osmFile = TRUE))
+				}
 			} else {
 				#Handle data.frame input
-				contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
-				contextDatasets[[i]]$data = 
+				contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+				context$data = 
 					ifelse(!remoteMode,
-						writeToServer(contextDatasets[[i]]$data, 
+						writeToServer(context$data, 
 							prefix = paste0(projectName,"_context", contextName),
 							useEscaping = preProcessing$fileEscaping
 						),
-						uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
+						uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
 													 , useEscaping = preProcessing$fileEscaping)
 				)
+				context
 			}
-		}
+		})
 	}
 	
 	params <-list(
