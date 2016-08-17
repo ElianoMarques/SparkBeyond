@@ -255,12 +255,14 @@ Session = setRefClass("Session",
 
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         extraParams = list(...)
+        fileUploadEnabled = ifelse(!is.null(extraParams$enableExperimentalUpload), extraParams$enableExperimentalUpload, FALSE)
+        fileUploadThreshold = ifelse(fileUploadEnabled, 0, NA)
         
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
                 
         datapath = ifelse (remoteMode, 
 					{
-						uploadedPath = uploadToServer(data = data, projectName = projectName, name = "enrich", useEscaping = fileEscaping)
+						uploadedPath = uploadToServer(data = data, projectName = projectName, name = "enrich", useEscaping = fileEscaping, directUploadThreshold = fileUploadThreshold)
 						if(is.na(uploadedPath)) stop("failed to upload file to enrich to server")
 						uploadedPath        
 					},
@@ -282,7 +284,7 @@ Session = setRefClass("Session",
         						 							useEscaping = preProcessingCtrl$fileEscaping
         						 ),
         						 uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
-        						 							 , useEscaping = preProcessingCtrl$fileEscaping)
+        						 							 , useEscaping = preProcessingCtrl$fileEscaping, directUploadThreshold = fileUploadThreshold)
         			)
         	}
         }
@@ -354,16 +356,18 @@ Session = setRefClass("Session",
       predict = function(data, contextDatasets = NULL, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE, ...) { 
         "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \\code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         #if(!currentUser(FALSE)) stop("Please login")
-                
+
         statusException()
         if (is.na(modelBuilt) || !modelBuilt) warning("Prediction requires full model building using learn")
         
         extraParams = list(...)        
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
+        fileUploadEnabled = ifelse(!is.null(extraParams$enableExperimentalUpload), extraParams$enableExperimentalUpload, FALSE)
+        fileUploadThreshold = ifelse(fileUploadEnabled, 0, NA)
         
         datapath = ifelse (remoteMode, 
 					{
-        		uploadedPath = uploadToServer(data = data, projectName = projectName, name = "predict", useEscaping = fileEscaping)
+        		uploadedPath = uploadToServer(data = data, projectName = projectName, name = "predict", useEscaping = fileEscaping, directUploadThreshold = fileUploadThreshold)
         		if(is.na(uploadedPath)) stop("failed to upload file to predict to server")
         		uploadedPath        
         	},
@@ -381,7 +385,7 @@ Session = setRefClass("Session",
 	        					 							useEscaping = preProcessingCtrl$fileEscaping
 	        					 ),
 	        					 uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
-	        					 							 , useEscaping = preProcessingCtrl$fileEscaping)
+	        					 							 , useEscaping = preProcessingCtrl$fileEscaping, directUploadThreshold = fileUploadThreshold)
 	        		)
 	        }
         }

@@ -519,36 +519,47 @@ doesFileExistOnServer = function(projectName, path) {
 #' @param projectName the name of the project to save the data under
 #' @param name the prefix of the file name in which the data will be saved
 #' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
-uploadToServer = function(data, projectName, name, useEscaping = TRUE) {
+uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUploadThreshold = NA) {
 	#if(!currentUser(FALSE)) stop("Please login")
 	if (length(class(data)) == 1 && class(data) == "character") data
 	else {
 		if (! "data.frame" %in% class(data)) stop("The provided data should of type data.frame or character")
-		hash = digest(data)
-		filename = paste0(name, "_", hash, ".tsv")
-		attempts = 2
-		succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
-		uploadResult = NA
-		if (!succeeded) {  #uploading only if doesn't exist
-			message(paste("Starting to upload", filename))
-			urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
-			colHeaders = paste0(colnames(data), collapse = "\t")
-			body = paste0(colHeaders, "\n", 
-										paste0(apply(cols2Text(data, useEscaping),1,paste0, collapse = "\t"), collapse="\n"))
-			
-			while (!succeeded && attempts > 0 ) {
-				uploadResult = httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
-				attempts = attempts - 1
-				succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
-				if (succeeded) message(paste("Successfully uploaded", filename))
+		
+		#Upload optimization for large dataframes
+		estimatedDataFrameSizeInMemory = utils::object.size(data)
+		if(!is.na(directUploadThreshold) && estimatedDataFrameSizeInMemory > directUploadThreshold) {
+			tempFilePath = paste0(tempdir(), "/", name, ".tsv")
+			write.table(data, file=tempFilePath, sep="\t", row.names=FALSE) #todo: enforce encoding?
+			uploadResult = uploadFileToServer(tempFilePath, projectName)
+			file.remove(tempFilePath)
+			uploadResult
+		} else {
+			hash = digest(data)
+			filename = paste0(name, "_", hash, ".tsv")
+			attempts = 2
+			succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
+			uploadResult = NA
+			if (!succeeded) {  #uploading only if doesn't exist
+				message(paste("Starting to upload", filename))
+				urlUpload = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/",filename)
+				colHeaders = paste0(colnames(data), collapse = "\t")
+				body = paste0(colHeaders, "\n", 
+											paste0(apply(cols2Text(data, useEscaping),1,paste0, collapse = "\t"), collapse="\n"))
+				
+				while (!succeeded && attempts > 0 ) {
+					uploadResult = httr::PUT(urlUpload, body = body)	#other options - multiPart / S3/ SSH
+					attempts = attempts - 1
+					succeeded = doesFileExistOnServer(projectName, paste0("/uploaded/", filename))
+					if (succeeded) message(paste("Successfully uploaded", filename))
+				}
+				
 			}
-			
+			ifelse (succeeded,
+							paste0("/uploaded/",filename),
+							stop(paste0("Failed to upload data: ", name,
+													", Status: ", uploadResult$status_code,
+													", Reason: ", uploadResult)))
 		}
-		ifelse (succeeded,
-						paste0("/uploaded/",filename),
-						stop(paste0("Failed to upload data: ", name,
-												", Status: ", uploadResult$status_code,
-												", Reason: ", uploadResult)))
 	}
 }
 

@@ -4,7 +4,8 @@
 \alias{uploadToServer}
 \title{uploadToServer}
 \usage{
-uploadToServer(data, projectName, name, useEscaping = TRUE)
+uploadToServer(data, projectName, name, useEscaping = TRUE,
+  directUploadThreshold = NA)
 }
 \arguments{
 \item{data}{dataFrame to be written to the server}
