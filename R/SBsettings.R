@@ -519,7 +519,8 @@ doesFileExistOnServer = function(projectName, path) {
 #' @param projectName the name of the project to save the data under
 #' @param name the prefix of the file name in which the data will be saved
 #' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
-uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUploadThreshold = NA) {
+#' @param toZip compresses the file before upload to save space
+uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUploadThreshold = NA, toZip=FALSE) {
 	#if(!currentUser(FALSE)) stop("Please login")
 	if (length(class(data)) == 1 && class(data) == "character") data
 	else {
@@ -530,7 +531,20 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUpl
 		if(!is.na(directUploadThreshold) && estimatedDataFrameSizeInMemory > directUploadThreshold) {
 			tempFilePath = paste0(tempdir(), "/", name, ".tsv")
 			write.table(data.frame(cols2Text(data)), file=tempFilePath, sep="\t", row.names=FALSE, quote = FALSE)
+			
 			uploadResult = uploadFileToServer(tempFilePath, projectName)
+			write.table(data, file=tempFilePath, sep="\t", row.names=FALSE) #todo: enforce encoding?
+			
+			# this is for zipping a file to save time
+			if (toZip){
+				message('zipping file')
+			  tempZipPath = paste0(tempFilePath,'.zip')
+			  zip(tempZipPath,tempFilePath)
+			  uploadResult = uploadFileToServer(tempZipPath, projectName)
+			  file.remove(tempZipPath)
+			}else{
+			  uploadResult = uploadFileToServer(tempFilePath, projectName)
+			}
 			file.remove(tempFilePath)
 			uploadResult
 		} else {

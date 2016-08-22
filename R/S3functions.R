@@ -517,6 +517,12 @@ learn <- function(
 	fileUploadEnabled = ifelse(!is.null(extraParams$enableExperimentalUpload), extraParams$enableExperimentalUpload, FALSE)
 	fileUploadThreshold = ifelse(fileUploadEnabled, 0, NA)
 	 
+	# for unable zip of a file before uploading
+	fileZipEnabled = ifelse(!is.null(extraParams$fileZipEnabled), extraParams$fileZipEnabled, FALSE)
+	if (fileZipEnabled){
+		message('file will be zipped before upload')
+	}
+	
 	# TODO: verify that there are no supurious parameters, e.g. (projectname instead of projectName)
 	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
 	if(remoteMode && !currentUser(FALSE)) stop("Please login before calling the learn function. Thank you.")
@@ -562,7 +568,7 @@ learn <- function(
 							useEscaping = preProcessing$fileEscaping
 						),
 						uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
-													 , useEscaping = preProcessing$fileEscaping, directUploadThreshold = fileUploadThreshold)
+													 , useEscaping = preProcessing$fileEscaping, directUploadThreshold = fileUploadThreshold, toZip = fileZipEnabled)
 				  )
 			}
 		}
@@ -575,7 +581,7 @@ learn <- function(
 					writeToServer(trainData, prefix = paste0(projectName,"_train"), useEscaping = preProcessing$fileEscaping),
 					{
 						uploadedPath = uploadToServer(data = trainData,projectName = projectName, name = "train"
-																					, useEscaping = preProcessing$fileEscaping, directUploadThreshold = fileUploadThreshold)
+																					, useEscaping = preProcessing$fileEscaping, directUploadThreshold = fileUploadThreshold, toZip = fileZipEnabled)
 						if(is.na(uploadedPath)) stop("failed to upload training file to server")
 						uploadedPath
 					}
@@ -585,7 +591,7 @@ learn <- function(
 			ifelse (!is.null(testData) && (any(grep("data.frame", class(testData))) || class(testData)=="character"),
 				ifelse(!remoteMode,
 						writeToServer(testData, prefix = paste0(projectName,"_test"), useEscaping = preProcessing$fileEscaping),
-						uploadToServer(data = testData,projectName = projectName, name = "test", useEscaping = preProcessing$fileEscaping, directUploadThreshold = fileUploadThreshold)
+						uploadToServer(data = testData,projectName = projectName, name = "test", useEscaping = preProcessing$fileEscaping, directUploadThreshold = fileUploadThreshold, toZip = fileZipEnabled)
 				),
 				NA
 		),	
