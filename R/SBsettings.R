@@ -529,7 +529,7 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUpl
 		estimatedDataFrameSizeInMemory = utils::object.size(data)
 		if(!is.na(directUploadThreshold) && estimatedDataFrameSizeInMemory > directUploadThreshold) {
 			tempFilePath = paste0(tempdir(), "/", name, ".tsv")
-			write.table(data, file=tempFilePath, sep="\t", row.names=FALSE) #todo: enforce encoding?
+			write.table(data.frame(cols2Text(data)), file=tempFilePath, sep="\t", row.names=FALSE, quote = FALSE)
 			uploadResult = uploadFileToServer(tempFilePath, projectName)
 			file.remove(tempFilePath)
 			uploadResult
