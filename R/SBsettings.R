@@ -530,21 +530,16 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUpl
 		estimatedDataFrameSizeInMemory = utils::object.size(data)
 		if(!is.na(directUploadThreshold) && estimatedDataFrameSizeInMemory > directUploadThreshold) {
 			tempFilePath = paste0(tempdir(), "/", name, ".tsv")
-			write.table(data.frame(cols2Text(data)), file=tempFilePath, sep="\t", row.names=FALSE, quote = FALSE)
-			
-			uploadResult = uploadFileToServer(tempFilePath, projectName)
-			write.table(data, file=tempFilePath, sep="\t", row.names=FALSE) #todo: enforce encoding?
 			
 			# this is for zipping a file to save time
 			if (toZip){
 				message('zipping file')
-			  tempZipPath = paste0(tempFilePath,'.zip')
-			  zip(tempZipPath,tempFilePath)
-			  uploadResult = uploadFileToServer(tempZipPath, projectName)
-			  file.remove(tempZipPath)
+				tempFilePath=paste0(tempFilePath,'.gz')
+				write.table(data.frame(cols2Text(data)), file=gzfile(tempFilePath), sep="\t", row.names=FALSE, quote = FALSE)
 			}else{
-			  uploadResult = uploadFileToServer(tempFilePath, projectName)
+				write.table(data.frame(cols2Text(data)), file=tempFilePath, sep="\t", row.names=FALSE, quote = FALSE)
 			}
+		  uploadResult = uploadFileToServer(tempFilePath, projectName)
 			file.remove(tempFilePath)
 			uploadResult
 		} else {
