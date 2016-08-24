@@ -519,8 +519,7 @@ doesFileExistOnServer = function(projectName, path) {
 #' @param projectName the name of the project to save the data under
 #' @param name the prefix of the file name in which the data will be saved
 #' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
-#' @param toZip compresses the file before upload to save space
-uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUploadThreshold = NA, toZip=FALSE) {
+uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUploadThreshold = NA) {
 	#if(!currentUser(FALSE)) stop("Please login")
 	if (length(class(data)) == 1 && class(data) == "character") data
 	else {
@@ -529,19 +528,18 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUpl
 		#Upload optimization for large dataframes
 		estimatedDataFrameSizeInMemory = utils::object.size(data)
 		if(!is.na(directUploadThreshold) && estimatedDataFrameSizeInMemory > directUploadThreshold) {
-			tempFilePath = paste0(tempdir(), "/", name, ".tsv")
-			
-			# this is for zipping a file to save time
-			if (toZip){
-				message('zipping file')
-				tempFilePath=paste0(tempFilePath,'.gz')
-				write.table(data.frame(cols2Text(data)), file=gzfile(tempFilePath), sep="\t", row.names=FALSE, quote = FALSE)
-			}else{
+			hash = digest(data)
+			filename = paste0(name, "_", hash, ".tsv")
+			fileServerPath = paste0("/uploaded/", filename)
+			if(doesFileExistOnServer(projectName, fileServerPath)) {
+				fileServerPath
+			} else {
+				tempFilePath = paste0(tempdir(), "/", filename)
 				write.table(data.frame(cols2Text(data)), file=tempFilePath, sep="\t", row.names=FALSE, quote = FALSE)
+				uploadResult = uploadFile(tempFilePath, projectName, filename, checkIfExists = FALSE)
+				file.remove(tempFilePath)
+				uploadResult
 			}
-		  uploadResult = uploadFileToServer(tempFilePath, projectName)
-			file.remove(tempFilePath)
-			uploadResult
 		} else {
 			hash = digest(data)
 			filename = paste0(name, "_", hash, ".tsv")
@@ -578,39 +576,47 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUpl
 #' @param projectName the name of the project to save the data under
 #' @param name the prefix of the file name in which the data will be saved
 uploadFileToServer = function(filePath, projectName, name=NA) {
-	originalFileName = basename(tools::file_path_sans_ext(filePath, compression = TRUE))
-	originalFileNameWithExt = basename(filePath)
-	originalFileExt = stringr::str_replace(originalFileNameWithExt, originalFileName, "")
-	hash = tools::md5sum(filePath)
-	filename = paste0(originalFileName, "_", hash, originalFileExt)
+  originalFileName = basename(tools::file_path_sans_ext(filePath, compression = TRUE))
+  originalFileNameWithExt = basename(filePath)
+  originalFileExt = stringr::str_replace(originalFileNameWithExt, originalFileName, "")
+  hash = tools::md5sum(filePath)
+  resourceName = paste0(originalFileName, "_", hash, originalFileExt)
+	
 	if(!is.na(name)) {
-		filename = paste0(name, "_", filename)
+		resourceName = paste0(name, "_", resourceName)
 	}
-	serverPath = paste0("/uploaded/", filename)
 	
-	uploadBody <- httr::upload_file(path = filePath)
-	uploadUrl = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/", filename)
-	progressBarConfig = httr::progress(type = "up")
+  uploadFile(filePath, projectName, resourceName)
+}
+
+#' uploadFile
+#' 
+#' @param filePath relative or absolute path to the file that should be upoloaded to the server
+#' @param projectName the name of the project to save the data under
+#' @param resourceName resource name on server
+#' @param checkIfExists check if the file was already uploaded to server
+uploadFile = function(filePath, projectName, resourceName, checkIfExists=TRUE) {
+	filename = basename(filePath)
+	serverPath = paste0("/uploaded/", resourceName)
 	
-	succeeded = doesFileExistOnServer(projectName, serverPath)
-	
-	if(succeeded) {
-		message(paste("Already uploaded", filename))
+	if(checkIfExists && doesFileExistOnServer(projectName, serverPath)) {
 		serverPath
 	} else {
-		message(paste("Starting to upload", filename))
-		response = httr::RETRY("PUT", url = uploadUrl, body = uploadBody, config = progressBarConfig)
+		uploadBody <- httr::upload_file(path = filePath)
+		uploadUrl = paste0(getSBserverDomain(),"/api2/fileUpload/", projectName, "/", resourceName)
+		progressBarConfig = httr::progress(type = "up")
 		
-		succeeded = doesFileExistOnServer(projectName, serverPath)
-		
-		if(succeeded) {
-			message(paste("Successfully uploaded", filename))
-			serverPath
-		} else {
-			stop(paste0("Failed to upload data: ", name,
-									", Status: ", response$status_code,
-									", Reason: ", response))
-			}
+	  message(paste("Starting to upload", filename))
+	  response = httr::RETRY("PUT", url = uploadUrl, body = uploadBody, config = progressBarConfig)
+	  
+	  if(doesFileExistOnServer(projectName, serverPath)) {
+	  	message(paste("Successfully uploaded", filename))
+	  	serverPath
+	  } else {
+	  	stop(paste0("Failed to upload data: ", filename,
+	  							", Status: ", response$status_code,
+	  							", Reason: ", response))
+	  }
 	}
 }
 
