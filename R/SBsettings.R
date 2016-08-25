@@ -529,13 +529,13 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUpl
 		estimatedDataFrameSizeInMemory = utils::object.size(data)
 		if(!is.na(directUploadThreshold) && estimatedDataFrameSizeInMemory > directUploadThreshold) {
 			hash = digest(data)
-			filename = paste0(name, "_", hash, ".tsv")
+			filename = paste0(name, "_", hash, ".tsv.gz")
 			fileServerPath = paste0("/uploaded/", filename)
 			if(doesFileExistOnServer(projectName, fileServerPath)) {
 				fileServerPath
 			} else {
 				tempFilePath = paste0(tempdir(), "/", filename)
-				write.table(data.frame(cols2Text(data)), file=tempFilePath, sep="\t", row.names=FALSE, quote = FALSE)
+				write.table(data.frame(cols2Text(data)), file=gzfile(tempFilePath), sep="\t", row.names=FALSE, quote = FALSE)
 				uploadResult = uploadFile(tempFilePath, projectName, filename, checkIfExists = FALSE)
 				file.remove(tempFilePath)
 				uploadResult
