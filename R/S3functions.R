@@ -499,15 +499,20 @@ learn <- function(
 					createContextObject(contextProvider = list(url = context$url, name = "Code file", jsonClass = "com.sparkbeyond.runtime.data.transform.CodeFile"),
 															name = context$name)
 				} else if("word2VecBasedOnDataContextDefinition" %in% class(context)) {
-					createContextObject(data=context$data,
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+																									, useEscaping = preProcessing$fileEscaping, directUploadThreshold = fileUploadThreshold),
 															name = context$name,
-															keyColumns = context$keyColumns)
+															keyColumns = context$keyColumns,
+															contextTypes = list("Word2Vec"))
 				} else if("word2VecPretrainedS3ContextDefinition" %in% class(context)) {
 					createContextObject(contextProvider = list(S3source = context$modelName, name = "Word2Vec", jsonClass = "com.sparkbeyond.runtime.data.transform.Word2Vec"),
 															name = context$name,
 															contextTypes = list("Word2VecPretrainedS3"))
 				} else if("word2VecPretrainedLocalContextDefinition" %in% class(context)) {
-					createContextObject(data=context$data,
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+																									, useEscaping = preProcessing$fileEscaping, directUploadThreshold = fileUploadThreshold),
 															name = context$name,
 															contextTypes = list("Word2VecPretrainedLocal"))
 				} else if("featuresFromRevisionContextDefinition" %in% class(context)) {

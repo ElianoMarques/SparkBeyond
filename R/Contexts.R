@@ -63,9 +63,10 @@ contexts = list(
 	
 	word2Vec = list(
 		trainOnData = function(data, keyColumns, name=NULL) {
-			if(!(is.data.frame(data) && "dataFrameSource"  %in% class(data))) {
-				stop("Data must be of type data.frame")
+			if(!any(c("data.frame", "dataFrameSource")  %in% class(data))) {
+				stop("data must be of type data.frame")
 			}
+
 			contextDefinition = list(
 				data = data,
 				keyColumns = keyColumns,
@@ -85,9 +86,10 @@ contexts = list(
 		},
 		
 		pretrainedLocal = function(data, name=NULL) {
-			if(!(is.data.frame(data) && "dataFrameSource"  %in% class(data))) {
-				stop("Data must be of type data.frame")
+			if(!any(c("data.frame", "dataFrameSource")  %in% class(data))) {
+				stop("data must be of type data.frame")
 			}
+			
 			contextDefinition = list(
 				data = data,
 				name = name
