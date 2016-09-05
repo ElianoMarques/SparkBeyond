@@ -233,10 +233,17 @@ functionCatalog = function() {
 
 #' Login to SparkBeyond server
 #' @param username Username (usually in email format)
-#' @param password Password
+#' @param password Password, if not supplied - password massagebox is shown (available only from RStudio)
 #' @param domain Domain name or ip of the SparkBeyond Server. (Usually starts with http or https. May require also the port of the server).
-login = function(username, password, domain) {
+login = function(username, password=NA, domain) {
 	isHttps = function(url) {"https" == substr(url, 1, 5)}
+	
+	if (is.na(password)) {
+		password = .rs.api.askForPassword("Please enter your SparkBeyond password:")
+		if (is.na(password)) {
+			stop("No password was entered")
+		}
+	}
 
 	setSBserverIOfolder(NULL)
 	if (nchar(domain) < 6) stop("Please provide a domain to log in to")

@@ -5,12 +5,12 @@
 \title{login
 Login to SparkBeyond server}
 \usage{
-login(username, password, domain)
+login(username, password = NA, domain)
 }
 \arguments{
 \item{username}{Username (usually in email format)}
 
-\item{password}{Password}
+\item{password}{Password, if not supplied - password massagebox is shown (available only from RStudio)}
 
 \item{domain}{Domain name or ip of the SparkBeyond Server. (Usually starts with http or https. May require also the port of the server).}
 }
