@@ -239,8 +239,8 @@ login = function(username, password=NA, domain) {
 	isHttps = function(url) {"https" == substr(url, 1, 5)}
 	
 	if (is.na(password)) {
-		password = .rs.api.askForPassword("Please enter your SparkBeyond password:")
-		if (is.na(password)) {
+		password = .rs.askForPassword("Please enter your SparkBeyond password:")
+		if (is.null(password)) {
 			stop("No password was entered")
 		}
 	}
