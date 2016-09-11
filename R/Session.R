@@ -72,7 +72,7 @@ Session = setRefClass("Session",
                 
         readStreamingAPI = function(prevLine = 0) {
         	#/rapi/notificationsLog/:project/:revision?skipLines=x
-        	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=UInotification.log&skipLines=",prevLine)					
+        	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=UInotification.log&skipLines=",prevLine)
         	res = httr::GET(url)
 					if (res$status == 200) {
 						txt = httr::content(res, as="text")
@@ -593,9 +593,12 @@ Session = setRefClass("Session",
         if (remoteMode) {
         	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=/reports/features/train_features.tsv")
         	res = httr::GET(url)
-        	txt = httr::content(res, as="text")
-        	if (res$status == 200) suppressWarnings(read.table(textConnection(txt),sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = "", comment.char = ""))
-        	else NULL
+        	if(res$status == 200) {
+        		txt = httr::content(res, as="text")
+        		suppressWarnings(read.table(textConnection(txt),sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = "", comment.char = ""))
+        	} else {
+        		NULL
+        	}
         } else {
 	        featuresFile = paste0(artifact_loc,"/reports/features/train_features.tsv")
 	        features = if (file.exists(featuresFile)){
