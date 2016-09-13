@@ -6,7 +6,8 @@
 \usage{
 problemDefinitionControl(forceRegression = NA, weightColumn = NA,
   weightByClass = FALSE, trainTestSplitRatio = 0.8,
-  temporalSplitColumn = NA, partitionColumn = NA)
+  temporalSplitColumn = NA, partitionColumn = NA,
+  timeWindowsDefinition = NA)
 }
 \arguments{
 \item{forceRegression}{Boolean. Force the problem to be regression problem instead of classification. Optional - NA by default will choose the best problem definition based on the target.}
@@ -20,6 +21,8 @@ problemDefinitionControl(forceRegression = NA, weightColumn = NA,
 \item{temporalSplitColumn}{Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.}
 
 \item{partitionColumn}{Optional. A column name containing information by which the data will be split to tain/test/validation set. Allowed values: "Train", "Validation", "Test".}
+
+\item{timeWindowsDefinition}{Optional. Definition of the relevant time windows, used for creation of TimeSeries/TimeSeriesMap contexts}
 }
 \description{
 problemDefinitionControl

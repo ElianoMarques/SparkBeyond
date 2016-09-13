@@ -1,5 +1,29 @@
 # S3 functions (De facto constructors of Session)
 
+#' timeWindowDefinition
+#' 
+#' @param dateCol The column name in training set that will be used.
+#' @param window The window length (numeric)
+#' @param unit The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Years"
+#' @param keyCol An optional key for the sliding window (NULL as default).
+#' @param relativeTime a boolean indicator for whether the time series should be coded with absolute timestamps or relative to the last point. In this case all time stamps will be negative using the defined time unit (e.g. -10 days). TRUE by default.
+#' @param offset allows defining an additional time gap between that will be masked for the feature search. The entire time series will be shifted accordingly using the time window that was picked. 0 by default.
+#' @param sample allows defining the maximum number of time points to be included in each time series. Random points are sampled from the time series to reduce the time series resolution in order to better capture global trends and increase runtime performance. By default set to 100.
+#' @return timeWindowDefinition object
+timeWindowDefinition = function(dateCol, keyCol = NULL, window, unit = "Days", relativeTime = TRUE, sample = 100, offset = 0) {
+	def = list(
+		dateColumn = dateCol, 
+		keyColumn = keyCol,
+		windowSize = window, 
+		timeUnit = unit, 
+		relativeTime = relativeTime, 
+		sampleSize = sample, 
+		offsetFromTarget = offset
+	)
+	
+	class(def) = "timeWindowDefinition"
+	def
+}
 
 #' problemDefinitionControl
 #' 
@@ -9,13 +33,15 @@
 #' @param trainTestSplitRatio Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param temporalSplitColumn Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.
 #' @param partitionColumn Optional. A column name containing information by which the data will be split to tain/test/validation set. Allowed values: "Train", "Validation", "Test".
+#' @param timeWindowsDefinition Optional. Definition of the relevant time windows, used for creation of TimeSeries/TimeSeriesMap contexts
 problemDefinitionControl = function(
 	forceRegression = NA,
 	weightColumn = NA,
 	weightByClass = FALSE,
 	trainTestSplitRatio = 0.8,
 	temporalSplitColumn = NA,
-	partitionColumn = NA
+	partitionColumn = NA,
+	timeWindowsDefinition = NA
 ){
 	list(
 		forceRegression = forceRegression,
@@ -23,7 +49,8 @@ problemDefinitionControl = function(
 		temporalSplitColumn = temporalSplitColumn,
 		weightByClass = weightByClass,
 		weightColumn = weightColumn,
-		partitionColumn = partitionColumn
+		partitionColumn = partitionColumn,
+		timeWindowsDefinition = timeWindowsDefinition
 	)
 }
 
@@ -573,6 +600,7 @@ learn <- function(
 		weightColumn = if(!is.null(extraParams$weightColumn)) extraParams$weightColumn else problemDefinition$weightColumn,
 		weightByClass = if(!is.null(extraParams$weightByClass)) extraParams$weightByClass else problemDefinition$weightByClass,
 		partitionColumn = if(!is.null(extraParams$partitionColumn)) extraParams$partitionColumn else problemDefinition$partitionColumn,
+		timeWindowsDefinition = if(!is.null(extraParams$timeWindowsDefinition)) list(extraParams$timeWindowsDefinition) else problemDefinition$timeWindowsDefinition,
 		
 		# preprocessing control
 		fileEscaping = if(!is.null(extraParams$fileEscaping)) extraParams$fileEscaping else preProcessing$fileEscaping,
