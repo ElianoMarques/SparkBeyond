@@ -478,8 +478,8 @@ learn <- function(
 	if(!is.null(extraParams$modelBuildingCtrl)) modelBuilding = extraParams$modelBuildingCtrl
 	if(!is.null(extraParams$reportingCtrl)) reporting = extraParams$reportingCtrl
 	
-	fileUploadEnabled = ifelse(!is.null(extraParams$enableExperimentalUpload), extraParams$enableExperimentalUpload, FALSE)
-	fileUploadThreshold = ifelse(fileUploadEnabled, 0, NA)
+	uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
+	fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
 
 	# TODO: verify that there are no supurious parameters, e.g. (projectname instead of projectName)
 	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())

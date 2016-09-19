@@ -255,8 +255,8 @@ Session = setRefClass("Session",
 
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         extraParams = list(...)
-        fileUploadEnabled = ifelse(!is.null(extraParams$enableExperimentalUpload), extraParams$enableExperimentalUpload, FALSE)
-        fileUploadThreshold = ifelse(fileUploadEnabled, 0, NA)
+        uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
+        fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
         
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
                 
@@ -362,8 +362,8 @@ Session = setRefClass("Session",
         
         extraParams = list(...)        
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
-        fileUploadEnabled = ifelse(!is.null(extraParams$enableExperimentalUpload), extraParams$enableExperimentalUpload, FALSE)
-        fileUploadThreshold = ifelse(fileUploadEnabled, 0, NA)
+        uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
+        fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
         
         datapath = ifelse (remoteMode, 
 					{
