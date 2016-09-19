@@ -41,8 +41,8 @@ SB object that encapsulates a session
   fileEscaping = TRUE, ...)}}{Returns lift from a created model and generates three plots. \code{predictionResult} is a dataframe to be analyzed, \code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \code{title} optional: a title for the plot. \code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis).}
 
 \item{\code{predict(data, contextDatasets = NULL, predictionColumnsOnly = TRUE,
-  columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE,
-  ...)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
+  columnsWhiteList = NA, outputName = NA_character_, fileEscaping = TRUE,
+  runBlocking = TRUE, ...)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
 \item{\code{reports()}}{Shows all reports applicable for the current analysis.}
 
