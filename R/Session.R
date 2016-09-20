@@ -534,6 +534,12 @@ Session = setRefClass("Session",
         	writeBin(httr::content(res), fullFileName)
         	print(paste0("Package was saved at: ", fullFileName))
         	TRUE
+        } else if (res$status == 501) {
+        	res <- jsonlite::fromJSON(txt=httr::content(res, as="text"))
+        	if(!is.null(res$error)) {
+        		warning(res$error)
+        	}
+        	FALSE
         } else {
         	errorFile = paste0(artifact_loc,"/package-errors.txt")
         	if (file.exists(errorFile)) {
