@@ -17,14 +17,16 @@
 Enrichment = setRefClass("Enrichment",
 	 fields = list(
 	 	executionId = "character",
-	 	totalRows = "numeric",
-	 	data = "data.frame"
+	 	.totalRows = "numeric",
+	 	.outputName = "character",
+	 	.data = "data.frame"
 	 ),
 	 methods = list(
-	 	initialize = function(executionId, totalRows = NA_integer_) {
+	 	initialize = function(executionId, outputName, totalRows = NA_integer_) {
 	 		"initializes an Enrichment object using executionId."
 	 		executionId <<- executionId
-	 		totalRows <<- totalRows
+	 		.totalRows <<- totalRows
+	 		.outputName <<- outputName
 	 	},
 	 	
 	 	currentStatus = function() {
@@ -39,10 +41,11 @@ Enrichment = setRefClass("Enrichment",
 	 		}
 	 	},
 	 	
-	 	getData = function(localFileName = "enriched", runBlocking=TRUE) {
-	 		"If \\code{data} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{data} is FALSE return the data if available, else return NULL"
-	 		if(nrow(data)!=0) {
-	 			data
+	 	getData = function(localFileName = NA_character_, runBlocking=TRUE) {
+	 		"If \\code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{runBlocking} is FALSE return the data if available, else return NULL"
+	 		outputName = ifelse(is.na(localFileName), .outputName, localFileName)
+	 		if(nrow(.data)!=0) {
+	 			.data
 	 		} else if(runBlocking) {
 	 			jobStatus = .getEnrichJobStatus(executionId)
 	 			state = jobStatus$state
@@ -65,7 +68,7 @@ Enrichment = setRefClass("Enrichment",
 	 			result = jobStatus$result
 	 			projectName = jobStatus$projectName
 	 			revision = jobStatus$revision
-	 			localFile = .downloadFile(projectName, revision, pathOnServer = result, saveToPath = paste0(localFileName, ".tsv.gz"))
+	 			localFile = .downloadFile(projectName, revision, pathOnServer = result, saveToPath = paste0(outputName, ".tsv.gz"))
 	 			enrichedData = if (!is.null(localFile)) {
 	 				.loadEnrichedDataFrame(localFile)
 	 			} else {
@@ -73,8 +76,8 @@ Enrichment = setRefClass("Enrichment",
 	 			}
 	 			
 	 			if(!is.null(enrichedData)) {
-	 				data <<- enrichedData
-	 				data
+	 				.data <<- enrichedData
+	 				.data
 	 			} else {
 	 				message("Failed to download the enriched data")
 	 				NULL

@@ -18,9 +18,9 @@ SB object that encapsulates an enrichment job
 \describe{
 \item{\code{currentStatus()}}{Get prediction job status - Started/Finished, number of lines processed, etc.}
 
-\item{\code{getData(localFileName = "enriched", runBlocking = TRUE)}}{If \code{data} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \code{data} is FALSE return the data if available, else return NULL}
+\item{\code{getData(localFileName = NA_character_, runBlocking = TRUE)}}{If \code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \code{runBlocking} is FALSE return the data if available, else return NULL}
 
-\item{\code{initialize(executionId, totalRows = NA_integer_)}}{initializes an Enrichment object using executionId.}
+\item{\code{initialize(executionId, outputName, totalRows = NA_integer_)}}{initializes an Enrichment object using executionId.}
 }}
 \examples{
 # Enrichment example

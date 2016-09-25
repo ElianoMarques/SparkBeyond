@@ -322,14 +322,14 @@ Session = setRefClass("Session",
         	executionId = enrichResult$executionId
         	total = nrow(data)
 
-        	enrichment = Enrichment(executionId, totalRows = total)
+        	enrichment = Enrichment(executionId, totalRows = total, outputName = outputName)
         	quoted = function(str) paste0('"', str, '"')
         	message(paste("Enrichment execution ID is:", executionId))
         	message(paste0("You can get back to following this enrichment execution by running: ",
         								 "Enrichment(executionId=", quoted(executionId), ")"))
 
         	if(runBlocking) {
-        		unusedRefToData = enrichment$getData(localFileName = outputName)
+        		unusedRefToData = enrichment$getData()
         	}
 
         	message("Done.")
@@ -423,14 +423,14 @@ Session = setRefClass("Session",
         	executionId = predictResult$executionId
         	total = nrow(data)
 
-        	prediction = Prediction(executionId, totalRows = total)
+        	prediction = Prediction(executionId, totalRows = total, outputName = outputName)
         	quoted = function(str) paste0('"', str, '"')
         	message(paste("Predict execution ID is:", executionId))
         	message(paste0("You can get back to following this predict execution by running: ", 
         								 "Prediction(executionId=", quoted(executionId), ")"))
         	
         	if(runBlocking) {
-        		unusedRefToData = prediction$getData(localFileName = outputName)
+        		unusedRefToData = prediction$getData()
         	}
 
         	prediction

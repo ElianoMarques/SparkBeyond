@@ -17,14 +17,16 @@
 Prediction = setRefClass("Prediction",
 		fields = list(
 			executionId = "character",
-			totalRows = "numeric",
-			data = "data.frame"
+			.totalRows = "numeric",
+			.outputName = "character",
+			.data = "data.frame"
 		),
 		methods = list(
-			initialize = function(executionId, totalRows = NA_integer_) {
+			initialize = function(executionId, outputName, totalRows = NA_integer_) {
 				"initializes a Prediction object using executionId."
 				executionId <<- executionId
-				totalRows <<- totalRows
+				.totalRows <<- totalRows
+				.outputName <<- outputName
 			},
 			
 			currentStatus = function() {
@@ -40,9 +42,10 @@ Prediction = setRefClass("Prediction",
 			},
 			
 			getData = function(localFileName = "predicted", runBlocking=TRUE) {
-				"If \\code{data} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{data} is FALSE return the data if available, else return NULL"
-				if(nrow(data)!=0) {
-					data
+				"If \\code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{runBlocking} is FALSE return the data if available, else return NULL"
+				outputName = ifelse(is.na(localFileName), .outputName, localFileName)
+				if(nrow(.data)!=0) {
+					.data
 				} else if(runBlocking) {
 					jobStatus = .getPredictJobStatus(executionId)
 					state = jobStatus$state
@@ -65,11 +68,11 @@ Prediction = setRefClass("Prediction",
 					result = jobStatus$result
 					projectName = jobStatus$projectName
 					revision = jobStatus$revision
-					predictedData = .downloadDataFrame(projectName, revision, pathOnServer = result, saveToPath = paste0(localFileName, ".tsv.gz"))
+					predictedData = .downloadDataFrame(projectName, revision, pathOnServer = result, saveToPath = paste0(outputName, ".tsv.gz"))
 					
 					if(!is.null(predictedData)) {
-						data <<- predictedData
-						data
+						.data <<- predictedData
+						.data
 					} else {
 						message("Failed to download the prediction result")
 						NULL
