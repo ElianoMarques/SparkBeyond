@@ -1,4 +1,3 @@
-
 .jobStatusFromJson <- function(json) {
 	validate = function(value) {
 		is.character(value$projectName) && is.integer(value$revision) && is.integer(value$rowCount) && is.character(value$state) && 
