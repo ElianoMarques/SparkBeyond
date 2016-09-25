@@ -55,7 +55,35 @@
 		}
 	)
 	
-	attr(value, "class") <- "predcitResult"
+	attr(value, "class") <- "predictResult"
+	value
+}
+
+.enrichResultFromJson = function(json){
+	validate = function(value) {
+		if(!is.null(value$result) && !is.null(value$error)) {
+			stop("Enrich result contains both result and error")
+		}
+	}
+	
+	value = list()
+	
+	tryCatch(
+		{
+			value = list(
+				result = json$result,
+				error = json$error,
+				executionId = json$executionId,
+				asyncMode = is.null(json$result) && !is.null(json$executionId)
+			)
+			validate(value)
+		},
+		error = function(cond) {
+			message(paste("Failed to deserialize enrich result:", cond))
+		}
+	)
+	
+	attr(value, "class") <- "enrichResult"
 	value
 }
 
@@ -65,6 +93,18 @@
 		url <- paste0(getSBserverDomain(),"/rapi/predict/", jobId),
 		error = function(cond) {
 			message(paste("Failed to get predict job status. Error:", cond))
+		}
+	)
+	res = httr::GET(url, httr::content_type_json())
+	res <- jsonlite::fromJSON(txt=httr::content(res, as="text"), simplifyDataFrame=TRUE)
+	jobStatus = .jobStatusFromJson(res)
+}
+
+.getEnrichJobStatus = function(jobId) {
+	tryCatch(
+		url <- paste0(getSBserverDomain(),"/rapi/enrich/", jobId),
+		error = function(cond) {
+			message(paste("Failed to get enrich job status. Error:", cond))
 		}
 	)
 	res = httr::GET(url, httr::content_type_json())
@@ -87,7 +127,7 @@
 
 .downloadDataFrame = function(projectName, revision, pathOnServer, saveToPath) {
 	localFile = .downloadFile(projectName, revision, pathOnServer, saveToPath)
-	if(!is.na(localFile)) {
+	if(!is.null(localFile)) {
 		read.table(localFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
 	} else {
 		NULL

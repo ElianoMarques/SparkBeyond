@@ -251,12 +251,13 @@ Session = setRefClass("Session",
       },
 
 			################################## enrich #####################
-      enrich = function(data, featureCount = NA,  contextDatasets = NULL ,enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, ...) {
+      enrich = function(data, featureCount = NA,  contextDatasets = NULL ,enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...) {
 
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         extraParams = list(...)
         uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
         fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
+        async = ifelse(!is.null(extraParams$async), extraParams$async, FALSE)
         
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
                 
@@ -297,7 +298,8 @@ Session = setRefClass("Session",
         							columnsWhiteList = columnsWhiteList,
         							fileEscaping = fileEscaping,
         							externalPrefixPath = ifelse (remoteMode, NA, getSBserverIOfolder()),
-        							contextDatasets = contextDatasets
+        							contextDatasets = contextDatasets,
+        							async = async
         							#addBooleanNumericExtractors        							
         )
         params = params[!is.na(params)]
@@ -309,47 +311,44 @@ Session = setRefClass("Session",
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+        enrichResult = .enrichResultFromJson(res)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result)) {
-        	if (remoteMode) {
-        		url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision,"/", res$result)
-        		res2 = httr::GET(url)
-        		if (res2$status == 200) {
-        			localfile = paste0(outputName, ".tsv.gz")
-        			writeBin(httr::content(res2), localfile)
-        			message(paste0("Results written to: ", getwd(),"/", localfile))
-        			df = read.table(localfile, sep="\t", quote = "",header=FALSE, skip = 1, comment.char = "")
-        			headers = readLines(localfile , n=1)
-        			cols = strsplit(headers, '\t')
-        			colnames(df) = cols[[1]]
-        			
-        			for(i in 1:ncol(df)) {
-        				if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
-        					df[,i] = as.logical(as.character(df[,i]))
-        				} else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
-        					df[,i] = as.logical(as.character(df[,i]))
-        				}
-        			}
-        			df
-        		} else NA        		
-        	} else {
-	          df = read.table(outputPath, header = TRUE, quote = "",sep="\t")
-	          for(i in 1:ncol(df)) {
-	            if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
-	              df[,i] = as.logical(as.character(df[,i]))
-	            } else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
-	              df[,i] = as.logical(as.character(df[,i]))
-	            }
-	          }
-	          df
-        	}
-        } else {
-          message = paste("Enrichment failed: ", res$error)
-          message(message)
-          stop(message)
+        if (!is.null(enrichResult$error)) {
+        	stop(paste("Enrichment failed: ", enrichResult$error))
         }
-        message("Done.")
-        return(finalRes)
+
+        if(enrichResult$asyncMode) {
+        	# Async mode
+        	executionId = enrichResult$executionId
+        	total = nrow(data)
+
+        	enrichment = Enrichment(executionId, totalRows = total)
+        	quoted = function(str) paste0('"', str, '"')
+        	message(paste("Enrichment execution ID is:", executionId))
+        	message(paste0("You can get back to following this enrichment execution by running: ",
+        								 "Enrichment(executionId=", quoted(executionId), ")"))
+
+        	if(runBlocking) {
+        		unusedRefToData = enrichment$getData(localFileName = outputName)
+        	}
+
+        	message("Done.")
+        	enrichment
+        } else {
+        	#	Sync mode for server version < 1.8, doesn't support async mode
+        	if(is.null(res$result)) {
+        		stop("Enrichment failed.")
+        	}
+        	localFile = .downloadFile(projectName, revision, pathOnServer = res$result, saveToPath = paste0(outputName, ".tsv.gz"))
+        	data = if (!is.null(localFile)) {
+        		.loadEnrichedDataFrame(localFile)
+        	} else {
+        		stop("Enrichment failed: failed to download results")
+        	}
+
+        	message("Done.")
+        	return(data)
+        }
       },
 
 			################################## predict #####################
@@ -427,9 +426,9 @@ Session = setRefClass("Session",
         	prediction = Prediction(executionId, totalRows = total)
         	quoted = function(str) paste0('"', str, '"')
         	message(paste("Predict execution ID is:", executionId))
-        	message(paste0("You can get back to following this predict execution by running: ",
-        								 "Prediction(executionId=", quoted(executionId)))
-
+        	message(paste0("You can get back to following this predict execution by running: ", 
+        								 "Prediction(executionId=", quoted(executionId), ")"))
+        	
         	if(runBlocking) {
         		unusedRefToData = prediction$getData(localFileName = outputName)
         	}
@@ -440,7 +439,6 @@ Session = setRefClass("Session",
 	        if(is.null(res$result)) {
 	        	stop("Prediction failed.")
 	        }
-        	browser()
         	data	= .downloadDataFrame(projectName, revision, pathOnServer = res$result, saveToPath = paste0(outputName, ".tsv.gz"))
 	        if(!is.null(data)) {
 	        	message("Done.")

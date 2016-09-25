@@ -1,5 +1,19 @@
-
-
+#' SB object that encapsulates a prediction job
+#' 
+#' @field executionId prediction job id
+#' @examples
+#' # Prediction example
+#' \donttest{
+#' # Create a Session object from scratch
+#' session = Session("project name", revision_id)
+#' # Learn
+#' session = learn("titanic", getData("titanic_train"), target="survived")
+#' # Non blocking predict
+#' prediction = session$predict(getData("titanic_test"), async=TRUE)
+#' prediction$currentStatus()
+#' data = prediction$getData()
+#' head(data)
+#' }
 Prediction = setRefClass("Prediction",
 		fields = list(
 			executionId = "character",
@@ -8,12 +22,13 @@ Prediction = setRefClass("Prediction",
 		),
 		methods = list(
 			initialize = function(executionId, totalRows = NA_integer_) {
-				"initializes a prediction object using executionId."
+				"initializes a Prediction object using executionId."
 				executionId <<- executionId
 				totalRows <<- totalRows
 			},
 			
 			currentStatus = function() {
+				"Get prediction job status - Started/Finished, number of lines processed, etc."
 				jobStatus = .getPredictJobStatus(executionId)
 				if(jobStatus$state == "Finished" && !is.null(jobStatus$error)) {
 					message(paste("Prediction has finished with an error:", jobStatus$error))
@@ -24,7 +39,8 @@ Prediction = setRefClass("Prediction",
 				}
 			},
 			
-			getData = function(localFileName = "predicted", runBlocking=TRUE) { 
+			getData = function(localFileName = "predicted", runBlocking=TRUE) {
+				"If \\code{data} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{data} is FALSE return the data if available, else return NULL"
 				if(nrow(data)!=0) {
 					data
 				} else if(runBlocking) {
@@ -50,6 +66,7 @@ Prediction = setRefClass("Prediction",
 					projectName = jobStatus$projectName
 					revision = jobStatus$revision
 					predictedData = .downloadDataFrame(projectName, revision, pathOnServer = result, saveToPath = paste0(localFileName, ".tsv.gz"))
+					
 					if(!is.null(predictedData)) {
 						data <<- predictedData
 						data

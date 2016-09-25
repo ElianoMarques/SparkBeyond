@@ -22,12 +22,9 @@ SB object that encapsulates a session
 
 \item{\code{cancel()}}{Cancel a queued / running job of this model}
 
-\item{\code{createPackage(sampleData = NULL, createRestAPIpackage = FALSE,
-  fileEscaping = TRUE, ...)}}{Create a sharable package for the model. \code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE).}
-
 \item{\code{enrich(data, featureCount = NA, contextDatasets = NULL,
   enrichedColumnsOnly = TRUE, columnsWhiteList = NA,
-  outputName = "enriched", fileEscaping = TRUE, ...)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
+  outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
 
 \item{\code{evaluate(...)}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
