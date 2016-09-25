@@ -251,12 +251,13 @@ Session = setRefClass("Session",
       },
 
 			################################## enrich #####################
-      enrich = function(data, featureCount = NA,  contextDatasets = NULL ,enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, ...) {
+      enrich = function(data, featureCount = NA,  contextDatasets = NULL ,enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...) {
 
         "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         extraParams = list(...)
         uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
         fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
+        async = ifelse(!is.null(extraParams$async), extraParams$async, FALSE)
         
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
                 
@@ -297,7 +298,8 @@ Session = setRefClass("Session",
         							columnsWhiteList = columnsWhiteList,
         							fileEscaping = fileEscaping,
         							externalPrefixPath = ifelse (remoteMode, NA, getSBserverIOfolder()),
-        							contextDatasets = contextDatasets
+        							contextDatasets = contextDatasets,
+        							async = async
         							#addBooleanNumericExtractors        							
         )
         params = params[!is.na(params)]
@@ -309,51 +311,48 @@ Session = setRefClass("Session",
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+        enrichResult = .enrichResultFromJson(res)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result)) {
-        	if (remoteMode) {
-        		url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision,"/", res$result)
-        		res2 = httr::GET(url)
-        		if (res2$status == 200) {
-        			localfile = paste0(outputName, ".tsv.gz")
-        			writeBin(httr::content(res2), localfile)
-        			message(paste0("Results written to: ", getwd(),"/", localfile))
-        			df = read.table(localfile, sep="\t", quote = "",header=FALSE, skip = 1, comment.char = "")
-        			headers = readLines(localfile , n=1)
-        			cols = strsplit(headers, '\t')
-        			colnames(df) = cols[[1]]
-        			
-        			for(i in 1:ncol(df)) {
-        				if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
-        					df[,i] = as.logical(as.character(df[,i]))
-        				} else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
-        					df[,i] = as.logical(as.character(df[,i]))
-        				}
-        			}
-        			df
-        		} else NA        		
-        	} else {
-	          df = read.table(outputPath, header = TRUE, quote = "",sep="\t")
-	          for(i in 1:ncol(df)) {
-	            if (length(levels(df[[i]])) == 1 && (levels(df[[i]]) == "false" || levels(df[[i]]) == "true")) {
-	              df[,i] = as.logical(as.character(df[,i]))
-	            } else if (length(levels(df[[i]])) == 2 && (levels(df[[i]]) == c("false","true"))) {
-	              df[,i] = as.logical(as.character(df[,i]))
-	            }
-	          }
-	          df
-        	}
-        } else {
-          message = paste("Enrichment failed: ", res$error)
-          message(message)
-          stop(message)
+        if (!is.null(enrichResult$error)) {
+        	stop(paste("Enrichment failed: ", enrichResult$error))
         }
-        message("Done.")
-        return(finalRes)
+
+        if(enrichResult$asyncMode) {
+        	# Async mode
+        	executionId = enrichResult$executionId
+        	total = nrow(data)
+
+        	enrichment = Enrichment(executionId, totalRows = total, outputName = outputName)
+        	quoted = function(str) paste0('"', str, '"')
+        	message(paste("Enrichment execution ID is:", executionId))
+        	message(paste0("You can get back to following this enrichment execution by running: ",
+        								 "Enrichment(executionId=", quoted(executionId), ")"))
+
+        	if(runBlocking) {
+        		unusedRefToData = enrichment$getData()
+        	}
+
+        	message("Done.")
+        	enrichment
+        } else {
+        	#	Sync mode for server version < 1.8, doesn't support async mode
+        	if(is.null(res$result)) {
+        		stop("Enrichment failed.")
+        	}
+        	localFile = .downloadFile(projectName, revision, pathOnServer = res$result, saveToPath = paste0(outputName, ".tsv.gz"))
+        	data = if (!is.null(localFile)) {
+        		.loadEnrichedDataFrame(localFile)
+        	} else {
+        		stop("Enrichment failed: failed to download results")
+        	}
+
+        	message("Done.")
+        	return(data)
+        }
       },
 
 			################################## predict #####################
-      predict = function(data, contextDatasets = NULL, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE, ...) { 
+      predict = function(data, contextDatasets = NULL, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = NA_character_, fileEscaping = TRUE, runBlocking = TRUE, ...) {
         "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \\code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         #if(!currentUser(FALSE)) stop("Please login")
 
@@ -364,6 +363,7 @@ Session = setRefClass("Session",
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
         uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
         fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
+        async = ifelse(!is.null(extraParams$async), extraParams$async, FALSE)
         
         datapath = ifelse (remoteMode, 
 					{
@@ -397,7 +397,11 @@ Session = setRefClass("Session",
         							fileEscaping = fileEscaping,
         							predictContexts = contextDatasets,  # Backward compatibility with 1.5
         							contextDatasets = contextDatasets,
-        							externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())
+        							externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder()),
+        							# Starting from version 1.8 this will activate async mode, older versions will ignore it
+        							# If async is TRUE and server version is >=1.8, successful response to this request will contain executionId
+        							# If the response will not contain executionId, old predict flow will be executed
+        							async = async
         							)        							
         params = params[!is.na(params)] 							
 
@@ -408,38 +412,40 @@ Session = setRefClass("Session",
         body = rjson::toJSON(params)
         res = httr::POST(url, body = body, httr::content_type_json())
         res <- jsonlite::fromJSON(txt=httr::content(res, as="text"), simplifyDataFrame=TRUE)
+        predictResult = .predictResultFromJson(res)
 
-        finalRes = if (is.null(res$error) && !is.null(res$result)) { 
-        	if (remoteMode) {
-        		url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/",res$result)
-        		res2 = httr::GET(url)
-        		if (res2$status == 200) {
-        			localfile = paste0(outputName, ".tsv.gz")
-        			writeBin(httr::content(res2), localfile)
-        			message(paste0("Results written to: ", getwd(),"/", localfile))
-        			read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
-        		} else NA 
-        	} else {
-	          table = read.table(res$result, header = TRUE, sep="\t")
-	          resultsLocation = paste0(artifact_loc, "/reports/predictions/test/")
-	          message (paste("Predictions and plots are available at:", resultsLocation))
-	          files = sapply(list.files(resultsLocation), function(f) grepl(".html", f))
-	          if (length(files) > 0) {
-	            htmlFilesInd = which(files)
-	            if (length(htmlFilesInd>0)) {
-	              htmlFiles = names(htmlFilesInd)
-	              for(f in htmlFiles) file.show(paste0(resultsLocation, f))
-	            }
-	          }
-	          table
-        	}
-        } else {
-          message = paste("Prediction failed: ", res$error)
-          message(message)
-          stop(message)
+        if (!is.null(predictResult$error)) {
+	        stop(paste("Prediction failed: ", predictResult$error))
         }
-        message("Done.")
-        return(finalRes)
+
+        if(predictResult$asyncMode) {
+        # Async mode
+        	executionId = predictResult$executionId
+        	total = nrow(data)
+
+        	prediction = Prediction(executionId, totalRows = total, outputName = outputName)
+        	quoted = function(str) paste0('"', str, '"')
+        	message(paste("Predict execution ID is:", executionId))
+        	message(paste0("You can get back to following this predict execution by running: ", 
+        								 "Prediction(executionId=", quoted(executionId), ")"))
+        	
+        	if(runBlocking) {
+        		unusedRefToData = prediction$getData()
+        	}
+
+        	prediction
+        } else {
+	        #	Sync mode for server version < 1.8, doesn't support async mode
+	        if(is.null(res$result)) {
+	        	stop("Prediction failed.")
+	        }
+        	data	= .downloadDataFrame(projectName, revision, pathOnServer = res$result, saveToPath = paste0(outputName, ".tsv.gz"))
+	        if(!is.null(data)) {
+	        	message("Done.")
+	        }
+
+        	return(data)
+        }
       },
 
 			################################## lift #####################			
@@ -501,7 +507,7 @@ Session = setRefClass("Session",
 
 			####################################### createPackage
       createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE, fileEscaping = TRUE, ...) { #
-        "Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \\code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE)."
+      	"Create a sharable package for the model. \\code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \\code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE)."
         if (is.na(modelBuilt) || !modelBuilt) warning("createPackage requires full model building using learn")
 
         sampleDataFilename = if (is.null(sampleData)) NA else {		     
