@@ -22,7 +22,7 @@ problemDefinitionControl(forceRegression = NA, weightColumn = NA,
 
 \item{partitionColumn}{Optional. A column name containing information by which the data will be split to tain/test/validation set. Allowed values: "Train", "Validation", "Test".}
 
-\item{timeWindowsDefinition}{Optional. Definition of the relevant time windows, used for creation of TimeSeries/TimeSeriesMap contexts}
+\item{timeWindowsDefinition}{Optional. List of \code{\link{timeWindowControl}} objects, used for creation of TimeSeries/TimeSeriesMap contexts.}
 }
 \description{
 problemDefinitionControl

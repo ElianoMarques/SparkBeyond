@@ -1,6 +1,6 @@
 # S3 functions (De facto constructors of Session)
 
-#' timeWindowDefinition
+#' timeWindowControl
 #' 
 #' @param dateCol The column name in training set that will be used.
 #' @param window The window length (numeric)
@@ -9,8 +9,11 @@
 #' @param relativeTime a boolean indicator for whether the time series should be coded with absolute timestamps or relative to the last point. In this case all time stamps will be negative using the defined time unit (e.g. -10 days). TRUE by default.
 #' @param offset allows defining an additional time gap between that will be masked for the feature search. The entire time series will be shifted accordingly using the time window that was picked. 0 by default.
 #' @param sample allows defining the maximum number of time points to be included in each time series. Random points are sampled from the time series to reduce the time series resolution in order to better capture global trends and increase runtime performance. By default set to 100.
-#' @return timeWindowDefinition object
-timeWindowDefinition = function(dateCol, keyCol = NULL, window, unit = "Days", relativeTime = TRUE, sample = 100, offset = 0) {
+#' @param allowHistoricalStats when true, statistics for various historical quantities of the corresponding key will be calculated over the entire history (e.g. the average historical price of an item since the beginning of time), as opposed to just within the time-window (e.g. the average price for an item within the past 3 days). TRUE by default."
+#' @param naturalModality usefull if there are natural time cycle dependencies such as daily or monthly. Multi_Modal will cause the system to try them all and No_Modality to try none. Possible values: No_Modality, Hour_Of_Day, Day_Of_Week, Month_Of_Year, Multi_Modal. No_Modality by default."
+#' @param applyModalityFilter a boolean indicator for whether to use only dates with the same modality as the date column, or search on both the whole window and the modal version. FALSE by default."
+#' @return timeWindowControl object
+timeWindowControl = function(dateCol, keyCol = NULL, window, unit = "Days", relativeTime = TRUE, sample = 100, offset = 0, allowHistoricalStats = TRUE, naturalModality = "No_Modality", applyModalityFilter = FALSE) {
 	def = list(
 		dateColumn = dateCol, 
 		keyColumn = keyCol,
@@ -18,10 +21,13 @@ timeWindowDefinition = function(dateCol, keyCol = NULL, window, unit = "Days", r
 		timeUnit = unit, 
 		relativeTime = relativeTime, 
 		sampleSize = sample, 
-		offsetFromTarget = offset
+		offsetFromTarget = offset,
+		allowHistoricalStats = allowHistoricalStats,
+		naturalModality = naturalModality,
+		applyModalityFilter = applyModalityFilter
 	)
 	
-	class(def) = "timeWindowDefinition"
+	class(def) = "timeWindowControl"
 	def
 }
 
@@ -33,7 +39,7 @@ timeWindowDefinition = function(dateCol, keyCol = NULL, window, unit = "Days", r
 #' @param trainTestSplitRatio Optional. Double value in [0,1] to split the train file data in order to keep some data for test. 0.8 by default. Ignored if test filename was provided.
 #' @param temporalSplitColumn Optional. A column name containing temporal information by which the data will be splitted to train and test based on trainTestSplitRatio.
 #' @param partitionColumn Optional. A column name containing information by which the data will be split to tain/test/validation set. Allowed values: "Train", "Validation", "Test".
-#' @param timeWindowsDefinition Optional. Definition of the relevant time windows, used for creation of TimeSeries/TimeSeriesMap contexts
+#' @param timeWindowsDefinition Optional. List of \code{\link{timeWindowControl}} objects, used for creation of TimeSeries/TimeSeriesMap contexts.
 problemDefinitionControl = function(
 	forceRegression = NA,
 	weightColumn = NA,
