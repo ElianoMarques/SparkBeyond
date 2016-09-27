@@ -18,15 +18,13 @@ Enrichment = setRefClass("Enrichment",
 	 fields = list(
 	 	executionId = "character",
 	 	.totalRows = "numeric",
-	 	.outputName = "character",
 	 	.data = "data.frame"
 	 ),
 	 methods = list(
-	 	initialize = function(executionId, outputName, totalRows = NA_integer_) {
-	 		"initializes an Enrichment object using executionId."
+	 	initialize = function(executionId, totalRows = NA_integer_) {
+	 		"Initializes an Enrichment object using executionId."
 	 		executionId <<- executionId
 	 		.totalRows <<- totalRows
-	 		.outputName <<- outputName
 	 	},
 	 	
 	 	currentStatus = function() {
@@ -43,7 +41,7 @@ Enrichment = setRefClass("Enrichment",
 	 	
 	 	getData = function(localFileName = NA_character_, runBlocking=TRUE) {
 	 		"If \\code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{runBlocking} is FALSE return the data if available, else return NULL"
-	 		outputName = ifelse(is.na(localFileName), .outputName, localFileName)
+	 		outputName = ifelse(is.na(localFileName), paste("enriched", executionId, "-"), localFileName)
 	 		if(nrow(.data)!=0) {
 	 			.data
 	 		} else if(runBlocking) {
@@ -56,7 +54,7 @@ Enrichment = setRefClass("Enrichment",
 	 			while(state!="Finished") {
 	 				Sys.sleep(5)
 	 				jobStatus = .getEnrichJobStatus(executionId)
-	 				processed = jobStatus$rowCount
+	 				processed = min(jobStatus$rowCount, .totalRows, na.rm = TRUE)
 	 				cat("\r", "Processed rows: ", processed, "\r")
 	 				state = jobStatus$state
 	 				# progressBar$update(processed)
