@@ -1,11 +1,10 @@
+library(R6)
+
 #' SB object that encapsulates an enrichment job
 #' 
-#' @field executionId enrichment job id
 #' @examples
 #' # Enrichment example
 #' \donttest{
-#' # Create a Session object from scratch
-#' session = Session("project name", revision_id)
 #' # Learn
 #' session = learn("titanic", getData("titanic_train"), target="survived")
 #' # Non blocking predict
@@ -14,22 +13,25 @@
 #' enrichment = prediction$getData()
 #' head(data)
 #' }
-Enrichment = setRefClass("Enrichment",
-	 fields = list(
-	 	executionId = "character",
-	 	.totalRows = "numeric",
-	 	.data = "data.frame"
+Enrichment = R6Class("Enrichment",
+	 lock_objects = TRUE,
+	 lock_class = TRUE,
+	 cloneable = FALSE,
+	 private = list(
+	 	executionId = NA_character_,
+	 	totalRows = NA_integer_,
+	 	data = NULL
 	 ),
-	 methods = list(
+	 public = list(
 	 	initialize = function(executionId, totalRows = NA_integer_) {
 	 		"Initializes an Enrichment object using executionId."
-	 		executionId <<- executionId
-	 		.totalRows <<- totalRows
+	 		private$executionId = executionId
+	 		private$totalRows = totalRows
 	 	},
 	 	
 	 	currentStatus = function() {
 	 		"Get prediction job status - Started/Finished, number of lines processed, etc."
-	 		jobStatus = .getEnrichJobStatus(executionId)
+	 		jobStatus = .getEnrichJobStatus(private$executionId)
 	 		if(jobStatus$state == "Finished" && !is.null(jobStatus$error)) {
 	 			message(paste("Enrichment has finished with an error:", jobStatus$error))
 	 		} else if(jobStatus$state == "Finished" && !is.null(jobStatus$result)) {
@@ -41,11 +43,11 @@ Enrichment = setRefClass("Enrichment",
 	 	
 	 	getData = function(localFileName = NA_character_, runBlocking=TRUE) {
 	 		"If \\code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{runBlocking} is FALSE return the data if available, else return NULL"
-	 		outputName = ifelse(is.na(localFileName), paste("enriched", executionId, "-"), localFileName)
-	 		if(nrow(.data)!=0) {
-	 			.data
+	 		outputName = ifelse(is.na(localFileName), paste("enriched", private$executionId, "-"), localFileName)
+	 		if(!is.null(private$data)) {
+	 			private$data
 	 		} else if(runBlocking) {
-	 			jobStatus = .getEnrichJobStatus(executionId)
+	 			jobStatus = .getEnrichJobStatus(private$executionId)
 	 			state = jobStatus$state
 	 			if(state!="Finished") {
 	 				message("Blocking the R console until enrichment is finished.")
@@ -53,8 +55,8 @@ Enrichment = setRefClass("Enrichment",
 	 			
 	 			while(state!="Finished") {
 	 				Sys.sleep(5)
-	 				jobStatus = .getEnrichJobStatus(executionId)
-	 				processed = min(jobStatus$rowCount, .totalRows, na.rm = TRUE)
+	 				jobStatus = .getEnrichJobStatus(private$executionId)
+	 				processed = min(jobStatus$rowCount, private$totalRows, na.rm = TRUE)
 	 				cat("\r", "Processed rows: ", processed, "\r")
 	 				state = jobStatus$state
 	 				# progressBar$update(processed)
@@ -74,8 +76,8 @@ Enrichment = setRefClass("Enrichment",
 	 			}
 	 			
 	 			if(!is.null(enrichedData)) {
-	 				.data <<- enrichedData
-	 				.data
+	 				private$data = enrichedData
+	 				private$data
 	 			} else {
 	 				message("Failed to download the enriched data")
 	 				NULL
