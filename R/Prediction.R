@@ -18,15 +18,13 @@ Prediction = setRefClass("Prediction",
 		fields = list(
 			executionId = "character",
 			.totalRows = "numeric",
-			.outputName = "character",
 			.data = "data.frame"
 		),
 		methods = list(
-			initialize = function(executionId, outputName, totalRows = NA_integer_) {
-				"initializes a Prediction object using executionId."
+			initialize = function(executionId, totalRows = NA_integer_) {
+				"Initializes a Prediction object using executionId."
 				executionId <<- executionId
 				.totalRows <<- totalRows
-				.outputName <<- outputName
 			},
 			
 			currentStatus = function() {
@@ -36,14 +34,16 @@ Prediction = setRefClass("Prediction",
 					message(paste("Prediction has finished with an error:", jobStatus$error))
 				} else if(jobStatus$state == "Finished" && !is.null(jobStatus$result)) {
 					message("Prediction has finished successfully. Call Prediction$getData() to get the results")
+				} else if((jobStatus$state == "Started" || jobStatus$state == "Running") && !is.na(.totalRows) && jobStatus$rowCount>=.totalRows) {
+					message("Generating reports")
 				} else if(jobStatus$state == "Started" || jobStatus$state == "Running") {
 					message(paste("Prediction job is running. So far processed", jobStatus$rowCount, "rows"))
 				}
 			},
 			
-			getData = function(localFileName = "predicted", runBlocking=TRUE) {
+			getData = function(localFileName = NA_character_, runBlocking=TRUE) {
 				"If \\code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{runBlocking} is FALSE return the data if available, else return NULL"
-				outputName = ifelse(is.na(localFileName), .outputName, localFileName)
+				outputName = ifelse(is.na(localFileName), paste("predicted", executionId, "-"), localFileName)
 				if(nrow(.data)!=0) {
 					.data
 				} else if(runBlocking) {
@@ -53,11 +53,20 @@ Prediction = setRefClass("Prediction",
 						message("Blocking the R console until prediction is finished.")
 					}
 					
+					displayedGeneratingReportsMessage = FALSE
 					while(state!="Finished") {
 						Sys.sleep(5)
 						jobStatus = .getPredictJobStatus(executionId)
-						processed = jobStatus$rowCount
-						cat("\r", "Processed rows: ", processed, "\r")
+						processed = min(jobStatus$rowCount, .totalRows, na.rm = TRUE)
+						if(!is.na(.totalRows) && processed==.totalRows) {
+							if(!displayedGeneratingReportsMessage) {
+								cat("\r", "Processed rows: ", .totalRows, "\r")
+								message("Generating reports")
+								displayedGeneratingReportsMessage = TRUE
+							}
+						} else {
+							cat("\r", "Processed rows: ", processed, "\r")
+						}
 						state = jobStatus$state
 						# progressBar$update(processed)
 					}

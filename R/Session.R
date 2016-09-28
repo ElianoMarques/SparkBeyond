@@ -322,15 +322,16 @@ Session = setRefClass("Session",
         	executionId = enrichResult$executionId
         	total = nrow(data)
 
-        	enrichment = Enrichment(executionId, totalRows = total, outputName = outputName)
+        	enrichment = Enrichment(executionId, totalRows = total)
         	quoted = function(str) paste0('"', str, '"')
         	message(paste("Enrichment execution ID is:", executionId))
         	message(paste0("You can get back to following this enrichment execution by running: ",
         								 "Enrichment(executionId=", quoted(executionId), ")"))
 
         	if(runBlocking) {
-        		unusedRefToData = enrichment$getData()
+        		unusedRefToData = enrichment$getData(localFileName = outputName)
         	}
+
 
         	message("Done.")
         	enrichment
@@ -352,7 +353,7 @@ Session = setRefClass("Session",
       },
 
 			################################## predict #####################
-      predict = function(data, contextDatasets = NULL, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = NA_character_, fileEscaping = TRUE, runBlocking = TRUE, ...) {
+      predict = function(data, contextDatasets = NULL, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE, runBlocking = TRUE, ...) {
         "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \\code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
         #if(!currentUser(FALSE)) stop("Please login")
 
@@ -423,14 +424,14 @@ Session = setRefClass("Session",
         	executionId = predictResult$executionId
         	total = nrow(data)
 
-        	prediction = Prediction(executionId, totalRows = total, outputName = outputName)
+        	prediction = Prediction(executionId, totalRows = total)
         	quoted = function(str) paste0('"', str, '"')
         	message(paste("Predict execution ID is:", executionId))
         	message(paste0("You can get back to following this predict execution by running: ", 
         								 "Prediction(executionId=", quoted(executionId), ")"))
         	
         	if(runBlocking) {
-        		unusedRefToData = prediction$getData()
+        		unusedRefToData = prediction$getData(localFileName = outputName)
         	}
 
         	prediction
