@@ -369,7 +369,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
          stop("Invalid time unit. Should be one of: 'Seconds', 'Minutes', 'Hours', 'Days', 'Years'")
   )
   prevTZ = Sys.timezone() 
-  if (!is.na(prevTZ) && prevTZ == "CET") Sys.setenv(TZ = "UTC") #temporary fix
+  Sys.setenv(TZ = "UTC")
   
   newCol = if (is.na(keyCol)) {
   	paste0("last_", window, "_", unit)
