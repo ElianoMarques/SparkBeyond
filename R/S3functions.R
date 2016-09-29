@@ -108,15 +108,15 @@ emptyValuePolicyList = function(
 #' Smart presets for creating deep features and explore interactions.
 #' Please note - only one of the following should be set to true
 #' @param default This mode is the standard feature search mode that composes all possible function up to a predefined complexity which is based on the column type, specific functions combination, and the depth definition.
-#' @param advanced This mode uses a genetic algorithm approach that will attempt to create more composite functions combination in places where a stronger signal was found - e.g., if an interim feature on time series data has shown signal in preliminary analysis, more effort will be made to exact additional signal by creating more complex expression which use or variant of that interim feature. 
+#' @param aggressiveWithPairs The genetic algorithm will perform a quick exploration of many potential pairs. 
+#' @param advanced This mode will attempt to create more composite functions combination in places where a stronger signal was found - e.g., if an interim feature on time series data has shown signal in preliminary analysis, more effort will be made to exact additional signal by creating more complex expression which use or variant of that interim feature. 
 #' @param advancedWithPairs This mode is similar to the one above with a focus on combining signals from pairs of interactions and producing more complex features from promising interim features pairs - please check "deep feature search with pairs example" in section G of the examples page.
-#' @param aggressiveWithPairs Experimental: In this mode the algorithm selects fewer pair interactions to examine but explores them more aggressively.
 #' @param digDeep This mode would follow more aggressively at looking for interactions between multiple interim features, and can attempt to create features using up to 5 fields. please check "deep feature search with many interactions" example in section G of the examples page.
 featureSearchModeList = function(
 	default = TRUE,
+	aggressiveWithPairs = FALSE,
 	advanced = FALSE,
 	advancedWithPairs = FALSE,
-	aggressiveWithPairs = FALSE,
 	digDeep = FALSE
 ) {
 	mode = "DEFAULT"
