@@ -43,7 +43,7 @@ Enrichment = R6Class("Enrichment",
 	 	
 	 	getData = function(localFileName = NA_character_, runBlocking=TRUE) {
 	 		"If \\code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{runBlocking} is FALSE return the data if available, else return NULL"
-	 		outputName = ifelse(is.na(localFileName), paste("enriched", private$executionId, "-"), localFileName)
+	 		outputName = ifelse(is.na(localFileName), paste("enriched", private$executionId, sep = "-"), localFileName)
 	 		if(!is.null(private$data)) {
 	 			private$data
 	 		} else if(runBlocking) {
