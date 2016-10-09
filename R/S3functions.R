@@ -575,6 +575,7 @@ learn <- function(
 		})
 	}
 	
+	extraModels = if(!is.null(extraParams$extraModels)) extraParams$extraModels else modelBuilding$extraModels
 	params <-list(
 		projectName = projectName,
 		trainingFilePath = 
@@ -653,7 +654,7 @@ learn <- function(
 		
 		# model building parameters
 		algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuilding$algorithmsWhiteList,
-		extraModels = if(!is.null(extraParams$extraModels)) extraParams$extraModels else modelBuilding$extraModels,
+		extraModels = .extraModelsAdaptToEarlierServerVersionIfNeeded(extraModels),
 		evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuilding$evaluationMetric,
 		crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuilding$crossValidation,
 		maxRecordsForModelBuild = if(!is.null(extraParams$maxRecordsForModelBuild)) extraParams$maxRecordsForModelBuild else modelBuilding$maxRecordsForModelBuild,

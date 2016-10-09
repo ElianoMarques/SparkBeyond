@@ -132,3 +132,57 @@
 		NULL
 	}
 }
+
+.getSupportedAlgorithms = function() {
+	url = paste0(getSBserverDomain(), "/api2/algorithms")
+	res = httr::GET(url)
+	jsonlite::fromJSON(txt=httr::content(res, as="text"), simplifyDataFrame=TRUE)['name']$name
+}
+
+.extraModelsAdaptToEarlierServerVersionIfNeeded = (function() {
+	backwardCompatibilityAlgorithmNamesMapping = list(
+		"RXGBoost" = c("RXGBoostRegressor", "RXGBoostClassifier"),
+		"RRpartDecisionTree" = c("RRpartDecisionTreeClassifier", "RRpartDecisionTreeRegressor"),
+		"RLinearEnsembleGBM_with_Rpart" = c("RLinearEnsembleGBM_with_RpartClassifier", "RLinearEnsembleGBM_with_RpartRegressor"),
+		"SciKitLearnSGD" = c("SciKitLearnSGDRegressor", "SciKitLearnSGDClassifier"),
+		"MLlibDecisionTree" = c("MLlibDecisionTreeRegressor", "MLlibDecisionTreeClassifier"),
+		"SciKitLearnGradientBoosting" = c("SciKitLearnGradientBoostingRegressor", "SciKitLearnGradientBoostingClassifier"),
+		"RCaretGBM" = c("RCaretGBMRegressor", "RCaretGBMClassifier"),
+		"SciKitLearnDecisionTree" = c("SciKitLearnDecisionTreeRegressor", "SciKitLearnDecisionTreeClassifier", "SciKitLearnDecisionTreeGiniClassifier"),
+		"RRandomForest" = c("RRandomForestClassifier", "RRandomForestRegressor"),
+		"SciKitLearnBagging" = c("SciKitLearnBaggingRegressor", "SciKitLearnBaggingClassifier"),
+		"RStackingEnsembleGBM_of_GBM_with_Rpart" = c("RStackingEnsembleGBM_of_GBM_with_RpartRegressor", "RStackingEnsembleGBM_of_GBM_with_RpartClassifier"),
+		"SciKitLearnRandomForest" = c("SciKitLearnRandomForestClassifier", "SciKitLearnRandomForestRegressor"),
+		"MLlibLinearModel" = c("MLlibLogisticRegression", "MLlibLinearRegression"),
+		"RRidgeGlmNet" = c("RRidgeLinearRegressionGlmnetRegressor", "RRidgeLogisticRegressionGlmnetClassifier"),
+		"KerasDeepLearning" = c("KerasDeepLearningClassifier", "KerasDeepLearningRegressor"),
+		"SciKitLearnAdaBoost" = c("SciKitLearnAdaBoostClassifier", "SciKitLearnAdaBoostRegressor"),
+		"SciKitLearnSVM" = c("SciKitLearnSVMRegressor", "SciKitLearnSVMClassifier"),
+		"RLassoGlmNet" = c("RLinearRegressionLMRegressor", "RLassoLogisticRegressionGlmnetClassifier", "RLassoLinearRegressionGlmnetRegressor"),
+		"MLlibRandomForest" = c("MLlibRandomForestRegressor", "MLlibRandomForestClassifier")
+	)
+	
+	function(original) {
+		if(isServerVersionOlderThan("1.8")) {
+			adapted = list()
+			originalNames = names(original)
+			for(n in originalNames) {
+				if (n %in% names(backwardCompatibilityAlgorithmNamesMapping) ) { 
+					oldNames = backwardCompatibilityAlgorithmNamesMapping[[n]]
+					for(oldName in oldNames) {
+						adapted[[oldName]] <- original[[n]]
+					}
+				} else {
+					adapted[[n]] <- original[[n]]
+				}
+			}
+			adapted
+		} else {
+			original
+		}
+	}
+})()
+
+.isServerVersionOlderThan = function(version) {
+	compareVersion(SBServerVersion, version) < 0
+}

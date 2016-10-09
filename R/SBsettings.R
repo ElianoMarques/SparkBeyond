@@ -292,6 +292,13 @@ login = function(username, password=NA, domain) {
 			FALSE
 		}
 	}
+	if(loggedIn) {
+		tryCatch({
+			releaseNumber = serverVersion()$releaseNumber
+			assign("SBServerVersion", releaseNumber, envir = globalenv())
+		},error = function(e) stop(paste("Failed to get the server version:", e)))
+		serverVersion()
+	}
 	loggedIn
 }
 
