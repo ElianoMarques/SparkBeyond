@@ -705,6 +705,22 @@ Session = setRefClass("Session",
 					reportList
 				}else NULL
 			},
+			exportModel = function(includeContexts = TRUE) {
+				"Export model for prediction box. If prediction requires to supply ALL new contexts and no original contexts are needed, download of the contexts can be skipped be setting \\code{includeContexts} to FALSE"
+				featureExtractorUrl = paste0(getSBserverDomain(), "/analytics/rawFile/", projectName,"/",revision,"/extcode.dat")
+				path = .download(url = featureExtractorUrl, localFile = "extcode.dat", description = "feature extractor")
+				message(paste("Successfully exported feature extractor to:", path))
+				
+				modelUrl = paste0(getSBserverDomain(), "/analytics/rawFile/", projectName,"/",revision,"/model.ser")
+				path = .download(url = modelUrl, localFile = "model.ser", description = "model")
+				message(paste("Successfully exported model to:", path))
+				
+				if(includeContexts) {
+					contextsUrl = paste0(getSBserverDomain(), "/api2/downloadContexts/", projectName,"/",revision)
+					path = .download(url = contextsUrl, description = "contexts")
+					message(paste("Successfully exported contexts to:", path))
+				}
+			},
 			webView = function (show=TRUE){
 				"Show a dynamic web view of the analysis."
 				suppressWarnings({
