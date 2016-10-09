@@ -163,7 +163,7 @@
 	)
 	
 	function(original) {
-		if(isServerVersionOlderThan("1.8")) {
+		if(.isServerVersionOlderThan("1.8")) {
 			adapted = list()
 			originalNames = names(original)
 			for(n in originalNames) {
