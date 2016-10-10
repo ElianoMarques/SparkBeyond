@@ -386,7 +386,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   	ifelse (is.na(keyCol), "TW:", "SKTW:")
   }
 
-  datePOSIXformatOut = "%m/%d/%Y %H:%M:%S %p %Z" #TODO: check if multiple output formats are possible
+  datePOSIXformatOut = "%m/%d/%Y %I:%M:%S %p %Z" #TODO: check if multiple output formats are possible
   dateColIndex = which(colnames(data)==dateCol)
   dateColData = data[[dateColIndex]]
   
