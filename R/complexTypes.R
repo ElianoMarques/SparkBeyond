@@ -370,6 +370,8 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   )
   prevTZ = Sys.timezone() 
   Sys.setenv(TZ = "UTC")
+  prevLocale = Sys.getlocale("LC_TIME")
+  Sys.setlocale("LC_TIME", "en_US.UTF-8")
   
   newCol = if (is.na(keyCol)) {
   	paste0("last_", window, "_", unit)
@@ -443,6 +445,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   	warning(paste0(percentNAUntil, "% of the time window end times are NA - are the function parameter correct?"))
   
   if(!is.na(prevTZ)) Sys.setenv(TZ = prevTZ)
+  Sys.setlocale("LC_TIME", prevLocale)
 
   data[]
 }
