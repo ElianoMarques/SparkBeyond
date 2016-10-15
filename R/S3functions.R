@@ -575,6 +575,7 @@ learn <- function(
 		})
 	}
 	
+	algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuilding$algorithmsWhiteList
 	extraModels = if(!is.null(extraParams$extraModels)) extraParams$extraModels else modelBuilding$extraModels
 	params <-list(
 		projectName = projectName,
@@ -653,8 +654,8 @@ learn <- function(
 		#customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else knowledge$customFunctions,
 		
 		# model building parameters
-		algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuilding$algorithmsWhiteList,
-		extraModels = .extraModelsAdaptToEarlierServerVersionIfNeeded(extraModels),
+		algorithmsWhiteList = .algorithmsCompatibility$adaptWhiteList(algorithmsWhiteList),
+		extraModels = .algorithmsCompatibility$adaptExtraModels(extraModels),
 		evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuilding$evaluationMetric,
 		crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuilding$crossValidation,
 		maxRecordsForModelBuild = if(!is.null(extraParams$maxRecordsForModelBuild)) extraParams$maxRecordsForModelBuild else modelBuilding$maxRecordsForModelBuild,

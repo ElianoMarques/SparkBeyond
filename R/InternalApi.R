@@ -191,7 +191,7 @@
 	jsonlite::fromJSON(txt=httr::content(res, as="text"), simplifyDataFrame=TRUE)['name']$name
 }
 
-.extraModelsAdaptToEarlierServerVersionIfNeeded = (function() {
+.algorithmsCompatibility = (function() {
 	backwardCompatibilityAlgorithmNamesMapping = list(
 		"RXGBoost" = c("RXGBoostRegressor", "RXGBoostClassifier"),
 		"RRpartDecisionTree" = c("RRpartDecisionTreeClassifier", "RRpartDecisionTreeRegressor"),
@@ -214,25 +214,44 @@
 		"MLlibRandomForest" = c("MLlibRandomForestRegressor", "MLlibRandomForestClassifier")
 	)
 	
-	function(original) {
-		if(.isServerVersionOlderThan("1.8")) {
-			adapted = list()
-			originalNames = names(original)
-			for(n in originalNames) {
-				if (n %in% names(backwardCompatibilityAlgorithmNamesMapping) ) { 
-					oldNames = backwardCompatibilityAlgorithmNamesMapping[[n]]
-					for(oldName in oldNames) {
-						adapted[[oldName]] <- original[[n]]
+	list(
+		adaptExtraModels = function(original) {
+			if(.isServerVersionOlderThan("1.8")) {
+				adapted = list()
+				originalNames = names(original)
+				for(n in originalNames) {
+					if (n %in% names(backwardCompatibilityAlgorithmNamesMapping) ) { 
+						oldNames = backwardCompatibilityAlgorithmNamesMapping[[n]]
+						for(oldName in oldNames) {
+							adapted[[oldName]] <- original[[n]]
+						}
+					} else {
+						adapted[[n]] <- original[[n]]
 					}
-				} else {
-					adapted[[n]] <- original[[n]]
 				}
+				adapted
+			} else {
+				original
 			}
-			adapted
-		} else {
-			original
+		},
+		adaptWhiteList = function(original) {
+			if(.isServerVersionOlderThan("1.8")) {
+				compatibleAlgNamesList = sapply(
+					original,
+					function(algName) {
+					 	ifelse(
+					 		algName %in% names(backwardCompatibilityAlgorithmNamesMapping), 
+					 		backwardCompatibilityAlgorithmNamesMapping[algName], 
+					 		algName
+					 	)
+				 	}, 
+				 	simplify = TRUE, USE.NAMES = FALSE)
+				unlist(compatibleAlgNamesList)
+			} else {
+				original
+			}
 		}
-	}
+	)
 })()
 
 .isServerVersionOlderThan = function(version) {
