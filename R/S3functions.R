@@ -437,6 +437,9 @@ contextTypesList = function(
 #' @param graphTargetNodeColumn allows to specify the graph target node column (for graph context). (Optional)
 contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL ) { 
 	keyColumns = as.list(keyColumns)
+	if (substr(name,1,1)==toupper(substr(name,1,1))){
+		warning("Please change the context name to lower case convention for proper context matching")
+	}
 	obj = list(data = data, contextTypes = contextTypes, name=name, keyColumns = keyColumns, timeColumn=timeColumn, graphSourceNodeColumn=graphSourceNodeColumn, graphTargetNodeColumn=graphTargetNodeColumn)
 	class(obj) = "contextObject"
 	obj
@@ -575,8 +578,6 @@ learn <- function(
 		})
 	}
 	
-	algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuilding$algorithmsWhiteList
-	extraModels = if(!is.null(extraParams$extraModels)) extraParams$extraModels else modelBuilding$extraModels
 	params <-list(
 		projectName = projectName,
 		trainingFilePath = 
@@ -654,8 +655,8 @@ learn <- function(
 		#customFunctions = if(!is.null(extraParams$customFunctions)) extraParams$customFunctions else knowledge$customFunctions,
 		
 		# model building parameters
-		algorithmsWhiteList = .algorithmsCompatibility$adaptWhiteList(algorithmsWhiteList),
-		extraModels = .algorithmsCompatibility$adaptExtraModels(extraModels),
+		algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuilding$algorithmsWhiteList,
+		extraModels = if(!is.null(extraParams$extraModels)) extraParams$extraModels else modelBuilding$extraModels,
 		evaluationMetric = if(!is.null(extraParams$evaluationMetric)) extraParams$evaluationMetric else modelBuilding$evaluationMetric,
 		crossValidation = if(!is.null(extraParams$crossValidation)) extraParams$crossValidation else modelBuilding$crossValidation,
 		maxRecordsForModelBuild = if(!is.null(extraParams$maxRecordsForModelBuild)) extraParams$maxRecordsForModelBuild else modelBuilding$maxRecordsForModelBuild,
