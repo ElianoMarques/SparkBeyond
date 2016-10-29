@@ -15,7 +15,11 @@ contexts$featuresFromRevision(revision, name)
   name (optional) - name of the context
   
 contexts$openStreetMap(filePath, name)
-  filePath - local pat to the OSM file
+  filePath - local path to the OSM file
+  name (optional) - name of the context
+  
+contexts$shapeFile(filePath, name)
+  filePath - local path to the shape file
   name (optional) - name of the context
 
 contexts$word2Vec$pretrainedS3(modelName, name)
@@ -35,7 +39,9 @@ contexts$word2Vec$trainOnData(data, keyColumns, name)
 \itemize{
   \item codeFile(codeFile, name) add functions from external code file
   \item featuresFromRevision(revision, name) start the learning with features discovered in a previous revision
-  \item openStreetMap(filePath, name) add functions from external code file
+  \item openStreetMap(filePath, name) define a context based on Open Street Map file
+  \item shapeFile(filePath, name) define a context based on Shape File. filePath should point to a <FILE_NAME>.shp file.
+  Additionally at least 2 files should be present in the same directory: <FILE_NAME>.shx, <FILE_NAME>.dbf.
   \item word2Vec can be used in several ways:
   \itemize{
     \item pretrainedS3(modelName, name) Word2Wec using pretrained models from S3

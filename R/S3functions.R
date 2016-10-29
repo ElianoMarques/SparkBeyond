@@ -430,7 +430,7 @@ contextTypesList = function(
 }
 
 #' contextObject
-#' 
+#'
 #' @param data a data frame or a path to a file containing the context data
 #' @param contextTypes one of the context types available in \code{\link{contextTypesList}}. 
 #' @param name an identifier for the context object to be created (optional).
@@ -563,6 +563,37 @@ learn <- function(
 					createContextObject(contextProvider = list(path = serverPath, jsonClass = "com.sparkbeyond.runtime.data.transform.OpenStreetMapFileInput"),
 															name = context$name,
 															contextTypes = contextTypesList(osmFile = TRUE))
+				} else if("shapeFileContextDefinition" %in% class(context)) {
+					findFilesRelatedToShapeFile = function(shapeFilePath) {
+						stopifnot(tools::file_ext(shapeFilePath) == "shp")
+
+						fileNameWithoutExtention = tools::file_path_sans_ext(shapeFilePath)
+						possibleExts = c("cpg", "dbf", "prj", "shx")
+						relatedFiles = paste0(fileNameWithoutExtention,".",possibleExts)
+						existingRelatedFiles = relatedFiles[file.exists(relatedFiles)]
+						
+						requiredExts = c("dbf", "shx")
+						requiredFiles = paste0(fileNameWithoutExtention,".",requiredExts)
+						if(!all(requiredFiles %in% existingRelatedFiles)) {
+							vec2String = function(vec) paste(vec, collapse = ", ")
+							stop(paste0("Missing some of the mandatory files for shape file: ", shapeFilePath, ".\n Required: ", vec2String(requiredFiles), ".\n Found: ", vec2String(existingRelatedFiles)))
+						}
+						relatedFiles
+					}
+					
+					if(! tools::file_ext(context$filePath) == "shp") {
+						stop(paste("filePath in shapeFile context should point to a file with .shp extension. Instead received:", context$filePath))
+					}
+					
+					shapeComplimentaryFiles = findFilesRelatedToShapeFile(context$filePath)
+					uploadFiles = Vectorize(uploadFileToServer, c("filePath"))
+					
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name), "")
+					uploadFiles(shapeComplimentaryFiles, projectName = projectName, name = paste0("context", contextName), generateHash=FALSE)
+					serverPath = uploadFileToServer(filePath = context$filePath, projectName = projectName, name = paste0("context", contextName), generateHash=FALSE)
+					createContextObject(contextProvider = list(path = serverPath, jsonClass = "com.sparkbeyond.runtime.data.transform.ShapeFileInput"),
+															name = context$name,
+															contextTypes = list("SpatialIndexFromShapes"))
 				}
 			} else {
 				#Handle data.frame input

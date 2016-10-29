@@ -591,13 +591,18 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUpl
 #' @param filePath relative or absolute path to the file that should be upoloaded to the server
 #' @param projectName the name of the project to save the data under
 #' @param name the prefix of the file name in which the data will be saved
-uploadFileToServer = function(filePath, projectName, name=NA) {
+uploadFileToServer = function(filePath, projectName, name=NA, generateHash=TRUE) {
   originalFileName = basename(tools::file_path_sans_ext(filePath, compression = TRUE))
   originalFileNameWithExt = basename(filePath)
   originalFileExt = stringr::str_replace(originalFileNameWithExt, originalFileName, "")
-  hash = tools::md5sum(filePath)
-  resourceName = paste0(originalFileName, "_", hash, ".", originalFileExt)
-	
+  
+  resourceName = if(generateHash) {
+	  hash = tools::md5sum(filePath)
+	  resourceName = paste0(originalFileName, "_", hash, originalFileExt)
+  } else {
+  	originalFileNameWithExt
+  }
+  
 	if(!is.na(name)) {
 		resourceName = paste0(name, "_", resourceName)
 	}

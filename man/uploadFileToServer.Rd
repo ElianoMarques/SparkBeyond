@@ -4,7 +4,7 @@
 \alias{uploadFileToServer}
 \title{uploadFileToServer}
 \usage{
-uploadFileToServer(filePath, projectName, name = NA)
+uploadFileToServer(filePath, projectName, name = NA, generateHash = TRUE)
 }
 \arguments{
 \item{filePath}{relative or absolute path to the file that should be upoloaded to the server}
