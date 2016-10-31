@@ -370,6 +370,8 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   )
   prevTZ = Sys.timezone() 
   Sys.setenv(TZ = "UTC")
+  prevLocale = Sys.getlocale("LC_TIME")
+  Sys.setlocale("LC_TIME", "en_US.UTF-8")
   
   newCol = if (is.na(keyCol)) {
   	paste0("last_", window, "_", unit)
@@ -386,7 +388,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   	ifelse (is.na(keyCol), "TW:", "SKTW:")
   }
 
-  datePOSIXformatOut = "%m/%d/%Y %H:%M:%S %p %Z" #TODO: check if multiple output formats are possible
+  datePOSIXformatOut = "%m/%d/%Y %I:%M:%S %p %Z" #TODO: check if multiple output formats are possible
   dateColIndex = which(colnames(data)==dateCol)
   dateColData = data[[dateColIndex]]
   
@@ -443,6 +445,7 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   	warning(paste0(percentNAUntil, "% of the time window end times are NA - are the function parameter correct?"))
   
   if(!is.na(prevTZ)) Sys.setenv(TZ = prevTZ)
+  Sys.setlocale("LC_TIME", prevLocale)
 
   data[]
 }

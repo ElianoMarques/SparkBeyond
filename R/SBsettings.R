@@ -292,6 +292,13 @@ login = function(username, password=NA, domain) {
 			FALSE
 		}
 	}
+	if(loggedIn) {
+		tryCatch({
+			releaseNumber = serverVersion()$releaseNumber
+			assign("SBServerVersion", releaseNumber, envir = globalenv())
+		},error = function(e) stop(paste("Failed to get the server version:", e)))
+		serverVersion()
+	}
 	loggedIn
 }
 
@@ -587,7 +594,7 @@ uploadFileToServer = function(filePath, projectName, name=NA) {
   originalFileNameWithExt = basename(filePath)
   originalFileExt = stringr::str_replace(originalFileNameWithExt, originalFileName, "")
   hash = tools::md5sum(filePath)
-  resourceName = paste0(originalFileName, "_", hash, originalFileExt)
+  resourceName = paste0(originalFileName, "_", hash, ".", originalFileExt)
 	
 	if(!is.na(name)) {
 		resourceName = paste0(name, "_", resourceName)

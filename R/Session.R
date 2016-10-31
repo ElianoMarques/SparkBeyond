@@ -322,11 +322,11 @@ Session = setRefClass("Session",
         	executionId = enrichResult$executionId
         	total = nrow(data)
 
-        	enrichment = Enrichment(executionId, totalRows = total)
+        	enrichment = Enrichment$new(executionId, totalRows = total)
         	quoted = function(str) paste0('"', str, '"')
         	message(paste("Enrichment execution ID is:", executionId))
         	message(paste0("You can get back to following this enrichment execution by running: ",
-        								 "Enrichment(executionId=", quoted(executionId), ")"))
+        								 "Enrichment$new(executionId=", quoted(executionId), ")"))
 
         	if(runBlocking) {
         		unusedRefToData = enrichment$getData(localFileName = outputName)
@@ -424,11 +424,11 @@ Session = setRefClass("Session",
         	executionId = predictResult$executionId
         	total = nrow(data)
 
-        	prediction = Prediction(executionId, totalRows = total)
+        	prediction = Prediction$new(executionId, totalRows = total)
         	quoted = function(str) paste0('"', str, '"')
         	message(paste("Predict execution ID is:", executionId))
         	message(paste0("You can get back to following this predict execution by running: ", 
-        								 "Prediction(executionId=", quoted(executionId), ")"))
+        								 "Prediction$new(executionId=", quoted(executionId), ")"))
         	
         	if(runBlocking) {
         		unusedRefToData = prediction$getData(localFileName = outputName)
@@ -704,6 +704,22 @@ Session = setRefClass("Session",
 					}										
 					reportList
 				}else NULL
+			},
+			exportModel = function(includeContexts = TRUE) {
+				"Export model for prediction box. If prediction requires to supply ALL new contexts and no original contexts are needed, download of the contexts can be skipped be setting \\code{includeContexts} to FALSE"
+				featureExtractorUrl = paste0(getSBserverDomain(), "/analytics/rawFile/", projectName,"/",revision,"/extcode.dat")
+				path = .download(url = featureExtractorUrl, localFile = "extcode.dat", description = "feature extractor")
+				message(paste("Successfully exported feature extractor to:", path))
+				
+				modelUrl = paste0(getSBserverDomain(), "/analytics/rawFile/", projectName,"/",revision,"/model.ser")
+				path = .download(url = modelUrl, localFile = "model.ser", description = "model")
+				message(paste("Successfully exported model to:", path))
+				
+				if(includeContexts) {
+					contextsUrl = paste0(getSBserverDomain(), "/api2/downloadContexts/", projectName,"/",revision)
+					path = .download(url = contextsUrl, description = "contexts")
+					message(paste("Successfully exported contexts to:", path))
+				}
 			},
 			webView = function (show=TRUE){
 				"Show a dynamic web view of the analysis."

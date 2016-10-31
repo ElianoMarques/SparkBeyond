@@ -111,6 +111,58 @@
 	jobStatus = .jobStatusFromJson(res)
 }
 
+.IsHttrRetryDefined = tryCatch({
+		f = httr::RETRY1
+		TRUE
+	}, error = function(e) FALSE
+)
+
+.download = function(url, localFile = NA_character_, description = NA_character_) {
+	tempFileName = "contexts-test_timeSeries_using_problem_definition-5.zip"
+	tempFileCreated = FALSE
+	downloadDescription = ifelse(!is.na(description), description, 
+											 ifelse(!is.na(localFile), localFile, "..."))
+	if(is.na(localFile)) {
+		tempFileCreated = TRUE
+		localFile = tempFileName
+	}
+	
+	message(paste("Downloading", downloadDescription))
+	attempts = 3
+	downloadResult = NA_integer_
+	
+	if(.IsHttrRetryDefined) {
+		downloadResult = httr::RETRY("GET", url = url, times = attemtps, config = httr::progress(type = "down"), httr::write_disk(localFile, overwrite = TRUE))
+	} else {
+		succeeded = FALSE
+		while (!succeeded && attempts > 0 ) {
+			downloadResult = httr::GET(url, config = httr::progress(type = "down"), httr::write_disk(localFile, overwrite = TRUE))
+			attempts = attempts - 1
+			succeeded = httr::status_code(downloadResult) == 200
+			if(!succeeded && attempts>0) {
+				message(paste("Download failed with status:", httr::status_code(downloadResult)))
+				message("Retrying")
+			}
+		}
+	}
+	
+	if(httr::status_code(downloadResult) == 200) {
+		if(tempFileCreated) {
+			contentDispositionFileName <- stringr::str_match(httr::headers(downloadResult)$`content-disposition`, "\"(.*)\"")[2]
+			if(!is.na(contentDispositionFileName)) {
+				file.rename(tempFileName, contentDispositionFileName)
+				localFile = contentDispositionFileName
+			} else {
+				stop(paste0("Error in download from ", url, ": Local file name is not defined"))
+			}
+		}
+		message(paste("File", localFile, "saved to:", normalizePath(localFile)))
+	} else {
+		stop(paste("Failed to download a file from:", url))
+	}
+	normalizePath(localFile)
+}
+
 .downloadFile = function(projectName, revision, pathOnServer, saveToPath) {
 	url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/",pathOnServer)
 	downloadResult = httr::GET(url)
@@ -131,4 +183,77 @@
 	} else {
 		NULL
 	}
+}
+
+.getSupportedAlgorithms = function() {
+	url = paste0(getSBserverDomain(), "/api2/algorithms")
+	res = httr::GET(url)
+	jsonlite::fromJSON(txt=httr::content(res, as="text"), simplifyDataFrame=TRUE)['name']$name
+}
+
+.algorithmsCompatibility = (function() {
+	backwardCompatibilityAlgorithmNamesMapping = list(
+		"RXGBoost" = c("RXGBoostRegressor", "RXGBoostClassifier"),
+		"RRpartDecisionTree" = c("RRpartDecisionTreeClassifier", "RRpartDecisionTreeRegressor"),
+		"RLinearEnsembleGBM_with_Rpart" = c("RLinearEnsembleGBM_with_RpartClassifier", "RLinearEnsembleGBM_with_RpartRegressor"),
+		"SciKitLearnSGD" = c("SciKitLearnSGDRegressor", "SciKitLearnSGDClassifier"),
+		"MLlibDecisionTree" = c("MLlibDecisionTreeRegressor", "MLlibDecisionTreeClassifier"),
+		"SciKitLearnGradientBoosting" = c("SciKitLearnGradientBoostingRegressor", "SciKitLearnGradientBoostingClassifier"),
+		"RCaretGBM" = c("RCaretGBMRegressor", "RCaretGBMClassifier"),
+		"SciKitLearnDecisionTree" = c("SciKitLearnDecisionTreeRegressor", "SciKitLearnDecisionTreeClassifier", "SciKitLearnDecisionTreeGiniClassifier"),
+		"RRandomForest" = c("RRandomForestClassifier", "RRandomForestRegressor"),
+		"SciKitLearnBagging" = c("SciKitLearnBaggingRegressor", "SciKitLearnBaggingClassifier"),
+		"RStackingEnsembleGBM_of_GBM_with_Rpart" = c("RStackingEnsembleGBM_of_GBM_with_RpartRegressor", "RStackingEnsembleGBM_of_GBM_with_RpartClassifier"),
+		"SciKitLearnRandomForest" = c("SciKitLearnRandomForestClassifier", "SciKitLearnRandomForestRegressor"),
+		"MLlibLinearModel" = c("MLlibLogisticRegression", "MLlibLinearRegression"),
+		"RRidgeGlmNet" = c("RRidgeLinearRegressionGlmnetRegressor", "RRidgeLogisticRegressionGlmnetClassifier"),
+		"KerasDeepLearning" = c("KerasDeepLearningClassifier", "KerasDeepLearningRegressor"),
+		"SciKitLearnAdaBoost" = c("SciKitLearnAdaBoostClassifier", "SciKitLearnAdaBoostRegressor"),
+		"SciKitLearnSVM" = c("SciKitLearnSVMRegressor", "SciKitLearnSVMClassifier"),
+		"RLassoGlmNet" = c("RLinearRegressionLMRegressor", "RLassoLogisticRegressionGlmnetClassifier", "RLassoLinearRegressionGlmnetRegressor"),
+		"MLlibRandomForest" = c("MLlibRandomForestRegressor", "MLlibRandomForestClassifier")
+	)
+	
+	list(
+		adaptExtraModels = function(original) {
+			if(.isServerVersionOlderThan("1.8")) {
+				adapted = list()
+				originalNames = names(original)
+				for(n in originalNames) {
+					if (n %in% names(backwardCompatibilityAlgorithmNamesMapping) ) { 
+						oldNames = backwardCompatibilityAlgorithmNamesMapping[[n]]
+						for(oldName in oldNames) {
+							adapted[[oldName]] <- original[[n]]
+						}
+					} else {
+						adapted[[n]] <- original[[n]]
+					}
+				}
+				adapted
+			} else {
+				original
+			}
+		},
+		adaptWhiteList = function(original) {
+			if(.isServerVersionOlderThan("1.8")) {
+				compatibleAlgNamesList = sapply(
+					original,
+					function(algName) {
+					 	ifelse(
+					 		algName %in% names(backwardCompatibilityAlgorithmNamesMapping), 
+					 		backwardCompatibilityAlgorithmNamesMapping[algName], 
+					 		algName
+					 	)
+				 	}, 
+				 	simplify = TRUE, USE.NAMES = FALSE)
+				unlist(compatibleAlgNamesList)
+			} else {
+				original
+			}
+		}
+	)
+})()
+
+.isServerVersionOlderThan = function(version) {
+	compareVersion(SBServerVersion, version) < 0
 }

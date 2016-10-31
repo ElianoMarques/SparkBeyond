@@ -31,6 +31,8 @@ SB object that encapsulates a session
 
 \item{\code{evaluate(...)}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
+\item{\code{exportModel(includeContexts = TRUE)}}{Export model for prediction box. If prediction requires to supply ALL new contexts and no original contexts are needed, download of the contexts can be skipped be setting \code{includeContexts} to FALSE}
+
 \item{\code{features(...)}}{Returns a dataset with top feature information}
 
 \item{\code{initialize(nameOfProject = NA, revisionNumber = NA, artifact_loc = NA,
