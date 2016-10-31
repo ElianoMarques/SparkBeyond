@@ -661,4 +661,5 @@ writeToServer = function(data, filename = NA, prefix = "data_in", useEscaping = 
 .onLoad <- function(libname = find.package("SparkBeyond"), pkgname = "SparkBeyond") {
   #print(paste0("Automatically trying to load settings saved in :",getwd()))
   #loadSettings()
+	message("Check out all the new updates in SparkBeyond latest release: https://sparkbeyond.freshdesk.com/support/solutions/16000050303")
 }
