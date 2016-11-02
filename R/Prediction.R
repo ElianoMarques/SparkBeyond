@@ -61,14 +61,17 @@ Prediction = R6Class("Prediction",
 						message("Blocking the R console until prediction is finished.")
 					}
 					
+					reachedTotalRows = FALSE
 					displayedGeneratingReportsMessage = FALSE
 					while(state!="Finished") {
 						Sys.sleep(5)
 						jobStatus = .getPredictJobStatus(private$executionId)
 						processed = min(jobStatus$rowCount, private$totalRows, na.rm = TRUE)
 						if(!is.na(private$totalRows) && processed==private$totalRows) {
-							if(!displayedGeneratingReportsMessage) {
+							if(!reachedTotalRows) {
+								reachedTotalRows = TRUE
 								cat("\r", "Processed rows: ", private$totalRows, "\r")
+							} else if(reachedTotalRows && !displayedGeneratingReportsMessage) {
 								message("Generating reports")
 								displayedGeneratingReportsMessage = TRUE
 							}
