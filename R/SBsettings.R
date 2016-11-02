@@ -549,7 +549,9 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUpl
 				fileServerPath
 			} else {
 				tempFilePath = paste0(tempdir(), "/", filename)
+				message(paste0("Compressing ", name, " before upload. Estimated size in memory: ", format(estimatedDataFrameSizeInMemory, units = "auto")))
 				write.table(data.frame(cols2Text(data)), file=gzfile(tempFilePath), sep="\t", row.names=FALSE, quote = FALSE)
+				message(paste0("Compressed ", name, ". File size: ", utils:::format.object_size(file.info(tempFilePath)$size, units = "auto")))
 				uploadResult = uploadFile(tempFilePath, projectName, filename, checkIfExists = FALSE)
 				file.remove(tempFilePath)
 				uploadResult
