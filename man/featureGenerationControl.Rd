@@ -10,9 +10,9 @@ featureGenerationControl(maxFeaturesCount = list(300),
   functionsWhiteList = NA, functionsBlackList = NA,
   localTopFeatureCount = NA, regressionDiscretizerBinsOverride = NA,
   booleanNumericFeatures = NA, numericEqualityFeatures = TRUE,
-  allowRangeFeatures = TRUE, crossRowFeatureSearch = FALSE,
-  autoColumnSubSets = list("CONCEPT"), customColumnSubsets = NA,
-  maxFeatureDuration = 100,
+  allowRangeFeatures = TRUE, useRawNumericColumns = FALSE,
+  crossRowFeatureSearch = FALSE, autoColumnSubSets = list("CONCEPT"),
+  customColumnSubsets = NA, maxFeatureDuration = 100,
   overrideMaxFeatureDurationForExternalData = TRUE,
   allocatedMemoryMB = 1000, maxCollectionSize = NA,
   useCachedFeatures = TRUE)
@@ -39,6 +39,8 @@ featureGenerationControl(maxFeaturesCount = list(300),
 \item{numericEqualityFeatures}{A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.}
 
 \item{allowRangeFeatures}{A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.}
+
+\item{useRawNumericColumns}{Use the original numeric columns as features when building the model. This will automatically attempt to also build a model based only on the numeric columns with applying additional transformations on the data. FALSE by default.}
 
 \item{autoColumnSubSets}{Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.}
 

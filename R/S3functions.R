@@ -141,6 +141,7 @@ featureSearchModeList = function(
 #' @param booleanNumericFeatures A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.
 #' @param numericEqualityFeatures A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.
 #' @param allowRangeFeatures A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.
+#' @param useRawNumericColumns Use the original numeric columns as features when building the model. This will automatically attempt to also build a model based only on the numeric columns with applying additional transformations on the data. FALSE by default.
 #' @param crossRowFeatureSearch. A booleean indicating whether to allow creating features using data collected from multiple rows together.FALSE by default.
 #' @param autoColumnSubSets Optional. A list of values contain any of the following: "CONCEPT", "NUMERIC_PAIRS", "ALL_PAIRS". "CONCEPT" will aim to generate column subset from fields that are from similar non-numeric types or combination of date and non-numeric elements. "NUMERIC_PAIRS" will create all column subsets for numeric columns. "ALL_PAIRS" will create subsets of size 2 from all columns. "CONCEPT" by default.
 #' @param customColumnSubsets Optional. A List of lists containing specific column subsets to examine. In order to set a certain depth to the subset, add an element in the end of the customSubSet with one digit as a string representing the requested depth. If not such element was defined the regular depth definitions will be used. NA by default.
@@ -162,6 +163,7 @@ featureGenerationControl = function(
 	booleanNumericFeatures = NA,
 	numericEqualityFeatures = TRUE,
 	allowRangeFeatures = TRUE,
+	useRawNumericColumns = FALSE,
 
 	crossRowFeatureSearch = FALSE,
 	autoColumnSubSets = list("CONCEPT"),
@@ -184,6 +186,7 @@ featureGenerationControl = function(
 		booleanNumericFeatures = booleanNumericFeatures,
 		numericEqualityFeatures = numericEqualityFeatures,
 		allowRangeFeatures = allowRangeFeatures,
+		useRawNumericColumns = useRawNumericColumns,
 		
 		crossRowFeatureSearch = crossRowFeatureSearch,
 		autoColumnSubSets = autoColumnSubSets,
@@ -631,6 +634,7 @@ learn <- function(
 		booleanNumericFeatures = if(!is.null(extraParams$booleanNumericFeatures)) extraParams$booleanNumericFeatures else featureGeneration$booleanNumericFeatures,
 		numericEqualityFeatures = if(!is.null(extraParams$numericEqualityFeatures)) extraParams$numericEqualityFeatures else featureGeneration$numericEqualityFeatures,
 		allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGeneration$allowRangeFeatures,																
+		useRawNumericColumns = if(!is.null(extraParams$useRawNumericColumns)) extraParams$useRawNumericColumns else featureGeneration$useRawNumericColumns,																
 		crossRowFeatureSearch = if(!is.null(extraParams$crossRowFeatureSearch)) extraParams$crossRowFeatureSearch else featureGeneration$crossRowFeatureSearch,
 		autoColumnSubSets = if(!is.null(extraParams$autoColumnSubSets)) extraParams$autoColumnSubSets else featureGeneration$autoColumnSubSets,
 		customColumnSubsets = if(!is.null(extraParams$customColumnSubsets)) extraParams$customColumnSubsets else featureGeneration$customColumnSubsets,
