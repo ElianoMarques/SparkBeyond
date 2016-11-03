@@ -255,7 +255,7 @@ knowledgeControl = function(
 #' @param extraModels: Optional. A named list of algorithms to run, along with the hyperparameters to set for these algorithms.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". NA by default automatically selects AUC for classification and RMSE for regression.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
-#' @param maxRecordsForModelBuild: Optional. Integer value representing how many records should be used.
+#' @param maxRecordsForModelBuild: The maximal number of records to use for model training. 100K by default. 
 modelBuildingControl = function(
 	algorithmsWhiteList = algorithmsList(),
 	extraModels = list(),

@@ -17,7 +17,7 @@ modelBuildingControl(algorithmsWhiteList = algorithmsList(),
 
 \item{crossValidation:}{Optional. Integer value representing how many cross validation splits should be used. 5 by default.}
 
-\item{maxRecordsForModelBuild:}{Optional. Integer value representing how many records should be used.}
+\item{maxRecordsForModelBuild:}{The maximal number of records to use for model training. 100K by default.}
 }
 \description{
 modelBuildingControl
