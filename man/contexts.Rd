@@ -6,6 +6,10 @@
 \title{Container for context definition helpers}
 \format{}
 \usage{
+contexts$textIndex(data, name)
+  data - a data frame
+  name (optional) - name of the context
+
 contexts$codeFile(codeFile, name)
   codeFile - url to a file containing the functions
   name (optional) - name of the context
@@ -37,6 +41,7 @@ contexts$word2Vec$trainOnData(data, keyColumns, name)
 }
 \description{
 \itemize{
+  \item textIndex(data, name) use text index (inverted index)
   \item codeFile(codeFile, name) add functions from external code file
   \item featuresFromRevision(revision, name) start the learning with features discovered in a previous revision
   \item openStreetMap(filePath, name) define a context based on Open Street Map file

@@ -436,7 +436,7 @@ contextTypesList = function(
 		contextList = vector()
 		if (geoSpatial) contextList = c(contextList, "GeoSpatial")
 		if (graph) contextList = c(contextList, "Graph")
-		if (invertedIndex) contextList = c(contextList, "InvertedIndex")
+		if (invertedIndex) contextList = c(contextList, "TextIndex")
 		if (lookupTables) contextList = c(contextList, "LookupTables")
 		if (membershipSet) contextList = c(contextList, "MembershipSet")
 		if (osmFile) contextList = c(contextList, "OSMFile")
@@ -565,7 +565,13 @@ learn <- function(
 					context
 				}
 
-				if("codeFileContextDefinition" %in% class(context)) {
+				if("textIndexContextDefinition" %in% class(context)) {
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+																									, useEscaping = preProcessing$fileEscaping, directUploadThreshold = fileUploadThreshold),
+															name = context$name,
+															contextTypes = list("TextIndex"))
+				} else if("codeFileContextDefinition" %in% class(context)) {
 					createContextObject(contextProvider = list(url = context$url, name = "Code file", jsonClass = "com.sparkbeyond.runtime.data.transform.CodeFile"),
 															name = context$name)
 				} else if("word2VecBasedOnDataContextDefinition" %in% class(context)) {
@@ -644,7 +650,7 @@ learn <- function(
 	}
 
 	algorithmsWhiteList = if(!is.null(extraParams$algorithmsWhiteList)) extraParams$algorithmsWhiteList else modelBuilding$algorithmsWhiteList
-    extraModels = if(!is.null(extraParams$extraModels)) extraParams$extraModels else modelBuilding$extraModels
+  extraModels = if(!is.null(extraParams$extraModels)) extraParams$extraModels else modelBuilding$extraModels
 	params <-list(
 		projectName = projectName,
 		trainingFilePath = 

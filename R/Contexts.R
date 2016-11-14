@@ -2,6 +2,7 @@
 #' 
 #' @description
 #' \itemize{
+#'   \item textIndex(data, name) use text index (inverted index)
 #'   \item codeFile(codeFile, name) add functions from external code file
 #'   \item featuresFromRevision(revision, name) start the learning with features discovered in a previous revision
 #'   \item openStreetMap(filePath, name) define a context based on Open Street Map file
@@ -16,6 +17,10 @@
 #' }
 #' 
 #' @usage
+#' contexts$textIndex(data, name)
+#'   data - a data frame
+#'   name (optional) - name of the context
+#'
 #' contexts$codeFile(codeFile, name)
 #'   codeFile - url to a file containing the functions
 #'   name (optional) - name of the context
@@ -57,6 +62,15 @@
 #' @format 
 #' 
 contexts = list(
+	
+	textIndex = function(data, name=NULL) {
+		contextDefinition = list(
+			data = data,
+			name = name
+		)
+		class(contextDefinition) = c("textIndexContextDefinition", "contextDefinition")
+		contextDefinition
+	},
 
 	codeFile = function(codeFile, name=NULL) {
 		contextDefinition = list(
