@@ -236,8 +236,6 @@ functionCatalog = function() {
 #' @param password Password, if not supplied - password massagebox is shown (available only from RStudio)
 #' @param domain Domain name or ip of the SparkBeyond Server. (Usually starts with http or https. May require also the port of the server).
 login = function(username, password=NA, domain) {
-	isHttps = function(url) {"https" == substr(url, 1, 5)}
-	
 	if (is.na(password)) {
 		password = .rs.askForPassword("Please enter your SparkBeyond password:")
 		if (is.null(password)) {
@@ -267,37 +265,15 @@ login = function(username, password=NA, domain) {
 			}
 			else stop(cond)
 	})
-	
-	if(!isHttps(domain) && isHttps(res$url)) {
-		# handle redirect from http to https
-		domain = gsub("http", "https", domain)
-	}
-	
+
 	setSBserverHost(domain)
-	#res = httr::POST(url, encode = "form", body = list(email=username, password=password, hash=""))
-	loggedIn = if (res$status_code == 404 || res$status_code == 200) {		#there is a weird redirection causing this, but this actually OK
-		currentUser()
-	} else {
-		if (res$status_code == 400){ # not sure why this is working although we get 400 sometimes
-			if (currentUser(FALSE))	{
-				currentUser() 
-				TRUE
-			}
-			else {
-				print ("Login failed. Please check your credentials.") 
-				FALSE
-			}
-		} else {  
-			print (paste("Login failed. Http status:", res$status_code))
-			FALSE
-		}
-	}
+	loggedIn = res$status_code == 200 && currentUser()
+
 	if(loggedIn) {
-		tryCatch({
-			releaseNumber = serverVersion()$releaseNumber
-			assign("SBServerVersion", releaseNumber, envir = globalenv())
-		},error = function(e) stop(paste("Failed to get the server version:", e)))
-		serverVersion()
+		releaseNumber = serverVersion()$releaseNumber
+		assign("SBServerVersion", releaseNumber, envir = globalenv())
+	} else {
+		print ("Login failed. Please check your credentials.")
 	}
 	loggedIn
 }
@@ -305,39 +281,42 @@ login = function(username, password=NA, domain) {
 #' Logout
 logout = function() {
 	url <- paste0(getSBserverDomain(), "/logout")
-	res = httr::GET(url, encode = "form")
-	ifelse(res$status_code == 200, 
-	 {
-	 	print ("You have been logged out")
-	 	TRUE
-	 }, 
-	 FALSE
-	)	
+	loggedIn = currentUser(showInfo = FALSE)
+
+	if(loggedIn) {
+		res = .executeRequest(
+			function() httr::GET(url, encode = "form"),
+			errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT)
+			)
+
+		ifelse(!currentUser(showInfo = FALSE),
+		 {
+		 	print ("You have been logged out")
+		 	TRUE
+		 	},
+		 FALSE
+		 )
+	} else {
+		print ("You are logged out")
+	}
 }
 
 #' currentUser
 #' 
 #' Current user information
-	currentUser = function(showInfo = TRUE) {
-	if(!is.null(getSBserverIOfolder())) TRUE else {
-		url <- paste0(getSBserverDomain(), "/currentUser")
-		res = httr::GET(url, encode = "form")
-		loggedIn = if (res$status_code == 200) {
-			ret = tryCatch({
-				userInfo = jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-				if (!is.null(userInfo$user$fullName)) {
-					if (showInfo) print (paste("Hello", userInfo$user$fullName, "!  ", paste0("(",userInfo$user$email ,")"), " on ", getSBserverDomain()))							
-					TRUE
-				} else	FALSE			
-			}, 
-			error = function(e) FALSE
-			)		
-			ret				
-		} else FALSE
-			
-		if(showInfo && !loggedIn)	print("You are currently not logged in.")
-			
-		loggedIn
+currentUser = function(showInfo = TRUE) {
+	url <- paste0(getSBserverDomain(), "/currentUser")
+	userInfo = .executeRequest(
+		function() httr::GET(url, encode = "form"),
+		errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT),
+		responseSerializer = .responseSerializers$JSON
+	)
+	if(!is.null(userInfo) && !is.null(userInfo$user$fullName)) {
+		if (showInfo) print (paste("Hello", userInfo$user$fullName, "!  ", paste0("(",userInfo$user$email ,")"), " on ", getSBserverDomain()))
+		TRUE
+	} else {
+		if(showInfo) message("You are currently not logged in.")
+		FALSE
 	}
 }
 
@@ -347,22 +326,23 @@ logout = function() {
 #' @param projectName name of project
 projectRevisions = function(projectName) {
 	#if(!currentUser(FALSE)) stop("Please login")	
-	url = paste0(getSBserverDomain(), "/analytics/revisions/",projectName)
-	res = httr::GET(url)
-	ret = if (res$status_code == 200) {
-		tryCatch({
-			txt =httr::content(res, as="text")
-			if (nchar(txt) > 0 & txt != "[]") {
-				projectInfo = jsonlite::fromJSON(txt=txt,simplifyDataFrame=TRUE)
-				if(!is.null(projectInfo)) {
-					projectInfo$name = as.numeric(projectInfo$name) 
-					projectInfo
-				}else NULL
-			} else NULL
-		})
-	} else NULL
-	if (is.null(ret)) print ("Project not found")
-	excludeCols(ret, c("jsonClass"), verbose = FALSE)
+	url = paste0(getSBserverDomain(), "/analytics/revisions/", projectName)
+	text = .executeRequest(
+		function() httr::GET(url),
+		responseSerializer = .responseSerializers$TEXT
+	)
+
+	if (nchar(text) == 0 || text == "[]") {
+		warning(paste0("Failed to get revisions for project: ", projectName, ". Failed to parse the response:", text))
+	}
+
+	tryCatch({
+		projectInfo = jsonlite::fromJSON(txt=text,simplifyDataFrame=TRUE)
+		projectInfo$name = as.numeric(projectInfo$name)
+		excludeCols(projectInfo, c("jsonClass"), verbose = FALSE)
+	}, error = function(e) {
+		warning(paste0("Failed to get revisions for project: ", projectName, ". Error: ", e$message))
+	})
 }
 
 
@@ -372,8 +352,10 @@ projectRevisions = function(projectName) {
 showProjectsLocks = function() {
 	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),"/api2/dblocks")
-	res = httr::GET(url)
-	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+	res = .executeRequest(
+		function() httr::GET(url),
+		responseSerializer = .responseSerializers$JSON
+	)
 }
 
 #' removeProjectLock
@@ -382,7 +364,7 @@ showProjectsLocks = function() {
 removeProjectLock = function(lockId) { 
 	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),"/api2/dblocks/",lockId,"/break")
-	res = httr::POST(url)
+	res = .executeRequest(function() httr::POST(url))
 }
 
 #' showJobs
@@ -402,14 +384,11 @@ showJobs = function(projectName = NA, revision = NA, status = NA, showAllColumns
 		else if (!is.na(projectName) && !is.na(status)) paste0("?project=",projectName,"&status=",status)
 		else ""}
 	url <- paste0(getSBserverDomain(),paste0("/api2/jobs", query))
-	res = httr::GET(url)
-	txt = httr::content(res, as="text")
-	if (substr(txt,1,13) == "\n\n\n\n<!DOCTYPE") {  #Giving a second chance
-		url <- paste0(getSBserverDomain(),paste0("/api2/jobs", query))
-		res = httr::GET(url)
-		txt = httr::content(res, as="text")
-	}
-	jobs = jsonlite::fromJSON(txt = txt, simplifyDataFrame=TRUE) 
+	jobs = .executeRequest(
+		function() httr::GET(url),
+		errorHandling = .withErrorHandling(retries = 1),
+		responseSerializer = .responseSerializers$JSON
+	)
 
 	finalJobs = if (length(jobs) > 0) { 		
 		if (showAllColumns) jobs else { 
@@ -436,8 +415,10 @@ showJobs = function(projectName = NA, revision = NA, status = NA, showAllColumns
 showJobById = function(jobId) {
 	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId))
-	res = httr::GET(url)
-	jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+	.executeRequest(
+		function() httr::GET(url),
+		responseSerializer = .responseSerializers$JSON
+	)
 }
 
 #' cancelJob
@@ -450,8 +431,11 @@ cancelJob = function(jobId) {
 	#url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId,"/cancel"))
 	#res = httr::POST(url)
 	url <- paste0(getSBserverDomain(), "/api2/deleteFromQueue/", jobId)
-	res = httr::DELETE(url)
-	ifelse(res$status == 200, {
+	res = .executeRequest(
+		function() httr::DELETE(url),
+		errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT)
+		)
+	ifelse(!is.null(res) && res$status == 200, {
 			print(paste("Job", jobId, "was canceled"))
 			TRUE
 		},{
@@ -467,9 +451,12 @@ cancelJob = function(jobId) {
 clearCache = function(projectName) {
 	#if(!currentUser(FALSE)) stop("Please login")
 	url <- paste0(getSBserverDomain(),"/rapi/cleanCache/",projectName)
-	res = httr::GET(url, httr::content_type_json())
+	res = .executeRequest(
+		function() httr::GET(url, httr::content_type_json()),
+		errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT)
+	)
 	#to verify: list.files(paste0(getSBserverIOfolder(),"/",getSBserverPort(),"/artifacts/",projectName))
-	if (res$status == 200) paste("Cleared:",projectName) else "Something went wrong"
+	if (!is.null(res) && res$status == 200) paste("Cleared:",projectName) else "Something went wrong"
 }
 
 
@@ -477,19 +464,22 @@ clearCache = function(projectName) {
 #' @return The response from the server.
 isServerAlive = function() {
 	url <- paste0(getSBserverDomain(),"/rapi/heartbeat")
-	status = tryCatch({
-		res = httr::GET(url, httr::content_type_json())
-		TRUE
-	}, error = function(cond) FALSE
+	res = .executeRequest(
+		function() httr::GET(url, httr::content_type_json()),
+		errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT),
+		responseSerializer = .responseSerializers$TEXT
 	)
-	status
+	!is.null(res)
 }
 
 isKnowledgeServerAlive = function() { #add help, match with engine version
 	if(!currentUser(showInfo = FALSE)) stop("This function requires you to be logged in")
 	url <- paste0(getSBserverDomain(),"/knowledge/ping")
-	res = httr::GET(url, httr::content_type_json())
-	content=httr::content(res)
+	content = .executeRequest(
+		function() httr::GET(url, httr::content_type_json()),
+		responseSerializer = .responseSerializers$JSON
+	)
+
 	if(!content$allConnected){
 		warning(paste(content$connectionTest$url, content$connectionTest$isConnected))
 		for(connection in content$connectionTest$nextConnections) {
@@ -503,14 +493,11 @@ isKnowledgeServerAlive = function() { #add help, match with engine version
 #' @return The server version information.
 serverVersion = function() {
 	url <- paste0(getSBserverDomain(),"/buildInfo")
-	status = tryCatch({
-		res = httr::GET(url, httr::content_type_json())
-		res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-		res
-	},
-	error = function(cond) NA
+	.executeRequest(
+		function() httr::GET(url, httr::content_type_json()),
+		errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT),
+		responseSerializer = .responseSerializers$JSON
 	)
-	status
 }
 
 ####################################################### 
@@ -534,7 +521,7 @@ doesFileExistOnServer = function(projectName, path) {
 #' @param name the prefix of the file name in which the data will be saved
 #' @param useEscaping A binary indicator noting whether a forward slash in the data needs to be escaped
 uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUploadThreshold = NA) {
-	#if(!currentUser(FALSE)) stop("Please login")
+	.assertUserAuthenticated()  # workaround to allow quicker failure on large uploads
 	if (length(class(data)) == 1 && class(data) == "character") data
 	else {
 		if (! "data.frame" %in% class(data)) stop("The provided data should of type data.frame or character")
@@ -592,17 +579,18 @@ uploadToServer = function(data, projectName, name, useEscaping = TRUE, directUpl
 #' @param projectName the name of the project to save the data under
 #' @param name the prefix of the file name in which the data will be saved
 uploadFileToServer = function(filePath, projectName, name=NA, generateHash=TRUE) {
+  .assertUserAuthenticated()   # workaround to allow quicker failure on large uploads
   originalFileName = basename(tools::file_path_sans_ext(filePath, compression = TRUE))
   originalFileNameWithExt = basename(filePath)
   originalFileExt = stringr::str_replace(originalFileNameWithExt, originalFileName, "")
-  
+
   resourceName = if(generateHash) {
 	  hash = tools::md5sum(filePath)
 	  resourceName = paste0(originalFileName, "_", hash, originalFileExt)
   } else {
   	originalFileNameWithExt
   }
-  
+
 	if(!is.na(name)) {
 		resourceName = paste0(name, "_", resourceName)
 	}
@@ -628,7 +616,11 @@ uploadFile = function(filePath, projectName, resourceName, checkIfExists=TRUE) {
 		progressBarConfig = httr::progress(type = "up")
 		
 	  message(paste("Starting to upload", filename))
-	  response = httr::RETRY("PUT", url = uploadUrl, body = uploadBody, config = progressBarConfig)
+	  response = .executeRequest(
+	  	function() httr::PUT(url = uploadUrl, body = uploadBody, config = progressBarConfig),
+	  	errorHandling = .withErrorHandling(retries = 2),
+	  	responseSerializer = .responseSerializers$JSON
+	  )
 	  
 	  if(doesFileExistOnServer(projectName, serverPath)) {
 	  	message(paste("Successfully uploaded", filename))
@@ -673,6 +665,7 @@ writeToServer = function(data, filename = NA, prefix = "data_in", useEscaping = 
 }
 
 .onLoad <- function(libname = find.package("SparkBeyond"), pkgname = "SparkBeyond") {
+	httr::set_config(httr::add_headers('X-Requested-With' = 'XMLHttpRequest'))
   #print(paste0("Automatically trying to load settings saved in :",getwd()))
   #loadSettings()
 	message("Check out all the new updates in SparkBeyond latest release: https://sparkbeyond.freshdesk.com/support/solutions/16000050303")

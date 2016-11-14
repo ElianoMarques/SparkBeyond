@@ -18,8 +18,6 @@ SB object that encapsulates a session
 \section{Methods}{
 
 \describe{
-\item{\code{buildNumber()}}{Returns the build number in which the model was generated.}
-
 \item{\code{cancel()}}{Cancel a queued / running job of this model}
 
 \item{\code{createPackage(sampleData = NULL, createRestAPIpackage = FALSE,

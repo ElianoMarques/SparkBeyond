@@ -4,7 +4,7 @@
 #' 
 #' @param dateCol The column name in training set that will be used.
 #' @param window The window length (numeric)
-#' @param unit The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Years"
+#' @param unit The window length unit. Should be one of: "Seconds", "Minutes", "Hours", "Days", "Weeks", "Years"
 #' @param keyCol An optional key for the sliding window (NULL as default).
 #' @param relativeTime a boolean indicator for whether the time series should be coded with absolute timestamps or relative to the last point. In this case all time stamps will be negative using the defined time unit (e.g. -10 days). TRUE by default.
 #' @param offset allows defining an additional time gap between that will be masked for the feature search. The entire time series will be shifted accordingly using the time window that was picked. 0 by default.
@@ -49,14 +49,17 @@ problemDefinitionControl = function(
 	partitionColumn = NA,
 	timeWindowsDefinition = NA
 ){
-	list(
-		forceRegression = forceRegression,
-		trainTestSplitRatio = trainTestSplitRatio,
-		temporalSplitColumn = temporalSplitColumn,
-		weightByClass = weightByClass,
-		weightColumn = weightColumn,
-		partitionColumn = partitionColumn,
-		timeWindowsDefinition = timeWindowsDefinition
+	structure(
+		class = c("ProblemDefinitionControl"),
+		list(
+			forceRegression = forceRegression,
+			trainTestSplitRatio = trainTestSplitRatio,
+			temporalSplitColumn = temporalSplitColumn,
+			weightByClass = weightByClass,
+			weightColumn = weightColumn,
+			partitionColumn = partitionColumn,
+			timeWindowsDefinition = timeWindowsDefinition
+		)
 	)
 }
 
@@ -72,10 +75,13 @@ preProcessingControl = function(
 	linesForTypeDetection = NA,
 	emptyValuePolicy = NA
 ) {
-	list(
-		emptyValuePolicy = emptyValuePolicy,
-		fileEncoding = fileEncoding,
-		fileEscaping = fileEscaping
+	structure(
+		class = c("PreProcessingControl"),
+		list(
+			emptyValuePolicy = emptyValuePolicy,
+			fileEncoding = fileEncoding,
+			fileEscaping = fileEscaping
+		)
 	)
 }
 
@@ -137,7 +143,7 @@ featureSearchModeList = function(
 #' @param functionsWhiteList Optional. A list of strings that represents a set of functions that will be used to guide the feature search. NA by default.
 #' @param functionsBlackList Optional. A list of strings that represents a set of function that will be excluded from the feature search. Can also include function domains including('math','arithmetics', 'collections', 'booleanOperators', 'semantics', 'nlp', 'trigonometry', 'bitwise'). NA by default.
 #' @param localTopFeatureCount The maximal number of top features that should be created from a single column. 1000 by default.
-#' @param regressionDiscretizerBinsOverride Define the bin boundaries that should be created for regresion problem bins. By default 6 bins will be created, with boundaries defined by equal mass (in order to not create a bias towards any of the bins). Should be a list of numbers spanning the entire target range. An example would be list(0,25,50,75,100) to create 4 bins spanning the entire 0-100 range. These bins will be used only for feature search purposes and not for model building. 
+#' @param regressionDiscretizerBinsOverride Define the bin boundaries that should be created for regresion problem bins. By default 6 bins will be created, with boundaries defined by equal mass (in order to not create a bias towards any of the bins). Should be a list of numbers spanning the entire target range. An example would be list(0,25,50,75,100) to create 4 bins spanning the entire 0-100 range. These bins will be used only for feature search purposes and not for model building.
 #' @param booleanNumericFeatures A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.
 #' @param numericEqualityFeatures A boolean indicator for whether to include features that compare numeric fields with specific values. TRUE by default.
 #' @param allowRangeFeatures A boolean indicator for whether to include features that define range over a set of numeric values. TRUE by default.
@@ -174,28 +180,31 @@ featureGenerationControl = function(
 	maxCollectionSize = NA,
 	useCachedFeatures = TRUE
 ) {
-	list(
-		maxFeaturesCount = maxFeaturesCount,
-		minSupportAbsolute = minSupportAbsolute,
-		maxDepth = maxDepth,
-		featureSearchMode = featureSearchMode,
-		functionsWhiteList = functionsWhiteList,
-		functionsBlackList = functionsBlackList,
-		localTopFeatureCount = localTopFeatureCount,
-		regressionDiscretizerBinsOverride = ifelse (is.na(regressionDiscretizerBinsOverride), NA, as.list(regressionDiscretizerBinsOverride)),
-		booleanNumericFeatures = booleanNumericFeatures,
-		numericEqualityFeatures = numericEqualityFeatures,
-		allowRangeFeatures = allowRangeFeatures,
-		useRawNumericColumns = useRawNumericColumns,
-		
-		crossRowFeatureSearch = crossRowFeatureSearch,
-		autoColumnSubSets = autoColumnSubSets,
-		customColumnSubsets = customColumnSubsets,
-		maxFeatureDuration = maxFeatureDuration,
-		overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
-		allocatedMemoryMB = allocatedMemoryMB,
-		maxCollectionSize = maxCollectionSize,
-		useCachedFeatures = useCachedFeatures
+	structure(
+		class = c("FeatureGenerationControl"),
+		list(
+            maxFeaturesCount = maxFeaturesCount,
+            minSupportAbsolute = minSupportAbsolute,
+            maxDepth = maxDepth,
+            featureSearchMode = featureSearchMode,
+            functionsWhiteList = functionsWhiteList,
+            functionsBlackList = functionsBlackList,
+            localTopFeatureCount = localTopFeatureCount,
+            regressionDiscretizerBinsOverride = ifelse (is.na(regressionDiscretizerBinsOverride), NA, as.list(regressionDiscretizerBinsOverride)),
+            booleanNumericFeatures = booleanNumericFeatures,
+            numericEqualityFeatures = numericEqualityFeatures,
+            allowRangeFeatures = allowRangeFeatures,
+            useRawNumericColumns = useRawNumericColumns,
+
+            crossRowFeatureSearch = crossRowFeatureSearch,
+            autoColumnSubSets = autoColumnSubSets,
+            customColumnSubsets = customColumnSubsets,
+            maxFeatureDuration = maxFeatureDuration,
+            overrideMaxFeatureDurationForExternalData = overrideMaxFeatureDurationForExternalData,
+            allocatedMemoryMB = allocatedMemoryMB,
+            maxCollectionSize = maxCollectionSize,
+            useCachedFeatures = useCachedFeatures
+		)
 	)
 }
 
@@ -231,20 +240,23 @@ knowledgeControl = function(
 	customDatasets = customDatasets ||
 		weather || usCensus || news || worldBank || twitter || searchEngines
 	
-	list(
-		linkedDataCore = linkedDataCore,
-		openStreetMap = openStreetMap,
-		weather = weather,
-		usCensus = usCensus,
-		news = news,
-		worldBank = worldBank,
-		twitter = twitter,
-		searchEngines = searchEngines,
-		customDatasets = customDatasets
-	
-		#customGraphsWhiteList = customGraphsWhiteList,
-		#customGraphsBlackList = customGraphsBlackList,
-		#customFunctions = customFunctions
+	structure(
+		class = c("KnowledgeControl"),
+		list(
+			linkedDataCore = linkedDataCore,
+			openStreetMap = openStreetMap,
+			weather = weather,
+			usCensus = usCensus,
+			news = news,
+			worldBank = worldBank,
+			twitter = twitter,
+			searchEngines = searchEngines,
+			customDatasets = customDatasets
+
+			#customGraphsWhiteList = customGraphsWhiteList,
+			#customGraphsBlackList = customGraphsBlackList,
+			#customFunctions = customFunctions
+		)
 	)
 }
 
@@ -255,7 +267,7 @@ knowledgeControl = function(
 #' @param extraModels: Optional. A named list of algorithms to run, along with the hyperparameters to set for these algorithms.
 #' @param evaluationMetric: Optional. A string representing the evaluation metric. Should be either "AUC", "PREC", or "RMSE". NA by default automatically selects AUC for classification and RMSE for regression.
 #' @param crossValidation: Optional. Integer value representing how many cross validation splits should be used. 5 by default.
-#' @param maxRecordsForModelBuild: The maximal number of records to use for model training. 100K by default. 
+#' @param maxRecordsForModelBuild: The maximal number of records to use for model training. 100K by default.
 modelBuildingControl = function(
 	algorithmsWhiteList = algorithmsList(),
 	extraModels = list(),
@@ -263,12 +275,15 @@ modelBuildingControl = function(
 	crossValidation = 5,
 	maxRecordsForModelBuild = NA
 ) {
-	list(
-		algorithmsWhiteList = algorithmsWhiteList,
-    extraModels = extraModels,
-		evaluationMetric = evaluationMetric,
-		crossValidation = crossValidation,
-		maxRecordsForModelBuild = maxRecordsForModelBuild
+	structure(
+		class = c("ModelBuildingControl"),
+		list(
+			algorithmsWhiteList = algorithmsWhiteList,
+			extraModels = extraModels,
+			evaluationMetric = evaluationMetric,
+			crossValidation = crossValidation,
+			maxRecordsForModelBuild = maxRecordsForModelBuild
+		)
 	)
 }
 
@@ -379,13 +394,16 @@ reportingControl = function(
 	featureVisualizations = FALSE,
 	evaluatedFunctionsReport = FALSE
 ) {
-	list(
-		featureClustersReport = featureClustersReport,
-		eevaluatedFunctionsReport = evaluatedFunctionsReport,
-		scoreOnTestSet = scoreOnTestSet,
-		featureVisualizations = featureVisualizations,
-		emailForNotification = emailForNotification,
-		showWebView = showWebView
+	structure(
+		class = c("ReportingControl"),
+		list(
+			featureClustersReport = featureClustersReport,
+			eevaluatedFunctionsReport = evaluatedFunctionsReport,
+			scoreOnTestSet = scoreOnTestSet,
+			featureVisualizations = featureVisualizations,
+			emailForNotification = emailForNotification,
+			showWebView = showWebView
+		)
 	)
 }
 
@@ -490,6 +508,19 @@ learn <- function(
 	if(!is.null(extraParams$modelBuildingCtrl)) modelBuilding = extraParams$modelBuildingCtrl
 	if(!is.null(extraParams$reportingCtrl)) reporting = extraParams$reportingCtrl
 	
+	assertClass = function(obj, expectedType) {
+		if(! expectedType %in% class(obj)) {
+			stop(paste0("Unexpected argument type. Expected: ", expectedType, ", received: ", class(obj)))
+		}
+	}
+
+	assertClass(problemDefinition, "ProblemDefinitionControl")
+	assertClass(preProcessing, "PreProcessingControl")
+	assertClass(featureGeneration, "FeatureGenerationControl")
+	assertClass(knowledge, "KnowledgeControl")
+	assertClass(modelBuilding, "ModelBuildingControl")
+	assertClass(reporting, "ReportingControl")
+
 	uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
 	fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
 
@@ -665,7 +696,7 @@ learn <- function(
 		booleanNumericFeatures = if(!is.null(extraParams$booleanNumericFeatures)) extraParams$booleanNumericFeatures else featureGeneration$booleanNumericFeatures,
 		numericEqualityFeatures = if(!is.null(extraParams$numericEqualityFeatures)) extraParams$numericEqualityFeatures else featureGeneration$numericEqualityFeatures,
 		allowRangeFeatures = if(!is.null(extraParams$allowRangeFeatures)) extraParams$allowRangeFeatures else featureGeneration$allowRangeFeatures,																
-		useRawNumericColumns = if(!is.null(extraParams$useRawNumericColumns)) extraParams$useRawNumericColumns else featureGeneration$useRawNumericColumns,																
+		useRawNumericColumns = if(!is.null(extraParams$useRawNumericColumns)) extraParams$useRawNumericColumns else featureGeneration$useRawNumericColumns,
 		crossRowFeatureSearch = if(!is.null(extraParams$crossRowFeatureSearch)) extraParams$crossRowFeatureSearch else featureGeneration$crossRowFeatureSearch,
 		autoColumnSubSets = if(!is.null(extraParams$autoColumnSubSets)) extraParams$autoColumnSubSets else featureGeneration$autoColumnSubSets,
 		customColumnSubsets = if(!is.null(extraParams$customColumnSubsets)) extraParams$customColumnSubsets else featureGeneration$customColumnSubsets,
@@ -720,13 +751,11 @@ learn <- function(
 	
 	body = rjson::toJSON(params)
 	#if (verbose) print(body)
-	res = httr::POST(url, body = body, httr::content_type_json())
-	res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-	if (!is.null(res$error)) {
-		res = paste("Train error: ", res$error, " - terminating.")
-		message(res)
-		stop(res)
-	}
+	res = .executeRequest(
+		function() httr::POST(url, body = body, httr::content_type_json()),
+		errorHandling = .withErrorHandling(message = "Train error"),
+		responseSerializer = .responseSerializers$JSON
+	)
 	
 	message(paste("Artifact location was created at:", res$artifactPath))
 	session = Session(artifact_loc = res$artifactPath, 
