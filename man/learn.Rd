@@ -37,7 +37,7 @@ learn(projectName, trainData, target, testData = NULL,
 \item{runBlocking:}{Block the R console while the session is running. FALSE by default.}
 }
 \value{
-Session object that encapsulates the model.
+\code{\link{Session}} object that encapsulates the model.
 }
 \description{
 Runs SparkBeyond feature enrichment and learning process.

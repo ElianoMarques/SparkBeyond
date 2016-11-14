@@ -182,7 +182,7 @@ featureGenerationControl = function(
 		functionsWhiteList = functionsWhiteList,
 		functionsBlackList = functionsBlackList,
 		localTopFeatureCount = localTopFeatureCount,
-		regressionDiscretizerBinsOverride = if (is.na(regressionDiscretizerBinsOverride)) NA else as.list(regressionDiscretizerBinsOverride),
+		regressionDiscretizerBinsOverride = ifelse (is.na(regressionDiscretizerBinsOverride), NA, as.list(regressionDiscretizerBinsOverride)),
 		booleanNumericFeatures = booleanNumericFeatures,
 		numericEqualityFeatures = numericEqualityFeatures,
 		allowRangeFeatures = allowRangeFeatures,
@@ -463,7 +463,7 @@ contextObject = function(data, contextTypes=NULL, name = NULL, keyColumns = list
 #' @param modelBuilding: A \code{\link{modelBuildingControl}} object with specific model building parameters.
 #' @param reporting: A \code{\link{reportingControl}} object with specific reporting parameters.
 #' @param runBlocking: Block the R console while the session is running. FALSE by default.
-#' @return Session object that encapsulates the model.
+#' @return \code{\link{Session}} object that encapsulates the model.
 #' @examples
 #' #session = learn("titanic", getData("titanic_train"), target = "survived")
 learn <- function(
