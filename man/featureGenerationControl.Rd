@@ -32,7 +32,7 @@ featureGenerationControl(maxFeaturesCount = list(300),
 
 \item{localTopFeatureCount}{The maximal number of top features that should be created from a single column. 1000 by default.}
 
-\item{regressionDiscretizerBinsOverride}{Define the bin boundaries that should be created for regresion problem bins. By default 6 bins will be created, with boundaries defined by equal mass (in order to not create a bias towards any of the bins). Should be a list of numbers spanning the entire target range. These bins will be used only for feature search purposes and not for model building.}
+\item{regressionDiscretizerBinsOverride}{Define the bin boundaries that should be created for regresion problem bins. By default 6 bins will be created, with boundaries defined by equal mass (in order to not create a bias towards any of the bins). Should be a list of numbers spanning the entire target range. An example would be list(0,25,50,75,100) to create 4 bins spanning the entire 0-100 range. These bins will be used only for feature search purposes and not for model building.}
 
 \item{booleanNumericFeatures}{A boolean indicating whether to transform all features to boolean values. (i.e., when FALSE the continuous value of the feature left-hand-side will be passed to the algorithm, without taking into account the specific cutoff chosen during the feature search phase). NA by default indicating that it will be TRUE for classification problems and FALSE for regression problems.}
 
