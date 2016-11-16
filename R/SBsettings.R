@@ -267,7 +267,7 @@ login = function(username, password=NA, domain) {
 	})
 
 	setSBserverHost(domain)
-	loggedIn = res$status_code == 200 && currentUser()
+	loggedIn = res$status_code == 200 || currentUser()
 
 	if(loggedIn) {
 		releaseNumber = serverVersion()$releaseNumber
