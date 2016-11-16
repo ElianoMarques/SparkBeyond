@@ -582,7 +582,8 @@ learn <- function(
 															keyColumns = context$keyColumns,
 															contextTypes = list("Word2Vec"))
 				} else if("word2VecPretrainedS3ContextDefinition" %in% class(context)) {
-					createContextObject(contextProvider = list(S3source = context$modelName, name = "Word2Vec", jsonClass = "com.sparkbeyond.runtime.data.transform.Word2Vec"),
+					# S3source was renamed to source in 1.8, depracated, left for backward compatibility
+					createContextObject(contextProvider = list(S3source = context$modelName, source = context$modelName, name = "Word2Vec", jsonClass = "com.sparkbeyond.runtime.data.transform.Word2Vec"),
 															name = context$name,
 															contextTypes = list("Word2VecPretrainedS3"))
 				} else if("word2VecPretrainedLocalContextDefinition" %in% class(context)) {
