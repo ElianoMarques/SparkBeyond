@@ -339,7 +339,7 @@
 		response = tryCatch(
 			httpCall(), 
 			error = function(e) {
-				.signalApiCondition(exceptions$CONNECTION_CURL, paste0("Request failed with error: ", e$message, ", usually indicates a connectivity problem"), call = e$call)
+				.signalApiCondition(exceptions$CONNECTION_CURL, paste0("Request failed with error: ", e$message, ", usually indicates a connectivity problem"), call = externalCallStack)
 			}
 		)
 		
