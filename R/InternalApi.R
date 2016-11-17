@@ -258,10 +258,10 @@
 
 # Serialization
 .responseSerializers = list(
-	NONE = function(response) { response },
-	JSON = function(response) { jsonlite::fromJSON(txt=httr::content(response, as="text"),simplifyDataFrame=TRUE) },
-	TEXT = function(response) { httr::content(response, as="text") },
-	DATA_FRAME = function(response) { suppressWarnings(read.table(textConnection(httr::content(response, as="text")),sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = "", comment.char = "")) }
+	NONE = "NONE",
+	JSON = "JSON",
+	TEXT = "TEXT",
+	DATA_FRAME = "DATA_FRAME"
 )
 
 # Error handling
@@ -297,6 +297,7 @@
 .executeRequest = function(httpCall, errorHandling = .withErrorHandling(), responseSerializer = .responseSerializers$NONE) {
 	externalCallStack = sys.call(-1)
 	error = NA_character_
+	trimUnparsableContentInErrorMessagesLength = 400
 	handleError = function(message, onError, stackTrace) {
 		if(onError == .onErrorBehavior$STOP) {
 			stop(.sdkError(message, stackTrace))
@@ -334,12 +335,34 @@
 		})
 	}
 	
+	responseSerializersFactory = list(
+		NONE = function(response) { response },
+		JSON = function(response) { 
+			responseText = NA_character_
+			tryCatch({
+					responseText <- suppressMessages(httr::content(response, as="text"))
+					jsonlite::fromJSON(txt=httr::content(response, as="text"), simplifyDataFrame=TRUE)
+				},error = function(e) {
+					truncatedResponse = ifelse(is.na(responseText), "Failed to parse context as text", strtrim(responseText, trimUnparsableContentInErrorMessagesLength))
+					if(nchar(responseText)>trimUnparsableContentInErrorMessagesLength) {
+						truncatedResponse = paste0(truncatedResponse, "...")
+					}
+					.signalApiCondition(exceptions$APPLICATION_FAILURE, paste0("Failed to parse response as json for url: ", response$url, 
+																																		 "\nHTTP Status: ", httr::status_code(response), 
+																																		 "\nResponse: ", truncatedResponse), 
+															call = externalCallStack, isRetriable = FALSE)
+				})
+			},
+		TEXT = function(response) { httr::content(response, as="text") },
+		DATA_FRAME = function(response) { suppressWarnings(read.table(textConnection(httr::content(response, as="text")),sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = "", comment.char = "")) }
+	)
+	
 	processRequest = function(httpCall) {
 		# Request execution
 		response = tryCatch(
 			httpCall(), 
 			error = function(e) {
-				.signalApiCondition(exceptions$CONNECTION_CURL, paste0("Request failed with error: ", e$message, ", usually indicates a connectivity problem"), call = externalCallStack)
+				.signalApiCondition(exceptions$CONNECTION_CURL, paste0(e$message, ", usually indicates a connectivity problem"), call = externalCallStack)
 			}
 		)
 		
@@ -354,7 +377,7 @@
 		} else if(status >= 400) {
 			ifelse(is.na(applicationError),
 						 { 
-						 	responseText = strtrim(suppressMessages(httr::content(response, as="text")), 100)
+						 	responseText = strtrim(suppressMessages(httr::content(response, as="text")), trimUnparsableContentInErrorMessagesLength)
 						 	.signalApiCondition(exceptions$APPLICATION_FAILURE, paste0(statusMessage, ", for url: ", response$url, "\nerror: ", responseText), call = externalCallStack, isRetriable = FALSE)
 						 	},
 						 .signalApiCondition(exceptions$APPLICATION_ERROR, applicationError, isRetriable = FALSE))
@@ -381,7 +404,8 @@
 		tryCatch( {
 				response = processRequest(httpCall)
 				requestFinished = TRUE
-				result = responseSerializer(response)
+				responseSerializerImpl = responseSerializersFactory[[responseSerializer]]
+				result = responseSerializerImpl(response)
 				# print(paste("Result:", result))
 			},
 			RequestFailedError = function(e) {
