@@ -318,7 +318,7 @@ Session = setRefClass("Session",
 					{
         		uploadedPath = uploadToServer(data = data, projectName = projectName, name = "predict", useEscaping = fileEscaping, directUploadThreshold = fileUploadThreshold)
         		if(is.na(uploadedPath)) stop("failed to upload file to predict to server")
-        		uploadedPaths
+        		uploadedPath
         	},
         	writeToServer(data, prefix = "predict", useEscaping = fileEscaping) #project name
 				)
