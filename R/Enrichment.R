@@ -10,17 +10,17 @@ library(R6)
 #' # Non blocking predict
 #' enrichment = session$enrich(getData("titanic_test"), async=TRUE)
 #' enrichment$currentStatus()
-#' enrichment = prediction$getData()
+#' data = enrichment$data()
 #' head(data)
 #' }
-Enrichment = R6Class("Enrichment",
+EnrichmentJob = R6Class("EnrichmentJob",
 	 lock_objects = TRUE,
 	 lock_class = TRUE,
 	 cloneable = FALSE,
 	 private = list(
 	 	executionId = NA_character_,
 	 	totalRows = NA_integer_,
-	 	data = NULL
+	 	dataFrame = NULL
 	 ),
 	 public = list(
 	 	initialize = function(executionId, totalRows = NA_integer_) {
@@ -41,11 +41,11 @@ Enrichment = R6Class("Enrichment",
 	 		}
 	 	},
 	 	
-	 	getData = function(localFileName = NA_character_, runBlocking=TRUE) {
+	 	data = function(localFileName = NA_character_, runBlocking=TRUE) {
 	 		"If \\code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{runBlocking} is FALSE return the data if available, else return NULL"
 	 		outputName = ifelse(is.na(localFileName), paste("enriched", private$executionId, sep = "-"), localFileName)
-	 		if(!is.null(private$data)) {
-	 			private$data
+	 		if(!is.null(private$dataFrame)) {
+	 			private$dataFrame
 	 		} else if(runBlocking) {
 	 			jobStatus = .getEnrichJobStatus(private$executionId)
 	 			state = jobStatus$state
@@ -76,8 +76,8 @@ Enrichment = R6Class("Enrichment",
 	 			}
 	 			
 	 			if(!is.null(enrichedData)) {
-	 				private$data = enrichedData
-	 				private$data
+	 				private$dataFrame = enrichedData
+	 				private$dataFrame
 	 			} else {
 	 				message("Failed to download the enriched data")
 	 				NULL

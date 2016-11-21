@@ -253,7 +253,7 @@ Session = setRefClass("Session",
 			################################## enrich #####################
       enrich = function(data, featureCount = NA,  contextDatasets = NULL ,enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...) {
 
-        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
+        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{enrichedColumnsOnly} to FALSE in order to include the original columns in the enriched dataset."
         extraParams = list(...)
         uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
         fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
@@ -322,14 +322,14 @@ Session = setRefClass("Session",
         	executionId = enrichResult$executionId
         	total = nrow(data)
 
-        	enrichment = Enrichment$new(executionId, totalRows = total)
+        	enrichment = EnrichmentJob$new(executionId, totalRows = total)
         	quoted = function(str) paste0('"', str, '"')
         	message(paste("Enrichment execution ID is:", executionId))
-        	message(paste0("You can get back to following this enrichment execution by running: ",
-        								 "Enrichment$new(executionId=", quoted(executionId), ")"))
+        	message(paste0("You can get back to following this enrichment job by running: ",
+        								 "EnrichmentJob$new(executionId=", quoted(executionId), ")"))
 
         	if(runBlocking) {
-        		unusedRefToData = enrichment$getData(localFileName = outputName)
+        		unusedRefToData = enrichment$data(localFileName = outputName)
         	}
 
 
@@ -424,14 +424,14 @@ Session = setRefClass("Session",
         	executionId = predictResult$executionId
         	total = nrow(data)
 
-        	prediction = Prediction$new(executionId, totalRows = total)
+        	prediction = PredictionJob$new(executionId, totalRows = total)
         	quoted = function(str) paste0('"', str, '"')
         	message(paste("Predict execution ID is:", executionId))
-        	message(paste0("You can get back to following this predict execution by running: ", 
-        								 "Prediction$new(executionId=", quoted(executionId), ")"))
-        	
+        	message(paste0("You can get back to following this prediction job by running: ", 
+        								 "PredictionJob$new(executionId=", quoted(executionId), ")"))
+
         	if(runBlocking) {
-        		unusedRefToData = prediction$getData(localFileName = outputName)
+        		unusedRefToData = prediction$data(localFileName = outputName)
         	}
 
         	prediction
@@ -449,62 +449,63 @@ Session = setRefClass("Session",
         }
       },
 
-			################################## lift #####################			
-      liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift", fileEscaping = TRUE, ...) { #TODO: change documentation
-        "Returns lift from a created model and generates three plots. \\code{predictionResult} is a dataframe to be analyzed, \\code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
-        extraParams = list(...)        
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
-        
-        if (is.na(modelBuilt) || !modelBuilt) warning("Lift requires full model building using learn") #TODO: verify classification problem
+################################## lift #####################			
+liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift", fileEscaping = TRUE, ...) { #TODO: change documentation
+	"Returns lift from a created model and generates three plots. \\code{predictionResult} is a dataframe to be analyzed, \\code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
+	extraParams = list(...)        
+	remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
+	
+	if (is.na(modelBuilt) || !modelBuilt) warning("Lift requires full model building using learn") #TODO: verify classification problem
+	
+	datapath = ifelse (remoteMode, {
+		uploadedPath = uploadToServer(data = predictionResult, projectName = projectName, name = "lift", useEscaping = fileEscaping)
+		if(is.na(uploadedPath)) stop("failed to upload file to plots lifts to server")
+		uploadedPath        
+	},
+	writeToServer(data, prefix = "lift", useEscaping = fileEscaping) 
+	)
+	
+	params <-list(modelPath = artifact_loc,
+								predictionPath = datapath,
+								title = title,
+								percentOfPopulationToPlot= percentOfPopulationToPlot,
+								fileEscaping = fileEscaping,
+								externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())
+	)
+	params = params[!is.na(params)]
+	
+	url <- paste0(getSBserverDomain(),"/rapi/liftFromPredictionResults")
+	message(paste("Calling:", url))
+	
+	body = rjson::toJSON(params)
+	res = httr::POST(url, body = body, httr::content_type_json())
+	res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+	browser()
+	finalRes = if (is.null(res$error) && !is.null(res$result)) {
+		plotName = res$result
+		subFolder = gsub("\\s+","_", title)
+		resultsLocation = paste0("predictions/", subFolder, "/")
+		showReport(paste0(resultsLocation, "CumulativeGain_counts_", plotName,".html")) #cummGain_counts
+		showReport(paste0(resultsLocation, "CumulativeGain_percent_", plotName,".html")) #cummGain_percent
+		showReport(paste0(resultsLocation, "Lift_plot_", plotName,".html")) #lift plot
+		
+		url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/reports/", resultsLocation, "lift_table_",plotName, ".tsv.gz")
+		res2 = httr::GET(url)
+		if (res2$status == 200) {
+			localfile = paste0(outputName, ".tsv.gz")
+			writeBin(httr::content(res2), localfile)
+			message(paste0("Results written to: ", getwd(),"/", localfile))
+			read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
+		} else NA 
+	} else {
+		message = paste("Lift failed: ", res$error)
+		message(message)
+		stop(message)
+	}
+	message("Done.")
+	return(finalRes)
+},
 
-        datapath = ifelse (remoteMode, {
-							uploadedPath = uploadToServer(data = predictionResult, projectName = projectName, name = "lift", useEscaping = fileEscaping)
-							if(is.na(uploadedPath)) stop("failed to upload file to plots lifts to server")
-							uploadedPath        
-						},
-						writeToServer(data, prefix = "lift", useEscaping = fileEscaping) 
-				)
-
-        params <-list(modelPath = artifact_loc,
-                      predictionPath = datapath,
-                      title = title,
-                      percentOfPopulationToPlot= percentOfPopulationToPlot,
-        							fileEscaping = fileEscaping,
-        							externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder())
-        )
-        params = params[!is.na(params)]
-
-        url <- paste0(getSBserverDomain(),"/rapi/liftFromPredictionResults")
-        message(paste("Calling:", url))
-
-        body = rjson::toJSON(params)
-        res = httr::POST(url, body = body, httr::content_type_json())
-        res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-
-        finalRes = if (is.null(res$error) && !is.null(res$result)) {
-          plotName = res$result
-          subFolder = gsub("\\s+","_", title)
-          resultsLocation = paste0("predictions/", subFolder, "/")
-          showReport(paste0(resultsLocation, "CumulativeGain_counts_", plotName,".html")) #cummGain_counts
-          showReport(paste0(resultsLocation, "CumulativeGain_percent_", plotName,".html")) #cummGain_percent
-          showReport(paste0(resultsLocation, "Lift_plot_", plotName,".html")) #lift plot
-          
-          url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/reports/", resultsLocation, "lift_table_",plotName, ".tsv.gz")
-          res2 = httr::GET(url)
-          if (res2$status == 200) {
-          	localfile = paste0(outputName, ".tsv.gz")
-          	writeBin(httr::content(res2), localfile)
-          	message(paste0("Results written to: ", getwd(),"/", localfile))
-          	read.table(localfile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
-          } else NA 
-        } else {
-          message = paste("Lift failed: ", res$error)
-          message(message)
-          stop(message)
-        }
-        message("Done.")
-        return(finalRes)
-      },
 
 			####################################### createPackage
       createPackage = function(sampleData = NULL, createRestAPIpackage = FALSE, fileEscaping = TRUE, ...) { #
@@ -622,14 +623,7 @@ Session = setRefClass("Session",
 
       showReport = function(report_name = NA){ #confine to a specific list
         "\\code{report_name} name of report to show"        
-        #htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
-      	suppressWarnings({
-	      	url <- paste0(getSBserverDomain(),paste0("/getToken")) 
-	      	res = httr::GET(url)
-	      	token = httr::content(res, as="text")
-	        htmlSource = paste0(getSBserverDomain(), "/analytics/report/", projectName, "/", revision, "/", report_name,"?token=", token)
-	      	browseURL(htmlSource)
-      	})
+        .showReport(report_name, projectName, revision)
       },
 
       showExtractors = function() {

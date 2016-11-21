@@ -257,3 +257,15 @@
 .isServerVersionOlderThan = function(version) {
 	compareVersion(SBServerVersion, version) < 0
 }
+
+.showReport = function(report_path = NA, projectName, revision){ #confine to a specific list
+	"\\code{report_path} path of report to show"        
+	#htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
+	suppressWarnings({
+		url <- paste0(getSBserverDomain(),paste0("/getToken")) 
+		res = httr::GET(url)
+		token = httr::content(res, as="text")
+		htmlSource = paste0(getSBserverDomain(), "/analytics/report/", projectName, "/", revision, "/", report_path,"?token=", token)
+		browseURL(htmlSource)
+	})
+}
