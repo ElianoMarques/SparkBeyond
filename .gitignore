@@ -4,3 +4,7 @@
 SparkBeyondLatestVersion.RData
 inst/extdata/examples-master_cache
 inst/extdata/examples-master_files
+.DS_Store
+.gitignore
+R/DoNotCommit.R
+R/logins.R

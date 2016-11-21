@@ -88,27 +88,34 @@
 
 
 .getPredictJobStatus = function(jobId) {
-	tryCatch(
-		url <- paste0(getSBserverDomain(),"/rapi/predict/", jobId),
-		error = function(cond) {
-			message(paste("Failed to get predict job status. Error:", cond))
-		}
-	)
-	res = httr::GET(url, httr::content_type_json())
-	res <- jsonlite::fromJSON(txt=httr::content(res, as="text"), simplifyDataFrame=TRUE)
+	url <- paste0(getSBserverDomain(),"/rapi/predict/", jobId)
+
+	res = .executeRequest(
+        function() httr::GET(url, httr::content_type_json()),
+        errorHandling = .withErrorHandling(onError = .onErrorBehavior$MESSAGE),
+        responseSerializer = .responseSerializers$JSON
+    )
 	jobStatus = .jobStatusFromJson(res)
 }
 
 .getEnrichJobStatus = function(jobId) {
-	tryCatch(
-		url <- paste0(getSBserverDomain(),"/rapi/enrich/", jobId),
-		error = function(cond) {
-			message(paste("Failed to get enrich job status. Error:", cond))
-		}
+	url <- paste0(getSBserverDomain(),"/rapi/enrich/", jobId)
+
+	res = .executeRequest(
+		function() httr::GET(url, httr::content_type_json()),
+		errorHandling = .withErrorHandling(onError = .onErrorBehavior$MESSAGE),
+		responseSerializer = .responseSerializers$JSON
 	)
-	res = httr::GET(url, httr::content_type_json())
-	res <- jsonlite::fromJSON(txt=httr::content(res, as="text"), simplifyDataFrame=TRUE)
 	jobStatus = .jobStatusFromJson(res)
+}
+
+.getNotificationLogReport = function(projectName, revision, path, responseSerializer = .responseSerializers$JSON, onError = .onErrorBehavior$STOP) {
+	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=", path)
+	re = .executeRequest(
+		function() httr::GET(url),
+		errorHandling = .withErrorHandling(onError = onError),
+		responseSerializer = responseSerializer
+	)
 }
 
 .IsHttrRetryDefined = tryCatch({
@@ -128,23 +135,10 @@
 	}
 	
 	message(paste("Downloading", downloadDescription))
-	attempts = 3
-	downloadResult = NA_integer_
-	
-	if(.IsHttrRetryDefined) {
-		downloadResult = httr::RETRY("GET", url = url, times = attemtps, config = httr::progress(type = "down"), httr::write_disk(localFile, overwrite = TRUE))
-	} else {
-		succeeded = FALSE
-		while (!succeeded && attempts > 0 ) {
-			downloadResult = httr::GET(url, config = httr::progress(type = "down"), httr::write_disk(localFile, overwrite = TRUE))
-			attempts = attempts - 1
-			succeeded = httr::status_code(downloadResult) == 200
-			if(!succeeded && attempts>0) {
-				message(paste("Download failed with status:", httr::status_code(downloadResult)))
-				message("Retrying")
-			}
-		}
-	}
+    downloadResult = .executeRequest(
+    	function() httr::GET(url, config = httr::progress(type = "down"), httr::write_disk(localFile, overwrite = TRUE)),
+      errorHandling = .withErrorHandling(retries = 2)
+    )
 	
 	if(httr::status_code(downloadResult) == 200) {
 		if(tempFileCreated) {
@@ -165,30 +159,26 @@
 
 .downloadFile = function(projectName, revision, pathOnServer, saveToPath) {
 	url = paste0(getSBserverDomain(),"/api2/downloadFile/",projectName,"/",revision, "/",pathOnServer)
-	downloadResult = httr::GET(url)
-	if (downloadResult$status == 200) {
-		writeBin(httr::content(downloadResult), saveToPath)
-		normalizePath(saveToPath)
-	} else {
-		warning(paste("Failed to download a file from", pathOnServer, "for project:", projectName, ",revision:", revision, 
-									". Request failed with status:", downloadResult$status))
-		NULL
-	}
+	downloadResult = .executeRequest(
+		function() httr::GET(url),
+		errorHandling = .withErrorHandling(retries = 2)
+	)
+	writeBin(httr::content(downloadResult), saveToPath)
+	normalizePath(saveToPath)
 }
 
 .downloadDataFrame = function(projectName, revision, pathOnServer, saveToPath) {
 	localFile = .downloadFile(projectName, revision, pathOnServer, saveToPath)
-	if(!is.null(localFile)) {
-		read.table(localFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
-	} else {
-		NULL
-	}
+	read.table(localFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
 }
 
 .getSupportedAlgorithms = function() {
 	url = paste0(getSBserverDomain(), "/api2/algorithms")
-	res = httr::GET(url)
-	jsonlite::fromJSON(txt=httr::content(res, as="text"), simplifyDataFrame=TRUE)['name']$name
+	algorithmsDF = .executeRequest(
+		function() httr::GET(url),
+		responseSerializer = .responseSerializers$DATA_FRAME
+		)
+	algorithmsDF['name']$name
 }
 
 .algorithmsCompatibility = (function() {
@@ -254,18 +244,220 @@
 	)
 })()
 
+.contextTypesCompatibility = function(contextTypes) {
+	# if(.isServerVersionOlderThan("1.9")) {
+	# 	lapply(contextTypes, function(name) { ifelse(name=="TextIndex", "InvertedIndex", name) })
+	# } else {
+		contextTypes
+	# }
+}
+
 .isServerVersionOlderThan = function(version) {
 	compareVersion(SBServerVersion, version) < 0
 }
 
+
 .showReport = function(report_path = NA, projectName, revision){ #confine to a specific list
 	"\\code{report_path} path of report to show"        
-	#htmlSource = paste0(artifact_loc,"/reports/", subFolder(report_name), "/", report_name, ".html")
 	suppressWarnings({
-		url <- paste0(getSBserverDomain(),paste0("/getToken")) 
-		res = httr::GET(url)
-		token = httr::content(res, as="text")
+		url <- paste0(getSBserverDomain(),paste0("/getToken"))
+		token = .executeRequest(
+			function() httr::GET(url),
+			responseSerializer = .responseSerializers$TEXT
+		)
 		htmlSource = paste0(getSBserverDomain(), "/analytics/report/", projectName, "/", revision, "/", report_path,"?token=", token)
 		browseURL(htmlSource)
 	})
 }
+
+	# Serialization
+.responseSerializers = list(
+	NONE = "NONE",
+	JSON = "JSON",
+	TEXT = "TEXT",
+	DATA_FRAME = "DATA_FRAME"
+)
+
+# Error handling
+.onErrorBehavior = list(
+	STOP = "stop",
+	WARNING = "warning",
+	MESSAGE = "message",
+	SILENT = "silent"
+)
+
+.withErrorHandling = function(retries = 0, onError = .onErrorBehavior$STOP, message = NA_character_) {
+	structure(
+		class = c("ErrorHandlingSettings"),
+		list(retries = retries, onError = onError, message = message)
+	)
+}
+
+.signalApiCondition = function(type, message, call = sys.call(-1), isRetriable=TRUE) {
+	exc = structure(
+		class = c(type, "RequestFailedError", "condition"),
+		list(message = message, isRetriable = isRetriable, call = call)
+	)
+	stop(exc)
+}
+
+.sdkError = function(message, call) {
+	structure(
+		class = c("SdkError", "condition"),
+		list(message = message, call = call)
+	)
+}
+
+.executeRequest = function(httpCall, errorHandling = .withErrorHandling(), responseSerializer = .responseSerializers$NONE) {
+	externalCallStack = sys.call(-1)
+	error = NA_character_
+	trimUnparsableContentInErrorMessagesLength = 400
+	handleError = function(message, onError, stackTrace) {
+		if(onError == .onErrorBehavior$STOP) {
+			stop(.sdkError(message, stackTrace))
+		} else if(onError == .onErrorBehavior$WARNING) {
+			warning(message)
+		} else if(onError == .onErrorBehavior$MESSAGE) {
+			message(message)
+		} else if(onError == .onErrorBehavior$SILENT) {
+			NULL
+		} else {
+			stop("Incorrect onError behavior defined, should be one of the following: [stop, warning, message, silent]")
+		}
+	}
+	
+	exceptions = list(
+		CONNECTION_CURL = "ConnectionCurl",
+		AUTHENTICATION = "Authentication",
+		AUTHORIZATION = "Authorization",
+		APPLICATION_FAILURE = "ApplicationFailure",
+		APPLICATION_ERROR = "ApplicationError",
+		UNEXPECTED_RESPONSE_FORMAT = "ResponseFormatError"
+	)
+	
+	extractApplicationError = function(httpResponse, expectJson=FALSE) {
+		tryCatch({
+			text = suppressMessages(httr::content(httpResponse, as="text"))
+			res <- jsonlite::fromJSON(txt = text, simplifyDataFrame=TRUE)
+			ifelse (!is.null(res$error), res$error, NA_character_)
+		}, error = function(e) {
+			if(expectJson) {
+				.signalApiCondition(exceptions$UNEXPECTED_RESPONSE_FORMAT, "Failed to parse the response")
+			} else {
+				NA_character_
+			}
+		})
+	}
+	
+	responseSerializersFactory = list(
+		NONE = function(response) { response },
+		JSON = function(response) { 
+			responseText = NA_character_
+			tryCatch({
+					responseText <- suppressMessages(httr::content(response, as="text"))
+					jsonlite::fromJSON(txt=httr::content(response, as="text"), simplifyDataFrame=TRUE)
+				},error = function(e) {
+					truncatedResponse = ifelse(is.na(responseText), "Failed to parse context as text", strtrim(responseText, trimUnparsableContentInErrorMessagesLength))
+					if(nchar(responseText)>trimUnparsableContentInErrorMessagesLength) {
+						truncatedResponse = paste0(truncatedResponse, "...")
+					}
+					.signalApiCondition(exceptions$APPLICATION_FAILURE, paste0("Failed to parse response as json for url: ", response$url, 
+																																		 "\nHTTP Status: ", httr::status_code(response), 
+																																		 "\nResponse: ", truncatedResponse), 
+															call = externalCallStack, isRetriable = FALSE)
+				})
+			},
+		TEXT = function(response) { httr::content(response, as="text") },
+		DATA_FRAME = function(response) { suppressWarnings(read.table(textConnection(httr::content(response, as="text")),sep="\t", header=TRUE, stringsAsFactors = FALSE, quote = "", comment.char = "")) }
+	)
+	
+	processRequest = function(httpCall) {
+		# Request execution
+		response = tryCatch(
+			httpCall(), 
+			error = function(e) {
+				.signalApiCondition(exceptions$CONNECTION_CURL, paste0(e$message, ", usually indicates a connectivity problem"), call = externalCallStack)
+			}
+		)
+		
+		# Checking HTTP status
+		status = httr::status_code(response)
+		statusMessage = httr::http_status(response)$message
+		applicationError = extractApplicationError(response)
+		if(status==401) {
+			.signalApiCondition(exceptions$AUTHENTICATION, "Authentication error, please login", call = externalCallStack, isRetriable = FALSE)
+		} else if(status==403) {
+			.signalApiCondition(exceptions$AUTHORIZATION, "Unauthorized: you don't have the required permissions", call = externalCallStack, isRetriable = FALSE)
+		} else if(status >= 400) {
+			ifelse(is.na(applicationError),
+						 { 
+						 	responseText = strtrim(suppressMessages(httr::content(response, as="text")), trimUnparsableContentInErrorMessagesLength)
+						 	.signalApiCondition(exceptions$APPLICATION_FAILURE, paste0(statusMessage, ", for url: ", response$url, "\nerror: ", responseText), call = externalCallStack, isRetriable = FALSE)
+						 	},
+						 .signalApiCondition(exceptions$APPLICATION_ERROR, applicationError, isRetriable = FALSE))
+		} else if(status == 303) {
+			if(grepl(response$headers$location, "login")) {
+				.signalApiCondition(exceptions$AUTHENTICATION, "Authentication error, please login", call = externalCallStack, isRetriable = FALSE)
+			} else {
+				warning(paste("Redirecting from:", response$url, "to:", response$headers$location))
+			}
+		}
+		
+		# Handling application errors in successfull HTTP requests
+		if(!is.na(applicationError)) {
+			.signalApiCondition(exceptions$APPLICATION_ERROR, applicationError, call = externalCallStack)
+		}
+		
+		response
+	}
+	
+	attempts = 0
+	requestFinished = FALSE
+	result = NULL
+	while (!requestFinished && attempts <= errorHandling$retries) {
+		tryCatch( {
+				response = processRequest(httpCall)
+				requestFinished = TRUE
+				responseSerializerImpl = responseSerializersFactory[[responseSerializer]]
+				result = responseSerializerImpl(response)
+				# print(paste("Result:", result))
+			},
+			RequestFailedError = function(e) {
+				# print(paste("RequestFailedError handler called. Error:", e))
+				if(attempts >= errorHandling$retries || !e$isRetriable) {
+					requestFinished <<- TRUE
+					errorMessage = e$message
+					if(!is.na(errorHandling$message)) {
+						errorMessage = paste0(errorHandling$message, ":\n", errorMessage)
+					}
+					result = handleError(errorMessage, errorHandling$onError, stackTrace = e$call)
+				} else {
+					attempts <<- attempts + 1
+					message(paste0("Request failed with error: ", e$message, ", retrying in 5 seconds"))
+					Sys.sleep(5)
+				}
+			},
+			error = function(e) {
+				requestFinished <<- TRUE
+				if("SdkError" %in% class(e)) {
+					stop(e)
+				} else {
+					errorMessage = e$message
+					if(!is.na(errorHandling$message)) {
+						errorMessage = paste0(errorHandling$message, ":\n", errorMessage)
+					}
+					result = stop(errorMessage)
+				}
+			}
+		)
+	}
+	result
+}
+
+.assertUserAuthenticated = function() {
+	url <- paste0(getSBserverDomain(), "/currentUser")
+	userInfo = .executeRequest(
+		function() httr::GET(url, encode = "form"),
+		responseSerializer = .responseSerializers$JSON
+	)
+s}

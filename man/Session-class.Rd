@@ -18,8 +18,6 @@ SB object that encapsulates a session
 \section{Methods}{
 
 \describe{
-\item{\code{buildNumber()}}{Returns the build number in which the model was generated.}
-
 \item{\code{cancel()}}{Cancel a queued / running job of this model}
 
 \item{\code{createPackage(sampleData = NULL, createRestAPIpackage = FALSE,
@@ -27,7 +25,7 @@ SB object that encapsulates a session
 
 \item{\code{enrich(data, featureCount = NA, contextDatasets = NULL,
   enrichedColumnsOnly = TRUE, columnsWhiteList = NA,
-  outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{writePredictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
+  outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{enrichedColumnsOnly} to FALSE in order to include the original columns in the enriched dataset.}
 
 \item{\code{evaluate(...)}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
