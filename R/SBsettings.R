@@ -392,7 +392,7 @@ showJobs = function(projectName = NA, revision = NA, status = NA, showAllColumns
 	url <- paste0(getSBserverDomain(),paste0("/api2/jobs", query))
 	jobs = .executeRequest(
 		function() httr::GET(url),
-		errorHandling = .withErrorHandling(retries = 1),
+		errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT),
 		responseSerializer = .responseSerializers$JSON
 	)
 
