@@ -223,21 +223,7 @@ Session = setRefClass("Session",
         								outputName,		#potentially get a name for the enriched output
         								tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz"))
        
-         if (!is.null(contextDatasets)){
-        	if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
-        	for (i in 1:length(contextDatasets)) {
-        		contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
-        		contextDatasets[[i]]$data = 
-        			ifelse(!remoteMode,
-        						 writeToServer(contextDatasets[[i]]$data, 
-        						 							prefix = paste0(projectName,"_context", contextName),
-        						 							useEscaping = preProcessingCtrl$fileEscaping
-        						 ),
-        						 uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
-        						 							 , useEscaping = preProcessingCtrl$fileEscaping, directUploadThreshold = fileUploadThreshold)
-        			)
-        	}
-        }
+        contextDatasets = .handleContexts(contextDatasets, projectName = projectName,uncompressedUpload = uncompressedUpload)
         
         params <-list(modelPath = artifact_loc,
         							dataPath = datapath,
@@ -323,21 +309,7 @@ Session = setRefClass("Session",
         	writeToServer(data, prefix = "predict", useEscaping = fileEscaping) #project name
 				)
         
-        if (!is.null(contextDatasets)){
-	        if (!all(sapply(contextDatasets, function(x) class(x) == "contextObject"))) stop("Not all provided context objects are of type 'contextObject'")
-	        for (i in 1:length(contextDatasets)) {
-	        	contextName = ifelse(!is.null(contextDatasets[[i]]$name), paste0("_", contextDatasets[[i]]$name),"")
-	        	contextDatasets[[i]]$data = 
-	        		ifelse(!remoteMode,
-	        					 writeToServer(contextDatasets[[i]]$data, 
-	        					 							prefix = paste0(projectName,"_context", contextName),
-	        					 							useEscaping = preProcessingCtrl$fileEscaping
-	        					 ),
-	        					 uploadToServer(data = contextDatasets[[i]]$data, projectName = projectName, name = paste0("context", contextName)
-	        					 							 , useEscaping = preProcessingCtrl$fileEscaping, directUploadThreshold = fileUploadThreshold)
-	        		)
-	        }
-        }
+        contextDatasets = .handleContexts(contextDatasets, projectName = projectName,uncompressedUpload = uncompressedUpload)
 
         params <-list(modelPath = artifact_loc,
         							dataPath = datapath,

@@ -172,6 +172,136 @@
 	read.table(localFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
 }
 
+.handleContexts = function(contextDatasets, projectName, useEscaping=TRUE, uncompressedUpload=FALSE) {
+	fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
+	isContextObjectDefinition = function(c) "contextObject" %in% class(c) || "contextDefinition" %in% class(c)
+	if (!is.null(contextDatasets)) {
+		if (class(contextDatasets) != "list") {
+			warning("contextDatasets should be a list")
+			if (!isContextObjectDefinition(contextDatasets)) error("contextDatasets are not of class contextObject")
+			contextDatasets=list(contextDatasets)
+		}
+		contextDatasets = as.list(contextDatasets)
+		if (!all(sapply(contextDatasets, isContextObjectDefinition))) stop("Not all provided context objects are of type 'contextObject'")
+		contextDatasets = lapply(contextDatasets, function(context) {
+			if("contextDefinition" %in% class(context)) {  # the new way of defining contexts
+				createContextObject = function(data=NULL, contextProvider=NULL, contextTypes=NULL, name = NULL, keyColumns = list(), timeColumn = NULL, graphSourceNodeColumn = NULL,graphTargetNodeColumn= NULL) {
+					context = contextObject(data, contextTypes, name, keyColumns, timeColumn, graphSourceNodeColumn ,graphTargetNodeColumn)
+					if(!is.null(contextProvider)) {
+						context$contextProvider = contextProvider
+					}
+					context
+				}
+				
+				if("lookupTableContextDefinition" %in% class(context)) {
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+																									, useEscaping = useEscaping, directUploadThreshold = fileUploadThreshold),
+															keyColumns = context$keyColumns,
+															name = context$name,
+															contextTypes = list("LookupTables"))
+				} else if("textIndexContextDefinition" %in% class(context)) {
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					keyColumns = if(is.null(context$keyColumn)) {
+						list()
+					} else {
+						list(context$keyColumn)
+					}
+					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+																									, useEscaping = useEscaping, directUploadThreshold = fileUploadThreshold),
+															keyColumns = keyColumns,
+															name = context$name,
+															contextTypes = list("TextIndex"))
+				} else if("graphContextDefinition" %in% class(context)) {
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+																									, useEscaping = useEscaping, directUploadThreshold = fileUploadThreshold),
+															graphSourceNodeColumn = context$sourceNodeColumn,
+															graphTargetNodeColumn = context$targetNodeColumn,
+															name = context$name,
+															contextTypes = list("Graph"))
+				} else if("timeSeriesContextDefinition" %in% class(context)) {
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+																									, useEscaping = useEscaping, directUploadThreshold = fileUploadThreshold),
+															timeColumn = context$timeColumn,
+															keyColumns = context$keyColumns,
+															name = context$name,
+															contextTypes = list("TimeSeries"))
+				} else if("codeFileContextDefinition" %in% class(context)) {
+					createContextObject(contextProvider = list(url = context$url, name = "Code file", jsonClass = "com.sparkbeyond.runtime.data.transform.CodeFile"),
+															name = context$name)
+				} else if("word2VecBasedOnDataContextDefinition" %in% class(context)) {
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+																									, useEscaping = useEscaping, directUploadThreshold = fileUploadThreshold),
+															name = context$name,
+															keyColumns = context$keyColumns,
+															contextTypes = list("Word2Vec"))
+				} else if("word2VecPretrainedS3ContextDefinition" %in% class(context)) {
+					# S3source was renamed to source in 1.8, depracated, left for backward compatibility
+					createContextObject(contextProvider = list(S3source = context$modelName, source = context$modelName, name = context$name, jsonClass = "com.sparkbeyond.runtime.data.transform.Word2Vec"),
+															name = context$name,
+															contextTypes = list("Word2VecPretrainedS3"))
+				} else if("word2VecPretrainedLocalContextDefinition" %in% class(context)) {
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+																									, useEscaping = useEscaping, directUploadThreshold = fileUploadThreshold),
+															name = context$name,
+															contextTypes = list("Word2VecPretrainedLocal"))
+				} else if("featuresFromRevisionContextDefinition" %in% class(context)) {
+					createContextObject(contextProvider = list(revisionId = context$revision, name = "FeaturesFromRevision", jsonClass = "com.sparkbeyond.runtime.data.transform.FeaturesFromRevision"),
+															name = context$name)
+				} else if("openStreetMapContextDefinition" %in% class(context)) {
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name), "")
+					serverPath = uploadFileToServer(filePath = context$filePath, projectName = projectName, name = paste0("context", contextName))
+					createContextObject(contextProvider = list(path = serverPath, jsonClass = "com.sparkbeyond.runtime.data.transform.OpenStreetMapFileInput"),
+															name = context$name,
+															contextTypes = contextTypesList(osmFile = TRUE))
+				} else if("shapeFileContextDefinition" %in% class(context)) {
+					findFilesRelatedToShapeFile = function(shapeFilePath) {
+						stopifnot(tools::file_ext(shapeFilePath) == "shp")
+						
+						fileNameWithoutExtention = tools::file_path_sans_ext(shapeFilePath)
+						possibleExts = c("cpg", "dbf", "prj", "shx")
+						relatedFiles = paste0(fileNameWithoutExtention,".",possibleExts)
+						existingRelatedFiles = relatedFiles[file.exists(relatedFiles)]
+						
+						requiredExts = c("dbf", "shx")
+						requiredFiles = paste0(fileNameWithoutExtention,".",requiredExts)
+						if(!all(requiredFiles %in% existingRelatedFiles)) {
+							vec2String = function(vec) paste(vec, collapse = ", ")
+							stop(paste0("Missing some of the mandatory files for shape file: ", shapeFilePath, ".\n Required: ", vec2String(requiredFiles), ".\n Found: ", vec2String(existingRelatedFiles)))
+						}
+						relatedFiles
+					}
+					
+					if(! tools::file_ext(context$filePath) == "shp") {
+						stop(paste("filePath in shapeFile context should point to a file with .shp extension. Instead received:", context$filePath))
+					}
+					
+					shapeComplimentaryFiles = findFilesRelatedToShapeFile(context$filePath)
+					uploadFiles = Vectorize(uploadFileToServer, c("filePath"))
+					
+					contextName = ifelse(!is.null(context$name), paste0("_", context$name), "")
+					uploadFiles(shapeComplimentaryFiles, projectName = projectName, name = paste0("context", contextName), generateHash=FALSE)
+					serverPath = uploadFileToServer(filePath = context$filePath, projectName = projectName, name = paste0("context", contextName), generateHash=FALSE)
+					createContextObject(contextProvider = list(path = serverPath, name = context$name, jsonClass = "com.sparkbeyond.runtime.data.transform.ShapeFileInput"),
+															name = context$name,
+															contextTypes = list("SpatialIndexFromShapes"))
+				}
+			} else {
+				#Handle data.frame input
+				contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+				context$data = uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
+								 							 , useEscaping = useEscaping, directUploadThreshold = fileUploadThreshold)
+				context
+			}
+		})
+	}
+	contextDatasets
+}
+
 .getSupportedAlgorithms = function() {
 	url = paste0(getSBserverDomain(), "/api2/algorithms")
 	algorithmsDF = .executeRequest(
