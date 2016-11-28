@@ -111,7 +111,7 @@
 
 .getNotificationLogReport = function(projectName, revision, path, responseSerializer = .responseSerializers$JSON, onError = .onErrorBehavior$STOP) {
 	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=", path)
-	re = .executeRequest(
+	.executeRequest(
 		function() httr::GET(url),
 		errorHandling = .withErrorHandling(onError = onError),
 		responseSerializer = responseSerializer
