@@ -222,12 +222,13 @@
 															contextTypes = list("Graph"))
 				} else if("timeSeriesContextDefinition" %in% class(context)) {
 					contextName = ifelse(!is.null(context$name), paste0("_", context$name),"")
+					contextType = ifelse(length(context$keyColumns)>0, "TimeSeriesMap", "TimeSeries")
 					createContextObject(data=uploadToServer(data = context$data, projectName = projectName, name = paste0("context", contextName)
 																									, useEscaping = useEscaping, directUploadThreshold = fileUploadThreshold),
 															timeColumn = context$timeColumn,
 															keyColumns = context$keyColumns,
 															name = context$name,
-															contextTypes = list("TimeSeries"))
+															contextTypes = list(contextType))
 				} else if("codeFileContextDefinition" %in% class(context)) {
 					createContextObject(contextProvider = list(url = context$url, name = "Code file", jsonClass = "com.sparkbeyond.runtime.data.transform.CodeFile"),
 															name = context$name)
