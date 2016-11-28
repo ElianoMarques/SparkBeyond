@@ -422,9 +422,9 @@ addTimeWindow = function(data, dateCol, keyCol = NA, window, unit = "Days", date
   }
   if (is.data.table(data)){
   	if (is.na(keyCol)) {
-  		data[,eval(as.symbol(newCol)):=sapply(dateColData, generateWindow)]
+  		data[,(newCol):=sapply(dateColData, generateWindow)]
   	} else {    
-  		data[,eval(as.symbol(newCol)):=mapply(generateWindow,dateColData,eval(as.symbol(keyCol)))]
+  		data[,(newCol):=mapply(generateWindow,dateColData,eval(as.symbol(keyCol)))]
   	}
   } else {
   	if (is.na(keyCol)) {
