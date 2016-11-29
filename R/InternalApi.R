@@ -172,6 +172,19 @@
 	read.table(localFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
 }
 
+.exportModelToPredictionBox = function(project, revision,
+																			 predictionBoxUrl, authKey = "",
+																			 uploadExtractor = TRUE, uploadModel = TRUE, uploadContexts = TRUE,
+																			 overwriteExisting = TRUE, overrideTargetGroupName = NULL) {
+	url = paste0(getSBserverDomain(), "/api2/predictionBoxClient/uploadModel")
+	params = list(project = project, revision = revision,
+								predictionBoxUrl = predictionBoxUrl, authKey = authKey,
+								uploadExtractor = uploadExtractor, uploadModel = uploadModel, uploadContexts = uploadContexts,
+								overwriteExisting = overwriteExisting, overrideTargetGroupName = overrideTargetGroupName)
+	.executeRequest(function() httr::POST(url, body = rjson::toJSON(params), httr::content_type_json()))
+	message(paste0("Model from project: ", projectName, ", revision: ", revision, " was exported successfully"))
+}
+
 .handleContexts = function(contextDatasets, projectName, useEscaping=TRUE, uncompressedUpload=FALSE) {
 	fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
 	isContextObjectDefinition = function(c) "contextObject" %in% class(c) || "contextDefinition" %in% class(c)
@@ -470,7 +483,13 @@
 		tryCatch({
 			text = suppressMessages(httr::content(httpResponse, as="text"))
 			res <- jsonlite::fromJSON(txt = text, simplifyDataFrame=TRUE)
-			ifelse (!is.null(res$error), res$error, NA_character_)
+			if(!is.null(res$error)) {
+				res$error
+			} else if(!is.null(res$message)) {
+				res$message
+			} else {
+				NA_character_
+			}
 		}, error = function(e) {
 			if(expectJson) {
 				.signalApiCondition(exceptions$UNEXPECTED_RESPONSE_FORMAT, "Failed to parse the response")

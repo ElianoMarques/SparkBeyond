@@ -594,6 +594,14 @@ Session = setRefClass("Session",
 					message(paste("Successfully exported contexts to:", path))
 				}
 			},
+			exportModelToPredictionBox = function(predictionBoxUrl, authKey = "", uploadContexts = TRUE,
+																						overwriteExisting = TRUE, overrideTargetGroupName = NULL) {
+				"Export model directly to prediction box. predictionBoxUrl - prediction box URL, authKey - prediction box authentication key, overwriteExisting - override existing model, overrideTargetGroupName - save the model under a different name in porediction box (by default project name is used as model identifier)"
+				.exportModelToPredictionBox(project = projectName, revision = revision, 
+																		predictionBoxUrl = predictionBoxUrl, authKey = authKey, 
+																		uploadContexts = uploadContexts,
+																		overwriteExisting = overwriteExisting, overrideTargetGroupName = overrideTargetGroupName)
+			},
 			webView = function (show=TRUE){
 				"Show a dynamic web view of the analysis."
 				suppressWarnings({
