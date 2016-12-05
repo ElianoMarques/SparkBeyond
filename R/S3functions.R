@@ -225,10 +225,12 @@ knowledgeControl = function(
 	weather = FALSE,
 	usCensus = FALSE,
 	news = FALSE,
-	worldBank = FALSE,
+	# worldBank = FALSE,
 	twitter = FALSE, 
 	searchEngines = FALSE,
-	customDatasets = FALSE
+	customDatasets = FALSE,
+	
+	...
 	
 	#useCustomGraphs = FALSE,	
 	#customGraphsWhiteList = NA,
@@ -237,6 +239,14 @@ knowledgeControl = function(
 	# customGraphsWhiteList A list that filters which domains should be used. NA by default.
 	# customGraphsBlackList A list that filters which custom graphs should be ignored. NA by default.
 	# customFunctions A list of additional functions that should be incorporated to the feature search. NA by default.
+	
+	extraParams = .threeDotsArgs$handle(
+	  args = list(...),
+	  handlers = list(
+			worldBank = .threeDotsArgs$handlers$deprecated("1.10")
+		))
+	worldBank = ifelse(is.null(extraParams$worldBank), FALSE, extraParams$worldBank)
+	
 	customDatasets = customDatasets ||
 		weather || usCensus || news || worldBank || twitter || searchEngines
 	

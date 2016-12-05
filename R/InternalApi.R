@@ -414,6 +414,59 @@
 	})
 }
 
+.threeDotsArgs = (function(){
+	warn = function(text, call) {
+		warning(
+			structure(
+				class = c("ThreeDotsArgWarning", "condition"),
+				list(message = text, call = call)
+			)
+		)
+	}
+	
+	list(
+		handlers = list(
+			inUse = function() {
+				function(argName, call) {}
+			},
+			deprecated = function(since, message=NA_character_) {
+				function(argName, call) {
+					if(.isServerVersionOlderThan(since)) {
+						# No need to do anything
+					} else {
+						warningText = paste("Argument:", argName, "is deprecated starting from version", since)
+						if(!is.na(message)) {
+							warningText = paste0(warningText, ". ", message)
+						}
+						warn(warningText, call)
+					}					
+				}
+			}
+		),
+		handle = function(args, handlers, default=NULL) {
+			externalCallStack = sys.call(-1)
+			paramsAndValuesList = args
+			handlers = handlers
+			defaultHandler = default
+			
+			for(paramName in names(paramsAndValuesList)) {
+				paramValue = paramsAndValuesList[[paramName]]
+				if (paramName %in% names(handlers) ) { 
+					handlers[[paramName]](paramName, externalCallStack)
+				} else {
+					if(!is.null(defaultHandler)) {
+						defaultHandler(paramName, externalCallStack)
+					} else {
+						warningText = paste("Argument:", paramName, "is not in use")
+						warn(warningText, externalCallStack)
+					}
+				}
+			}
+			args
+		}
+	)
+})()
+
 	# Serialization
 .responseSerializers = list(
 	NONE = "NONE",
