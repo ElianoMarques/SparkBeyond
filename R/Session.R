@@ -30,12 +30,12 @@ Session = setRefClass("Session",
     fields = list(
       artifact_loc = "character",
       modelBuilt = "logical",       #TODO: replace to a function call
-      jobId = "numeric",
+      jobId = "character",
       projectName = "character",
       revision = "numeric"
     ),
     methods = list(
-      initialize = function(nameOfProject = NA, revisionNumber = NA, artifact_loc = NA, modelBuilt = TRUE, jobId = -1) {
+      initialize = function(nameOfProject = NA, revisionNumber = NA, artifact_loc = NA, modelBuilt = TRUE, jobId = NA_character_) {
         "initializes a session using a projectName and revision number."
         if (!is.na(nameOfProject) && !is.na(revisionNumber)) {
         	artifact_loc <<- paste0(nameOfProject,"/",revisionNumber)
@@ -43,7 +43,7 @@ Session = setRefClass("Session",
         	revision <<- as.numeric(revisionNumber)
         	jobs = showJobs(projectName = projectName) #currently not using revision for backward compatibility 
         	if ("revision" %in% colnames(jobs)) {
-        		jobId <<- as.numeric(jobs[jobs$revision == revision,]$id)
+        		jobId <<- jobs[jobs$revision == revision,]$id
         	}
         } else {
 	        artifact_loc <<- artifact_loc
