@@ -423,6 +423,7 @@ showJobById = function(jobId) {
 	url <- paste0(getSBserverDomain(),paste0("/api2/jobs/", jobId))
 	.executeRequest(
 		function() httr::GET(url),
+		errorHandling = .withErrorHandling(extractErrorFromJson = FALSE),
 		responseSerializer = .responseSerializers$JSON
 	)
 }

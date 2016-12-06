@@ -677,7 +677,7 @@ learn <- function(
 							modelBuilt = !(length(params$algorithmsWhiteList) == 1 &&
 								tolower(params$algorithmsWhiteList[[1]]) == "zeror" &&
 								length(params$extraModels) == 0),
-							jobId = if(is.null(res$jobId)) -1 else res$jobId
+							jobId = as.character(if(is.null(res$jobId)) -1 else res$jobId)
 					)
 	
 # 	if (autoSave) {

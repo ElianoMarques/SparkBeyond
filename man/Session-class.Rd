@@ -31,10 +31,14 @@ SB object that encapsulates a session
 
 \item{\code{exportModel(includeContexts = TRUE)}}{Export model for prediction box. If prediction requires to supply ALL new contexts and no original contexts are needed, download of the contexts can be skipped be setting \code{includeContexts} to FALSE}
 
+\item{\code{exportModelToPredictionBox(predictionBoxUrl, authKey = "",
+  uploadContexts = TRUE, overwriteExisting = TRUE,
+  overrideTargetGroupName = NULL)}}{Export model directly to prediction box. predictionBoxUrl - prediction box URL, authKey - prediction box authentication key, overwriteExisting - override existing model, overrideTargetGroupName - save the model under a different name in porediction box (by default project name is used as model identifier)}
+
 \item{\code{features(...)}}{Returns a dataset with top feature information}
 
 \item{\code{initialize(nameOfProject = NA, revisionNumber = NA, artifact_loc = NA,
-  modelBuilt = TRUE, jobId = -1)}}{initializes a session using a projectName and revision number.}
+  modelBuilt = TRUE, jobId = NA_character_)}}{initializes a session using a projectName and revision number.}
 
 \item{\code{liftFromPrediction(predictionResult, overrideDesiredClass = NA,
   title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift",

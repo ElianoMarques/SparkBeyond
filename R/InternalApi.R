@@ -483,10 +483,10 @@
 	SILENT = "silent"
 )
 
-.withErrorHandling = function(retries = 0, onError = .onErrorBehavior$STOP, message = NA_character_) {
+.withErrorHandling = function(retries = 0, extractErrorFromJson=TRUE, onError = .onErrorBehavior$STOP, message = NA_character_) {
 	structure(
 		class = c("ErrorHandlingSettings"),
-		list(retries = retries, onError = onError, message = message)
+		list(retries = retries, extractErrorFromJson=extractErrorFromJson, onError = onError, message = message)
 	)
 }
 
@@ -535,7 +535,7 @@
 	extractApplicationError = function(httpResponse, expectJson=FALSE) {
 		tryCatch({
 			text = suppressMessages(httr::content(httpResponse, as="text"))
-			res <- jsonlite::fromJSON(txt = text, simplifyDataFrame=TRUE)
+			res <- jsonlite::fromJSON(txt = text, simplifyDataFrame=FALSE)
 			if(!is.null(res$error)) {
 				res$error
 			} else if(!is.null(res$message)) {
@@ -586,7 +586,7 @@
 		# Checking HTTP status
 		status = httr::status_code(response)
 		statusMessage = httr::http_status(response)$message
-		applicationError = extractApplicationError(response)
+		applicationError = ifelse(errorHandling$extractErrorFromJson, extractApplicationError(response), NA_character_)
 		if(status==401) {
 			.signalApiCondition(exceptions$AUTHENTICATION, "Authentication error, please login", call = externalCallStack, isRetriable = FALSE)
 		} else if(status==403) {
