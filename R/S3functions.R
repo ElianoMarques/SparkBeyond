@@ -215,7 +215,6 @@ featureGenerationControl = function(
 #' @param weather Weather data from NOAA Climate.gov. Matches the training data by date and location.
 #' @param usCensus Experimental: The United States Census decennial census. Matches training data by Zipcode.
 #' @param news Experimental: News data from the GDELT Project that monitors the world's broadcast, print, and web news. Matches the training data based on a date, location or both.
-#' @param worldBank Experimental: Historical values of the World Bank Global Development Indicators (WDI) by country. Matches the training data by a country.
 #' @param twitter Experimental: information from tweets that appeared on a certain date (based on dates in the data). (Limited by the maximum allowed Twitter quota per day).
 #' @param searchEngines Experimental: Use search engines to find matching datasets. Matches training data by textual elements
 #' @param customDatasets Custom datasets current include include US zipcode information with 44 parameters, UK postcode information, data on the largest 1000 cities and airport information. 

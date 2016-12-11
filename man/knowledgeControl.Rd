@@ -5,8 +5,8 @@
 \title{knowledge Control}
 \usage{
 knowledgeControl(linkedDataCore = FALSE, openStreetMap = FALSE,
-  weather = FALSE, usCensus = FALSE, news = FALSE, worldBank = FALSE,
-  twitter = FALSE, searchEngines = FALSE, customDatasets = FALSE)
+  weather = FALSE, usCensus = FALSE, news = FALSE, twitter = FALSE,
+  searchEngines = FALSE, customDatasets = FALSE, ...)
 }
 \arguments{
 \item{linkedDataCore}{Includes DBPedia, Yago2, Wordnet and OpenLibrary. DBpedia is a crowd-sourced community effort to extract structured information from Wikipedia. Matches training data by Text elements.}
@@ -18,8 +18,6 @@ knowledgeControl(linkedDataCore = FALSE, openStreetMap = FALSE,
 \item{usCensus}{Experimental: The United States Census decennial census. Matches training data by Zipcode.}
 
 \item{news}{Experimental: News data from the GDELT Project that monitors the world's broadcast, print, and web news. Matches the training data based on a date, location or both.}
-
-\item{worldBank}{Experimental: Historical values of the World Bank Global Development Indicators (WDI) by country. Matches the training data by a country.}
 
 \item{twitter}{Experimental: information from tweets that appeared on a certain date (based on dates in the data). (Limited by the maximum allowed Twitter quota per day).}
 
