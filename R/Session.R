@@ -43,7 +43,7 @@ Session = setRefClass("Session",
         	revision <<- as.numeric(revisionNumber)
         	jobs = showJobs(projectName = projectName) #currently not using revision for backward compatibility 
         	if ("revision" %in% colnames(jobs)) {
-        		jobId <<- jobs[jobs$revision == revision,]$id
+        		jobId <<- as.character(jobs[jobs$revision == revision,]$id)
         	}
         } else {
 	        artifact_loc <<- artifact_loc
