@@ -279,7 +279,7 @@ login = function(username, password=NA, domain) {
 		releaseNumber = serverVersion()$releaseNumber
 		assign("SBServerVersion", releaseNumber, envir = globalenv())
 	} else {
-		print ("Login failed. Please check your credentials.")
+		stop ("Login failed. Please check your credentials.")
 	}
 	loggedIn
 }
