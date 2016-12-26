@@ -16,7 +16,7 @@ SB object that encapsulates an enrichment job
 \donttest{
 # Learn
 session = learn("titanic", getData("titanic_train"), target="survived")
-# Non blocking predict
+# Non blocking enrich
 enrichment = session$enrich(getData("titanic_test"), async=TRUE)
 enrichment$currentStatus()
 data = enrichment$data()

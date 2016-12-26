@@ -71,8 +71,8 @@ Session = setRefClass("Session",
 				message("In order to see the job queue, terminate the current command and run showJobs(status='queued')")
                 
         readStreamingAPI = function(prevLine = 0) {
-        	#/rapi/notificationsLog/:project/:revision?skipLines=x
-        	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=UInotification.log&skipLines=",prevLine)
+        	#/api/notificationsLog/:project/:revision?skipLines=x
+        	url = paste0(getSBserverDomain(),"/api/notificationsLog/",projectName,"/",revision, "?path=UInotification.log&skipLines=",prevLine)
         	txt = .executeRequest(
         		function() httr::GET(url),
         		errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT),
@@ -200,39 +200,36 @@ Session = setRefClass("Session",
       },
 
 			################################## enrich #####################
-      enrich = function(data, featureCount = NA,  contextDatasets = NULL ,enrichedColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...) {
-
-        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{enrichedColumnsOnly} to FALSE in order to include the original columns in the enriched dataset."
+      enrich = function(data, featureCount = NA,  contextDatasets = NULL , includeOriginals = FALSE, columnsWhiteList = NA, outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...) {
+        "Returns a data frame containing the enrichedData. \\code{data} is a dataframe to be enriched. Set \\code{featureCount} in order to limit the number of returned features. Set \\code{includeOriginals} to TRUE in order to include the original columns in the enriched dataset.\
+				\\code{columnsWhiteList} - specify the original columns to be included in the result , set \\code{outputName} to change the default result file name"
+      	
         extraParams = list(...)
         uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
         fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
         async = ifelse(!is.null(extraParams$async), extraParams$async, FALSE)
+        enrichedColumnsOnly = ifelse(!is.null(extraParams$enrichedColumnsOnly), extraParams$enrichedColumnsOnly, TRUE) #Removed in 1.10
+        includeOriginals = includeOriginals || !enrichedColumnsOnly #Added in 1.10
         
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
                 
-        datapath = ifelse (remoteMode, 
-					{
-						uploadedPath = uploadToServer(data = data, projectName = projectName, name = "enrich", useEscaping = fileEscaping, directUploadThreshold = fileUploadThreshold)
-						if(is.na(uploadedPath)) stop("failed to upload file to enrich to server")
-						uploadedPath        
-					},
-					writeToServer(data, prefix = "enrich", useEscaping = fileEscaping) #project name
-        )        
- 
-        outputPath = ifelse(remoteMode,
-        								outputName,		#potentially get a name for the enriched output
-        								tempfile(pattern = "data", tmpdir = getSBserverIOfolder(), fileext = ".tsv.gz"))
+        datapath = {
+					uploadedPath = uploadToServer(data = data, projectName = projectName, name = "enrich", useEscaping = fileEscaping, directUploadThreshold = fileUploadThreshold)
+					if(is.na(uploadedPath)) stop("failed to upload file to enrich to server")
+					uploadedPath        
+				}
        
         contextDatasets = .handleContexts(contextDatasets, projectName = projectName,uncompressedUpload = uncompressedUpload)
         
-        params <-list(modelPath = artifact_loc,
+        params <-list(projectName = projectName,
+        							revision = revision,
+        							modelPath = artifact_loc,  #not needed since 1.10
         							dataPath = datapath,
         							featureCount = featureCount,
-        							outputName = outputPath,
-        							enrichedColumnsOnly = enrichedColumnsOnly,
+        							outputName = outputName,
+        							enrichedColumnsOnly = !includeOriginals,
+        							includeOriginals = includeOriginals,
         							columnsWhiteList = columnsWhiteList,
         							fileEscaping = fileEscaping,
-        							externalPrefixPath = ifelse (remoteMode, NA, getSBserverIOfolder()),
         							contextDatasets = contextDatasets,
         							async = async
         							#addBooleanNumericExtractors        							
@@ -240,7 +237,7 @@ Session = setRefClass("Session",
         params = params[!is.na(params)]
 
         message (paste("Enriching ",params$dataPath))
-        url <- paste0(getSBserverDomain(),"/rapi/enrich")
+        url <- paste0(getSBserverDomain(),"/api/enrich")
         message(paste("Calling:", url))
 
         body = rjson::toJSON(params)
@@ -249,76 +246,100 @@ Session = setRefClass("Session",
         	errorHandling = .withErrorHandling(message = "Enrichment failed"),
         	responseSerializer = .responseSerializers$JSON
         )
-        enrichResult = .enrichResultFromJson(res)
-
-        if(enrichResult$asyncMode) {
-        	# Async mode
-        	executionId = enrichResult$executionId
-        	total = nrow(data)
-
-        	enrichment = EnrichmentJob$new(executionId, totalRows = total)
-        	quoted = function(str) paste0('"', str, '"')
-        	message(paste("Enrichment execution ID is:", executionId))
-        	message(paste0("You can get back to following this enrichment job by running: ",
-        								 "EnrichmentJob$new(executionId=", quoted(executionId), ")"))
-
-        	if(runBlocking) {
-        		unusedRefToData = enrichment$data(localFileName = outputName)
-        	}
-
-
-        	message("Done.")
-        	enrichment
+        
+        if(.isServerVersionOlderThan("1.10")) {
+	        enrichResult = .enrichResultFromJson(res)
+	
+	        if(enrichResult$asyncMode) {
+	        	# Async mode
+	        	executionId = enrichResult$executionId
+	        	total = nrow(data)
+	
+	        	enrichment = EnrichmentJob$new(executionId, totalRows = total)
+	        	quoted = function(str) paste0('"', str, '"')
+	        	message(paste("Enrichment job ID is:", executionId))
+	        	message(paste0("You can get back to following this enrichment job by running: ",
+	        								 "EnrichmentJob$new(", quoted(executionId), ")"))
+	
+	        	if(runBlocking) {
+	        		unusedRefToData = enrichment$data(localFileName = outputName)
+	        	}
+	
+	
+	        	message("Done.")
+	        	enrichment
+	        } else {
+	        	#	Sync mode for server version < 1.8, doesn't support async mode
+	        	if(is.null(res$result)) {
+	        		stop("Enrichment failed.")
+	        	}
+	        	localFile = .downloadFile(projectName, revision, pathOnServer = res$result, saveToPath = paste0(outputName, ".tsv.gz"))
+	        	data = if (!is.null(localFile)) {
+	        		.loadEnrichedDataFrame(localFile)
+	        	} else {
+	        		stop("Enrichment failed: failed to download results")
+	        	}
+	
+	        	message("Done.")
+	        	return(data)
+	        }
         } else {
-        	#	Sync mode for server version < 1.8, doesn't support async mode
-        	if(is.null(res$result)) {
-        		stop("Enrichment failed.")
+        	jobState = .jobStateFromJson(res)
+        	enrichJobId = jobState$jobId
+        	total = nrow(data)
+        	enrichmentJob = EnrichmentJob$new(enrichJobId, totalRows = total)
+        	quoted = function(str) paste0('"', str, '"')
+        	message(paste("Enrich job ID is:", enrichJobId))
+        	message(paste0("You can get back to following this enrichment job by running: ", 
+        								 "EnrichmentJob$new(jobId=", quoted(enrichJobId), ")"))
+        	
+        	if(runBlocking) {
+        		unusedRefToData = enrichmentJob$data(localFileName = outputName)
         	}
-        	localFile = .downloadFile(projectName, revision, pathOnServer = res$result, saveToPath = paste0(outputName, ".tsv.gz"))
-        	data = if (!is.null(localFile)) {
-        		.loadEnrichedDataFrame(localFile)
-        	} else {
-        		stop("Enrichment failed: failed to download results")
-        	}
-
-        	message("Done.")
-        	return(data)
+        	
+        	enrichmentJob        	
         }
       },
 
 			################################## predict #####################
-      predict = function(data, contextDatasets = NULL, predictionColumnsOnly = TRUE, columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE, runBlocking = TRUE, ...) {
-        "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \\code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset."
-        #if(!currentUser(FALSE)) stop("Please login")
+      predict = function(data, contextDatasets = NULL, includeOriginals = FALSE, includeEnriched = FALSE, columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE, runBlocking = TRUE, ...) {
+        "Returns prediction on a created model. \\code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \\code{includeOriginals} to TRUE to include the original columns in the result. Set \\code{includeEnriched} to TRUE to include the enriched columns in the result.\
+				\\code{columnsWhiteList} - specify the original columns to be included in the result (\\code{includeOriginals} is required to be TRUE), set \\code{outputName} to change the default result file name"
 
-        statusException()
         if (is.na(modelBuilt) || !modelBuilt) warning("Prediction requires full model building using learn")
         
-        extraParams = list(...)        
-        remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
+        extraParams = list(...)
         uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
         fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
         async = ifelse(!is.null(extraParams$async), extraParams$async, FALSE)
+        predictionColumnsOnly = ifelse(!is.null(extraParams$predictionColumnsOnly), extraParams$predictionColumnsOnly, TRUE)
+        includeOriginals = includeOriginals || !predictionColumnsOnly
+        includeEnriched = includeEnriched
+        predictionColumnsOnly = !(includeEnriched || includeOriginals)
         
-        datapath = ifelse (remoteMode, 
-					{
-        		uploadedPath = uploadToServer(data = data, projectName = projectName, name = "predict", useEscaping = fileEscaping, directUploadThreshold = fileUploadThreshold)
-        		if(is.na(uploadedPath)) stop("failed to upload file to predict to server")
-        		uploadedPath
-        	},
-        	writeToServer(data, prefix = "predict", useEscaping = fileEscaping) #project name
-				)
+        if(!.isServerVersionOlderThan("1.10") && (!is.na(columnsWhiteList) && length(columnsWhiteList)>0) && includeOriginals == FALSE) {
+        	warning("includeOriginals has to be set to TRUE in order to enable columnsWhiteList")
+        }
         
+        datapath = {
+      		uploadedPath = uploadToServer(data = data, projectName = projectName, name = "predict", useEscaping = fileEscaping, directUploadThreshold = fileUploadThreshold)
+      		if(is.na(uploadedPath)) stop("failed to upload file to predict to server")
+      		uploadedPath
+      	}
+      
         contextDatasets = .handleContexts(contextDatasets, projectName = projectName,uncompressedUpload = uncompressedUpload)
 
-        params <-list(modelPath = artifact_loc,
+        params <-list(projectName = projectName,
+        							revision = revision,
+        							modelPath = artifact_loc,
         							dataPath = datapath,
-        							writePredictionColumnsOnly = predictionColumnsOnly,
+        							includeOriginals = includeOriginals, # From 1.10
+        							includeEnriched = includeEnriched, # From 1.10
+        							writePredictionColumnsOnly = predictionColumnsOnly, # Redundant since 1.10
         							columnsWhiteList = columnsWhiteList,
         							fileEscaping = fileEscaping,
-        							predictContexts = contextDatasets,  # Backward compatibility with 1.5
         							contextDatasets = contextDatasets,
-        							externalPrefixPath = ifelse(remoteMode, NA, getSBserverIOfolder()),
+        							# Starting from version 1.10 not in use
         							# Starting from version 1.8 this will activate async mode, older versions will ignore it
         							# If async is TRUE and server version is >=1.8, successful response to this request will contain executionId
         							# If the response will not contain executionId, old predict flow will be executed
@@ -327,7 +348,7 @@ Session = setRefClass("Session",
         params = params[!is.na(params)] 							
 
         message (paste("Predicting ",params$dataPath))
-        url <- paste0(getSBserverDomain(),"/rapi/predict")
+        url <- paste0(getSBserverDomain(),"/api/predict")
         message(paste("Calling:", url))
 
         body = rjson::toJSON(params)
@@ -336,41 +357,63 @@ Session = setRefClass("Session",
         	errorHandling = .withErrorHandling(message = "Prediction failed"),
         	responseSerializer = .responseSerializers$JSON
         )
-        predictResult = .predictResultFromJson(res)
-
-        if(predictResult$asyncMode) {
-        # Async mode
-        	executionId = predictResult$executionId
-        	total = nrow(data)
-
-        	prediction = PredictionJob$new(executionId, totalRows = total)
-        	quoted = function(str) paste0('"', str, '"')
-        	message(paste("Predict execution ID is:", executionId))
-        	message(paste0("You can get back to following this prediction job by running: ", 
-        								 "PredictionJob$new(executionId=", quoted(executionId), ")"))
-
-        	if(runBlocking) {
-        		unusedRefToData = prediction$data(localFileName = outputName)
+        
+        if(.isServerVersionOlderThan("1.10")) {
+        	predictResult = .predictResultFromJson(res)
+        	
+        	if(predictResult$asyncMode) {
+        		# Async mode
+        		executionId = predictResult$executionId
+        		total = nrow(data)
+        		
+        		prediction = PredictionJob$new(executionId, totalRows = total)
+        		quoted = function(str) paste0('"', str, '"')
+        		message(paste("Predict job ID is:", executionId))
+        		message(paste0("You can get back to following this prediction job by running: ", 
+        									 "PredictionJob$new(", quoted(executionId), ")"))
+        		
+        		if(runBlocking) {
+        			unusedRefToData = prediction$data(localFileName = outputName)
+        		}
+        		
+        		prediction
+        	} else {
+        		#	Sync mode for server version < 1.8, doesn't support async mode
+        		if(is.null(res$result)) {
+        			stop("Prediction failed.")
+        		}
+        		data	= .downloadDataFrame(projectName, revision, pathOnServer = res$result, saveToPath = paste0(outputName, ".tsv.gz"))
+        		if(!is.null(data)) {
+        			message("Done.")
+        		}
+        		
+        		return(data)
         	}
-
-        	prediction
         } else {
-	        #	Sync mode for server version < 1.8, doesn't support async mode
-	        if(is.null(res$result)) {
-	        	stop("Prediction failed.")
-	        }
-        	data	= .downloadDataFrame(projectName, revision, pathOnServer = res$result, saveToPath = paste0(outputName, ".tsv.gz"))
-	        if(!is.null(data)) {
-	        	message("Done.")
-	        }
-
-        	return(data)
+        	jobState = .jobStateFromJson(res)
+        	predictJobId = jobState$jobId
+        	total = nrow(data)
+        	predictionJob = PredictionJob$new(predictJobId, totalRows = total)
+        	quoted = function(str) paste0('"', str, '"')
+        	message(paste("Predict job ID is:", predictJobId))
+        	message(paste0("You can get back to following this prediction job by running: ", 
+        								 "PredictionJob$new(jobId=", quoted(predictJobId), ")"))
+        	
+        	if(runBlocking) {
+        		unusedRefToData = predictionJob$data(localFileName = outputName)
+        	}
+        	
+        	predictionJob
         }
       },
 
 			################################## lift #####################			
       liftFromPrediction = function(predictionResult, overrideDesiredClass = NA, title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift", fileEscaping = TRUE, ...) { #TODO: change documentation
         "Returns lift from a created model and generates three plots. \\code{predictionResult} is a dataframe to be analyzed, \\code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \\code{title} optional: a title for the plot. \\code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis)."
+      	if(!.isServerVersionOlderThan("1.10")) {
+      		stop('liftPlot is deprecated starting from server version 1.10. Use "PredictionJob" functions "downloadReports", "browseReports" and "evaluate" instead')
+      	}
+      	
         extraParams = list(...)        
         remoteMode = if(!is.null(extraParams$remoteMode)) extraParams$remoteMode else is.null(getSBserverIOfolder())
         
@@ -393,7 +436,7 @@ Session = setRefClass("Session",
         )
         params = params[!is.na(params)]
 
-        url <- paste0(getSBserverDomain(),"/rapi/liftFromPredictionResults")
+        url <- paste0(getSBserverDomain(),"/api/liftFromPredictionResults")
         message(paste("Calling:", url))
 
         body = rjson::toJSON(params)
@@ -446,7 +489,7 @@ Session = setRefClass("Session",
 
         params = params[!is.na(params)]
 
-        url <- paste0(getSBserverDomain(),"/rapi/createPackage")
+        url <- paste0(getSBserverDomain(),"/api/createPackage")
         message(paste("Calling:", url))
 
         body = rjson::toJSON(params)

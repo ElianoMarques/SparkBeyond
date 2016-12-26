@@ -24,8 +24,9 @@ SB object that encapsulates a session
   fileEscaping = TRUE, ...)}}{Create a sharable package for the model. \code{sampleData} can be used to a sample data to the package and test it. Only first 20 rows of the sample data will be used. \code{createRestAPIpackage} is a boolean indicator for whether to create a package for prediction via command line (set to FALSE) or via programmatic REST API call(TRUE).}
 
 \item{\code{enrich(data, featureCount = NA, contextDatasets = NULL,
-  enrichedColumnsOnly = TRUE, columnsWhiteList = NA,
-  outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{enrichedColumnsOnly} to FALSE in order to include the original columns in the enriched dataset.}
+  includeOriginals = FALSE, columnsWhiteList = NA,
+  outputName = "enriched", fileEscaping = TRUE, runBlocking = TRUE, ...)}}{Returns a data frame containing the enrichedData. \code{data} is a dataframe to be enriched. Set \code{featureCount} in order to limit the number of returned features. Set \code{includeOriginals} to TRUE in order to include the original columns in the enriched dataset.
+\code{columnsWhiteList} - specify the original columns to be included in the result , set \code{outputName} to change the default result file name}
 
 \item{\code{evaluate(...)}}{Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more.}
 
@@ -44,9 +45,10 @@ SB object that encapsulates a session
   title = "test", percentOfPopulationToPlot = 0.2, outputName = "lift",
   fileEscaping = TRUE, ...)}}{Returns lift from a created model and generates three plots. \code{predictionResult} is a dataframe to be analyzed, \code{overrideDesiredClass} the class in the label column to check the lift for (e.g. '1'), \code{title} optional: a title for the plot. \code{percentOfPopulationToPlot} optional: limit the plot to the top percent of the data (x axis).}
 
-\item{\code{predict(data, contextDatasets = NULL, predictionColumnsOnly = TRUE,
-  columnsWhiteList = NA, outputName = "predicted", fileEscaping = TRUE,
-  runBlocking = TRUE, ...)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \code{predictionColumnsOnly} to TRUE to return only prediction and probabily columns rather than the entire dataset.}
+\item{\code{predict(data, contextDatasets = NULL, includeOriginals = FALSE,
+  includeEnriched = FALSE, columnsWhiteList = NA,
+  outputName = "predicted", fileEscaping = TRUE, runBlocking = TRUE, ...)}}{Returns prediction on a created model. \code{data} is a dataframe to be predicted. contextDatasets - list of contextObject(s) with context information unique to the prediction (see more information in learn()). Set \code{includeOriginals} to TRUE to include the original columns in the result. Set \code{includeEnriched} to TRUE to include the enriched columns in the result.
+\code{columnsWhiteList} - specify the original columns to be included in the result (\code{includeOriginals} is required to be TRUE), set \code{outputName} to change the default result file name}
 
 \item{\code{reports()}}{Shows all reports applicable for the current analysis.}
 

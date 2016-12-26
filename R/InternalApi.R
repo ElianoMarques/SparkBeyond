@@ -88,7 +88,7 @@
 
 
 .getPredictJobStatus = function(jobId) {
-	url <- paste0(getSBserverDomain(),"/rapi/predict/", jobId)
+	url <- paste0(getSBserverDomain(),"/api/predict/", jobId)
 
 	res = .executeRequest(
         function() httr::GET(url, httr::content_type_json()),
@@ -99,7 +99,7 @@
 }
 
 .getEnrichJobStatus = function(jobId) {
-	url <- paste0(getSBserverDomain(),"/rapi/enrich/", jobId)
+	url <- paste0(getSBserverDomain(),"/api/enrich/", jobId)
 
 	res = .executeRequest(
 		function() httr::GET(url, httr::content_type_json()),
@@ -109,8 +109,141 @@
 	jobStatus = .jobStatusFromJson(res)
 }
 
+.enrichPredictStatusFromJson = function(json) {
+	tryCatch({
+		structure(
+			class = c("enrichPredictJobStatus"),
+			list(builtContexts = json$builtContexts, 
+					 processedRows = ifelse(is.null(json$processedRows), 0, json$processedRows$amount)))
+		},
+		error = function(cond) {
+			stop(paste("Invalid json received, can't deserialize into job status:", json))
+		}
+	)
+}
+
+.generatePredictionReports = function(predictJobId, desiredClassOverride = NA, percentOfPopulationToPlot = 0.2, outputName = "lift") {
+	url = paste0(getSBserverDomain(),"/api/generatePredictionJobReports")
+	params = list(
+		predictJobId = predictJobId,
+		desiredClassOverride = desiredClassOverride,
+		percentOfPopulationToPlot = percentOfPopulationToPlot
+	)
+	params = params[!is.na(params)]
+	body = rjson::toJSON(params)
+	
+	response = .executeRequest(
+		function() httr::POST(url, body = body, httr::content_type_json()),
+		responseSerializer = .responseSerializers$JSON
+	)
+	
+	.jobStateFromJson(response)
+}
+
+.showPredictResultReport = function(jobId, filename) {
+	url = paste0(getSBserverDomain(),"/api/predictionReportFile/", jobId, "/", filename)
+	token = .executeRequest(
+		function() httr::GET(paste0(getSBserverDomain(),paste0("/getToken"))),
+		responseSerializer = .responseSerializers$TEXT
+	)
+	htmlSource = paste0(url, "?token=", token)
+	browseURL(htmlSource)
+}
+
+.getPredictEvaluation = function(jobId) {
+	url = paste0(getSBserverDomain(),"/api/predictionReportFile/", jobId, "/evaluation.json")
+	.executeRequest(
+		function() httr::GET(url),
+		responseSerializer = .responseSerializers$JSON
+	)
+}
+
+.jobResultFromJson = function(resultJson) {
+	if(is.na(resultJson)) {
+		stop(paste("Invalid json received, can't deserialize into job result:", resultJson))
+	}
+	
+	structure(
+		class = c("jobResult"),
+		list(error = resultJson$failure, 
+				 success = resultJson$success,
+				 isSucceeded = is.null(resultJson$failure)))
+}
+
+.jobStateFromJson <- function(json) {
+	extractTimestampMillis = function(json, name) {
+		if(is.null(json[[name]])) {
+			NULL
+		} else {
+			json[[name]] %/% 1000
+		}
+	}
+	tryCatch({
+		enqueuedMillis = extractTimestampMillis(json, "enqueued")
+		startedMillis = extractTimestampMillis(json, "started")
+		endedMillis = extractTimestampMillis(json, "ended")
+		structure(
+			class = c("jobState"),
+			list(jobId = json$id, 
+					 enqueuedMillis = enqueuedMillis, 
+					 startedMillis = startedMillis,
+					 endedMillis = endedMillis,
+					 workerId = if(is.null(json$worker)) { NULL } else { json$worker$logicalId },
+					 status = json$status,
+					 result = json$result,
+					 isEnqueued = !is.null(enqueuedMillis) && is.null(startedMillis),
+					 isRunning = !is.null(startedMillis) && is.null(endedMillis),
+					 isCompleted = !is.null(endedMillis)))
+		},
+		error = function(cond) {
+			stop(paste("Invalid json received, can't deserialize into job state:", json, "-", cond$message))
+		}
+	)
+}
+
+.getJobState = function(jobId) {
+	url <- paste0(getSBserverDomain(),"/api/jobState/", jobId)
+	
+	res = .executeRequest(
+		function() httr::GET(url, httr::content_type_json()),
+		errorHandling = .withErrorHandling(onError = .onErrorBehavior$MESSAGE),
+		responseSerializer = .responseSerializers$JSON
+	)
+	
+	if(is.null(res)) 
+		NULL 
+	else 
+		.jobStateFromJson(res)
+}
+
+.cancelJob = function(jobId) {
+	url <- paste0(getSBserverDomain(),"/api/cancelOrAbortJob/", jobId)
+	.executeRequest(function() httr::POST(url))
+}
+
+.initJob = function(jobId) {
+	structure(
+		class = c("job"),
+		list(jobId = jobId,
+			currentState = function() {
+				.getJobState(jobId)
+			},
+			cancel = function() {
+				.cancelJob(jobId)
+			},
+			# STATE_UPDATE_FUN - callback that is executed on polling. Returns TRUE to continue polling, FALSE otherwise.
+			pollState = function(STATE_CALLBACK_FUN, pollingIntervalSeconds = 5) {
+				state = .getJobState(jobId)
+				while(STATE_CALLBACK_FUN(state)) {
+					Sys.sleep(pollingIntervalSeconds)
+					state = .getJobState(jobId)
+				}
+			})
+	)
+}
+
 .getNotificationLogReport = function(projectName, revision, path, responseSerializer = .responseSerializers$JSON, onError = .onErrorBehavior$STOP) {
-	url = paste0(getSBserverDomain(),"/rapi/notificationsLog/",projectName,"/",revision, "?path=", path)
+	url = paste0(getSBserverDomain(),"/api/notificationsLog/",projectName,"/",revision, "?path=", path)
 	.executeRequest(
 		function() httr::GET(url),
 		errorHandling = .withErrorHandling(onError = onError),
@@ -125,7 +258,7 @@
 )
 
 .download = function(url, localFile = NA_character_, description = NA_character_) {
-	tempFileName = "contexts-test_timeSeries_using_problem_definition-5.zip"
+	tempFileName = "downloaded.tmp"
 	tempFileCreated = FALSE
 	downloadDescription = ifelse(!is.na(description), description, 
 											 ifelse(!is.na(localFile), localFile, "..."))
@@ -135,10 +268,10 @@
 	}
 	
 	message(paste("Downloading", downloadDescription))
-    downloadResult = .executeRequest(
-    	function() httr::GET(url, config = httr::progress(type = "down"), httr::write_disk(localFile, overwrite = TRUE)),
-      errorHandling = .withErrorHandling(retries = 2)
-    )
+  downloadResult = .executeRequest(
+  	function() httr::GET(url, config = httr::progress(type = "down"), httr::write_disk(localFile, overwrite = TRUE)),
+    errorHandling = .withErrorHandling(retries = 2)
+  )
 	
 	if(httr::status_code(downloadResult) == 200) {
 		if(tempFileCreated) {
@@ -516,6 +649,7 @@
 			warning(message)
 		} else if(onError == .onErrorBehavior$MESSAGE) {
 			message(message)
+			NULL
 		} else if(onError == .onErrorBehavior$SILENT) {
 			NULL
 		} else {
