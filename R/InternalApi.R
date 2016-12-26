@@ -182,7 +182,7 @@
 								uploadExtractor = uploadExtractor, uploadModel = uploadModel, uploadContexts = uploadContexts,
 								overwriteExisting = overwriteExisting, overrideTargetGroupName = overrideTargetGroupName)
 	.executeRequest(function() httr::POST(url, body = rjson::toJSON(params), httr::content_type_json()))
-	message(paste0("Model from project: ", projectName, ", revision: ", revision, " was exported successfully"))
+	message(paste0("Model from project: ", project, ", revision: ", revision, " was exported successfully"))
 }
 
 .handleContexts = function(contextDatasets, projectName, useEscaping=TRUE, uncompressedUpload=FALSE) {
