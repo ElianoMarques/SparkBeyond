@@ -37,8 +37,8 @@ EnrichmentJob = R6Class("EnrichmentJob",
 	 			result = .jobResultFromJson(state$result)
 	 			status = .enrichPredictStatusFromJson(state$status)
 	 			if(result$isSucceeded) {
-	 				totalRowsMessage = ifelse(is.na(private$totalRows), "", paste0("out of ", private$totalRows))
-	 				message(paste("Enrichment has finished successfully. Processed", status$processedRows, totalRowsMessage, "rows"))
+	 				totalRowsMessage = ifelse(is.na(private$totalRows), "", paste0(" out of ", private$totalRows))
+	 				message(paste0("Enrichment has finished successfully. Processed ", status$processedRows, totalRowsMessage, " rows"))
 	 			} else {
 	 				stop(paste("Enrichment failed:", result$error))
 	 			}

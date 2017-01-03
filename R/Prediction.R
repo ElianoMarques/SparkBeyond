@@ -34,13 +34,13 @@ PredictionJob = R6Class("PredictionJob",
 						message(paste("Prediction job is running. Parsing contexts..."))
 					} else {
 						totalRowsMessage = ifelse(is.na(private$totalRows), "", paste0("out of ", private$totalRows))
-						cat("\r", "Prediction job is running. Processed", status$processedRows, totalRowsMessage, "rows", "\r")
+						cat("\r", "Prediction job is running. So far processed", status$processedRows, totalRowsMessage, "rows", "\r")
 					}
 				} else if(state$isCompleted) {
 					result = .jobResultFromJson(state$result)
 					status = .enrichPredictStatusFromJson(state$status)
 					if(result$isSucceeded) {
-						totalRowsMessage = ifelse(is.na(private$totalRows), "", paste0("out of ", private$totalRows))
+						totalRowsMessage = ifelse(is.na(private$totalRows), "", paste0(" out of ", private$totalRows))
 						message(paste0("Prediction has finished successfully. Processed ", status$processedRows, totalRowsMessage, " rows",
 													 ". Started: ", as.POSIXct(state$startedMillis, origin="1970-01-01"),
 													 ". Ended: ", as.POSIXct(state$endedMillis, origin="1970-01-01")))
