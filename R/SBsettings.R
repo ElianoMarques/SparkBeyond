@@ -457,7 +457,7 @@ cancelJob = function(jobId) {
 #' @return The response from the server.
 clearCache = function(projectName) {
 	#if(!currentUser(FALSE)) stop("Please login")
-	url <- paste0(getSBserverDomain(),"/rapi/cleanCache/",projectName)
+	url <- paste0(getSBserverDomain(),"/api/cleanCache/",projectName)
 	res = .executeRequest(
 		function() httr::GET(url, httr::content_type_json()),
 		errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT)
@@ -470,7 +470,7 @@ clearCache = function(projectName) {
 #' A function to check whether the server is alive
 #' @return The response from the server.
 isServerAlive = function() {
-	url <- paste0(getSBserverDomain(),"/rapi/heartbeat")
+	url <- paste0(getSBserverDomain(),"/api/heartbeat")
 	res = .executeRequest(
 		function() httr::GET(url, httr::content_type_json()),
 		errorHandling = .withErrorHandling(onError = .onErrorBehavior$SILENT),

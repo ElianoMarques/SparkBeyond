@@ -552,7 +552,7 @@ learn <- function(
 		stop ("testData and trainData have different schemas")
 	}
 	
-	url <- paste0(getSBserverDomain(),"/rapi/learn")
+	url <- paste0(getSBserverDomain(),"/api/learn")
 	message(paste("Calling:", url))
 	
 	contextDatasets = .handleContexts(contextDatasets, projectName = projectName,uncompressedUpload = uncompressedUpload)
@@ -733,7 +733,7 @@ featureSearch.file = function(...) {
 # #' @examples
 # #' predictRes = SBpredict(modelRes$artifactPath, titanic_test_filename, "./titanic_test.tsv.gz")
 # SBpredict <- function(modelPath, dataPath, outputPath, server_port = 9000){
-#   url <- paste("http://127.0.0.1:",server_port,"/rapi/predict", sep="")
+#   url <- paste("http://127.0.0.1:",server_port,"/api/predict", sep="")
 # 	params <-list(modelPath = modelPath,
 # 		dataPath = dataPath,
 # 		outputPath = outputPath)

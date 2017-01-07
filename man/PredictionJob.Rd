@@ -14,7 +14,7 @@ SB object that encapsulates a prediction job
 \section{Fields}{
 
 \describe{
-\item{\code{executionId}}{prediction job id}
+\item{\code{jobId}}{prediction job id}
 }}
 \examples{
 # Prediction example
