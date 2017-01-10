@@ -632,7 +632,7 @@
 
 .sdkError = function(message, call) {
 	structure(
-		class = c("SdkError", "condition"),
+		class = c("SdkError", "error", "condition"),
 		list(message = message, call = call)
 	)
 }
