@@ -14,7 +14,6 @@ algorithms = list(
 			LibSVM = "weka.classifiers.functions.LibSVM",
 			LinearRegression = "weka.classifiers.functions.LinearRegression",
 			Logistic = "weka.classifiers.functions.Logistic",
-			SimpleLinearRegression = "weka.classifiers.functions.SimpleLinearRegression",
 			SMO = "weka.classifiers.functions.SMO",
 			SMOreg = "weka.classifiers.functions.SMOreg",
 			VotedPerceptron = "weka.classifiers.functions.VotedPerceptron",
@@ -29,7 +28,6 @@ algorithms = list(
 			RegressionByDiscretization = "weka.classifiers.meta.RegressionByDiscretization",
 			DecisionTable = "weka.classifiers.rules.DecisionTable",
 			ZeroR = "weka.classifiers.rules.ZeroR",
-			Id3 = "weka.classifiers.trees.Id3",
 			RandomForest = "weka.classifiers.trees.RandomForest",
 			REPTree = "weka.classifiers.trees.REPTree",
 			J48 = "J48"
@@ -63,7 +61,6 @@ algorithms = list(
 			RRandomForest = "RRandomForest",
 			RRidgeGlmNet = "RRidgeGlmNet",
 			RRpartDecisionTree = "RRpartDecisionTree",
-			RStackingEnsembleGBM_of_GBM_with_Rpart = "RStackingEnsembleGBM_of_GBM_with_Rpart",
 			RXGBoost = "RXGBoost"
 		),
 

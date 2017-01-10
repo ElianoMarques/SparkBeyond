@@ -308,7 +308,6 @@ modelBuildingControl = function(
 #' @param ridgeGlmnet logistic regression / linear regression algorithm with alpha = 1 from the glmnet package.  
 #' @param linearRegression linear regression algorithm. lm from the base package.  
 #' @param linearEnsemble A linear ensemble of a collection of GBM and rpart algorithms.
-#' @param stackingEnsemble A stacking ensemble of GBM as meta-model that ensmebles a collection of GBM and rpart algorithms.
 #' @param naiveBayes.weka Classification algorithm. A naive Bayes classifier is a simple probabilistic classifier based on applying Bayes' theorem with strong independence assumptions.
 #' @param bagging.weka bagging a classifier to reduce variance Can do classification and regression.
 #' @param votedPerceptron.weka Classification algorithm. The perceptron is an algorithm for supervised classification of an input into one of several possible non-binary outputs.
@@ -334,7 +333,6 @@ algorithmsList = function(
 		ridgeGlmnet = FALSE,
 		linearRegression = FALSE,
 		linearEnsemble = FALSE,
-		stackingEnsemble = FALSE,
 		naiveBayes.weka = FALSE,
 		bagging.weka = FALSE,
 		votedPerceptron.weka = FALSE,
@@ -358,7 +356,6 @@ algorithmsList = function(
 		if (lassoGlmnet) algsList = c(algsList, "RLassoLogisticRegressionGlmnetClassifier", "RLassoLinearRegressionGlmnetRegressor")
 		if (ridgeGlmnet) algsList = c(algsList, "RRidgeLogisticRegressionGlmnetClassifier",  "RRidgeLinearRegressionGlmnetRegressor")
 		if (linearEnsemble) algsList = c(algsList, "RLinearEnsembleGBM_with_RpartClassifier", "RLinearEnsembleGBM_with_RpartRegressor")
-		if (stackingEnsemble) algsList = c(algsList, "RStackingEnsembleGBM_of_GBM_with_RpartClassifier", "RStackingEnsembleGBM_of_GBM_with_RpartRegressor")
 
 		if (linearRegression) algsList = c(algsList, "RLinearRegressionLMRegressor")
 		

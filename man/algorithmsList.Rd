@@ -7,7 +7,7 @@
 algorithmsList(isClassification = NA, randomForest = TRUE, zeroR = FALSE,
   xgBoost = FALSE, GBM = FALSE, rpart = FALSE, lassoGlmnet = FALSE,
   ridgeGlmnet = FALSE, linearRegression = FALSE, linearEnsemble = FALSE,
-  stackingEnsemble = FALSE, naiveBayes.weka = FALSE, bagging.weka = FALSE,
+  naiveBayes.weka = FALSE, bagging.weka = FALSE,
   votedPerceptron.weka = FALSE, classificationViaClustering.weka = FALSE,
   classificationViaRegression.weka = FALSE, randomSubSpace.weka = FALSE,
   bayesNet.weka = FALSE, libSVM.weka = FALSE, adaBoostM1.weka = FALSE,
@@ -34,8 +34,6 @@ algorithmsList(isClassification = NA, randomForest = TRUE, zeroR = FALSE,
 \item{linearRegression}{linear regression algorithm. lm from the base package.}
 
 \item{linearEnsemble}{A linear ensemble of a collection of GBM and rpart algorithms.}
-
-\item{stackingEnsemble}{A stacking ensemble of GBM as meta-model that ensmebles a collection of GBM and rpart algorithms.}
 
 \item{naiveBayes.weka}{Classification algorithm. A naive Bayes classifier is a simple probabilistic classifier based on applying Bayes' theorem with strong independence assumptions.}
 
