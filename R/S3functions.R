@@ -80,6 +80,7 @@ preProcessingControl = function(
 		list(
 			emptyValuePolicy = emptyValuePolicy,
 			fileEncoding = fileEncoding,
+			linesForTypeDetection = linesForTypeDetection,
 			fileEscaping = fileEscaping
 		)
 	)
