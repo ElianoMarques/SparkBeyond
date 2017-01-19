@@ -1,17 +1,51 @@
 library(R6)
 
-#' SB object that encapsulates an enrichment job
+#' @title
+#' EnrichmentJob
+#' @description 
+#' \section{SB object that encapsulates a enrichment job}
 #' 
-#' @examples
+#' \section{\bold{Methods}}{
+#' 
+#' \subsection{\code{currentStatus()}}{
+#' \emph{Print the current job status to console}
+#' }
+#' 
+#' \subsection{\code{data(localFileName, runBlocking)}}{
+#' \emph{Retreive the job result as a DataFrame. By default, if the data is not currently available, the function will block until the result is ready, and download it}
+#' \itemize{
+#'   \item \code{localFileName} - chose the name of the file the result will be stored in 
+#'   \item \code{runBlocking} - if TRUE - wait for the result to be available and downloaded, and then return the result. If FALSE - return the data immediately if available, return NULL otherwise. Defaults to TRUE.  
+#' }
+#' }
+#' 
+#' \subsection{\code{cancel()}}{
+#' \emph{Cancel the job}
+#' }
+#' }
+#' 
+#' @usage
 #' # Enrichment example
 #' \donttest{
 #' # Learn
 #' session = learn("titanic", getData("titanic_train"), target="survived")
-#' # Non blocking enrich
-#' enrichment = session$enrich(getData("titanic_test"), async=TRUE)
-#' enrichment$currentStatus()
-#' data = enrichment$data()
+#' 
+#' # enrich function returns EnrichmentJob object
+#' enrichmentJob = session$enrich(getData("titanic_test"))
+#' 
+#' # currentStatus() function can be used to show job's status
+#' enrichmentJob$currentStatus()
+#' 
+#' # use data() function to retreive the job result as a DataFrame
+#' data = enrichmentJob$data()
 #' head(data)
+#' }
+#' 
+#' # A job can be canceled using the cancel() function
+#' \donttest{
+#' session = learn("titanic", getData("titanic_train"), target="survived")
+#' enrichmentJob = session$enrich(getData("titanic_test"))
+#' enrichmentJob$cancel()
 #' }
 EnrichmentJob = R6Class("EnrichmentJob",
 	 lock_objects = TRUE,

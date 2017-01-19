@@ -1,18 +1,81 @@
 library(R6)
 
-#' SB object that encapsulates a prediction job
+#' @title
+#' PredictionJob
+#' @description 
+#' \section{SB object that encapsulates a prediction job}
 #' 
-#' @field jobId prediction job id
-#' @examples
+#' \section{\bold{Methods}}{
+#' 
+#' \subsection{\code{currentStatus()}}{
+#' \emph{Print the current job status to console}
+#' }
+#' 
+#' \subsection{\code{data(localFileName, runBlocking)}}{
+#' \emph{Retreive the job result as a DataFrame. By default, if the data is not currently available, the function will block until the result is ready, and download it}
+#' \itemize{
+#'   \item \code{localFileName} - chose the name of the file the result will be stored in 
+#'   \item \code{runBlocking} - if TRUE - wait for the result to be available and downloaded, and then return the result. If FALSE - return the data immediately if available, return NULL otherwise. Defaults to TRUE.  
+#' }
+#' }
+#' 
+#' \subsection{\code{cancel()}}{
+#' \emph{Cancel the job}
+#' }
+#' 
+#' \subsection{\code{downloadReports(percentOfPopulationToPlot, outputName)}}{
+#' \emph{Download all the prediction reports as an archived file.}
+#' You can get several reports for prediction results: lift plots, evaluation, etc.
+#' Most of the reports require the target column to be present in prediction input
+#' \itemize{
+#'   \item \code{percentOfPopulationToPlot} - percentage of population for lift plots. Defaults to 0.2.
+#'   \item \code{outputName} - chose the name of the file the result will be stored in.  
+#' }
+#' }
+#' 
+#' \subsection{\code{browseReports(percentOfPopulationToPlot)}}{
+#' \emph{Browse the list of the available reports.}
+#' You can chose to view a specific report from the list of the available reports.
+#' \itemize{
+#'   \item \code{percentOfPopulationToPlot} - percentage of population for lift plots. Defaults to 0.2.
+#' }
+#' }
+#' 
+#' \subsection{\code{evaluate()}}{
+#' \emph{Get prediction evaluation. Also available via downloadReports and browseReports.}
+#' }
+#' }
+#' 
+#' @usage
 #' # Prediction example
 #' \donttest{
-#' # Learn
 #' session = learn("titanic", getData("titanic_train"), target="survived")
-#' # Non blocking predict
-#' prediction = session$predict(getData("titanic_test"), async=TRUE)
-#' prediction$currentStatus()
-#' data = prediction$data()
+#' 
+#' # predict function returns a PredictionJob object
+#' predictionJob = session$predict(getData("titanic_test"))
+#' 
+#' # currentStatus() function can be used to show job's status
+#' predictionJob$currentStatus()
+#' 
+#' # use data() function to retreive the job result as a DataFrame
+#' data = predictionJob$data()
 #' head(data)
+#' 
+#' # You can use downloadReports() to download a zip file containing all reports
+#' predictionJob$downloadReports()
+#' 
+#' # You can also browse the list of the available reports using browseReports() function and chose to download a specific report 
+#' predictionJob$browseReports()
+#' 
+#' # Prediction evaluation is available both as one of the reports and via dedicated function, evaluate()
+#' predictionJob$evaluate()
+#' }
+#' 
+#' # A job can be canceled using the cancel() function
+#' \donttest{
+#' session = learn("titanic", getData("titanic_train"), target="survived")
+#' predictionJob = session$predict(getData("titanic_test"))
+#' predictionJob$cancel()
 #' }
 PredictionJob = R6Class("PredictionJob",
 		lock_objects = TRUE,
