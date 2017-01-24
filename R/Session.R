@@ -207,7 +207,7 @@ Session = setRefClass("Session",
         extraParams = list(...)
         uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
         fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
-        async = ifelse(!is.null(extraParams$async), extraParams$async, FALSE)
+        async = ifelse(!is.null(extraParams$async), extraParams$async, TRUE)
         enrichedColumnsOnly = ifelse(!is.null(extraParams$enrichedColumnsOnly), extraParams$enrichedColumnsOnly, TRUE) #Removed in 1.10
         includeOriginals = includeOriginals || !enrichedColumnsOnly #Added in 1.10
         
@@ -311,7 +311,7 @@ Session = setRefClass("Session",
         extraParams = list(...)
         uncompressedUpload = ifelse(!is.null(extraParams$uncompressedUpload), extraParams$uncompressedUpload, FALSE)
         fileUploadThreshold = ifelse(uncompressedUpload, NA, 0)
-        async = ifelse(!is.null(extraParams$async), extraParams$async, FALSE)
+        async = ifelse(!is.null(extraParams$async), extraParams$async, TRUE)
         predictionColumnsOnly = ifelse(!is.null(extraParams$predictionColumnsOnly), extraParams$predictionColumnsOnly, TRUE)
         includeOriginals = includeOriginals || !predictionColumnsOnly
         includeEnriched = includeEnriched
