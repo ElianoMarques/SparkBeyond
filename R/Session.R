@@ -329,6 +329,12 @@ Session = setRefClass("Session",
       
         contextDatasets = .handleContexts(contextDatasets, projectName = projectName,uncompressedUpload = uncompressedUpload)
 
+        realIncludeOriginals = FALSE
+        if(!.isServerVersionOlderThan("1.10") && .isServerVersionOlderThan("1.11")) {
+        	 realIncludeOriginals = includeOriginals
+        	 includeOriginals = FALSE
+        }
+        
         params <-list(projectName = projectName,
         							revision = revision,
         							modelPath = artifact_loc,
@@ -400,7 +406,11 @@ Session = setRefClass("Session",
         								 "PredictionJob$new(jobId=", quoted(predictJobId), ")"))
         	
         	if(runBlocking) {
-        		unusedRefToData = predictionJob$data(localFileName = outputName)
+        		if(realIncludeOriginals == TRUE) { # Workaround for 1.10
+        			unusedRefToData = predictionJob$data(localFileName = outputName, originalInput=data)
+        		} else {
+        			unusedRefToData = predictionJob$data(localFileName = outputName)
+        		}
         	}
         	
         	predictionJob

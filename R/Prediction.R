@@ -108,7 +108,7 @@ PredictionJob = R6Class("PredictionJob",
 													 ". Started: ", as.POSIXct(state$startedMillis, origin="1970-01-01"),
 													 ". Ended: ", as.POSIXct(state$endedMillis, origin="1970-01-01")))
 					} else {
-						stop(paste0("Prediction failed: ", result$error, ". Worker ID: ", state$workerId, 
+						stop(paste0("Prediction failed: ", result$error, ". Worker ID: ", state$workerId,
 												". Started: ", as.POSIXct(state$startedMillis, origin="1970-01-01"),
 												". Ended: ", as.POSIXct(state$endedMillis, origin="1970-01-01")))
 					}
@@ -213,7 +213,7 @@ PredictionJob = R6Class("PredictionJob",
 				}
 			},
 			
-			data = function(localFileName = NA_character_, runBlocking=TRUE) {
+			data = function(localFileName = NA_character_, runBlocking=TRUE, originalInput = NULL) {
 				"Set \\code{localFileName} to change the default result file name. If \\code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{runBlocking} is FALSE return the data if available, else return NULL"
 				outputName = ifelse(is.na(localFileName), paste("predicted", private$jobId, sep = "-"), localFileName)
 				if(!is.null(private$dataFrame)) { # todo: check status and download
@@ -256,7 +256,7 @@ PredictionJob = R6Class("PredictionJob",
 						predictedData = .downloadDataFrame(projectName, revision, pathOnServer = result, saveToPath = paste0(outputName, ".tsv.gz"))
 						
 						if(!is.null(predictedData)) {
-							private$dataFrame = predictedData
+								private$dataFrame = predictedData
 							private$dataFrame
 						} else {
 							message("Failed to download the prediction result")
@@ -276,7 +276,16 @@ PredictionJob = R6Class("PredictionJob",
 								if(result$isSucceeded) {
 									downloadUrl = paste0(getSBserverDomain(),"/api/downloadJobResult/", private$jobId)
 									predictedFile = .download(downloadUrl, localFile = paste0(outputName, ".tsv.gz"), description = paste("prediction result for job:", private$jobId))
-									private$dataFrame = read.table(predictedFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
+									predictedResult = read.table(predictedFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
+									if(!is.null(originalInput)) { # Workaround for 1.10
+										res_col_names = names(predictedResult)
+										target_predicted_col_name = res_col_names[grepl("_predicted", res_col_names)]
+										target_col_name = gsub("_predicted", "", target_predicted_col_name)
+										result_without_target = predictedResult[!(names(predictedResult) %in% c(target_col_name))]
+										private$dataFrame = cbind(originalInput, result_without_target)
+									} else {
+										private$dataFrame = predictedResult
+									}
 								} else {
 									stop(paste("Prediction failed with an error:", result$failure))
 								}
