@@ -407,7 +407,12 @@ Session = setRefClass("Session",
         	
         	if(runBlocking) {
         		if(realIncludeOriginals == TRUE) { # Workaround for 1.10
-        			unusedRefToData = predictionJob$data(localFileName = outputName, originalInput=data)
+        			input = if(is.na(columnsWhiteList)) {
+        				data
+        			} else {
+        				data[(names(data) %in% columnsWhiteList)]
+        			}
+        			unusedRefToData = predictionJob$data(localFileName = outputName, originalInput=input)
         		} else {
         			unusedRefToData = predictionJob$data(localFileName = outputName)
         		}
