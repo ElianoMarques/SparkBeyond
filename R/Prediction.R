@@ -213,7 +213,7 @@ PredictionJob = R6Class("PredictionJob",
 				}
 			},
 			
-			data = function(localFileName = NA_character_, runBlocking=TRUE, originalInput = NULL) {
+			data = function(localFileName = NA_character_, runBlocking=TRUE, ...) {
 				"Set \\code{localFileName} to change the default result file name. If \\code{runBlocking} is TRUE, block until the job finishes while showing processed rows counter, and return the result when available. If \\code{runBlocking} is FALSE return the data if available, else return NULL"
 				outputName = ifelse(is.na(localFileName), paste("predicted", private$jobId, sep = "-"), localFileName)
 				if(!is.null(private$dataFrame)) { # todo: check status and download
@@ -277,12 +277,15 @@ PredictionJob = R6Class("PredictionJob",
 									downloadUrl = paste0(getSBserverDomain(),"/api/downloadJobResult/", private$jobId)
 									predictedFile = .download(downloadUrl, localFile = paste0(outputName, ".tsv.gz"), description = paste("prediction result for job:", private$jobId))
 									predictedResult = read.table(predictedFile, sep="\t", header=TRUE, stringsAsFactors = FALSE, comment.char = "")
-									if(!is.null(originalInput)) { # Workaround for 1.10
+									extraParams = list(...)
+									originalInput = extraParams$originalInput
+									if(.overrideOriginalColumnsInPredict() && !is.null(originalInput)) { # Workaround for 1.10-1.10.1
 										res_col_names = names(predictedResult)
-										target_predicted_col_name = res_col_names[grepl("_predicted", res_col_names)]
-										target_col_name = gsub("_predicted", "", target_predicted_col_name)
-										result_without_target = predictedResult[!(names(predictedResult) %in% c(target_col_name))]
-										private$dataFrame = cbind(originalInput, result_without_target)
+										input_column_names = names(originalInput)
+										original_column_names_in_result = res_col_names[res_col_names %in% input_column_names]
+										original_columns = originalInput[input_column_names %in% original_column_names_in_result]
+										result_without_original_columns = predictedResult[!(res_col_names %in% original_column_names_in_result)]
+										private$dataFrame = cbind(original_columns, result_without_original_columns)
 									} else {
 										private$dataFrame = predictedResult
 									}
@@ -305,8 +308,8 @@ PredictionJob = R6Class("PredictionJob",
 			
 			downloadReports = function(percentOfPopulationToPlot = 0.2, outputName = "prediction_reports") {
 				"Download all reports as a zip archive. \\code{percentOfPopulationToPlot} percentage of population for lift plots. Set \\code{outputName} to change the default result file name"
-				if(.isServerVersionOlderThan("1.10")) {
-					stop("downloadReports is available starting from server version 1.10. Currently used version: ", SBServerVersion)
+				if(.isServerVersionOlderThan("1.10.2")) {
+					stop("downloadReports is available starting from server version 1.10.2. Currently used version: ", SBServerVersion)
 				}
 				
 				completedReportsGenerationJobId = private$executeReportsGeneration(percentOfPopulationToPlot)
@@ -316,8 +319,8 @@ PredictionJob = R6Class("PredictionJob",
 			
 			browseReports = function(percentOfPopulationToPlot = 0.2) {
 				"Show interactive list of the available reports - enter a report number to browse to the report. \\code{percentOfPopulationToPlot} percentage of population for lift plots."
-				if(.isServerVersionOlderThan("1.10")) {
-					stop("browseReports is available starting from server version 1.10. Currently used version: ", SBServerVersion)
+				if(.isServerVersionOlderThan("1.10.2")) {
+					stop("browseReports is available starting from server version 1.10.2. Currently used version: ", SBServerVersion)
 				}
 				
 				completedReportsGenerationJobId = private$executeReportsGeneration(percentOfPopulationToPlot)
@@ -340,8 +343,8 @@ PredictionJob = R6Class("PredictionJob",
 			
 			evaluate = function() {
 				"Returns an evaluation object containing various information on the run including evaluation metric that was used, evaluation score, precision, confusion matrix, number of correct and incorrect instances, AUC information and more."
-				if(.isServerVersionOlderThan("1.10")) {
-					stop("downloadReports is available starting from server version 1.10. Currently used version: ", SBServerVersion)
+				if(.isServerVersionOlderThan("1.10.2")) {
+					stop("downloadReports is available starting from server version 1.10.2. Currently used version: ", SBServerVersion)
 				}
 				
 				completedReportsGenerationJobId = private$executeReportsGeneration()
@@ -360,7 +363,7 @@ PredictionJob = R6Class("PredictionJob",
 					stop("cancel is available starting from server version 1.10. Currently used version: ", SBServerVersion)
 				}
 				
-				private$job$cancel()
+				res = private$job$cancel()
 			}
 		)
 )

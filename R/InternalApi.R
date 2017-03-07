@@ -532,6 +532,10 @@
 	compareVersion(SBServerVersion, version) < 0
 }
 
+.overrideOriginalColumnsInPredict = function() {
+	compareVersion(SBServerVersion, "1.10") >= 0 && compareVersion(SBServerVersion, "1.10.2") < 0
+}
+
 
 .showReport = function(report_path = NA, projectName, revision){ #confine to a specific list
 	"\\code{report_path} path of report to show"        
