@@ -178,16 +178,22 @@ isLatestVersion = function() {
 #General:
 #' A function to update the package from github
 updatePackage = function() {
-  #if (! isLatestRpackage()) { #just to be on the safe side for now - not included in the if
-    devtools::install_github("zinman/SparkBeyond")
-  #}
-  #assuming package updated successfully
-  filename = "SparkBeyondLatestVersion.RData"
-  url = "https://api.github.com/repos/zinman/SparkBeyond/git/refs/heads/master"
-  res = httr::GET(url, httr::content_type_json())
-  res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
-  SparkBeyondLatestVersion = res$object$sha
-  save(SparkBeyondLatestVersion, file=filename)
+	.assertUserAuthenticated("You need to login in order to update the package")
+	if(!.isServerVersionOlderThan("1.11")) {
+		.install(SBhost)
+		message("RStudio requires to restart the R session following the update")
+	} else {
+	  #if (! isLatestRpackage()) { #just to be on the safe side for now - not included in the if
+	    devtools::install_github("zinman/SparkBeyond")
+	  #}
+	  #assuming package updated successfully
+	  filename = "SparkBeyondLatestVersion.RData"
+	  url = "https://api.github.com/repos/zinman/SparkBeyond/git/refs/heads/master"
+	  res = httr::GET(url, httr::content_type_json())
+	  res <- jsonlite::fromJSON(txt=httr::content(res, as="text"),simplifyDataFrame=TRUE)
+	  SparkBeyondLatestVersion = res$object$sha
+	  save(SparkBeyondLatestVersion, file=filename)
+	}
 }
 
 #' A function to check if the current version is the latest one
@@ -278,6 +284,10 @@ login = function(username, password=NA, domain) {
 	if(loggedIn) {
 		releaseNumber = serverVersion()$releaseNumber
 		assign("SBServerVersion", releaseNumber, envir = globalenv())
+		
+		if(!.isServerVersionOlderThan("1.11")) {
+			stop("Current client version is not compatible with the server version ", SBServerVersion, ", please run updatePackage()")
+		}
 	} else {
 		stop ("Login failed. Please check your credentials.")
 	}

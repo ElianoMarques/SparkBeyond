@@ -794,10 +794,19 @@
 	result
 }
 
-.assertUserAuthenticated = function() {
+.assertUserAuthenticated = function(message=NULL) {
 	url <- paste0(getSBserverDomain(), "/currentUser")
-	userInfo = .executeRequest(
-		function() httr::GET(url, encode = "form"),
-		responseSerializer = .responseSerializers$JSON
-	)
+	tryCatch({
+		userInfo = .executeRequest(
+			function() httr::GET(url, encode = "form"),
+			responseSerializer = .responseSerializers$JSON
+		)
+	}, error = function(e) {
+		if(!is.null(message)) {
+			stop(message)
+		} else {
+			stop(e)
+		}
+	})
+	
 }
